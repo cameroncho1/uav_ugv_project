@@ -353,14 +353,6 @@ The simulation uses UDP port `8888`.
 # Build PX4
 
 ```bash
-cd ~/uav_ugv_project
-
-./scripts/build_px4.sh
-```
-
-Manual equivalent:
-
-```bash
 cd ~/uav_ugv_project/external/PX4-Autopilot
 make px4_sitl
 ```
