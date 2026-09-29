@@ -3,41 +3,15 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Engineering design review for the UAV-UGV cooperative localization subsystem.">
-  <title>UGV Localization with UAV-Assisted Positioning</title>
+  <meta name="description" content="Design overview and first steps for the UGV cooperative localization subsystem.">
+  <title>UGV Localization</title>
   <style>
     :root {
-      color-scheme: light dark;
-      --bg: #f2f4f2;
-      --surface: #e8ece9;
-      --surface-strong: #dce2de;
-      --ink: #17201e;
-      --muted: #596661;
-      --line: #bdc7c1;
-      --accent: #b84f32;
-      --accent-soft: #f1d8ce;
-      --accent-ink: #71301e;
-      --inverse: #eef2ef;
-      --inverse-bg: #26302d;
-      --radius: 12px;
-      --font-sans: "Aptos", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
-      --font-mono: "Cascadia Code", "SFMono-Regular", Consolas, monospace;
-    }
-
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --bg: #121816;
-        --surface: #1b2421;
-        --surface-strong: #26312d;
-        --ink: #e8eeea;
-        --muted: #aab6b0;
-        --line: #46534e;
-        --accent: #df7857;
-        --accent-soft: #47291f;
-        --accent-ink: #ffd5c7;
-        --inverse: #16201d;
-        --inverse-bg: #dce5e0;
-      }
+      color-scheme: light;
+      --bg: #ffffff;
+      --ink: #000000;
+      --font: "Aptos", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+      --mono: "Cascadia Code", "SFMono-Regular", Consolas, monospace;
     }
 
     * {
@@ -52,7 +26,7 @@
       overflow: hidden;
       background: var(--bg);
       color: var(--ink);
-      font-family: var(--font-sans);
+      font-family: var(--font);
     }
 
     button {
@@ -60,16 +34,10 @@
       font: inherit;
     }
 
-    .presentation {
-      position: relative;
-      min-height: 100dvh;
-      isolation: isolate;
-    }
-
-    .topbar {
+    .topbar,
+    .bottombar {
       position: fixed;
       z-index: 4;
-      top: 0;
       left: 0;
       right: 0;
       height: 58px;
@@ -78,28 +46,35 @@
       justify-content: space-between;
       gap: 24px;
       padding: 0 clamp(22px, 4vw, 64px);
-      border-bottom: 1px solid var(--line);
       background: var(--bg);
     }
 
+    .topbar {
+      top: 0;
+      border-bottom: 1px solid var(--ink);
+    }
+
+    .bottombar {
+      bottom: 0;
+      border-top: 1px solid var(--ink);
+    }
+
     .topbar-title {
-      font-size: 0.82rem;
-      font-weight: 650;
-      letter-spacing: 0.01em;
+      font-size: 0.85rem;
+      font-weight: 700;
       white-space: nowrap;
     }
 
     .topbar-context {
       overflow: hidden;
-      color: var(--muted);
-      font-size: 0.78rem;
+      font-size: 0.85rem;
       text-overflow: ellipsis;
       white-space: nowrap;
     }
 
     .slides {
       position: fixed;
-      inset: 58px 0 58px;
+      inset: 58px 0;
     }
 
     .slide {
@@ -107,25 +82,27 @@
       inset: 0;
       display: grid;
       place-items: center;
-      padding: clamp(28px, 4vw, 64px);
+      padding: clamp(24px, 3.5vw, 56px) clamp(22px, 4vw, 64px);
       visibility: hidden;
       opacity: 0;
-      transform: translateY(8px);
       pointer-events: none;
-      transition: opacity 180ms ease, transform 180ms ease, visibility 180ms;
+      overflow-y: auto;
     }
 
     .slide.active {
       visibility: visible;
       opacity: 1;
-      transform: translateY(0);
       pointer-events: auto;
     }
 
+    @media (prefers-reduced-motion: no-preference) {
+      .slide {
+        transition: opacity 150ms ease, visibility 150ms;
+      }
+    }
+
     .slide-inner {
-      width: min(100%, 1400px);
-      height: 100%;
-      min-height: 0;
+      width: min(100%, 1300px);
       display: grid;
       align-content: center;
     }
@@ -138,586 +115,270 @@
     }
 
     h1 {
-      max-width: 30ch;
-      margin-bottom: 24px;
-      font-size: clamp(2.8rem, 4.2vw, 3.35rem);
-      font-weight: 680;
-      letter-spacing: -0.055em;
-      line-height: 0.98;
+      max-width: 18ch;
+      margin-bottom: 28px;
+      font-size: clamp(2.6rem, 5.4vw, 4.6rem);
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      line-height: 1.02;
     }
 
     h2 {
-      max-width: none;
-      margin-bottom: 20px;
-      font-size: clamp(2rem, 3.6vw, 3.2rem);
-      font-weight: 660;
-      letter-spacing: -0.045em;
-      line-height: 1.02;
+      max-width: 30ch;
+      margin-bottom: 12px;
+      font-size: clamp(1.7rem, 3vw, 2.6rem);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.08;
     }
 
     h3 {
       margin-bottom: 10px;
-      font-size: clamp(1rem, 1.4vw, 1.25rem);
-      font-weight: 680;
-      letter-spacing: -0.015em;
+      font-size: clamp(1.05rem, 1.5vw, 1.3rem);
+      font-weight: 700;
     }
 
-    p {
-      color: var(--muted);
-      font-size: clamp(0.96rem, 1.35vw, 1.22rem);
-      line-height: 1.55;
+    p,
+    li {
+      font-size: clamp(0.95rem, 1.3vw, 1.18rem);
+      line-height: 1.45;
     }
 
     .lead {
-      max-width: 44ch;
+      max-width: 42ch;
       margin-bottom: 0;
-      color: var(--ink);
-      font-size: clamp(1.2rem, 2vw, 1.72rem);
-      line-height: 1.38;
+      font-size: clamp(1.15rem, 2vw, 1.6rem);
+      line-height: 1.4;
     }
 
-    .compact-lead {
-      max-width: 56ch;
-      margin-bottom: 28px;
+    .cite {
+      max-width: 66ch;
+      margin-bottom: clamp(18px, 2.6vw, 32px);
+      font-size: clamp(0.95rem, 1.3vw, 1.15rem);
+    }
+
+    .note {
+      max-width: 80ch;
+      margin: clamp(16px, 2.2vw, 26px) 0 0;
+      font-size: clamp(0.85rem, 1.1vw, 1rem);
     }
 
     .mono {
-      font-family: var(--font-mono);
+      font-family: var(--mono);
       font-size: 0.92em;
     }
 
-    .accent-text {
-      color: var(--accent);
+    ul,
+    ol {
+      margin: 0;
+      padding-left: 1.15em;
     }
 
-    .muted {
-      color: var(--muted);
+    li + li {
+      margin-top: 0.55em;
     }
 
-    .small {
-      font-size: clamp(0.75rem, 1vw, 0.9rem);
-      line-height: 1.45;
+    li span.sub {
+      display: block;
+      margin-top: 2px;
+      font-size: 0.85em;
     }
 
-    .caption {
-      margin: 12px 0 0;
-      color: var(--muted);
-      font-size: clamp(0.74rem, 0.92vw, 0.86rem);
-      line-height: 1.45;
-    }
-
-    .status-line {
-      display: inline-flex;
-      align-items: center;
-      width: fit-content;
-      margin-top: 28px;
-      padding-left: 14px;
-      border-left: 3px solid var(--accent);
-      color: var(--muted);
-      font-size: 0.86rem;
-      line-height: 1.4;
-    }
-
-    .hero-layout {
+    .columns {
+      --pad: clamp(24px, 4vw, 64px);
       display: grid;
-      grid-template-columns: minmax(0, 1.28fr) minmax(340px, 0.72fr);
-      gap: clamp(40px, 7vw, 112px);
-      align-items: center;
+      grid-template-columns: 1fr 1fr;
+      padding-top: clamp(20px, 2.6vw, 32px);
+      border-top: 1px solid var(--ink);
     }
 
-    .hero-visual {
+    .columns > section:first-child {
+      padding-right: var(--pad);
+    }
+
+    .columns > section + section {
+      padding-left: var(--pad);
+      border-left: 1px solid var(--ink);
+    }
+
+    .split {
       display: grid;
-      place-items: center;
-      min-height: 420px;
-      border-left: 1px solid var(--line);
-      padding-left: clamp(28px, 5vw, 72px);
-    }
-
-    .section-heading {
-      margin-bottom: clamp(24px, 3.5vw, 46px);
-    }
-
-    .section-heading h2 {
-      margin-bottom: 12px;
-    }
-
-    .section-heading p {
-      max-width: 58ch;
-      margin-bottom: 0;
-    }
-
-    .responsibility-layout {
-      display: grid;
-      grid-template-columns: 0.8fr 1.2fr;
-      gap: clamp(36px, 6vw, 96px);
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+      gap: clamp(28px, 5vw, 72px);
       align-items: center;
     }
 
-    .question-pair {
+    .hero {
       display: grid;
-      gap: 22px;
-      padding-left: 22px;
-      border-left: 1px solid var(--line);
-    }
-
-    .question-row {
-      display: grid;
-      grid-template-columns: 9rem 1fr;
-      gap: 20px;
-      align-items: baseline;
-    }
-
-    .question-row strong {
-      font-size: clamp(1.05rem, 1.5vw, 1.34rem);
-    }
-
-    .question-row span {
-      color: var(--muted);
-      font-size: clamp(0.92rem, 1.15vw, 1.05rem);
-      line-height: 1.45;
-    }
-
-    .impact-statement {
-      margin-top: 30px;
-      padding: 18px 20px;
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      background: var(--surface);
-      color: var(--ink);
-      font-size: clamp(1rem, 1.35vw, 1.2rem);
-      line-height: 1.45;
-    }
-
-    .drift-layout {
-      display: grid;
-      grid-template-columns: minmax(300px, 0.74fr) minmax(520px, 1.26fr);
-      gap: clamp(36px, 5vw, 76px);
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+      gap: clamp(28px, 5vw, 72px);
       align-items: center;
     }
 
-    .short-list {
-      display: grid;
-      gap: 18px;
-      margin: 24px 0 0;
-      padding: 0;
-      list-style: none;
+    svg {
+      display: block;
+      width: 100%;
+      height: auto;
+      max-height: 54vh;
     }
 
-    .short-list li {
-      display: grid;
-      grid-template-columns: 34px 1fr;
-      gap: 14px;
-      align-items: start;
-      color: var(--muted);
-      font-size: clamp(0.92rem, 1.2vw, 1.08rem);
-      line-height: 1.42;
+    svg text {
+      fill: #000;
+      font-family: var(--font);
+      font-size: 15px;
     }
 
-    .short-list .index {
-      color: var(--accent);
-      font-family: var(--font-mono);
-      font-size: 0.83rem;
+    svg .b {
       font-weight: 700;
-      line-height: 1.7;
+      font-size: 17px;
     }
 
-    .diagram-panel {
-      min-height: 390px;
-      display: grid;
-      place-items: center;
-      padding: clamp(16px, 2vw, 28px);
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      background: var(--surface);
+    svg .m {
+      font-family: var(--mono);
+      font-size: 14px;
     }
 
-    .architecture-flow {
+    svg .ln {
+      fill: none;
+      stroke: #000;
+      stroke-width: 2;
+    }
+
+    svg .thin {
+      fill: none;
+      stroke: #000;
+      stroke-width: 1.5;
+    }
+
+    svg .fill {
+      fill: #000;
+      stroke: none;
+    }
+
+    svg .heavy {
+      fill: #fff;
+      stroke: #000;
+      stroke-width: 3;
+    }
+
+    svg .box {
+      fill: #fff;
+      stroke: #000;
+      stroke-width: 1.5;
+    }
+
+    .flow {
       display: grid;
-      grid-template-columns: minmax(180px, 0.8fr) 44px minmax(220px, 1fr) 44px minmax(250px, 1.08fr);
-      gap: 10px;
-      align-items: center;
+      grid-template-columns: 1fr 40px 1fr 40px 1fr;
+      gap: 0;
+      align-items: stretch;
       margin-top: 8px;
     }
 
-    .input-stack {
-      display: grid;
-      gap: 12px;
+    .flow.three {
+      grid-template-columns: 1fr 40px 1fr;
+      margin-top: 0;
     }
 
-    .flow-node {
-      min-height: 58px;
-      display: grid;
-      align-content: center;
-      padding: 13px 16px;
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      background: var(--surface);
+    .box {
+      padding: 16px 18px;
+      border: 1px solid var(--ink);
     }
 
-    .flow-node strong {
-      font-size: clamp(0.88rem, 1.05vw, 1rem);
-      line-height: 1.2;
+    .box + .box {
+      margin-top: 10px;
     }
 
-    .flow-node span {
+    .box strong {
+      display: block;
+      font-size: clamp(0.95rem, 1.3vw, 1.15rem);
+    }
+
+    .box span {
+      display: block;
       margin-top: 4px;
-      color: var(--muted);
-      font-size: clamp(0.72rem, 0.86vw, 0.82rem);
-      line-height: 1.3;
+      font-size: clamp(0.8rem, 1.05vw, 0.95rem);
+      line-height: 1.35;
     }
 
-    .estimator-node {
-      min-height: 246px;
-      border: 2px solid var(--accent);
-      background: var(--accent-soft);
+    .box.heavy {
+      border-width: 3px;
     }
 
-    .estimator-node strong {
-      color: var(--accent-ink);
-      font-size: clamp(1.28rem, 1.9vw, 1.72rem);
-    }
-
-    .estimator-node span {
-      color: var(--accent-ink);
-    }
-
-    .output-node {
-      min-height: 246px;
-      background: var(--inverse-bg);
-      color: var(--inverse);
-    }
-
-    .output-node strong {
-      font-size: clamp(1.08rem, 1.45vw, 1.3rem);
-    }
-
-    .output-node span,
-    .output-node .output-row {
-      color: var(--inverse);
-    }
-
-    .output-details {
+    .stack {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px 14px;
-      margin-top: 22px;
+      align-content: start;
     }
 
-    .output-row {
-      padding-top: 8px;
-      border-top: 1px solid color-mix(in srgb, var(--inverse) 36%, transparent);
-      font-size: clamp(0.75rem, 0.92vw, 0.86rem);
+    .arrow + .stack,
+    .stack + .arrow + .stack {
+      align-content: center;
     }
 
-    .arrow-rail {
-      position: relative;
-      height: 2px;
-      background: var(--accent);
-    }
-
-    .arrow-rail::after {
-      content: "";
-      position: absolute;
-      top: 50%;
-      right: -1px;
-      width: 9px;
-      height: 9px;
-      border-top: 2px solid var(--accent);
-      border-right: 2px solid var(--accent);
-      transform: translateY(-50%) rotate(45deg);
-    }
-
-    .correction-layout {
+    .arrow {
       display: grid;
-      grid-template-columns: minmax(520px, 1.15fr) minmax(300px, 0.85fr);
-      gap: clamp(34px, 5vw, 72px);
-      align-items: center;
+      place-items: center;
+      font-size: 1.6rem;
     }
 
-    .scope-note {
-      display: grid;
-      gap: 18px;
-    }
-
-    .scope-block {
-      padding: 0 0 18px;
-      border-bottom: 1px solid var(--line);
-    }
-
-    .scope-block:last-child {
-      border-bottom: 0;
-    }
-
-    .scope-block p {
-      margin-bottom: 0;
-      font-size: clamp(0.88rem, 1.05vw, 1rem);
-    }
-
-    .system-diagram {
+    table {
       width: 100%;
-      height: min(52vh, 500px);
-      min-height: 390px;
+      max-width: 940px;
+      border-collapse: collapse;
     }
 
-    .interface-layout {
-      display: grid;
-      grid-template-columns: minmax(390px, 1.04fr) minmax(360px, 0.96fr);
-      gap: clamp(38px, 6vw, 92px);
-      align-items: center;
+    th,
+    td {
+      padding: 13px 16px 13px 0;
+      border-bottom: 1px solid var(--ink);
+      font-size: clamp(0.95rem, 1.3vw, 1.15rem);
+      line-height: 1.4;
+      text-align: left;
+      vertical-align: top;
     }
 
-    .interface-spec {
-      overflow: hidden;
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      background: var(--surface);
-    }
-
-    .interface-spec header {
-      padding: 16px 20px;
-      border-bottom: 1px solid var(--line);
-      color: var(--muted);
-      font-size: 0.82rem;
+    th {
       font-weight: 700;
+      border-bottom-width: 2px;
     }
 
-    .spec-body {
+    .kv th {
+      width: 8.5em;
+      border-bottom-width: 1px;
+    }
+
+    .steps {
       display: grid;
-      gap: 0;
-      padding: 8px 20px 20px;
+      gap: 14px;
+      max-width: 86ch;
+      padding-left: 1.6em;
     }
 
-    .spec-row {
-      display: grid;
-      grid-template-columns: 7rem 1fr;
-      gap: 18px;
-      padding: 15px 0;
-      border-bottom: 1px solid var(--line);
-    }
-
-    .spec-row:last-child {
-      border-bottom: 0;
-    }
-
-    .spec-row dt {
-      color: var(--muted);
-      font-size: 0.82rem;
-    }
-
-    .spec-row dd {
+    .steps li {
       margin: 0;
-      overflow-wrap: anywhere;
-      font-family: var(--font-mono);
-      font-size: clamp(0.8rem, 1vw, 0.95rem);
-      font-weight: 650;
-      line-height: 1.4;
+      font-size: clamp(0.98rem, 1.45vw, 1.28rem);
     }
 
-    .contract-rules {
-      display: grid;
-      gap: 20px;
-    }
-
-    .contract-rule {
-      display: grid;
-      grid-template-columns: 9rem 1fr;
-      gap: 20px;
-      align-items: baseline;
-    }
-
-    .contract-rule strong {
-      font-size: 0.96rem;
-    }
-
-    .contract-rule span {
-      color: var(--muted);
-      font-size: clamp(0.85rem, 1.05vw, 0.98rem);
-      line-height: 1.42;
-    }
-
-    .frame-conversion {
-      display: grid;
-      grid-template-columns: 1fr 46px 1fr;
-      gap: 12px;
-      align-items: center;
-      margin-top: 28px;
-      padding-top: 24px;
-      border-top: 1px solid var(--line);
-    }
-
-    .frame-box {
-      padding: 14px;
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      background: var(--surface);
-      text-align: center;
-    }
-
-    .frame-box strong {
+    .steps li span {
       display: block;
-      font-family: var(--font-mono);
-      font-size: 1rem;
-    }
-
-    .frame-box span {
-      color: var(--muted);
-      font-size: 0.78rem;
-    }
-
-    .evaluation-layout {
-      display: grid;
-      grid-template-columns: minmax(0, 1.2fr) minmax(270px, 0.8fr);
-      gap: clamp(36px, 5vw, 72px);
-      align-items: center;
-    }
-
-    .scenario-list {
-      display: grid;
-      gap: 16px;
-    }
-
-    .scenario {
-      display: grid;
-      grid-template-columns: 2.2fr 1fr;
-      gap: 20px;
-      align-items: center;
-      min-height: 88px;
-      padding: 14px 18px;
-      border-left: 4px solid var(--line);
-      background: var(--surface);
-    }
-
-    .scenario.emphasis {
-      border-left-color: var(--accent);
-      background: var(--accent-soft);
-    }
-
-    .scenario strong {
-      display: block;
-      margin-bottom: 5px;
-      font-size: clamp(0.95rem, 1.2vw, 1.1rem);
-    }
-
-    .scenario span {
-      color: var(--muted);
-      font-size: clamp(0.75rem, 0.9vw, 0.85rem);
-      line-height: 1.35;
-    }
-
-    .metrics {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 18px 26px;
-      padding-left: 26px;
-      border-left: 1px solid var(--line);
-    }
-
-    .metric {
-      min-height: 58px;
-    }
-
-    .metric strong {
-      display: block;
-      margin-bottom: 4px;
-      font-size: clamp(0.88rem, 1.05vw, 1rem);
-    }
-
-    .metric span {
-      color: var(--muted);
-      font-size: clamp(0.74rem, 0.86vw, 0.82rem);
-      line-height: 1.35;
-    }
-
-    .evaluation-question {
-      grid-column: 1 / -1;
-      margin-top: 18px;
-      padding: 18px 20px;
-      border: 1px solid var(--accent);
-      border-radius: var(--radius);
-      color: var(--accent-ink);
-      background: var(--accent-soft);
-      font-size: clamp(1rem, 1.35vw, 1.2rem);
-      font-weight: 670;
-      line-height: 1.4;
-    }
-
-    .boundaries {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: clamp(42px, 7vw, 110px);
-      margin-top: 26px;
-    }
-
-    .boundary-column {
-      padding-top: 18px;
-      border-top: 3px solid var(--accent);
-    }
-
-    .boundary-column.out {
-      border-top-color: var(--line);
-    }
-
-    .boundary-column h3 {
-      margin-bottom: 18px;
-      font-size: clamp(1.2rem, 1.7vw, 1.5rem);
-    }
-
-    .boundary-column ul {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px 22px;
-      margin: 0;
-      padding: 0;
-      list-style: none;
-    }
-
-    .boundary-column li {
-      padding-left: 14px;
-      border-left: 1px solid var(--line);
-      color: var(--muted);
-      font-size: clamp(0.82rem, 1vw, 0.94rem);
-      line-height: 1.4;
-    }
-
-    .closing-statement {
-      max-width: 76ch;
-      margin: 34px 0 0;
-      color: var(--ink);
-      font-size: clamp(1rem, 1.42vw, 1.25rem);
-      line-height: 1.45;
-    }
-
-    .bottombar {
-      position: fixed;
-      z-index: 4;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      height: 58px;
-      display: grid;
-      grid-template-columns: 1fr auto 1fr;
-      align-items: center;
-      gap: 20px;
-      padding: 0 clamp(22px, 4vw, 64px);
-      border-top: 1px solid var(--line);
-      background: var(--bg);
+      margin-top: 2px;
+      font-size: clamp(0.85rem, 1.1vw, 1rem);
     }
 
     .nav-button {
-      width: fit-content;
-      min-width: 76px;
-      padding: 8px 12px;
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      background: var(--surface);
+      min-width: 108px;
+      min-height: 38px;
+      padding: 0 18px;
+      border: 1px solid var(--ink);
+      border-radius: 0;
+      background: var(--bg);
       cursor: pointer;
-      font-size: 0.8rem;
-      font-weight: 650;
-      transition: background 140ms ease, transform 100ms ease;
+      font-size: 0.85rem;
     }
 
     .nav-button:hover:not(:disabled) {
-      background: var(--surface-strong);
+      background: var(--ink);
+      color: var(--bg);
     }
 
     .nav-button:active:not(:disabled) {
@@ -726,261 +387,92 @@
 
     .nav-button:focus-visible,
     .segment:focus-visible {
-      outline: 3px solid color-mix(in srgb, var(--accent) 55%, transparent);
-      outline-offset: 2px;
+      outline: 2px solid var(--ink);
+      outline-offset: 3px;
     }
 
     .nav-button:disabled {
+      opacity: 0.35;
       cursor: default;
-      opacity: 0.42;
-    }
-
-    #nextButton {
-      justify-self: end;
-    }
-
-    .navigation-status {
-      display: flex;
-      align-items: center;
-      gap: 18px;
     }
 
     .segments {
-      display: grid;
-      grid-template-columns: repeat(9, 22px);
-      gap: 5px;
+      flex: 1;
+      display: flex;
+      gap: 6px;
+      max-width: 520px;
     }
 
     .segment {
-      width: 22px;
-      height: 4px;
+      flex: 1;
+      height: 18px;
       padding: 0;
       border: 0;
-      border-radius: 2px;
-      background: var(--line);
+      background: transparent;
       cursor: pointer;
+      position: relative;
     }
 
-    .segment.current {
-      background: var(--accent);
+    .segment::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 8px;
+      height: 2px;
+      background: var(--ink);
+      opacity: 0.25;
+    }
+
+    .segment.current::after {
+      opacity: 1;
     }
 
     .counter {
-      min-width: 4.4rem;
-      color: var(--muted);
-      font-family: var(--font-mono);
-      font-size: 0.76rem;
+      min-width: 64px;
+      font-size: 0.85rem;
       text-align: right;
+      font-variant-numeric: tabular-nums;
     }
 
-    svg {
-      display: block;
-      max-width: 100%;
-    }
-
-    .svg-ink {
-      fill: var(--ink);
-    }
-
-    .svg-muted {
-      fill: var(--muted);
-    }
-
-    .svg-surface {
-      fill: var(--surface);
-    }
-
-    .svg-surface-strong {
-      fill: var(--surface-strong);
-    }
-
-    .svg-line {
-      fill: none;
-      stroke: var(--line);
-    }
-
-    .svg-ink-line {
-      fill: none;
-      stroke: var(--ink);
-    }
-
-    .svg-accent {
-      fill: var(--accent);
-    }
-
-    .svg-accent-soft {
-      fill: var(--accent-soft);
-    }
-
-    .svg-accent-line {
-      fill: none;
-      stroke: var(--accent);
-    }
-
-    .svg-inverse-bg {
-      fill: var(--inverse-bg);
-    }
-
-    .svg-inverse {
-      fill: var(--inverse);
-    }
-
-    .svg-label {
-      font-family: var(--font-sans);
-      font-size: 16px;
-      font-weight: 680;
-    }
-
-    .svg-copy {
-      font-family: var(--font-sans);
-      font-size: 13px;
-      font-weight: 500;
-    }
-
-    .svg-mono {
-      font-family: var(--font-mono);
-      font-size: 12px;
-      font-weight: 650;
-    }
-
-    @media (max-width: 900px) {
+    @media (max-width: 860px) {
       html,
       body {
-        overflow: hidden;
+        overflow: auto;
       }
 
-      .slide {
-        overflow-y: auto;
-        padding: 28px 22px;
-      }
-
-      .slide-inner {
-        height: auto;
-        min-height: 100%;
-      }
-
-      .hero-layout,
-      .responsibility-layout,
-      .drift-layout,
-      .correction-layout,
-      .interface-layout,
-      .evaluation-layout {
-        grid-template-columns: 1fr;
-      }
-
-      .hero-visual {
-        min-height: 280px;
-        border-top: 1px solid var(--line);
-        border-left: 0;
-        padding-top: 24px;
-        padding-left: 0;
-      }
-
-      .architecture-flow {
-        grid-template-columns: 1fr;
-      }
-
-      .arrow-rail {
-        width: 2px;
-        height: 28px;
-        justify-self: center;
-      }
-
-      .arrow-rail::after {
-        top: auto;
-        right: auto;
-        bottom: -1px;
-        left: 50%;
-        transform: translateX(-50%) rotate(135deg);
-      }
-
-      .estimator-node,
-      .output-node {
-        min-height: auto;
-      }
-
-      .system-diagram {
-        min-height: 300px;
-        height: auto;
-      }
-
-      .boundaries {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    @media (max-width: 620px) {
       .topbar-context,
       .segments {
         display: none;
       }
 
-      .topbar {
-        justify-content: center;
-      }
-
-      .question-row,
-      .contract-rule,
-      .spec-row,
-      .scenario {
-        grid-template-columns: 1fr;
-        gap: 7px;
-      }
-
-      .metrics,
-      .boundary-column ul {
+      .columns,
+      .flow,
+      .flow.three,
+      .split,
+      .hero {
         grid-template-columns: 1fr;
       }
 
-      .bottombar {
-        grid-template-columns: auto 1fr auto;
+      .columns > section:first-child {
+        padding-right: 0;
       }
 
-      .navigation-status {
-        justify-content: center;
+      .columns > section + section {
+        padding-left: 0;
+        margin-top: 20px;
+        padding-top: 20px;
+        border-left: 0;
+        border-top: 1px solid var(--ink);
       }
-    }
 
-    @media (max-height: 700px) and (min-width: 901px) {
+      .arrow {
+        transform: rotate(90deg);
+        min-height: 36px;
+      }
+
       .slide {
-        padding-top: 22px;
-        padding-bottom: 22px;
-      }
-
-      h2 {
-        margin-bottom: 12px;
-      }
-
-      .section-heading {
-        margin-bottom: 20px;
-      }
-
-      .diagram-panel {
-        min-height: 330px;
-      }
-
-      .system-diagram {
-        min-height: 340px;
-        height: 47vh;
-      }
-
-      .short-list {
-        gap: 11px;
-      }
-
-      .architecture-flow {
-        transform: scale(0.94);
-        transform-origin: center;
-      }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      *,
-      *::before,
-      *::after {
-        scroll-behavior: auto !important;
-        transition-duration: 0.001ms !important;
-        animation-duration: 0.001ms !important;
+        place-items: start;
       }
     }
 
@@ -988,8 +480,6 @@
       html,
       body {
         overflow: visible;
-        background: white;
-        color: #17201e;
       }
 
       .topbar,
@@ -1004,129 +494,108 @@
       .slide {
         position: relative;
         inset: auto;
-        width: 100%;
         min-height: 100vh;
         page-break-after: always;
         visibility: visible;
         opacity: 1;
-        transform: none;
       }
     }
   </style>
 </head>
 <body>
-  <main class="presentation" aria-label="Cooperative localization presentation">
+  <main aria-label="UGV localization presentation">
     <header class="topbar">
       <div class="topbar-title">Cooperative localization</div>
-      <div class="topbar-context" id="currentTitle">UGV Localization with UAV-Assisted Positioning</div>
+      <div class="topbar-context" id="currentTitle">UGV Localization</div>
     </header>
 
     <div class="slides">
       <section class="slide active" data-title="UGV Localization" aria-hidden="false">
-        <div class="slide-inner hero-layout">
+        <div class="slide-inner hero">
           <div>
-            <h1>UGV <span class="accent-text">Localization</span></h1>
-            <p class="lead">Use UAV-assisted positioning to estimate the UGV pose when its GNSS is degraded or unavailable.</p>
-            <div class="status-line">This is the current design contract. It is not implemented yet.</div>
+            <h1>UGV Localization</h1>
+            <p class="lead">Find where the ground robot is, even when its GPS gets weak or drops out. The drone helps.</p>
+            <p class="note">This is the current design contract. It is not implemented yet.</p>
           </div>
-          <div class="hero-visual">
-            <svg viewBox="0 0 520 430" role="img" aria-labelledby="hero-title hero-desc">
-              <title id="hero-title">UGV pose and uncertainty in a map frame</title>
-              <desc id="hero-desc">An ENU map axis with a UGV pose, heading, and covariance ellipse.</desc>
-              <line x1="70" y1="350" x2="454" y2="350" class="svg-line" stroke-width="2"/>
-              <line x1="70" y1="350" x2="70" y2="52" class="svg-line" stroke-width="2"/>
-              <path d="M454 350 l-12 -7 v14 z" class="svg-muted"/>
-              <path d="M70 52 l-7 12 h14 z" class="svg-muted"/>
-              <text x="462" y="356" class="svg-mono svg-muted">E</text>
-              <text x="62" y="38" class="svg-mono svg-muted">N</text>
-              <text x="70" y="383" class="svg-mono svg-muted">map / ENU</text>
-              <path d="M105 316 C178 300 203 253 265 245 C331 237 342 177 411 148" class="svg-line" stroke-width="3" stroke-dasharray="7 9"/>
-              <ellipse cx="329" cy="202" rx="92" ry="54" transform="rotate(-28 329 202)" class="svg-accent-soft"/>
-              <ellipse cx="329" cy="202" rx="92" ry="54" transform="rotate(-28 329 202)" class="svg-accent-line" stroke-width="2" stroke-dasharray="6 7"/>
-              <circle cx="329" cy="202" r="10" class="svg-accent"/>
-              <line x1="329" y1="202" x2="382" y2="166" class="svg-accent-line" stroke-width="5" stroke-linecap="round"/>
-              <path d="M382 166 l-16 2 l8 12 z" class="svg-accent"/>
-              <text x="274" y="112" class="svg-label svg-ink">Pose estimate</text>
-              <text x="275" y="133" class="svg-copy svg-muted">position + orientation</text>
-              <line x1="320" y1="139" x2="325" y2="174" class="svg-line" stroke-width="1.5"/>
-              <text x="360" y="275" class="svg-label svg-ink">Covariance</text>
-              <text x="360" y="296" class="svg-copy svg-muted">uncertainty in the pose</text>
-              <line x1="361" y1="260" x2="383" y2="237" class="svg-line" stroke-width="1.5"/>
-            </svg>
-          </div>
+          <svg viewBox="0 0 520 430" role="img" aria-label="Robot pose and uncertainty on a map with east and north axes">
+            <line class="ln" x1="70" y1="350" x2="454" y2="350"/>
+            <line class="ln" x1="70" y1="350" x2="70" y2="52"/>
+            <path class="fill" d="M454 350 l-12 -7 v14 z"/>
+            <path class="fill" d="M70 52 l-7 12 h14 z"/>
+            <text x="462" y="356">E</text>
+            <text x="62" y="38">N</text>
+            <text x="70" y="383">map / ENU</text>
+            <path class="thin" d="M105 316 C178 300 203 253 265 245 C331 237 342 177 411 148" stroke-dasharray="7 9"/>
+            <ellipse class="thin" cx="329" cy="202" rx="92" ry="54" transform="rotate(-28 329 202)" stroke-dasharray="6 7"/>
+            <circle class="fill" cx="329" cy="202" r="10"/>
+            <line x1="329" y1="202" x2="382" y2="166" stroke="#000" stroke-width="5" stroke-linecap="round"/>
+            <path class="fill" d="M382 166 l-16 2 l8 12 z"/>
+            <text class="b" x="274" y="112">Pose estimate</text>
+            <text x="275" y="133">position + orientation</text>
+            <line class="thin" x1="320" y1="139" x2="325" y2="174"/>
+            <text class="b" x="360" y="275">Covariance</text>
+            <text x="360" y="296">uncertainty in the pose</text>
+            <line class="thin" x1="361" y1="260" x2="383" y2="237"/>
+          </svg>
         </div>
       </section>
 
       <section class="slide" data-title="Planner pose input" aria-hidden="true">
-        <div class="slide-inner responsibility-layout">
-          <div>
-            <h2>Planner pose input</h2>
-            <p class="compact-lead">The planner needs the UGV pose, traversability map, and goal in the same coordinate frame.</p>
-            <div class="impact-statement">A route can be correct while the UGV follows it incorrectly if its estimated pose has drifted.</div>
-          </div>
-          <div>
-            <div class="question-pair">
-              <div class="question-row">
-                <strong>Localization</strong>
-                <span>Estimates the current UGV pose.</span>
+        <div class="slide-inner">
+          <h2>The planner needs the robot's pose</h2>
+          <p class="cite">The planner needs the robot's pose, the terrain map, and the goal in the same coordinate frame. A route can be correct while the robot follows it wrongly if its estimated pose has drifted.</p>
+          <div class="split">
+            <table>
+              <thead>
+                <tr><th>Subsystem</th><th>What it does</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Localization</td><td>Estimates the current robot pose.</td></tr>
+                <tr><td>Traversability</td><td>Marks the terrain the robot can cross.</td></tr>
+                <tr><td>Planning</td><td>Uses the pose, terrain, and goal to generate a route.</td></tr>
+              </tbody>
+            </table>
+            <div class="flow three">
+              <div class="stack">
+                <div class="box"><strong>Authoritative pose</strong><span>From localization</span></div>
+                <div class="box"><strong>Traversability map</strong><span>From traversability mapping</span></div>
               </div>
-              <div class="question-row">
-                <strong>Traversability</strong>
-                <span>Marks the terrain the UGV can cross.</span>
-              </div>
-              <div class="question-row">
-                <strong>Planning</strong>
-                <span>Uses the pose, terrain, and goal to generate a route.</span>
+              <div class="arrow" aria-hidden="true">&rarr;</div>
+              <div class="stack">
+                <div class="box heavy"><strong>Route planning</strong><span>pose + terrain + goal</span></div>
               </div>
             </div>
-            <svg viewBox="0 0 760 190" role="img" aria-labelledby="need-title need-desc" style="margin-top: 26px; width: 100%;">
-              <title id="need-title">Localization and traversability both feed planning</title>
-              <desc id="need-desc">Separate localization and traversability outputs converge at route planning.</desc>
-              <defs>
-                <marker id="need-arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto">
-                  <path d="M0,0 L9,4.5 L0,9 z" class="svg-accent"/>
-                </marker>
-              </defs>
-              <rect x="20" y="20" width="215" height="58" rx="12" class="svg-accent-soft"/>
-              <text x="42" y="54" class="svg-label" fill="var(--accent-ink)">Authoritative pose</text>
-              <rect x="20" y="112" width="215" height="58" rx="12" class="svg-surface" stroke="var(--line)"/>
-              <text x="42" y="146" class="svg-label svg-ink">Traversability map</text>
-              <path d="M238 49 H390 Q420 49 420 79 V94" class="svg-accent-line" stroke-width="2.5" marker-end="url(#need-arrow)"/>
-              <path d="M238 141 H390 Q420 141 420 111 V96" class="svg-accent-line" stroke-width="2.5" marker-end="url(#need-arrow)"/>
-              <rect x="451" y="65" width="284" height="76" rx="12" class="svg-inverse-bg"/>
-              <text x="478" y="97" class="svg-label svg-inverse">Route planning</text>
-              <text x="478" y="120" class="svg-copy svg-inverse">pose + terrain + goal</text>
-            </svg>
           </div>
+          <p class="note">"Pose" means position plus the direction the robot faces.</p>
         </div>
       </section>
 
-      <section class="slide" data-title="UGV GNSS loss" aria-hidden="true">
-        <div class="slide-inner drift-layout">
-          <div>
-            <h2>UGV GNSS loss</h2>
-            <p>GNSS provides a global position while it is available. If it drops out, wheel odometry and the IMU still track motion, but their errors accumulate.</p>
-            <p>The subsystem keeps publishing a pose. As the estimate drifts, its covariance should increase to show that the pose is less certain.</p>
-          </div>
-          <div class="diagram-panel">
-            <svg viewBox="0 0 780 420" role="img" aria-labelledby="drift-title drift-desc">
-              <title id="drift-title">Estimated UGV path drifting after GNSS loss</title>
-              <desc id="drift-desc">The true and estimated paths agree before GNSS loss, then diverge while uncertainty grows.</desc>
-              <line x1="72" y1="340" x2="718" y2="340" class="svg-line" stroke-width="1.5"/>
-              <line x1="72" y1="340" x2="72" y2="54" class="svg-line" stroke-width="1.5"/>
-              <text x="676" y="370" class="svg-mono svg-muted">time</text>
-              <line x1="330" y1="60" x2="330" y2="340" class="svg-line" stroke-width="2" stroke-dasharray="6 7"/>
-              <text x="272" y="42" class="svg-mono svg-muted">GNSS unavailable</text>
-              <path d="M94 302 C170 280 227 250 330 230 C438 209 548 183 690 142" class="svg-ink-line" stroke-width="4" stroke-linecap="round"/>
-              <path d="M94 302 C170 280 227 250 330 230 C446 204 549 138 690 78" class="svg-accent-line" stroke-width="4" stroke-linecap="round"/>
-              <path d="M330 230 C446 204 549 138 690 78 L690 188 C548 222 438 225 330 230 Z" class="svg-accent-soft" opacity="0.78"/>
-              <path d="M330 230 C446 204 549 138 690 78" class="svg-accent-line" stroke-width="4" stroke-linecap="round"/>
-              <circle cx="690" cy="142" r="7" class="svg-ink"/>
-              <circle cx="690" cy="78" r="7" class="svg-accent"/>
-              <text x="566" y="118" class="svg-label" fill="var(--accent)">Estimated</text>
-              <text x="565" y="174" class="svg-label svg-ink">True position</text>
-              <text x="506" y="260" class="svg-copy svg-muted">uncertainty grows with drift</text>
-              <line x1="554" y1="242" x2="574" y2="200" class="svg-line" stroke-width="1.5"/>
+      <section class="slide" data-title="UGV GPS loss" aria-hidden="true">
+        <div class="slide-inner">
+          <h2>What happens when the robot loses GPS</h2>
+          <p class="cite">The subsystem never stops publishing a pose. What changes is how sure it is.</p>
+          <div class="split">
+            <ul>
+              <li>GPS gives a global position while it is available.</li>
+              <li>If it drops out, wheel odometry and the motion sensor (IMU) still track movement. Their small errors add up, so the estimate drifts.</li>
+              <li>As the estimate drifts, the uncertainty value (covariance) grows to show the pose is less certain.</li>
+              <li>Drone corrections pull the estimate back toward the true position.</li>
+            </ul>
+            <svg viewBox="0 0 640 390" role="img" aria-label="Estimated robot path drifting away from the true path after GPS is lost, with growing uncertainty">
+              <line class="ln" x1="60" y1="320" x2="600" y2="320"/>
+              <line class="ln" x1="60" y1="320" x2="60" y2="40"/>
+              <text x="600" y="342" text-anchor="end">time</text>
+              <line class="thin" x1="260" y1="60" x2="260" y2="320" stroke-dasharray="6 6"/>
+              <text class="b" x="268" y="56">GPS unavailable</text>
+              <path d="M260 204 L600 101 L600 291 Z" fill="none" stroke="#000" stroke-width="1.5" stroke-dasharray="2 5"/>
+              <path d="M60 260 L600 109" fill="none" stroke="#000" stroke-width="3"/>
+              <path d="M260 204 Q420 225 600 196" fill="none" stroke="#000" stroke-width="3" stroke-dasharray="10 7"/>
+              <line x1="60" y1="368" x2="92" y2="368" stroke="#000" stroke-width="3"/>
+              <text x="100" y="373">True position</text>
+              <line x1="230" y1="368" x2="262" y2="368" stroke="#000" stroke-width="3" stroke-dasharray="10 7"/>
+              <text x="270" y="373">Estimated</text>
+              <line x1="380" y1="368" x2="412" y2="368" stroke="#000" stroke-width="1.5" stroke-dasharray="2 5"/>
+              <text x="420" y="373">uncertainty grows with drift</text>
             </svg>
           </div>
         </div>
@@ -1134,293 +603,283 @@
 
       <section class="slide" data-title="Localization inputs and output" aria-hidden="true">
         <div class="slide-inner">
-          <div class="section-heading">
-            <h2>Localization inputs and output</h2>
-            <p>The estimator combines the measurements that are available and publishes one UGV pose for the planner.</p>
-          </div>
-          <div class="architecture-flow" role="img" aria-label="UGV GNSS, odometry, IMU, and UAV relative position feed the localization estimator, which outputs one UGV pose with covariance.">
-            <div class="input-stack">
-              <div class="flow-node"><strong>UGV GNSS</strong><span>Global position when available</span></div>
-              <div class="flow-node"><strong>UGV odometry</strong><span>Wheel-derived motion</span></div>
-              <div class="flow-node"><strong>UGV IMU</strong><span>Rotation and acceleration</span></div>
-              <div class="flow-node"><strong>UAV relative position</strong><span>Noisy observation</span></div>
+          <h2>What goes in and what comes out</h2>
+          <p class="cite">The estimator combines the measurements that are available and publishes one robot pose for the planner.</p>
+          <div class="flow">
+            <div class="stack">
+              <div class="box"><strong>UGV GPS</strong><span>Global position when available</span></div>
+              <div class="box"><strong>UGV odometry</strong><span>Motion from the wheels</span></div>
+              <div class="box"><strong>UGV IMU</strong><span>Rotation and acceleration</span></div>
+              <div class="box"><strong>UAV relative position</strong><span>Noisy observation of the robot, seen from the drone</span></div>
             </div>
-            <div class="arrow-rail" aria-hidden="true"></div>
-            <div class="flow-node estimator-node">
-              <strong>Localization estimator</strong>
-              <span>Likely an EKF or UKF using existing ROS 2 tooling</span>
-              <span style="margin-top: 18px;">Continues without GNSS and rejects stale or invalid measurements.</span>
-            </div>
-            <div class="arrow-rail" aria-hidden="true"></div>
-            <div class="flow-node output-node">
-              <strong>Authoritative UGV pose</strong>
-              <span class="mono">/ugv/localization/pose</span>
-              <div class="output-details">
-                <div class="output-row">Position</div>
-                <div class="output-row">Orientation</div>
-                <div class="output-row">Timestamp</div>
-                <div class="output-row">Covariance</div>
+            <div class="arrow" aria-hidden="true">&rarr;</div>
+            <div class="stack">
+              <div class="box heavy">
+                <strong>Localization estimator</strong>
+                <span>Likely an EKF or UKF (standard filters that blend noisy measurements), built on existing ROS 2 tools.</span>
+                <span>Keeps running without GPS. Rejects stale or invalid measurements.</span>
               </div>
-              <span style="margin-top: 18px;">Covariance: how uncertain the estimator is about the pose.</span>
+            </div>
+            <div class="arrow" aria-hidden="true">&rarr;</div>
+            <div class="stack">
+              <div class="box heavy">
+                <strong>Authoritative UGV pose</strong>
+                <span class="mono">/ugv/localization/pose</span>
+                <span>Position, orientation, timestamp, and covariance</span>
+              </div>
             </div>
           </div>
-          <p class="caption">These interfaces are not implemented yet. Raw topic names, QoS, rates, and noise values are still open.</p>
+          <p class="note">Covariance: how uncertain the estimator is about the pose. These interfaces are not implemented yet. Raw topic names, message quality settings (QoS), rates, and noise values are still open.</p>
         </div>
       </section>
 
       <section class="slide" data-title="UAV correction" aria-hidden="true">
-        <div class="slide-inner correction-layout">
-          <div class="diagram-panel">
-            <svg viewBox="0 0 760 440" role="img" aria-labelledby="uav-title uav-desc">
-              <title id="uav-title">UAV relative-position correction reduces UGV drift</title>
-              <desc id="uav-desc">A localized UAV observes the UGV relative to itself, moving the estimate closer to the true UGV pose and reducing uncertainty.</desc>
+        <div class="slide-inner">
+          <h2>How the drone helps</h2>
+          <p class="cite">The drone acts as a second source of position when the robot's own GPS is not usable.</p>
+          <div class="split">
+            <table class="kv">
+              <tbody>
+                <tr><th>Assumption</th><td>The drone keeps reliable localization while the robot's GPS is unavailable.</td></tr>
+                <tr><th>Measurement</th><td>The drone reports a noisy observation of the robot's position relative to itself.</td></tr>
+                <tr><th>Effect</th><td>The correction reduces drift and uncertainty. It does not make the estimate exact.</td></tr>
+                <tr><th>Hardware</th><td>UWB radios, AprilTags, or camera tracking could produce this measurement later. The current interface does not require one.</td></tr>
+              </tbody>
+            </table>
+            <svg viewBox="0 0 640 400" role="img" aria-label="A localized drone observes the true robot position, and the correction moves the drifted estimate toward it">
               <defs>
-                <marker id="uav-arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto">
-                  <path d="M0,0 L9,4.5 L0,9 z" class="svg-accent"/>
+                <marker id="head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+                  <path d="M0 0 L10 5 L0 10 z" fill="#000"/>
                 </marker>
               </defs>
-              <line x1="62" y1="352" x2="705" y2="352" class="svg-line" stroke-width="1.5"/>
-              <g transform="translate(300 72)">
-                <path d="M-38 0 H38 M0 -21 V21 M-24 -15 L24 15 M-24 15 L24 -15" class="svg-ink-line" stroke-width="4" stroke-linecap="round"/>
-                <circle cx="0" cy="0" r="12" class="svg-surface-strong" stroke="var(--ink)" stroke-width="3"/>
-                <circle cx="-38" cy="0" r="8" class="svg-ink"/>
-                <circle cx="38" cy="0" r="8" class="svg-ink"/>
-                <circle cx="0" cy="-21" r="8" class="svg-ink"/>
-                <circle cx="0" cy="21" r="8" class="svg-ink"/>
-              </g>
-              <text x="244" y="126" class="svg-label svg-ink">Localized UAV</text>
-              <path d="M305 102 C344 165 411 218 492 279" class="svg-accent-line" stroke-width="2.5" stroke-dasharray="7 7" marker-end="url(#uav-arrow)"/>
-              <text x="350" y="187" class="svg-copy" fill="var(--accent)">noisy relative-position observation</text>
-              <ellipse cx="552" cy="310" rx="114" ry="66" class="svg-accent-soft"/>
-              <ellipse cx="552" cy="310" rx="114" ry="66" class="svg-accent-line" stroke-width="2" stroke-dasharray="7 7"/>
-              <circle cx="611" cy="313" r="8" class="svg-ink"/>
-              <text x="625" y="303" class="svg-label svg-ink">True UGV</text>
-              <circle cx="473" cy="280" r="8" class="svg-accent"/>
-              <text x="409" y="255" class="svg-label" fill="var(--accent)">Drifted estimate</text>
-              <path d="M485 287 Q534 300 590 309" class="svg-accent-line" stroke-width="4" marker-end="url(#uav-arrow)"/>
-              <text x="459" y="399" class="svg-copy svg-muted">Correction reduces drift and uncertainty.</text>
-              <text x="459" y="419" class="svg-copy svg-muted">It does not make the estimate exact.</text>
+              <rect class="box" x="70" y="30" width="170" height="46"/>
+              <text class="b" x="155" y="59" text-anchor="middle">Localized UAV</text>
+              <line x1="155" y1="76" x2="462" y2="288" stroke="#000" stroke-width="2" stroke-dasharray="8 6" marker-end="url(#head)"/>
+              <text x="384" y="196">noisy relative-position</text>
+              <text x="384" y="216">observation</text>
+              <circle class="fill" cx="476" cy="300" r="14"/>
+              <text class="b" x="476" y="340" text-anchor="middle">True UGV</text>
+              <circle cx="300" cy="320" r="14" fill="#fff" stroke="#000" stroke-width="2" stroke-dasharray="4 4"/>
+              <text class="b" x="300" y="360" text-anchor="middle">Drifted estimate</text>
+              <line x1="318" y1="312" x2="452" y2="300" stroke="#000" stroke-width="3" marker-end="url(#head)"/>
+              <text x="332" y="286">correction</text>
             </svg>
-          </div>
-          <div>
-            <h2>UAV correction</h2>
-            <div class="scope-note">
-              <div class="scope-block">
-                <h3>Assumption</h3>
-                <p>The UAV keeps reliable localization while UGV GNSS is unavailable.</p>
-              </div>
-              <div class="scope-block">
-                <h3>Measurement</h3>
-                <p>The UAV provides a noisy observation of the UGV position relative to itself.</p>
-              </div>
-              <div class="scope-block">
-                <h3>Hardware</h3>
-                <p>UWB, AprilTags, or camera tracking could produce this measurement later. The current interface does not require one.</p>
-              </div>
-            </div>
           </div>
         </div>
       </section>
 
       <section class="slide" data-title="Project interfaces" aria-hidden="true">
         <div class="slide-inner">
-          <div class="section-heading">
-            <h2>Project interfaces</h2>
-            <p>Localization and traversability are separate. Both publish data in <span class="mono">map</span> so route planning can use them together.</p>
-          </div>
-          <svg class="system-diagram" viewBox="0 0 1260 500" role="img" aria-labelledby="system-title system-desc">
-            <title id="system-title">System-level UAV-UGV project architecture</title>
-            <desc id="system-desc">UAV control and UGV sensors feed cooperative localization. Localization, traversability mapping, and mission goals feed route planning. Route planning sends a route to UGV control. Fault management may affect and observe localization.</desc>
+          <h2>How localization fits the whole project</h2>
+          <p class="cite">Localization and traversability are separate. Both publish data in <span class="mono">map</span> so route planning can use them together.</p>
+          <svg viewBox="0 0 1200 530" role="img" aria-label="UAV control, UGV sensor interfaces, and fault management connect to cooperative localization. Localization, traversability mapping, and the mission goal feed route planning. Route planning sends a route to UGV control.">
             <defs>
-              <marker id="system-arrow" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto">
-                <path d="M0,0 L10,5 L0,10 z" class="svg-accent"/>
-              </marker>
-              <marker id="system-arrow-neutral" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto">
-                <path d="M0,0 L10,5 L0,10 z" class="svg-muted"/>
+              <marker id="head2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+                <path d="M0 0 L10 5 L0 10 z" fill="#000"/>
               </marker>
             </defs>
 
-            <rect x="30" y="38" width="236" height="82" rx="12" class="svg-surface" stroke="var(--line)"/>
-            <text x="54" y="72" class="svg-label svg-ink">UAV control</text>
-            <text x="54" y="96" class="svg-copy svg-muted">PX4 state in local NED</text>
+            <rect class="box" x="0" y="30" width="270" height="76"/>
+            <text class="b" x="14" y="58">UAV control</text>
+            <text x="14" y="86">PX4 state in local NED</text>
 
-            <rect x="30" y="168" width="236" height="94" rx="12" class="svg-surface" stroke="var(--line)"/>
-            <text x="54" y="201" class="svg-label svg-ink">UGV sensor interfaces</text>
-            <text x="54" y="225" class="svg-copy svg-muted">GNSS, odometry, IMU</text>
-            <text x="54" y="245" class="svg-copy svg-muted">not yet available in ROS 2</text>
+            <rect class="box" x="0" y="126" width="270" height="96"/>
+            <text class="b" x="14" y="154">UGV sensor interfaces</text>
+            <text x="14" y="178">GNSS, odometry, IMU</text>
+            <text x="14" y="202">not yet available in ROS 2</text>
 
-            <rect x="30" y="334" width="236" height="94" rx="12" class="svg-surface" stroke="var(--line)" stroke-dasharray="7 6"/>
-            <text x="54" y="367" class="svg-label svg-ink">Fault management</text>
-            <text x="54" y="391" class="svg-copy svg-muted">Inject or report GNSS faults</text>
-            <text x="54" y="411" class="svg-copy svg-muted">API remains open</text>
+            <rect class="box" x="0" y="242" width="270" height="96"/>
+            <text class="b" x="14" y="270">Fault management</text>
+            <text x="14" y="298">Inject or report GNSS faults</text>
+            <text x="14" y="322">API remains open</text>
 
-            <rect x="396" y="110" width="292" height="192" rx="12" class="svg-accent-soft" stroke="var(--accent)" stroke-width="3"/>
-            <text x="424" y="149" class="svg-label" fill="var(--accent-ink)">Cooperative localization</text>
-            <text x="424" y="177" class="svg-copy" fill="var(--accent-ink)">Combines localization measurements</text>
-            <text x="424" y="201" class="svg-copy" fill="var(--accent-ink)">Maintains the UGV pose estimate</text>
-            <line x1="424" y1="224" x2="658" y2="224" stroke="var(--accent)" opacity="0.45"/>
-            <text x="424" y="252" class="svg-mono" fill="var(--accent-ink)">/ugv/localization/pose</text>
-            <text x="424" y="275" class="svg-copy" fill="var(--accent-ink)">authoritative pose in map / ENU</text>
+            <line x1="270" y1="68" x2="338" y2="68" stroke="#000" stroke-width="2" marker-end="url(#head2)"/>
+            <line x1="270" y1="174" x2="338" y2="174" stroke="#000" stroke-width="2" marker-end="url(#head2)"/>
+            <line x1="270" y1="280" x2="338" y2="280" stroke="#000" stroke-width="2" stroke-dasharray="6 5" marker-start="url(#head2)" marker-end="url(#head2)"/>
 
-            <rect x="396" y="350" width="292" height="100" rx="12" class="svg-surface" stroke="var(--line)"/>
-            <text x="424" y="386" class="svg-label svg-ink">Traversability mapping</text>
-            <text x="424" y="412" class="svg-copy svg-muted">Terrain information in map / ENU</text>
+            <rect class="heavy" x="340" y="30" width="270" height="288"/>
+            <text class="b" x="354" y="66">Cooperative localization</text>
+            <text x="354" y="100">Combines localization</text>
+            <text x="354" y="120">measurements</text>
+            <text x="354" y="152">Maintains the UGV pose</text>
+            <text x="354" y="172">estimate</text>
+            <text class="m" x="354" y="216">/ugv/localization/pose</text>
+            <text x="354" y="242">authoritative pose in</text>
+            <text x="354" y="262">map / ENU</text>
 
-            <rect x="784" y="30" width="236" height="78" rx="12" class="svg-surface" stroke="var(--line)"/>
-            <text x="812" y="64" class="svg-label svg-ink">Mission or goal</text>
-            <text x="812" y="88" class="svg-copy svg-muted">Destination in map / ENU</text>
+            <rect class="box" x="340" y="356" width="270" height="76"/>
+            <text class="b" x="354" y="384">Traversability mapping</text>
+            <text x="354" y="412">Terrain information in map / ENU</text>
 
-            <rect x="784" y="164" width="300" height="174" rx="12" class="svg-inverse-bg"/>
-            <text x="816" y="207" class="svg-label svg-inverse">Route planning</text>
-            <text x="816" y="237" class="svg-copy svg-inverse">Consumes pose, terrain, and goal</text>
-            <text x="816" y="264" class="svg-copy svg-inverse">Does not consume raw localization sensors</text>
-            <line x1="816" y1="284" x2="1050" y2="284" stroke="var(--inverse)" opacity="0.35"/>
-            <text x="816" y="314" class="svg-mono svg-inverse">output: route</text>
+            <rect class="box" x="340" y="446" width="270" height="76"/>
+            <text class="b" x="354" y="474">Mission or goal</text>
+            <text x="354" y="502">Destination in map / ENU</text>
 
-            <rect x="1130" y="200" width="104" height="104" rx="12" class="svg-surface" stroke="var(--line)"/>
-            <text x="1151" y="243" class="svg-label svg-ink">UGV</text>
-            <text x="1147" y="268" class="svg-copy svg-muted">control</text>
+            <line x1="610" y1="174" x2="678" y2="174" stroke="#000" stroke-width="2" marker-end="url(#head2)"/>
+            <polyline points="610,394 644,394 644,286 678,286" fill="none" stroke="#000" stroke-width="2" marker-end="url(#head2)"/>
+            <polyline points="610,484 662,484 662,316 678,316" fill="none" stroke="#000" stroke-width="2" marker-end="url(#head2)"/>
 
-            <path d="M266 79 H336 Q366 79 366 119 V157 H396" class="svg-accent-line" stroke-width="2.5" marker-end="url(#system-arrow)"/>
-            <path d="M266 215 H396" class="svg-accent-line" stroke-width="2.5" marker-end="url(#system-arrow)"/>
-            <path d="M266 380 H320 Q350 380 350 304 V286 H396" class="svg-line" stroke-width="2.5" stroke-dasharray="7 6" marker-end="url(#system-arrow-neutral)"/>
-            <path d="M688 206 H784" class="svg-accent-line" stroke-width="3" marker-end="url(#system-arrow)"/>
-            <path d="M688 400 H728 Q758 400 758 324 V293 H784" class="svg-line" stroke-width="2.5" marker-end="url(#system-arrow-neutral)"/>
-            <path d="M902 108 V164" class="svg-line" stroke-width="2.5" marker-end="url(#system-arrow-neutral)"/>
-            <path d="M1084 251 H1130" class="svg-line" stroke-width="2.5" marker-end="url(#system-arrow-neutral)"/>
+            <rect class="heavy" x="680" y="120" width="270" height="228"/>
+            <text class="b" x="694" y="156">Route planning</text>
+            <text x="694" y="190">Consumes pose, terrain,</text>
+            <text x="694" y="210">and goal</text>
+            <text x="694" y="242">Does not consume raw</text>
+            <text x="694" y="262">localization sensors</text>
+            <text x="694" y="304">output: route</text>
 
-            <text x="405" y="91" class="svg-mono" fill="var(--accent)">cooperative_localization</text>
+            <line x1="950" y1="234" x2="1010" y2="234" stroke="#000" stroke-width="2" marker-end="url(#head2)"/>
+            <rect class="box" x="1012" y="190" width="188" height="88"/>
+            <text class="b" x="1106" y="230" text-anchor="middle">UGV</text>
+            <text class="b" x="1106" y="252" text-anchor="middle">control</text>
           </svg>
+          <p class="note">The package for this subsystem is <span class="mono">cooperative_localization</span>.</p>
         </div>
       </section>
 
       <section class="slide" data-title="Interface contract" aria-hidden="true">
-        <div class="slide-inner interface-layout">
-          <div>
-            <h2>Localization interface</h2>
-            <div class="interface-spec">
-              <header>Preferred localization contract</header>
-              <dl class="spec-body">
-                <div class="spec-row">
-                  <dt>Topic</dt>
-                  <dd>/ugv/localization/pose</dd>
-                </div>
-                <div class="spec-row">
-                  <dt>Message</dt>
-                  <dd>geometry_msgs/<wbr>msg/<wbr>PoseWithCovarianceStamped</dd>
-                </div>
-                <div class="spec-row">
-                  <dt>Frame</dt>
-                  <dd>map</dd>
-                </div>
-                <div class="spec-row">
-                  <dt>Convention</dt>
-                  <dd>ENU</dd>
-                </div>
-              </dl>
-            </div>
-            <p class="caption">Preferred design contract. Not yet implemented in the repository.</p>
-          </div>
-          <div>
-            <div class="contract-rules">
-              <div class="contract-rule"><strong>Planner</strong><span>Uses this pose instead of subscribing to raw GNSS, odometry, IMU, or UAV measurements.</span></div>
-              <div class="contract-rule"><strong>Mapping</strong><span>Publishes traversability data in the same ENU <span class="mono">map</span> frame.</span></div>
-              <div class="contract-rule"><strong>Coordinates</strong><span>UGV pose, obstacles, routes, and goals all use the same frame.</span></div>
-              <div class="contract-rule"><strong>Covariance</strong><span>Reports how uncertain the estimator is about the pose.</span></div>
-            </div>
-            <div class="frame-conversion" aria-label="PX4 NED state must be converted to the project ENU map frame">
-              <div class="frame-box"><strong>PX4 NED</strong><span>current UAV state</span></div>
-              <div class="arrow-rail" aria-hidden="true"></div>
-              <div class="frame-box"><strong>map / ENU</strong><span>project-facing frame</span></div>
-            </div>
+        <div class="slide-inner">
+          <h2>The one interface other subsystems use</h2>
+          <p class="cite">Route planning reads this pose. It does not read GPS, odometry, IMU, or drone readings directly.</p>
+          <div class="columns">
+            <section>
+              <h3>Preferred localization contract</h3>
+              <table class="kv">
+                <tbody>
+                  <tr><th>Topic</th><td class="mono">/ugv/localization/pose</td></tr>
+                  <tr><th>Message</th><td class="mono">geometry_msgs/msg/PoseWithCovarianceStamped</td></tr>
+                  <tr><th>Frame</th><td class="mono">map</td></tr>
+                  <tr><th>Convention</th><td>ENU: east, north, up</td></tr>
+                </tbody>
+              </table>
+              <p class="note">This is a preferred design contract. It is not yet implemented in the repository.</p>
+            </section>
+            <section>
+              <h3>Who uses it and how</h3>
+              <ul>
+                <li><strong>Planner:</strong> uses this pose instead of subscribing to raw GPS, odometry, IMU, or drone measurements.</li>
+                <li><strong>Mapping:</strong> publishes traversability data in the same ENU map frame.</li>
+                <li><strong>Coordinates:</strong> the robot pose, obstacles, routes, and goals all use the same frame.</li>
+                <li><strong>Covariance:</strong> reports how uncertain the estimator is about the pose.</li>
+                <li><strong>Frames:</strong> the drone's state is PX4 NED (north, east, down). Convert it to the project's map / ENU frame.</li>
+              </ul>
+            </section>
           </div>
         </div>
       </section>
 
       <section class="slide" data-title="Evaluation plan" aria-hidden="true">
         <div class="slide-inner">
-          <div class="section-heading">
-            <h2>Evaluation plan</h2>
-            <p>Run the same route under three GNSS conditions and compare estimator and path-following error.</p>
+          <h2>How we will test it</h2>
+          <p class="cite">Run the same route under three GPS conditions. Compare estimator error and path-following error.</p>
+          <div class="columns">
+            <section>
+              <h3>Three cases</h3>
+              <ol>
+                <li>Nominal GPS
+                  <span class="sub">Regular global position updates.</span></li>
+                <li>GPS loss without drone assistance
+                  <span class="sub">Odometry and IMU continue as the estimate drifts.</span></li>
+                <li>GPS loss with drone assistance
+                  <span class="sub">Relative observations correct the estimate during the outage.</span></li>
+              </ol>
+            </section>
+            <section>
+              <h3>What we measure</h3>
+              <ul>
+                <li>Position RMSE: overall position error.</li>
+                <li>Mean and max error: typical and worst deviation.</li>
+                <li>Heading error: orientation accuracy.</li>
+                <li>Covariance: reported uncertainty versus actual error.</li>
+                <li>Path-following error: effect on downstream navigation.</li>
+              </ul>
+            </section>
           </div>
-          <div class="evaluation-layout">
-            <div class="scenario-list">
-              <div class="scenario">
-                <div><strong>Nominal GNSS</strong><span>Regular global position updates.</span></div>
-                <svg viewBox="0 0 180 54" role="img" aria-label="Estimated path stays close to true path">
-                  <path d="M8 43 C50 36 84 26 171 10" class="svg-ink-line" stroke-width="3"/>
-                  <path d="M8 45 C52 35 83 28 171 12" class="svg-accent-line" stroke-width="3"/>
-                </svg>
-              </div>
-              <div class="scenario">
-                <div><strong>GNSS loss without UAV assistance</strong><span>Odometry and IMU continue as the estimate drifts.</span></div>
-                <svg viewBox="0 0 180 54" role="img" aria-label="Estimated path drifts away from true path">
-                  <path d="M8 43 C50 36 84 26 171 10" class="svg-ink-line" stroke-width="3"/>
-                  <path d="M8 43 C52 36 92 23 171 43" class="svg-accent-line" stroke-width="3"/>
-                </svg>
-              </div>
-              <div class="scenario emphasis">
-                <div><strong>GNSS loss with UAV assistance</strong><span>Relative observations correct the estimate during the outage.</span></div>
-                <svg viewBox="0 0 180 54" role="img" aria-label="Estimated path drifts, then moves closer to the true path after corrections">
-                  <path d="M8 43 C50 36 84 26 171 10" class="svg-ink-line" stroke-width="3"/>
-                  <path d="M8 43 C48 36 76 31 104 35 C126 37 143 22 171 14" class="svg-accent-line" stroke-width="3"/>
-                  <circle cx="108" cy="34" r="4" class="svg-accent"/>
-                </svg>
-              </div>
-            </div>
-            <div class="metrics">
-              <div class="metric"><strong>Position RMSE</strong><span>Overall position error.</span></div>
-              <div class="metric"><strong>Mean and max error</strong><span>Typical and worst deviation.</span></div>
-              <div class="metric"><strong>Heading error</strong><span>Orientation accuracy.</span></div>
-              <div class="metric"><strong>Covariance</strong><span>Reported uncertainty versus error.</span></div>
-              <div class="metric"><strong>Path-following error</strong><span>Effect on downstream navigation.</span></div>
-            </div>
-            <div class="evaluation-question">Test whether UAV relative-position updates reduce drift and path-following error during UGV GNSS loss.</div>
-          </div>
+          <p class="note">Goal: test whether drone relative-position updates reduce drift and path-following error during robot GPS loss.</p>
         </div>
       </section>
 
       <section class="slide" data-title="Scope and boundaries" aria-hidden="true">
         <div class="slide-inner">
-          <div class="section-heading">
-            <h2>Subsystem scope</h2>
-            <p>The subsystem estimates the UGV pose. It does not map terrain, generate routes, or control either vehicle.</p>
-          </div>
-          <div class="boundaries">
-            <section class="boundary-column">
+          <h2>What this subsystem does and does not do</h2>
+          <p class="cite">The subsystem estimates the robot's pose. It does not map terrain, generate routes, or control either vehicle.</p>
+          <div class="columns">
+            <section>
               <h3>In scope</h3>
               <ul>
                 <li>UGV pose estimation</li>
-                <li>GNSS degradation behavior</li>
+                <li>GPS degradation behavior</li>
                 <li>Odometry and IMU fusion</li>
-                <li>UAV relative-position corrections</li>
+                <li>Drone relative-position corrections</li>
                 <li>Pose covariance</li>
                 <li>Planner-facing pose output</li>
               </ul>
             </section>
-            <section class="boundary-column out">
+            <section>
               <h3>Not in scope</h3>
               <ul>
                 <li>Terrain classification</li>
                 <li>Path generation</li>
-                <li>UAV path planning</li>
-                <li>Full SLAM</li>
+                <li>Drone path planning</li>
+                <li>Full SLAM (mapping and localizing at once)</li>
                 <li>Loss of localization for both vehicles</li>
                 <li>Commitment to UWB or camera hardware</li>
               </ul>
             </section>
           </div>
-          <p class="closing-statement">This supports search-and-rescue routes where UGV GNSS may be degraded and the UAV still has reliable localization. It does not solve localization if both vehicles lose their global reference.</p>
+          <p class="note">This supports search-and-rescue routes where the robot's GPS may be degraded and the drone still has reliable localization. It does not solve localization if both vehicles lose their global reference.</p>
+        </div>
+      </section>
+
+      <section class="slide" data-title="Steps to begin" aria-hidden="true">
+        <div class="slide-inner">
+          <h2>Steps to begin</h2>
+          <p class="cite">Start with data. The filter is the easy part once real sensor data reaches it.</p>
+          <ol class="steps">
+            <li>Agree with the simulation and integration subsystem on who adds the robot's sensors and the bridge into ROS 2.
+              <span>This is an open decision and it blocks everything after it.</span></li>
+            <li>Add an IMU and a GPS sensor to the ground robot model. Bridge odometry, IMU, GPS, and the true position into ROS 2.
+              <span>The true position is only for making test data and scoring results.</span></li>
+            <li>Write a test-sensor node that adds noise to the true position.
+              <span>It outputs GPS with an on and off switch, and a noisy drone reading of the robot.</span></li>
+            <li>Run the existing EKF tool on GPS, odometry, and IMU. Add a small relay that publishes the result on the pose topic.
+              <span>The tool outputs a different message type than our contract, so the relay converts it.</span></li>
+            <li>Add the drone reading as another input, after converting drone axes from NED to ENU.</li>
+            <li>Log error against the true position for the three test cases.</li>
+          </ol>
+        </div>
+      </section>
+
+      <section class="slide" data-title="Open decisions" aria-hidden="true">
+        <div class="slide-inner">
+          <h2>Decisions still open</h2>
+          <p class="cite">Agree on these early so the subsystems can connect without rework.</p>
+          <div class="columns">
+            <section>
+              <h3>With other subsystems</h3>
+              <ul>
+                <li>Who owns the simulation-to-ROS bridge.</li>
+                <li>Who owns the coordinate transform tree.</li>
+                <li>Raw sensor topic names and message quality settings.</li>
+                <li>How fault management will inject GPS loss and read localization health.</li>
+              </ul>
+            </section>
+            <section>
+              <h3>Inside localization</h3>
+              <ul>
+                <li>Sensor update rates and noise values.</li>
+                <li>Filter type and tuning.</li>
+                <li>Whether the drone reading is 2D or 3D.</li>
+              </ul>
+            </section>
+          </div>
         </div>
       </section>
     </div>
 
     <nav class="bottombar" aria-label="Slide navigation">
       <button class="nav-button" id="previousButton" type="button">Previous</button>
-      <div class="navigation-status">
-        <div class="segments" id="segments" aria-label="Choose a slide"></div>
-        <div class="counter" id="counter" aria-live="polite">01 / 09</div>
-      </div>
+      <div class="segments" id="segments"></div>
+      <div class="counter" id="counter">01 / 11</div>
       <button class="nav-button" id="nextButton" type="button">Next</button>
     </nav>
   </main>
@@ -1458,6 +917,7 @@
           const active = slideIndex === current;
           slide.classList.toggle('active', active);
           slide.setAttribute('aria-hidden', String(!active));
+          if (active) slide.scrollTop = 0;
         });
 
         segmentButtons.forEach((button, buttonIndex) => {
@@ -1470,7 +930,7 @@
         nextButton.disabled = current === slides.length - 1;
         counter.textContent = `${String(current + 1).padStart(2, '0')} / ${String(slides.length).padStart(2, '0')}`;
         currentTitle.textContent = slides[current].dataset.title;
-        document.title = `${slides[current].dataset.title} | Cooperative Localization`;
+        document.title = `${slides[current].dataset.title} | UGV Localization`;
 
         if (updateHash) {
           window.history.replaceState(null, '', `#slide-${current + 1}`);
