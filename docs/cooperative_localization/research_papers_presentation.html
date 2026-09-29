@@ -150,6 +150,11 @@
       line-height: 1.4;
     }
 
+    a {
+      color: inherit;
+      text-decoration: underline;
+    }
+
     .cite {
       margin-bottom: clamp(20px, 3vw, 36px);
       font-size: clamp(0.85rem, 1.1vw, 1rem);
@@ -369,21 +374,20 @@
     <div class="slides">
       <section class="slide active" data-title="Research papers" aria-hidden="false">
         <div class="slide-inner">
-          <h1>Research Papers for Cooperative Localization</h1>
-          <p class="lead">Five references that support the UGV localization subsystem and the final paper.</p>
+          <h1>Cooperative Localization: Research Papers</h1>
+          <p class="lead">UAV-assisted UGV localization papers and the EKF tool we plan to use.</p>
         </div>
       </section>
 
-      <section class="slide list-slide" data-title="The five references" aria-hidden="true">
+      <section class="slide list-slide" data-title="Reference list" aria-hidden="true">
         <div class="slide-inner">
-          <h2>The five references</h2>
-          <p class="cite">Each one covers a different part of the localization design.</p>
+          <h2>Reference list</h2>
           <ol>
-            <li>Pryor thesis: evidence that UAV help cuts UGV drift when GPS is lost.</li>
-            <li>Akhihiero et al.: how to fuse several noisy measurements in one filter.</li>
-            <li>De Silva and Katupitiya: GPS-equipped drones locating a ground vehicle without GPS.</li>
-            <li>Brunacci et al.: treating a UAV-UGV relative position as a filter input.</li>
-            <li>Moore and Stouch: the ROS filter tool we plan to use.</li>
+            <li><a href="https://etd.auburn.edu/handle/10415/7871" target="_blank" rel="noopener">Pryor thesis</a>: UAV help cuts UGV drift when GPS is lost.</li>
+            <li><a href="https://navi.ion.org/content/71/4/navi.677" target="_blank" rel="noopener">Akhihiero et al.</a>: fusing several noisy measurements in one filter.</li>
+            <li><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC11280856/" target="_blank" rel="noopener">De Silva and Katupitiya</a>: GPS-equipped drones locating a ground vehicle that has no GPS.</li>
+            <li><a href="https://arxiv.org/pdf/2603.08926" target="_blank" rel="noopener">Brunacci et al.</a>: UAV-UGV relative position as a filter input.</li>
+            <li><a href="https://docs.ros.org/en/api/robot_localization/html/index.html" target="_blank" rel="noopener">Moore and Stouch</a>: robot_localization, the ROS filter package we plan to use.</li>
           </ol>
         </div>
       </section>
@@ -391,7 +395,7 @@
       <section class="slide" data-title="1. Pryor thesis" aria-hidden="true">
         <div class="slide-inner">
           <h2>Evaluation of Cooperative Navigation Strategies with Maneuvering UAVs</h2>
-          <p class="cite">Pryor, Auburn University master's thesis, 2021</p>
+          <p class="cite">Pryor, Auburn University master's thesis, 2021 &middot; <a href="https://etd.auburn.edu/handle/10415/7871" target="_blank" rel="noopener">Paper link</a></p>
           <div class="paper-layout">
             <section>
               <h3>Summary</h3>
@@ -428,7 +432,7 @@
       <section class="slide" data-title="2. Akhihiero et al." aria-hidden="true">
         <div class="slide-inner">
           <h2>Cooperative Localization for GNSS-Denied Subterranean Navigation</h2>
-          <p class="cite">Akhihiero, Olawoye, Das, and Gross, NAVIGATION, 2024</p>
+          <p class="cite">Akhihiero, Olawoye, Das, and Gross, NAVIGATION, 2024 &middot; <a href="https://navi.ion.org/content/71/4/navi.677" target="_blank" rel="noopener">Paper link</a></p>
           <div class="paper-layout">
             <section>
               <h3>Summary</h3>
@@ -453,8 +457,8 @@
               <div class="relevance-group">
                 <h3>To the project</h3>
                 <ul>
-                  <li>The direction is reversed (ground robot tracks drone), so we cite it for method only.</li>
-                  <li>The authors list UAV-helps-UGV as future work. That is our subsystem.</li>
+                  <li>Ground robot tracks drone, the reverse of our case. Cite for method only.</li>
+                  <li>The authors list UAV-helps-UGV as future work, which is our subsystem.</li>
                 </ul>
               </div>
             </section>
@@ -465,7 +469,7 @@
       <section class="slide" data-title="3. De Silva and Katupitiya" aria-hidden="true">
         <div class="slide-inner">
           <h2>UAV-UGV Collaborative Localisation with Minimum Sensing</h2>
-          <p class="cite">De Silva and Katupitiya, Sensors, 2024</p>
+          <p class="cite">De Silva and Katupitiya, Sensors, 2024 &middot; <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC11280856/" target="_blank" rel="noopener">Paper link</a></p>
           <div class="paper-layout">
             <section>
               <h3>Summary</h3>
@@ -501,7 +505,7 @@
       <section class="slide" data-title="4. Brunacci et al." aria-hidden="true">
         <div class="slide-inner">
           <h2>Fly, Track, Land: Infrastructure-less Magnetic Localization for Heterogeneous UAV-UGV Teaming</h2>
-          <p class="cite">Brunacci et al., arXiv preprint, 2026</p>
+          <p class="cite">Brunacci et al., arXiv preprint, 2026 &middot; <a href="https://arxiv.org/pdf/2603.08926" target="_blank" rel="noopener">Paper link</a></p>
           <div class="paper-layout">
             <section>
               <h3>Summary</h3>
@@ -527,7 +531,7 @@
                 <h3>To the project</h3>
                 <ul>
                   <li>Confirms UAV-UGV teaming is active research.</li>
-                  <li>It is a preprint focused on docking. Use it for filter design, not accuracy claims.</li>
+                  <li>Preprint focused on docking. Use for filter design, not accuracy claims.</li>
                 </ul>
               </div>
             </section>
@@ -538,7 +542,7 @@
       <section class="slide" data-title="5. Moore and Stouch" aria-hidden="true">
         <div class="slide-inner">
           <h2>A Generalized Extended Kalman Filter Implementation for the Robot Operating System</h2>
-          <p class="cite">Moore and Stouch, IAS-13, 2014. Software: robot_localization</p>
+          <p class="cite">Moore and Stouch, IAS-13, 2014. Software: robot_localization &middot; <a href="https://docs.ros.org/en/api/robot_localization/html/index.html" target="_blank" rel="noopener">Documentation</a></p>
           <div class="paper-layout">
             <section>
               <h3>Summary</h3>
@@ -564,7 +568,7 @@
                 <h3>To the project</h3>
                 <ul>
                   <li>A standard ROS tool lowers integration risk.</li>
-                  <li>We read the package documentation, not the paper PDF. Read the paper before citing it.</li>
+                  <li>We read the package documentation, not the paper. Read the paper before citing it.</li>
                 </ul>
               </div>
             </section>
@@ -572,10 +576,10 @@
         </div>
       </section>
 
-      <section class="slide" data-title="Use in the final paper" aria-hidden="true">
+      <section class="slide" data-title="Final paper mapping" aria-hidden="true">
         <div class="slide-inner">
-          <h2>Where each reference fits in the final paper</h2>
-          <p class="cite">Numbers match the reference list.</p>
+          <h2>Reference use in the final paper</h2>
+          <p class="cite">Numbers refer to the reference list.</p>
           <table>
             <thead>
               <tr><th>Section</th><th>References</th></tr>
@@ -593,10 +597,9 @@
         </div>
       </section>
 
-      <section class="slide" data-title="What we take forward" aria-hidden="true">
+      <section class="slide" data-title="Design choices and gaps" aria-hidden="true">
         <div class="slide-inner">
-          <h2>What we take forward</h2>
-          <p class="cite">Design choices from the papers, and what is still missing.</p>
+          <h2>Design choices and gaps</h2>
           <div class="paper-layout">
             <section>
               <h3>Design choices</h3>
@@ -612,7 +615,7 @@
               <h3>Gaps</h3>
               <ul>
                 <li>No source yet for Gazebo or PX4 simulation validity.</li>
-                <li>The papers used real sensors or MATLAB. Ours is simulation only, so claims stay limited to the simulated conditions.</li>
+                <li>The papers used real sensors or MATLAB. Ours is simulation only, so claims apply to the simulated conditions.</li>
               </ul>
             </section>
           </div>

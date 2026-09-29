@@ -514,8 +514,8 @@
         <div class="slide-inner hero">
           <div>
             <h1>UGV Localization</h1>
-            <p class="lead">Find where the ground robot is, even when its GPS gets weak or drops out. The drone helps.</p>
-            <p class="note">This is the current design contract. It is not implemented yet.</p>
+            <p class="lead">Estimates the ground robot's position, including when its GPS is weak or lost. The drone provides corrections.</p>
+            <p class="note">Design only. Not implemented yet.</p>
           </div>
           <svg viewBox="0 0 520 430" role="img" aria-label="Robot pose and uncertainty on a map with east and north axes">
             <line class="ln" x1="70" y1="350" x2="454" y2="350"/>
@@ -540,10 +540,10 @@
         </div>
       </section>
 
-      <section class="slide" data-title="Planner pose input" aria-hidden="true">
+      <section class="slide" data-title="Localization and planning" aria-hidden="true">
         <div class="slide-inner">
-          <h2>The planner needs the robot's pose</h2>
-          <p class="cite">The planner needs the robot's pose, the terrain map, and the goal in the same coordinate frame. A route can be correct while the robot follows it wrongly if its estimated pose has drifted.</p>
+          <h2>Localization and route planning</h2>
+          <p class="cite">Route planning takes the robot pose, the terrain map, and the goal, all in the same coordinate frame.</p>
           <div class="split">
             <table>
               <thead>
@@ -566,20 +566,20 @@
               </div>
             </div>
           </div>
-          <p class="note">"Pose" means position plus the direction the robot faces.</p>
+          <p class="note">Pose: position and heading.</p>
         </div>
       </section>
 
-      <section class="slide" data-title="UGV GPS loss" aria-hidden="true">
+      <section class="slide" data-title="GPS loss" aria-hidden="true">
         <div class="slide-inner">
-          <h2>What happens when the robot loses GPS</h2>
-          <p class="cite">The subsystem never stops publishing a pose. What changes is how sure it is.</p>
+          <h2>GPS loss</h2>
+          <p class="cite">The subsystem keeps publishing a pose during GPS loss.</p>
           <div class="split">
             <ul>
               <li>GPS gives a global position while it is available.</li>
-              <li>If it drops out, wheel odometry and the motion sensor (IMU) still track movement. Their small errors add up, so the estimate drifts.</li>
-              <li>As the estimate drifts, the uncertainty value (covariance) grows to show the pose is less certain.</li>
-              <li>Drone corrections pull the estimate back toward the true position.</li>
+              <li>Without GPS, wheel odometry and the IMU track movement. Their errors accumulate and the estimate drifts.</li>
+              <li>Covariance (the uncertainty value) grows as the estimate drifts.</li>
+              <li>Drone corrections reduce the drift.</li>
             </ul>
             <svg viewBox="0 0 640 390" role="img" aria-label="Estimated robot path drifting away from the true path after GPS is lost, with growing uncertainty">
               <line class="ln" x1="60" y1="320" x2="600" y2="320"/>
@@ -601,10 +601,10 @@
         </div>
       </section>
 
-      <section class="slide" data-title="Localization inputs and output" aria-hidden="true">
+      <section class="slide" data-title="Inputs and output" aria-hidden="true">
         <div class="slide-inner">
-          <h2>What goes in and what comes out</h2>
-          <p class="cite">The estimator combines the measurements that are available and publishes one robot pose for the planner.</p>
+          <h2>Inputs and output</h2>
+          <p class="cite">The estimator combines the available measurements into one robot pose.</p>
           <div class="flow">
             <div class="stack">
               <div class="box"><strong>UGV GPS</strong><span>Global position when available</span></div>
@@ -616,7 +616,7 @@
             <div class="stack">
               <div class="box heavy">
                 <strong>Localization estimator</strong>
-                <span>Likely an EKF or UKF (standard filters that blend noisy measurements), built on existing ROS 2 tools.</span>
+                <span>EKF or UKF (standard filters for noisy measurements) using existing ROS 2 tools.</span>
                 <span>Keeps running without GPS. Rejects stale or invalid measurements.</span>
               </div>
             </div>
@@ -629,21 +629,21 @@
               </div>
             </div>
           </div>
-          <p class="note">Covariance: how uncertain the estimator is about the pose. These interfaces are not implemented yet. Raw topic names, message quality settings (QoS), rates, and noise values are still open.</p>
+          <p class="note">Covariance: the estimator's uncertainty in the pose. Not implemented. Open: raw topic names, QoS settings, rates, noise values.</p>
         </div>
       </section>
 
-      <section class="slide" data-title="UAV correction" aria-hidden="true">
+      <section class="slide" data-title="Drone corrections" aria-hidden="true">
         <div class="slide-inner">
-          <h2>How the drone helps</h2>
-          <p class="cite">The drone acts as a second source of position when the robot's own GPS is not usable.</p>
+          <h2>Drone corrections</h2>
+          <p class="cite">The drone is a second position source when the robot's GPS is unusable.</p>
           <div class="split">
             <table class="kv">
               <tbody>
-                <tr><th>Assumption</th><td>The drone keeps reliable localization while the robot's GPS is unavailable.</td></tr>
-                <tr><th>Measurement</th><td>The drone reports a noisy observation of the robot's position relative to itself.</td></tr>
-                <tr><th>Effect</th><td>The correction reduces drift and uncertainty. It does not make the estimate exact.</td></tr>
-                <tr><th>Hardware</th><td>UWB radios, AprilTags, or camera tracking could produce this measurement later. The current interface does not require one.</td></tr>
+                <tr><th>Assumption</th><td>Drone localization stays reliable during robot GPS loss.</td></tr>
+                <tr><th>Measurement</th><td>Noisy robot position relative to the drone.</td></tr>
+                <tr><th>Effect</th><td>Reduces drift and uncertainty.</td></tr>
+                <tr><th>Hardware</th><td>Possible sources: UWB, AprilTags, camera tracking. Not fixed yet.</td></tr>
               </tbody>
             </table>
             <svg viewBox="0 0 640 400" role="img" aria-label="A localized drone observes the true robot position, and the correction moves the drifted estimate toward it">
@@ -668,81 +668,85 @@
         </div>
       </section>
 
-      <section class="slide" data-title="Project interfaces" aria-hidden="true">
+      <section class="slide" data-title="Subsystem connections" aria-hidden="true">
         <div class="slide-inner">
-          <h2>How localization fits the whole project</h2>
-          <p class="cite">Localization and traversability are separate. Both publish data in <span class="mono">map</span> so route planning can use them together.</p>
-          <svg viewBox="0 0 1200 530" role="img" aria-label="UAV control, UGV sensor interfaces, and fault management connect to cooperative localization. Localization, traversability mapping, and the mission goal feed route planning. Route planning sends a route to UGV control.">
-            <defs>
-              <marker id="head2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
-                <path d="M0 0 L10 5 L0 10 z" fill="#000"/>
-              </marker>
-            </defs>
-
-            <rect class="box" x="0" y="30" width="270" height="76"/>
-            <text class="b" x="14" y="58">UAV control</text>
-            <text x="14" y="86">PX4 state in local NED</text>
-
-            <rect class="box" x="0" y="126" width="270" height="96"/>
-            <text class="b" x="14" y="154">UGV sensor interfaces</text>
-            <text x="14" y="178">GNSS, odometry, IMU</text>
-            <text x="14" y="202">not yet available in ROS 2</text>
-
-            <rect class="box" x="0" y="242" width="270" height="96"/>
-            <text class="b" x="14" y="270">Fault management</text>
-            <text x="14" y="298">Inject or report GNSS faults</text>
-            <text x="14" y="322">API remains open</text>
-
-            <line x1="270" y1="68" x2="338" y2="68" stroke="#000" stroke-width="2" marker-end="url(#head2)"/>
-            <line x1="270" y1="174" x2="338" y2="174" stroke="#000" stroke-width="2" marker-end="url(#head2)"/>
-            <line x1="270" y1="280" x2="338" y2="280" stroke="#000" stroke-width="2" stroke-dasharray="6 5" marker-start="url(#head2)" marker-end="url(#head2)"/>
-
-            <rect class="heavy" x="340" y="30" width="270" height="288"/>
-            <text class="b" x="354" y="66">Cooperative localization</text>
-            <text x="354" y="100">Combines localization</text>
-            <text x="354" y="120">measurements</text>
-            <text x="354" y="152">Maintains the UGV pose</text>
-            <text x="354" y="172">estimate</text>
-            <text class="m" x="354" y="216">/ugv/localization/pose</text>
-            <text x="354" y="242">authoritative pose in</text>
-            <text x="354" y="262">map / ENU</text>
-
-            <rect class="box" x="340" y="356" width="270" height="76"/>
-            <text class="b" x="354" y="384">Traversability mapping</text>
-            <text x="354" y="412">Terrain information in map / ENU</text>
-
-            <rect class="box" x="340" y="446" width="270" height="76"/>
-            <text class="b" x="354" y="474">Mission or goal</text>
-            <text x="354" y="502">Destination in map / ENU</text>
-
-            <line x1="610" y1="174" x2="678" y2="174" stroke="#000" stroke-width="2" marker-end="url(#head2)"/>
-            <polyline points="610,394 644,394 644,286 678,286" fill="none" stroke="#000" stroke-width="2" marker-end="url(#head2)"/>
-            <polyline points="610,484 662,484 662,316 678,316" fill="none" stroke="#000" stroke-width="2" marker-end="url(#head2)"/>
-
-            <rect class="heavy" x="680" y="120" width="270" height="228"/>
-            <text class="b" x="694" y="156">Route planning</text>
-            <text x="694" y="190">Consumes pose, terrain,</text>
-            <text x="694" y="210">and goal</text>
-            <text x="694" y="242">Does not consume raw</text>
-            <text x="694" y="262">localization sensors</text>
-            <text x="694" y="304">output: route</text>
-
-            <line x1="950" y1="234" x2="1010" y2="234" stroke="#000" stroke-width="2" marker-end="url(#head2)"/>
-            <rect class="box" x="1012" y="190" width="188" height="88"/>
-            <text class="b" x="1106" y="230" text-anchor="middle">UGV</text>
-            <text class="b" x="1106" y="252" text-anchor="middle">control</text>
-          </svg>
-          <p class="note">The package for this subsystem is <span class="mono">cooperative_localization</span>.</p>
+          <h2>Subsystem connections</h2>
+          <p class="cite">Localization and traversability mapping both publish in the <span class="mono">map</span> frame. Route planning reads both.</p>
+          <svg viewBox="0 0 1200 615" style="max-height:58vh" role="img" aria-label="Data sources (UGV sensors, drone, fault management) feed cooperative localization. Localization publishes one pose. Route planning combines that pose with the traversability map and the mission goal and sends a route to UGV control. Gazebo ground truth is used only for test data and scoring.">
+<defs><marker id="head2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#000"/></marker></defs>
+<text class="b" x="0" y="20">Data sources</text>
+<text class="b" x="350" y="20">Localization</text>
+<text class="b" x="700" y="20">Route planning</text>
+<text class="b" x="1012" y="20">Robot</text>
+<rect class="box" x="0" y="50" width="250" height="80" />
+<text class="b" x="14" y="78">UGV sensors</text>
+<text x="14" y="102">GPS, wheel odometry, IMU</text>
+<text x="14" y="123">Not yet in ROS 2</text>
+<rect class="box" x="0" y="150" width="250" height="90" />
+<text class="b" x="14" y="178">Drone (UAV)</text>
+<text x="14" y="202">Own position, from PX4</text>
+<text x="14" y="223">Noisy view of the robot</text>
+<rect class="box" x="0" y="260" width="250" height="80" />
+<text class="b" x="14" y="288">Fault management</text>
+<text x="14" y="312">Injects and reports GPS loss</text>
+<text x="14" y="333">API undecided</text>
+<rect class="box" x="0" y="380" width="250" height="110" stroke-dasharray="6 5"/>
+<text class="b" x="14" y="408">Gazebo ground truth</text>
+<text x="14" y="432">Makes test sensor data and</text>
+<text x="14" y="453">scores results. Never sent</text>
+<text x="14" y="474">to the planner.</text>
+<polyline points="250,90 348,90" fill="none" stroke="#000" stroke-width="2" marker-end="url(#head2)"/>
+<polyline points="250,195 348,195" fill="none" stroke="#000" stroke-width="2" marker-end="url(#head2)"/>
+<polyline points="250,300 348,300" fill="none" stroke="#000" stroke-width="2" stroke-dasharray="6 5" marker-start="url(#head2)" marker-end="url(#head2)"/>
+<rect class="heavy" x="350" y="40" width="270" height="310"/>
+<text class="b" x="364" y="68">Cooperative localization</text>
+<text x="364" y="94">Combines all inputs into one</text>
+<text x="364" y="115">robot position estimate.</text>
+<text x="364" y="136">Keeps publishing if GPS drops.</text>
+<text x="364" y="157">Uncertainty grows until the</text>
+<text x="364" y="178">drone corrects it.</text>
+<line class="thin" x1="350" y1="235" x2="620" y2="235"/>
+<text class="b" x="364" y="258">Output</text>
+<text class="m" x="364" y="280">/ugv/localization/pose</text>
+<text x="364" y="302">position, heading, uncertainty</text>
+<text x="364" y="323">in map frame (ENU)</text>
+<text x="350" y="384">Other route planning inputs</text>
+<rect class="box" x="350" y="394" width="270" height="64" />
+<text class="b" x="364" y="422">Traversability mapping</text>
+<text x="364" y="446">Terrain, in map frame</text>
+<rect class="box" x="350" y="474" width="270" height="64" />
+<text class="b" x="364" y="502">Mission</text>
+<text x="364" y="526">Goal, in map frame</text>
+<rect class="heavy" x="700" y="150" width="250" height="230"/>
+<text class="b" x="714" y="180">Route planning</text>
+<text x="714" y="210">Takes pose, terrain, and goal.</text>
+<text x="714" y="234">Never reads raw sensors.</text>
+<text x="714" y="258">Outputs a route.</text>
+<polyline points="620,280 698,280" fill="none" stroke="#000" stroke-width="2" marker-end="url(#head2)"/>
+<polyline points="620,427 660,427 660,318 698,318" fill="none" stroke="#000" stroke-width="2" marker-end="url(#head2)"/>
+<polyline points="620,506 680,506 680,352 698,352" fill="none" stroke="#000" stroke-width="2" marker-end="url(#head2)"/>
+<text x="659" y="270" text-anchor="middle">pose</text>
+<polyline points="950,260 1010,260" fill="none" stroke="#000" stroke-width="2" marker-end="url(#head2)"/>
+<text x="980" y="250" text-anchor="middle">route</text>
+<rect class="box" x="1012" y="215" width="188" height="90"/>
+<text class="b" x="1106" y="255" text-anchor="middle">UGV control</text>
+<text x="1106" y="278" text-anchor="middle">drives the route</text>
+<line x1="0" y1="580" x2="40" y2="580" stroke="#000" stroke-width="2" marker-end="url(#head2)"/><text x="52" y="585">data flow</text>
+<line x1="170" y1="580" x2="210" y2="580" stroke="#000" stroke-width="2" stroke-dasharray="6 5" marker-start="url(#head2)" marker-end="url(#head2)"/><text x="222" y="585">two-way, interface undecided</text>
+<rect class="heavy" x="470" y="568" width="30" height="24"/><text x="512" y="585">main pipeline</text>
+<rect class="box" x="700" y="568" width="30" height="24" stroke-dasharray="4 3"/><text x="742" y="585">test and scoring only</text>
+</svg>
+          <p class="note">Package: <span class="mono">cooperative_localization</span>.</p>
         </div>
       </section>
 
-      <section class="slide" data-title="Interface contract" aria-hidden="true">
+      <section class="slide" data-title="Pose interface" aria-hidden="true">
         <div class="slide-inner">
-          <h2>The one interface other subsystems use</h2>
-          <p class="cite">Route planning reads this pose. It does not read GPS, odometry, IMU, or drone readings directly.</p>
+          <h2>Pose interface</h2>
+          <p class="cite">Route planning reads the pose from this topic. It does not read GPS, odometry, IMU, or drone readings.</p>
           <div class="columns">
             <section>
-              <h3>Preferred localization contract</h3>
+              <h3>Topic definition</h3>
               <table class="kv">
                 <tbody>
                   <tr><th>Topic</th><td class="mono">/ugv/localization/pose</td></tr>
@@ -751,57 +755,55 @@
                   <tr><th>Convention</th><td>ENU: east, north, up</td></tr>
                 </tbody>
               </table>
-              <p class="note">This is a preferred design contract. It is not yet implemented in the repository.</p>
+              <p class="note">Not yet implemented.</p>
             </section>
             <section>
-              <h3>Who uses it and how</h3>
+              <h3>Consumers</h3>
               <ul>
-                <li><strong>Planner:</strong> uses this pose instead of subscribing to raw GPS, odometry, IMU, or drone measurements.</li>
+                <li><strong>Planner:</strong> subscribes to this pose only.</li>
                 <li><strong>Mapping:</strong> publishes traversability data in the same ENU map frame.</li>
-                <li><strong>Coordinates:</strong> the robot pose, obstacles, routes, and goals all use the same frame.</li>
-                <li><strong>Covariance:</strong> reports how uncertain the estimator is about the pose.</li>
-                <li><strong>Frames:</strong> the drone's state is PX4 NED (north, east, down). Convert it to the project's map / ENU frame.</li>
+                <li><strong>Coordinates:</strong> pose, obstacles, routes, and goals share one frame.</li>
+                <li><strong>Covariance:</strong> the estimator's uncertainty in the pose.</li>
+                <li><strong>Frames:</strong> drone state is PX4 NED (north, east, down) and is converted to map / ENU.</li>
               </ul>
             </section>
           </div>
         </div>
       </section>
 
-      <section class="slide" data-title="Evaluation plan" aria-hidden="true">
+      <section class="slide" data-title="Evaluation" aria-hidden="true">
         <div class="slide-inner">
-          <h2>How we will test it</h2>
-          <p class="cite">Run the same route under three GPS conditions. Compare estimator error and path-following error.</p>
+          <h2>Evaluation</h2>
+          <p class="cite">Same route under three GPS conditions. Measures estimator error and path-following error.</p>
           <div class="columns">
             <section>
-              <h3>Three cases</h3>
+              <h3>Test cases</h3>
               <ol>
                 <li>Nominal GPS
                   <span class="sub">Regular global position updates.</span></li>
                 <li>GPS loss without drone assistance
-                  <span class="sub">Odometry and IMU continue as the estimate drifts.</span></li>
+                  <span class="sub">Odometry and IMU only. The estimate drifts.</span></li>
                 <li>GPS loss with drone assistance
-                  <span class="sub">Relative observations correct the estimate during the outage.</span></li>
+                  <span class="sub">Drone observations correct the estimate.</span></li>
               </ol>
             </section>
             <section>
-              <h3>What we measure</h3>
+              <h3>Metrics</h3>
               <ul>
                 <li>Position RMSE: overall position error.</li>
-                <li>Mean and max error: typical and worst deviation.</li>
-                <li>Heading error: orientation accuracy.</li>
+                <li>Mean and max position error.</li>
+                <li>Heading error.</li>
                 <li>Covariance: reported uncertainty versus actual error.</li>
-                <li>Path-following error: effect on downstream navigation.</li>
+                <li>Path-following error.</li>
               </ul>
             </section>
           </div>
-          <p class="note">Goal: test whether drone relative-position updates reduce drift and path-following error during robot GPS loss.</p>
         </div>
       </section>
 
-      <section class="slide" data-title="Scope and boundaries" aria-hidden="true">
+      <section class="slide" data-title="Scope" aria-hidden="true">
         <div class="slide-inner">
-          <h2>What this subsystem does and does not do</h2>
-          <p class="cite">The subsystem estimates the robot's pose. It does not map terrain, generate routes, or control either vehicle.</p>
+          <h2>Scope</h2>
           <div class="columns">
             <section>
               <h3>In scope</h3>
@@ -826,23 +828,22 @@
               </ul>
             </section>
           </div>
-          <p class="note">This supports search-and-rescue routes where the robot's GPS may be degraded and the drone still has reliable localization. It does not solve localization if both vehicles lose their global reference.</p>
+          <p class="note">Assumes the drone has reliable localization while the robot's GPS is degraded. Localization when both vehicles lose their global reference is out of scope.</p>
         </div>
       </section>
 
-      <section class="slide" data-title="Steps to begin" aria-hidden="true">
+      <section class="slide" data-title="First steps" aria-hidden="true">
         <div class="slide-inner">
-          <h2>Steps to begin</h2>
-          <p class="cite">Start with data. The filter is the easy part once real sensor data reaches it.</p>
+          <h2>First steps</h2>
           <ol class="steps">
             <li>Agree with the simulation and integration subsystem on who adds the robot's sensors and the bridge into ROS 2.
-              <span>This is an open decision and it blocks everything after it.</span></li>
+              <span>Open decision. Blocks the remaining steps.</span></li>
             <li>Add an IMU and a GPS sensor to the ground robot model. Bridge odometry, IMU, GPS, and the true position into ROS 2.
-              <span>The true position is only for making test data and scoring results.</span></li>
+              <span>True position is used only to generate test data and score results.</span></li>
             <li>Write a test-sensor node that adds noise to the true position.
-              <span>It outputs GPS with an on and off switch, and a noisy drone reading of the robot.</span></li>
+              <span>Outputs GPS with an on/off switch and a noisy drone reading of the robot.</span></li>
             <li>Run the existing EKF tool on GPS, odometry, and IMU. Add a small relay that publishes the result on the pose topic.
-              <span>The tool outputs a different message type than our contract, so the relay converts it.</span></li>
+              <span>The tool's output message type differs from the pose contract. The relay converts it.</span></li>
             <li>Add the drone reading as another input, after converting drone axes from NED to ENU.</li>
             <li>Log error against the true position for the three test cases.</li>
           </ol>
@@ -851,8 +852,7 @@
 
       <section class="slide" data-title="Open decisions" aria-hidden="true">
         <div class="slide-inner">
-          <h2>Decisions still open</h2>
-          <p class="cite">Agree on these early so the subsystems can connect without rework.</p>
+          <h2>Open decisions</h2>
           <div class="columns">
             <section>
               <h3>With other subsystems</h3>
