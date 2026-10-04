@@ -3,14 +3,23 @@
 <package format="3">
   <name>mission_manager</name>
   <version>0.0.0</version>
-  <description>TODO: Package description</description>
+  <description>Publishes shared mission goals and launches the UAV-UGV demo.</description>
   <maintainer email="chocamer@usc.edu">cameron</maintainer>
   <license>TODO: License declaration</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 
   <depend>rclcpp</depend>
-  <depend>std_msgs</depend>
+  <depend>geometry_msgs</depend>
+  <depend>visualization_msgs</depend>
+  <exec_depend>uav_control</exec_depend>
+  <exec_depend>ugv_control</exec_depend>
+  <exec_depend>traversability_mapping</exec_depend>
+  <exec_depend>route_planning</exec_depend>
+  <exec_depend>launch</exec_depend>
+  <exec_depend>launch_ros</exec_depend>
+  <exec_depend>ament_index_python</exec_depend>
+  <exec_depend>rviz2</exec_depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>

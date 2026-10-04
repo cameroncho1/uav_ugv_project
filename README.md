@@ -67,7 +67,7 @@ uav_ugv_project/
 
 ## ROS 2 Package Responsibilities (Just an outline for now, subject to change)
 
-- `uav_control`: PX4/UAV interface. Current example: `odometry_listener.cpp`. Future examples: offboard control and scout control.
+- `uav_control`: PX4/UAV interface, including the Offboard goal controller.
 - `ugv_control`: UGV state and motion control.
 - `traversability_mapping`: UAV perception data to terrain/hazard/traversability map.
 - `route_planning`: UGV path planning and dynamic replanning.
@@ -484,10 +484,6 @@ ros2 topic list | grep /fmu
 ros2 topic echo /fmu/out/vehicle_odometry --once
 ```
 
-```bash
-ros2 run uav_control odometry_listener
-```
-
 ## Terminal 5 — Gazebo GUI
 
 Run this from the Ubuntu graphical desktop:
@@ -563,44 +559,6 @@ Project C++ nodes
 
 ---
 
-# Test the C++ ROS 2 Odometry Node
-
-```bash
-cd ~/uav_ugv_project/ros2_ws
-
-source /opt/ros/humble/setup.bash
-source install/setup.bash
-
-colcon build \
-  --packages-select uav_control \
-  --symlink-install
-
-source install/setup.bash
-
-ros2 run uav_control odometry_listener
-```
-
-Expected output is similar to:
-
-```text
-Listening to /fmu/out/vehicle_odometry
-PX4 position (NED): x=..., y=..., z=... m
-```
-
-PX4 uses NED coordinates:
-
-```text
-+x = North
-+y = East
-+z = Down
-```
-
-A UAV about 2.3 m above the local origin may therefore report:
-
-```text
-z ≈ -2.3 m
-```
-
 ---
 
 # Test UAV Takeoff
@@ -671,7 +629,6 @@ ament_target_dependencies(
 
 install(
   TARGETS
-    odometry_listener
     offboard_controller
   DESTINATION lib/${PROJECT_NAME}
 )
