@@ -118,7 +118,7 @@ export GZ_PARTITION="$GZ_PARTITION" GZ_IP="$GZ_IP"
 cd "$PROJECT/ros2_ws"
 echo "ROS 2 shell ready. Try:"
 echo "  ros2 topic list | grep /fmu"
-echo "  ros2 run uav_control odometry_listener"
+echo "  ros2 launch mission_manager simple_goal_demo.launch.py start_simulation:=false"
 EOF
 gnome-terminal --tab --title="4 ROS 2" -- bash --rcfile "$ROS_RC"
 
