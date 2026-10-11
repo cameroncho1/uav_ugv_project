@@ -2,9 +2,9 @@
 
 ## Purpose and Current State
 
-This subsystem is intended to supply the UGV's position to the rest of the project, including when UGV GPS is degraded. Its implemented input layer bridges wheel odometry, IMU, GPS, and simulation time into ROS 2. A measurement adapter projects GPS into the map frame, anchors wheel odometry to the UGV spawn pose, and publishes noisy readings with configured covariance. Both Gazebo worlds contain the sensors. [Interfaces](interfaces.md) lists the live topics, frames, error settings, and commands to check them.
+This subsystem supplies a fused UGV position from wheel motion, IMU heading, and GPS. Its input layer bridges the simulated sensors into ROS 2. A measurement adapter projects GPS into the map frame, anchors wheel odometry to the UGV spawn pose, and publishes noisy readings with configured covariance. A planar EKF combines them and publishes `/ugv/localization/pose`. Both Gazebo worlds contain the sensors. [Interfaces](interfaces.md) lists the live topics, frames, error settings, and commands to check them.
 
-There is no fused pose estimator, GPS outage control, UAV-to-UGV measurement, or localization accuracy result in the repository. The goal demo drives and plans from its existing `/ugv_pose` topic, which the UGV controller makes from Gazebo odometry.
+The fused pose is a GPS, wheel, and IMU baseline. GPS outage control, a UAV-to-UGV measurement, and localization accuracy results are not implemented. The goal demo still drives and plans from its existing `/ugv_pose` topic, which the UGV controller makes from Gazebo odometry.
 
 ## Sensor Boundary
 
@@ -17,17 +17,17 @@ There is no fused pose estimator, GPS outage control, UAV-to-UGV measurement, or
 
 These are raw simulation measurements. Wheel odometry is relative to the UGV spawn pose; GPS is geodetic; IMU is in its chassis sensor frame. Their raw covariance fields do not provide a useful uncertainty model. `ugv_measurements.py` publishes prepared wheel odometry and GPS position in ENU `map`, and an IMU reading in its original sensor frame. It adds configurable independent Gaussian noise and corresponding covariance; the raw inputs remain unchanged. The values are test assumptions, not hardware calibration.
 
-## Fused Pose Contract
+## Fused Pose and Boundaries
 
-The integration target is one authoritative UGV estimate on `/ugv/localization/pose`, type `geometry_msgs/msg/PoseWithCovarianceStamped`, in the ENU `map` frame. That topic has no publisher yet. Its estimator must account for sensor frames, timestamps, and measurement uncertainty. The measurement adapter handles the configured GPS origin and wheel-odometry spawn offset.
+The implemented baseline publishes one UGV estimate on `/ugv/localization/pose`, type `geometry_msgs/msg/PoseWithCovarianceStamped`, in the ENU `map` frame. `robot_localization` runs the 2D EKF. It predicts from wheel forward speed, tracks heading with IMU yaw and turn rate, and corrects map x/y with GPS. The output adapter copies the EKF pose and covariance into the agreed message type. An identity TF relates the chassis and the IMU mounted at its origin.
 
-An EKF through `robot_localization` is the starting approach. The prepared GPS input is already in the local map frame. A UAV-assisted correction also needs a measured UGV-to-UAV relative position and a UAV pose converted from PX4 NED to map ENU. PX4 UAV odometry by itself is not a UGV correction.
+A UAV-assisted correction needs a measured UGV-to-UAV relative position and a UAV pose converted from PX4 NED to map ENU. PX4 UAV odometry by itself is not a UGV correction.
 
-Once the fused topic is validated, the path planner and UGV controller can consume it in place of `/ugv_pose`. Terrain mapping, obstacle detection, route planning, and flight control stay in their existing packages.
+The path planner and UGV controller can consume the fused topic in place of `/ugv_pose` after accuracy and GPS-loss tests. Terrain mapping, obstacle detection, route planning, and flight control stay in their existing packages.
 
 ## GPS Degradation and Evaluation
 
-The target behavior during UGV GPS loss is a continuously published pose based on remaining measurements, with uncertainty that grows when the estimate drifts. No GPS loss behavior is implemented yet.
+The target behavior during UGV GPS loss is a continuously published pose based on remaining measurements, with uncertainty that grows when the estimate drifts. GPS loss injection and this behavior's validation are not implemented yet.
 
 The evaluation compares nominal GPS, GPS loss without UAV help, and GPS loss with UAV help. It records position error, heading error, uncertainty versus observed error, and UGV path-following error. Gazebo's true state is a scoring reference, never the operational localization output. Claims apply only to the simulated conditions tested.
 

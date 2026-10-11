@@ -380,7 +380,7 @@
       <section class="slide active" data-title="Research papers" aria-hidden="false">
         <div class="slide-inner">
           <h1>Cooperative Localization: Research Papers</h1>
-          <p class="lead">UAV-assisted UGV localization papers and the EKF tool we plan to use.</p>
+          <p class="lead">UAV-assisted UGV localization papers and the EKF used by our GPS, wheel, and IMU baseline.</p>
         </div>
       </section>
 
@@ -392,7 +392,7 @@
             <li><a href="https://navi.ion.org/content/71/4/navi.677" target="_blank" rel="noopener">Akhihiero et al.</a>: fusing several noisy measurements in one filter.</li>
             <li><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC11280856/" target="_blank" rel="noopener">De Silva and Katupitiya</a>: GPS-equipped drones locating a ground vehicle that has no GPS.</li>
             <li><a href="https://arxiv.org/pdf/2603.08926" target="_blank" rel="noopener">Brunacci et al.</a>: UAV-UGV relative position as a filter input.</li>
-            <li><a href="https://docs.ros.org/en/api/robot_localization/html/index.html" target="_blank" rel="noopener">Moore and Stouch</a>: robot_localization, the ROS filter package we plan to use.</li>
+            <li><a href="https://docs.ros.org/en/api/robot_localization/html/index.html" target="_blank" rel="noopener">Moore and Stouch</a>: robot_localization, the ROS filter package used by our baseline.</li>
           </ol>
         </div>
       </section>
@@ -564,7 +564,7 @@
               <div class="relevance-group">
                 <h3>To localization</h3>
                 <ul>
-                  <li>The planned tool in our technical plan.</li>
+                  <li>The EKF package used by our GPS, wheel, and IMU baseline.</li>
                   <li>Continuous estimation matches our rule that the pose never stops publishing.</li>
                   <li>Our contract is PoseWithCovarianceStamped, so we need a small relay node.</li>
                 </ul>
@@ -622,7 +622,7 @@
                 <li><span class="mono">/ugv/measurements/wheel_odom</span>: motion anchored to the UGV's map spawn point.</li>
                 <li><span class="mono">/ugv/measurements/gps_pose</span>: GPS converted to east/north meters in map.</li>
                 <li><span class="mono">/ugv/measurements/imu</span>: noisy inertial reading with covariance.</li>
-                <li>The next estimator combines these inputs and publishes <span class="mono">/ugv/localization/pose</span>.</li>
+                <li>A 2D EKF combines wheel speed, IMU heading, and GPS position on <span class="mono">/ugv/localization/pose</span>.</li>
                 <li>The current planner still reads <span class="mono">/ugv_pose</span> from the demo controller; it does not use the new sensor topics yet.</li>
               </ul>
             </section>
@@ -637,7 +637,7 @@
             <section>
               <h3>Design choices</h3>
               <ul>
-                <li>Build the estimator with robot_localization.</li>
+                <li>Use robot_localization for the GPS, wheel, and IMU baseline.</li>
                 <li>Reject stale and out-of-range measurements before fusing.</li>
                 <li>Model UAV pose error, not only UGV sensor noise.</li>
                 <li>Score three cases: nominal GPS, GPS loss without UAV, and GPS loss with UAV.</li>

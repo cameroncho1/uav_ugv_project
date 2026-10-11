@@ -18,7 +18,7 @@ Terms used below:
 | 2 | Akhihiero et al. (2024), Cooperative Localization for GNSS-Denied Subterranean Navigation | Journal paper | Shows how several noisy measurements at different rates are fused, and compares EKF with a heavier method. |
 | 3 | De Silva and Katupitiya (2024), UAV-UGV Collaborative Localisation with Minimum Sensing | Journal paper | Closest match to the problem: UAVs with GPS localize a UGV without GPS. Shows how to reject impossible estimates. |
 | 4 | Brunacci et al. (2026), Fly, Track, Land | Preprint | Shows how to treat a UAV-UGV relative position reading as a filter input, with outlier rejection. |
-| 5 | Moore and Stouch (2014), `robot_localization` | Conference paper and software | The tool we plan to use to build the estimator. |
+| 5 | Moore and Stouch (2014), `robot_localization` | Conference paper and software | The EKF package used by the GPS, wheel, and IMU baseline. |
 
 ---
 
@@ -186,7 +186,7 @@ Proceedings of the 13th International Conference on Intelligent Autonomous Syste
 
 ### Relevance to cooperative localization
 
-- This is the planned tool, as stated in `technical_plan.md`.
+- The subsystem runs this package's 2D EKF for the GPS, wheel, and IMU baseline.
 - Its continuous estimation and sensor timeout match our requirement that the pose keeps publishing when GPS is lost.
 - Its pose-with-covariance input suits our UAV-derived UGV position.
 - Its rejection thresholds cover our requirement for handling rejected measurements.

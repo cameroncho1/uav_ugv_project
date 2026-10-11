@@ -4,7 +4,7 @@
 
 Both Gazebo worlds, `simple_goal_demo` and `uav_ugv`, contain the `simple_ugv` differential-drive robot. Its chassis has an IMU and a NavSat sensor. The differential-drive system publishes wheel odometry. `cooperative_localization` launches one Gazebo-to-ROS bridge for the three measurements and simulation clock.
 
-The goal demo starts the bridge and measurement adapter through `mission_manager/launch/simple_goal_demo.launch.py`. They also run on their own with `ros2 launch cooperative_localization ugv_sensors.launch.py` when the `uav_ugv` world is already running. Pass `world:=simple_goal_demo` for that world. The bridge topic mapping is in `ros2_ws/src/cooperative_localization/config/ugv_sensor_bridges.yaml`.
+The goal demo starts the bridge, measurement adapter, and EKF through `mission_manager/launch/simple_goal_demo.launch.py`. To run the full localization chain against an already running `uav_ugv` world, use `ros2 launch cooperative_localization ugv_localization.launch.py`. Pass `world:=simple_goal_demo` for that world. `ugv_sensors.launch.py` starts just the bridge and adapter. The bridge topic mapping is in `ros2_ws/src/cooperative_localization/config/ugv_sensor_bridges.yaml`.
 
 | ROS 2 topic | Type | Gazebo topic | Rate configured in SDF | Frame in messages |
 | --- | --- | --- | ---: | --- |
@@ -41,22 +41,24 @@ The configured GPS standard deviations are 1.5 m horizontally and 3 m vertically
 
 The goal demo's UGV controller still reads Gazebo odometry directly and publishes `/ugv_pose` as `geometry_msgs/msg/PoseStamped` in `map`. It applies the demo's configured spawn offset. The local A* planner reads `/ugv_pose`. The raw and prepared localization topics do not drive the controller or planner yet.
 
-## Localization Integration Contract
+## Fused UGV Position
 
-`cooperative_localization` owns the single fused UGV pose interface:
+`ugv_localization.launch.py` starts a planar `robot_localization` EKF and a small output adapter. It also publishes an identity TF from `simple_ugv/chassis` to `simple_ugv/chassis/imu`; the Gazebo IMU is mounted at the chassis link origin. The EKF configuration is `ros2_ws/src/cooperative_localization/config/ugv_ekf.yaml`. The EKF publishes at 30 Hz and continues prediction when an input is late. It does not publish a map-to-chassis TF; consumers use the pose message.
+
+The EKF uses wheel forward velocity to predict movement, IMU yaw and turn rate to track heading, and GPS map x/y to correct position. It does not fuse the wheel's integrated pose a second time or use the GPS message's placeholder orientation. It publishes filtered odometry on `/ugv/localization/odometry`. The output adapter publishes the single fused pose interface:
 
 - Topic: `/ugv/localization/pose`
 - Type: `geometry_msgs/msg/PoseWithCovarianceStamped`
 - Frame: `map` (ENU)
-- Contents: timestamp, position, orientation, and estimator covariance
+- Contents: EKF timestamp, position, orientation, and covariance
 
-This fused topic has no publisher in the current code. The estimator must combine the prepared UGV measurements and a UAV-assisted relative-position measurement, handle missing UGV GPS, and publish a continuous pose with uncertainty. The UAV-assisted measurement producer and topic are not implemented. The planner and controller can move from `/ugv_pose` to the fused topic after the estimator is implemented and validated against simulator truth.
+This is a GPS, wheel, and IMU baseline. The adapter copies the EKF's pose and covariance; it does not perform another filter step. The planner and controller still use `/ugv_pose`. The fused pose needs accuracy and GPS-loss tests before they can use it. A UAV-assisted measurement producer and correction are not implemented.
 
 Gazebo's true state is for simulation checks and scoring only. It is not the fused localization output. GPS outage controls, estimator tuning, and accuracy evaluation are separate work.
 
 ## Run and Check
 
-Install a Gazebo Harmonic build of `ros_gz_bridge` alongside ROS 2 Humble. On this Ubuntu 22.04 setup the package is `ros-humble-ros-gzharmonic-bridge`. Build and source the workspace, then launch the demo or launch `ugv_sensors.launch.py` while the `uav_ugv` world is running.
+Install a Gazebo Harmonic build of `ros_gz_bridge` and `robot_localization` alongside ROS 2 Humble. On this Ubuntu 22.04 setup the packages are `ros-humble-ros-gzharmonic-bridge` and `ros-humble-robot-localization`. Build and source the workspace, then launch the demo or launch `ugv_localization.launch.py` while the `uav_ugv` world is running.
 
 ```bash
 source /opt/ros/humble/setup.bash
@@ -68,6 +70,7 @@ ros2 topic echo --once /ugv/sensors/gps --qos-reliability best_effort
 ros2 topic echo --once /ugv/measurements/wheel_odom --qos-reliability best_effort
 ros2 topic echo --once /ugv/measurements/imu --qos-reliability best_effort
 ros2 topic echo --once /ugv/measurements/gps_pose --qos-reliability best_effort
+ros2 topic echo --once /ugv/localization/pose
 ```
 
-Expected: all three raw sensors and their prepared measurements publish stamped readings, and `/clock` advances while Gazebo runs. A listed topic alone does not prove that it is publishing; check at least one message. In the `uav_ugv` world, prepared wheel odometry starts near map `(1, 0)`; in `simple_goal_demo`, it starts near `(-4, 0)`. Individual GPS readings scatter around the spawn point because noise is enabled.
+Expected: all three raw sensors and their prepared measurements publish stamped readings, `/clock` advances, and the fused pose publishes in `map` with nonzero covariance. A listed topic alone does not prove that it is publishing; check at least one message. In the `uav_ugv` world, prepared wheel odometry starts near map `(1, 0)`; in `simple_goal_demo`, it starts near `(-4, 0)`. Individual GPS readings scatter around the spawn point because noise is enabled.

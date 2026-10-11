@@ -71,7 +71,7 @@ def generate_launch_description():
         world,
         agent,
         IncludeLaunchDescription(
-            PythonLaunchDescriptionSource(str(localization_share / "launch/ugv_sensors.launch.py")),
+            PythonLaunchDescriptionSource(str(localization_share / "launch/ugv_localization.launch.py")),
             launch_arguments={"world": "simple_goal_demo"}.items(),
         ),
         Node(
