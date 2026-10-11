@@ -2,8 +2,9 @@ from pathlib import Path
 
 from ament_index_python.packages import get_package_prefix, get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, ExecuteProcess, SetEnvironmentVariable, TimerAction
+from launch.actions import DeclareLaunchArgument, ExecuteProcess, IncludeLaunchDescription, SetEnvironmentVariable, TimerAction
 from launch.conditions import IfCondition
+from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 from launch_ros.parameter_descriptions import ParameterValue
@@ -12,6 +13,7 @@ from launch_ros.parameter_descriptions import ParameterValue
 def generate_launch_description():
     project_root = Path(get_package_prefix("mission_manager")).parents[2]
     package_share = Path(get_package_share_directory("mission_manager"))
+    localization_share = Path(get_package_share_directory("cooperative_localization"))
     start_simulation = LaunchConfiguration("start_simulation")
     start_rviz = LaunchConfiguration("start_rviz")
 
@@ -68,6 +70,8 @@ def generate_launch_description():
         SetEnvironmentVariable("GZ_IP", "127.0.0.1"),
         world,
         agent,
+        IncludeLaunchDescription(PythonLaunchDescriptionSource(
+            str(localization_share / "launch/ugv_sensors.launch.py"))),
         Node(
             package="mission_manager",
             executable="goal_manager",

@@ -1,0 +1,28 @@
+# Raw simulated UGV measurements. Keep these separate from the future fused pose.
+- ros_topic_name: /clock
+  gz_topic_name: /clock
+  ros_type_name: rosgraph_msgs/msg/Clock
+  gz_type_name: gz.msgs.Clock
+  direction: GZ_TO_ROS
+  qos_profile: CLOCK
+
+- ros_topic_name: /ugv/sensors/wheel_odom
+  gz_topic_name: /simple_ugv/odom
+  ros_type_name: nav_msgs/msg/Odometry
+  gz_type_name: gz.msgs.Odometry
+  direction: GZ_TO_ROS
+  qos_profile: SENSOR_DATA
+
+- ros_topic_name: /ugv/sensors/imu
+  gz_topic_name: /simple_ugv/imu
+  ros_type_name: sensor_msgs/msg/Imu
+  gz_type_name: gz.msgs.IMU
+  direction: GZ_TO_ROS
+  qos_profile: SENSOR_DATA
+
+- ros_topic_name: /ugv/sensors/gps
+  gz_topic_name: /simple_ugv/gps
+  ros_type_name: sensor_msgs/msg/NavSatFix
+  gz_type_name: gz.msgs.NavSat
+  direction: GZ_TO_ROS
+  qos_profile: SENSOR_DATA

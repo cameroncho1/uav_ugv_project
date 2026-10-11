@@ -6,12 +6,12 @@ The default local goal is `(4, 0)` in the ROS `map` frame. The UGV starts at `(-
 
 ## Build
 
-Gazebo Harmonic transport development libraries (`gz-transport13` and `gz-msgs10`), `MicroXRCEAgent`, and a built PX4 Gazebo target must be available. From the repository root:
+Gazebo Harmonic transport development libraries (`gz-transport13` and `gz-msgs10`), `MicroXRCEAgent`, a built PX4 Gazebo target, and the Gazebo Harmonic build of `ros_gz_bridge` must be available. On Ubuntu 22.04 with the OSRF Gazebo package repository, install the bridge with `sudo apt install ros-humble-ros-gzharmonic-bridge`. From the repository root:
 
 ```bash
 source /opt/ros/humble/setup.bash
 cd ros2_ws
-colcon build --packages-up-to mission_manager uav_control ugv_control traversability_mapping route_planning --symlink-install
+colcon build --packages-up-to mission_manager uav_control ugv_control traversability_mapping route_planning cooperative_localization --symlink-install
 source install/setup.bash
 ```
 
@@ -26,6 +26,8 @@ ros2 launch mission_manager simple_goal_demo.launch.py
 ```
 
 The launch starts the Gazebo world, PX4 SITL, Micro XRCE-DDS Agent, the goal manager, stationary-XY UAV controller, camera grid mapper, local A-star planner, UGV path follower, and RViz. The UAV controller holds its initial horizontal position, streams the altitude setpoint, waits for PX4 preflight checks, then retries Offboard and arm requests until PX4 confirms the state. Keep the launch terminal open; Ctrl+C shuts down the launched processes.
+
+The launch also starts the UGV sensor bridge. It publishes `/ugv/sensors/wheel_odom`, `/ugv/sensors/imu`, `/ugv/sensors/gps`, and `/clock` in ROS 2. These raw topics do not feed the demo planner yet. The current planner uses `/ugv_pose` from the UGV controller; [the localization interface document](docs/cooperative_localization/interfaces.md) describes the sensor frames and the planned fused pose output.
 
 Change the local goal, camera altitude, grid resolution, or image threshold with launch arguments:
 

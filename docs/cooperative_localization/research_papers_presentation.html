@@ -160,6 +160,11 @@
       font-size: clamp(0.85rem, 1.1vw, 1rem);
     }
 
+    .mono {
+      font-family: Consolas, "Liberation Mono", monospace;
+      font-size: 0.88em;
+    }
+
     ul,
     ol {
       margin: 0;
@@ -597,6 +602,32 @@
         </div>
       </section>
 
+      <section class="slide" data-title="Sensor inputs" aria-hidden="true">
+        <div class="slide-inner">
+          <h2>UGV sensor inputs are connected</h2>
+          <p class="cite">Both Gazebo worlds publish UGV wheel odometry, IMU, and GPS. The localization bridge exposes them in ROS 2.</p>
+          <div class="paper-layout">
+            <section>
+              <h3>Working input layer</h3>
+              <ul>
+                <li><span class="mono">/ugv/sensors/wheel_odom</span>: relative motion, 20 Hz.</li>
+                <li><span class="mono">/ugv/sensors/imu</span>: orientation and acceleration, 50 Hz.</li>
+                <li><span class="mono">/ugv/sensors/gps</span>: latitude and longitude, 5 Hz.</li>
+                <li><span class="mono">/clock</span>: Gazebo simulation time.</li>
+              </ul>
+            </section>
+            <section>
+              <h3>Connection to navigation</h3>
+              <ul>
+                <li>The next estimator combines these readings with explicit frame conversion and measurement uncertainty.</li>
+                <li>Its agreed output is <span class="mono">/ugv/localization/pose</span> in the shared map frame.</li>
+                <li>The current planner still reads <span class="mono">/ugv_pose</span> from the demo controller; it does not use the new sensor topics yet.</li>
+              </ul>
+            </section>
+          </div>
+        </div>
+      </section>
+
       <section class="slide" data-title="Design choices and gaps" aria-hidden="true">
         <div class="slide-inner">
           <h2>Design choices and gaps</h2>
@@ -626,7 +657,7 @@
     <nav class="bottombar" aria-label="Slide navigation">
       <button class="nav-button" id="previousButton" type="button">Previous</button>
       <div class="segments" id="segments"></div>
-      <div class="counter" id="counter">01 / 09</div>
+      <div class="counter" id="counter">01 / 10</div>
       <button class="nav-button" id="nextButton" type="button">Next</button>
     </nav>
   </main>

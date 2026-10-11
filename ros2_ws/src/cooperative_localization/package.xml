@@ -3,7 +3,7 @@
 <package format="3">
   <name>cooperative_localization</name>
   <version>0.0.0</version>
-  <description>TODO: Package description</description>
+  <description>UGV sensor interfaces and cooperative localization integration.</description>
   <maintainer email="chocamer@usc.edu">cameron</maintainer>
   <license>TODO: License declaration</license>
 
@@ -13,6 +13,10 @@
   <depend>geometry_msgs</depend>
   <depend>nav_msgs</depend>
   <depend>sensor_msgs</depend>
+  <exec_depend>ros_gz_bridge</exec_depend>
+  <exec_depend>launch</exec_depend>
+  <exec_depend>launch_ros</exec_depend>
+  <exec_depend>ament_index_python</exec_depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>

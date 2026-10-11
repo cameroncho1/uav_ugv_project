@@ -1,119 +1,34 @@
-# Cooperative Localization Subsystem Specification
+# Cooperative UGV Localization
 
-## Purpose
+## Purpose and Current State
 
-The cooperative localization subsystem estimates the UGV's current pose. Its purpose is to maintain a useful pose estimate when UGV GNSS measurements are degraded or unavailable.
+This subsystem is intended to supply the UGV's position to the rest of the project, including when UGV GPS is degraded. Its implemented sensor input layer brings wheel odometry, IMU, GPS, and simulation time into ROS 2 through a dedicated bridge. Both Gazebo worlds contain the sensors. [Interfaces](interfaces.md) lists the live topics, frames, rates, and commands to check them.
 
-The subsystem supports resilient UGV navigation in degraded-GNSS defense and search-and-rescue scenarios. Its scope does not include complete GNSS denial affecting both the UAV and UGV. The initial operating assumption is that the UAV retains reliable localization while UGV GNSS is degraded.
+There is no fused pose estimator, GPS outage control, UAV-to-UGV measurement, or localization accuracy result in the repository. The goal demo drives and plans from its existing `/ugv_pose` topic, which the UGV controller makes from Gazebo odometry.
 
-## Subsystem Boundary
+## Sensor Boundary
 
-`cooperative_localization` owns:
+`cooperative_localization` owns the ROS-facing raw sensor topic names and their Gazebo bridge configuration:
 
-- Combining localization-related measurements.
-- Maintaining the UGV pose estimate.
-- Handling degraded or unavailable UGV GNSS.
-- Incorporating UAV-assisted corrections.
-- Publishing the authoritative pose and its covariance.
+- `/ugv/sensors/wheel_odom`: `nav_msgs/msg/Odometry`, 20 Hz in Gazebo.
+- `/ugv/sensors/imu`: `sensor_msgs/msg/Imu`, 50 Hz in Gazebo.
+- `/ugv/sensors/gps`: `sensor_msgs/msg/NavSatFix`, 5 Hz in Gazebo.
+- `/clock`: Gazebo simulation time for consumers that enable `use_sim_time`.
 
-It does not own:
+These are raw simulation measurements. Wheel odometry is relative to the UGV spawn pose; GPS is geodetic; IMU is in its chassis sensor frame. The bridge does not turn any of them into a map-frame pose. Their current covariance fields do not provide a useful uncertainty model.
 
-- Terrain classification or traversability assessment.
-- Obstacle detection.
-- Path generation.
-- UAV path planning or flight control.
-- Mission coordination.
-- Full simultaneous localization and mapping (SLAM).
+## Fused Pose Contract
 
-## Expected Inputs
+The integration target is one authoritative UGV estimate on `/ugv/localization/pose`, type `geometry_msgs/msg/PoseWithCovarianceStamped`, in the ENU `map` frame. That topic has no publisher yet. Its estimator must account for sensor frames, timestamps, measurement uncertainty, and the offset between wheel odometry and `map`.
 
-The estimator is expected to accept these future raw inputs:
+An EKF through `robot_localization` is the starting approach. GPS coordinates need conversion into the local map frame. A UAV-assisted correction also needs a measured UGV-to-UAV relative position and a UAV pose converted from PX4 NED to map ENU. PX4 UAV odometry by itself is not a UGV correction.
 
-- UGV GNSS measurements.
-- UGV wheel odometry.
-- UGV IMU measurements.
-- A UAV-assisted relative-position measurement.
+Once the fused topic is validated, the path planner and UGV controller can consume it in place of `/ugv_pose`. Terrain mapping, obstacle detection, route planning, and flight control stay in their existing packages.
 
-Raw topic names are not yet established. Each measurement used by the estimator requires a timestamp, an identified coordinate frame, and an uncertainty model.
+## GPS Degradation and Evaluation
 
-## UAV-Assisted Measurement
+The target behavior during UGV GPS loss is a continuously published pose based on remaining measurements, with uncertainty that grows when the estimate drifts. No GPS loss behavior is implemented yet.
 
-For the initial system, UAV assistance is a noisy relative-position observation of the UGV with respect to the UAV. The UAV is assumed to retain reliable localization while UGV GNSS is degraded.
+The evaluation compares nominal GPS, GPS loss without UAV help, and GPS loss with UAV help. It records position error, heading error, uncertainty versus observed error, and UGV path-following error. Gazebo's true state is a scoring reference, never the operational localization output. Claims apply only to the simulated conditions tested.
 
-The simulation and estimator interface remain independent of the physical sensing technology. UWB, AprilTags, and camera tracking are possible real-world implementations, not architectural commitments.
-
-## Estimation Approach
-
-A standard state estimator, such as an extended Kalman filter, is the expected starting point. Existing ROS 2 estimation tooling is preferred over implementing a filter from scratch when it satisfies the required state, measurement, frame, and failure-handling behavior.
-
-The estimator must tolerate missing, degraded, stale, or rejected measurements without substituting Gazebo ground truth for operational sensor data. Measurement validity, timing, and uncertainty must be represented consistently enough for the estimator to distinguish nominal data from degraded data.
-
-## GNSS Degradation Behavior
-
-When UGV GNSS becomes degraded or unavailable:
-
-- The authoritative pose output remains continuous.
-- Odometry and IMU measurements continue contributing to the estimate.
-- Pose uncertainty may increase as uncorrected drift accumulates.
-- UAV-assisted relative-position observations may reduce drift and uncertainty.
-
-A UAV correction improves the estimate according to its modeled uncertainty; it does not make localization exact or eliminate all accumulated error.
-
-## Authoritative Output
-
-The subsystem will publish one authoritative UGV localization estimate using the preferred interface:
-
-- Topic: `/ugv/localization/pose`
-- Message type: `geometry_msgs/msg/PoseWithCovarianceStamped`
-- Frame: `map`
-- Coordinate convention: ENU
-
-This interface is the project default unless a future integration issue requires a documented change. It is a design contract and is not yet implemented in the repository.
-
-The message contains:
-
-- Position.
-- Orientation.
-- Timestamp.
-- Covariance, representing the estimator's uncertainty in the pose.
-
-The path planner and other downstream navigation components consume this single authoritative pose. They do not subscribe directly to GNSS, wheel odometry, IMU, or UAV-assisted correction topics as independent pose sources.
-
-## Ground-Truth Separation
-
-Three data categories must remain distinct:
-
-- **Gazebo ground truth:** The simulator's actual UGV state.
-- **Simulated sensor measurements:** Noisy, delayed, degraded, or unavailable observations derived from the simulation.
-- **Operational localization estimate:** The estimator output published on `/ugv/localization/pose`.
-
-Ground truth may be used to:
-
-- Generate simulated measurements.
-- Debug the simulation and estimator.
-- Evaluate estimator error.
-
-Ground truth must not be forwarded directly as the operational localization estimate consumed by the path planner. When ground truth contributes to a simulated input, it must pass through an explicit sensor or measurement model.
-
-## Evaluation
-
-Evaluation should compare at least these operating cases:
-
-- Nominal UGV GNSS.
-- UGV GNSS loss without UAV assistance.
-- UGV GNSS loss with UAV assistance.
-
-Relevant metrics include:
-
-- Position root-mean-square error.
-- Mean position error.
-- Maximum position error.
-- Heading error.
-- Reported localization uncertainty and its consistency with observed error.
-- Downstream UGV path-following error.
-
-Results should identify the tested GNSS degradation, measurement noise, outage duration, estimator configuration, and ground-truth reference. Claims should remain limited to the simulated conditions evaluated.
-
-## Scope Limits
-
-The initial subsystem assumes a reliably localized UAV can provide useful relative-position information to a UGV experiencing degraded GNSS. It does not establish localization when both vehicles lack a reliable global reference, and it does not provide mapping, perception, planning, control, mission management, or full SLAM.
+The initial scope assumes the UAV retains reliable localization while UGV GPS is degraded. It does not cover loss of both vehicles' global reference or full SLAM.

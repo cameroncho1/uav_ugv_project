@@ -604,7 +604,7 @@
       <section class="slide" data-title="Inputs and output" aria-hidden="true">
         <div class="slide-inner">
           <h2>Inputs and output</h2>
-          <p class="cite">The estimator combines the available measurements into one robot pose.</p>
+          <p class="cite">UGV sensor topics are available in ROS 2. This diagram shows the planned estimator connection.</p>
           <div class="flow">
             <div class="stack">
               <div class="box"><strong>UGV GPS</strong><span>Global position when available</span></div>
@@ -629,7 +629,7 @@
               </div>
             </div>
           </div>
-          <p class="note">Covariance: the estimator's uncertainty in the pose. Not implemented. Open: raw topic names, QoS settings, rates, noise values.</p>
+          <p class="note">Wheel odometry, IMU, and GPS are bridged. The estimator, UAV relative reading, and useful measurement covariance are not implemented.</p>
         </div>
       </section>
 
@@ -671,7 +671,7 @@
       <section class="slide" data-title="Subsystem connections" aria-hidden="true">
         <div class="slide-inner">
           <h2>Subsystem connections</h2>
-          <p class="cite">Localization and traversability mapping both publish in the <span class="mono">map</span> frame. Route planning reads both.</p>
+          <p class="cite">Target connection: the fused UGV pose and traversability map share the <span class="mono">map</span> frame. The demo planner still uses <span class="mono">/ugv_pose</span>.</p>
           <svg viewBox="0 0 1200 615" style="max-height:58vh" role="img" aria-label="Data sources (UGV sensors, drone, fault management) feed cooperative localization. Localization publishes one pose. Route planning combines that pose with the traversability map and the mission goal and sends a route to UGV control. Gazebo ground truth is used only for test data and scoring.">
 <defs><marker id="head2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#000"/></marker></defs>
 <text class="b" x="0" y="20">Data sources</text>
@@ -681,7 +681,7 @@
 <rect class="box" x="0" y="50" width="250" height="80" />
 <text class="b" x="14" y="78">UGV sensors</text>
 <text x="14" y="102">GPS, wheel odometry, IMU</text>
-<text x="14" y="123">Not yet in ROS 2</text>
+<text x="14" y="123">Available in ROS 2</text>
 <rect class="box" x="0" y="150" width="250" height="90" />
 <text class="b" x="14" y="178">Drone (UAV)</text>
 <text x="14" y="202">Own position, from PX4</text>
@@ -699,12 +699,12 @@
 <polyline points="250,195 348,195" fill="none" stroke="#000" stroke-width="2" marker-end="url(#head2)"/>
 <polyline points="250,300 348,300" fill="none" stroke="#000" stroke-width="2" stroke-dasharray="6 5" marker-start="url(#head2)" marker-end="url(#head2)"/>
 <rect class="heavy" x="350" y="40" width="270" height="310"/>
-<text class="b" x="364" y="68">Cooperative localization</text>
-<text x="364" y="94">Combines all inputs into one</text>
+<text class="b" x="364" y="68">Planned estimator</text>
+<text x="364" y="94">Will combine inputs into one</text>
 <text x="364" y="115">robot position estimate.</text>
-<text x="364" y="136">Keeps publishing if GPS drops.</text>
-<text x="364" y="157">Uncertainty grows until the</text>
-<text x="364" y="178">drone corrects it.</text>
+<text x="364" y="136">Must keep publishing if GPS</text>
+<text x="364" y="157">drops. Drone readings should</text>
+<text x="364" y="178">reduce drift.</text>
 <line class="thin" x1="350" y1="235" x2="620" y2="235"/>
 <text class="b" x="364" y="258">Output</text>
 <text class="m" x="364" y="280">/ugv/localization/pose</text>
@@ -736,14 +736,14 @@
 <rect class="heavy" x="470" y="568" width="30" height="24"/><text x="512" y="585">main pipeline</text>
 <rect class="box" x="700" y="568" width="30" height="24" stroke-dasharray="4 3"/><text x="742" y="585">test and scoring only</text>
 </svg>
-          <p class="note">Package: <span class="mono">cooperative_localization</span>.</p>
+          <p class="note">Package: <span class="mono">cooperative_localization</span>. The sensor bridge is implemented; the fused-pose path is a target interface.</p>
         </div>
       </section>
 
       <section class="slide" data-title="Pose interface" aria-hidden="true">
         <div class="slide-inner">
           <h2>Pose interface</h2>
-          <p class="cite">Route planning reads the pose from this topic. It does not read GPS, odometry, IMU, or drone readings.</p>
+          <p class="cite">This is the planned fused pose topic. The demo planner currently reads <span class="mono">/ugv_pose</span>.</p>
           <div class="columns">
             <section>
               <h3>Topic definition</h3>
@@ -760,11 +760,11 @@
             <section>
               <h3>Consumers</h3>
               <ul>
-                <li><strong>Planner:</strong> subscribes to this pose only.</li>
+                <li><strong>Planner:</strong> connects to this pose after the estimator is implemented and tested.</li>
                 <li><strong>Mapping:</strong> publishes traversability data in the same ENU map frame.</li>
                 <li><strong>Coordinates:</strong> pose, obstacles, routes, and goals share one frame.</li>
                 <li><strong>Covariance:</strong> the estimator's uncertainty in the pose.</li>
-                <li><strong>Frames:</strong> drone state is PX4 NED (north, east, down) and is converted to map / ENU.</li>
+                <li><strong>Frames:</strong> drone state is PX4 NED (north, east, down) and needs conversion to map / ENU.</li>
               </ul>
             </section>
           </div>
@@ -832,20 +832,18 @@
         </div>
       </section>
 
-      <section class="slide" data-title="First steps" aria-hidden="true">
+      <section class="slide" data-title="Next steps" aria-hidden="true">
         <div class="slide-inner">
-          <h2>First steps</h2>
+          <h2>Next steps</h2>
           <ol class="steps">
-            <li>Agree with the simulation and integration subsystem on who adds the robot's sensors and the bridge into ROS 2.
-              <span>Open decision. Blocks the remaining steps.</span></li>
-            <li>Add an IMU and a GPS sensor to the ground robot model. Bridge odometry, IMU, GPS, and the true position into ROS 2.
-              <span>True position is used only to generate test data and score results.</span></li>
-            <li>Write a test-sensor node that adds noise to the true position.
-              <span>Outputs GPS with an on/off switch and a noisy drone reading of the robot.</span></li>
-            <li>Run the existing EKF tool on GPS, odometry, and IMU. Add a small relay that publishes the result on the pose topic.
+            <li>Assign measurement noise and covariance to the bridged odometry, IMU, and GPS readings.
+              <span>The raw sensor topics and simulation clock already publish in ROS 2.</span></li>
+            <li>Define the odometry-to-map transform and convert GPS coordinates into the local map frame.
+              <span>Wheel odometry starts at the robot's spawn pose, not the map origin.</span></li>
+            <li>Run an EKF on GPS, odometry, and IMU. Add a relay that publishes the result on the pose topic.
               <span>The tool's output message type differs from the pose contract. The relay converts it.</span></li>
-            <li>Add the drone reading as another input, after converting drone axes from NED to ENU.</li>
-            <li>Log error against the true position for the three test cases.</li>
+            <li>Add a noisy drone reading of the robot and convert drone axes from NED to ENU.</li>
+            <li>Inject GPS loss and log estimator error against simulator truth for the three test cases.</li>
           </ol>
         </div>
       </section>
@@ -857,9 +855,8 @@
             <section>
               <h3>With other subsystems</h3>
               <ul>
-                <li>Who owns the simulation-to-ROS bridge.</li>
                 <li>Who owns the coordinate transform tree.</li>
-                <li>Raw sensor topic names and message quality settings.</li>
+                <li>What noise and covariance to assign each sensor.</li>
                 <li>How fault management will inject GPS loss and read localization health.</li>
               </ul>
             </section>

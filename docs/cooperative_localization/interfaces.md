@@ -1,167 +1,56 @@
-# Cooperative Localization Interface Specification
+# Cooperative Localization Interfaces
 
-## Status
+## Implemented Sensor Input Layer
 
-This document defines the preferred project interfaces and ownership boundaries for cooperative UGV localization. These contracts guide future integration but are not yet implemented in the repository. Items listed under Open Decisions remain intentionally unresolved.
+Both Gazebo worlds, `simple_goal_demo` and `uav_ugv`, contain the `simple_ugv` differential-drive robot. Its chassis has an IMU and a NavSat sensor. The differential-drive system publishes wheel odometry. `cooperative_localization` launches one Gazebo-to-ROS bridge for the three measurements and simulation clock.
 
-## Confirmed Repository Baseline
+The goal demo starts this bridge through `mission_manager/launch/simple_goal_demo.launch.py`. The bridge also runs on its own with `ros2 launch cooperative_localization ugv_sensors.launch.py` when a world is already running. Its topic mapping is in `ros2_ws/src/cooperative_localization/config/ugv_sensor_bridges.yaml`.
 
-- The project targets ROS 2 Humble and Gazebo Harmonic using `gz-sim8`.
-- The Gazebo world uses ENU coordinates.
-- PX4 UAV vehicle odometry uses local NED coordinates.
-- The UGV is an inline Gazebo SDF model named `simple_ugv` with a differential-drive plugin.
-- UGV differential-drive odometry is configured for 20 Hz, but its output topic is not explicitly configured or bridged into ROS 2.
-- The UGV has no configured IMU or GNSS/NavSat sensor.
-- No TF tree currently exists.
-- `cooperative_localization`, `route_planning`, `traversability_mapping`, and `ugv_control` are package scaffolds without subsystem nodes.
-- UAV odometry is ROS-visible at `/fmu/out/vehicle_odometry` as `px4_msgs/msg/VehicleOdometry`.
-- No UAV-to-UGV localization measurement interface currently exists.
+| ROS 2 topic | Type | Gazebo topic | Rate configured in SDF | Frame in messages |
+| --- | --- | --- | ---: | --- |
+| `/ugv/sensors/wheel_odom` | `nav_msgs/msg/Odometry` | `/simple_ugv/odom` | 20 Hz | `simple_ugv/odom`, child `simple_ugv/chassis` |
+| `/ugv/sensors/imu` | `sensor_msgs/msg/Imu` | `/simple_ugv/imu` | 50 Hz | `simple_ugv/chassis/imu` |
+| `/ugv/sensors/gps` | `sensor_msgs/msg/NavSatFix` | `/simple_ugv/gps` | 5 Hz | `simple_ugv/chassis/gps` |
+| `/clock` | `rosgraph_msgs/msg/Clock` | `/clock` | simulator clock | n/a |
 
-## System Invariants
+The bridge direction is Gazebo to ROS. The three sensor topics use ROS `SENSOR_DATA` QoS (best effort); `/clock` uses `CLOCK` QoS. Messages keep Gazebo simulation timestamps. ROS consumers that compare message times against a node clock need `use_sim_time:=true`.
 
-- There is one authoritative UGV pose output.
-- Downstream navigation components use the shared ENU `map` frame.
-- Ground truth is never used directly as the operational localization output.
-- The path planner does not depend directly on raw localization sensors.
-- Localization continues publishing during UGV GNSS degradation or loss.
-- UAV assistance is represented as a noisy relative-position observation.
-- Initial scope assumes UAV localization remains available.
+## Coordinates and Measurement Meaning
 
-## Authoritative Localization Output
+- Gazebo world coordinates use ENU. The NavSat sensor reports WGS84 latitude, longitude, and altitude using the world's `spherical_coordinates` origin.
+- Wheel odometry is relative to the UGV's starting pose. Its `(0, 0)` is not the `map` origin. In `simple_goal_demo`, the UGV starts at map `(-4, 0)`; in `uav_ugv`, it starts at map `(1, 0)`.
+- IMU orientation, angular velocity, and acceleration come from the sensor on the UGV chassis. The sensor frame is named in each message. No TF transforms are published for these frames.
+- The bridged odometry and IMU covariance arrays contain zeros, and NavSatFix reports unknown position covariance. The worlds do not configure explicit sensor noise. A future estimator must assign defensible measurement uncertainty before treating these data as localization corrections.
+- PX4 UAV odometry uses NED coordinates. Any UAV measurement joined with UGV data needs an explicit conversion to the shared ENU `map` frame.
 
-`cooperative_localization` will publish one authoritative UGV pose estimate through the preferred interface:
+## Current Demo Consumers
+
+The goal demo's UGV controller still reads Gazebo odometry directly and publishes `/ugv_pose` as `geometry_msgs/msg/PoseStamped` in `map`. It applies the demo's configured spawn offset. The local A* planner reads `/ugv_pose`. The three `/ugv/sensors/*` topics are available to localization work; they do not drive the controller or planner yet.
+
+## Localization Integration Contract
+
+`cooperative_localization` owns the single fused UGV pose interface:
 
 - Topic: `/ugv/localization/pose`
-- Message type: `geometry_msgs/msg/PoseWithCovarianceStamped`
-- Frame: `map`
-- Coordinate convention: ENU
+- Type: `geometry_msgs/msg/PoseWithCovarianceStamped`
+- Frame: `map` (ENU)
+- Contents: timestamp, position, orientation, and estimator covariance
 
-This interface is the project default unless a future integration issue requires a documented change. The message contains position, orientation, timestamp, and covariance. Covariance represents the estimator's uncertainty in the pose.
+This fused topic has no publisher in the current code. The estimator must combine raw UGV sensors and a UAV-assisted relative-position measurement, handle missing UGV GPS, and publish a continuous pose with uncertainty. The UAV-assisted measurement producer and topic are not implemented. The planner and controller can move from `/ugv_pose` to the fused topic when that publisher exists and the frame conversion is tested.
 
-Downstream navigation components consume this output instead of treating GNSS, wheel odometry, IMU, or UAV-assisted observations as independent pose sources.
+Gazebo's true state is for simulation checks and scoring only. It is not the fused localization output. GPS outage controls, measurement noise, estimator tuning, and accuracy evaluation are also separate work.
 
-## Raw Localization Inputs
+## Run and Check
 
-The estimator is expected to consume:
+Install a Gazebo Harmonic build of `ros_gz_bridge` alongside ROS 2 Humble. On this Ubuntu 22.04 setup the package is `ros-humble-ros-gzharmonic-bridge`. Build and source the workspace, then launch the demo or launch `ugv_sensors.launch.py` while the `uav_ugv` world is running.
 
-- UGV odometry.
-- UGV IMU.
-- UGV GNSS.
-- A UAV-assisted relative-position measurement.
+```bash
+source /opt/ros/humble/setup.bash
+source ros2_ws/install/setup.bash
+ros2 topic list -t | grep -E '/ugv/sensors/|^/clock'
+ros2 topic echo --once /ugv/sensors/wheel_odom --qos-reliability best_effort
+ros2 topic echo --once /ugv/sensors/imu --qos-reliability best_effort
+ros2 topic echo --once /ugv/sensors/gps --qos-reliability best_effort
+```
 
-Raw topic names are not finalized. Candidate ROS representations are:
-
-| Input | Candidate representation | Current repository state |
-|---|---|---|
-| UGV odometry | `nav_msgs/msg/Odometry` | Gazebo DiffDrive odometry is configured but not bridged into ROS 2. |
-| UGV IMU | `sensor_msgs/msg/Imu` | No simulated sensor or ROS topic exists. |
-| UGV GNSS | `sensor_msgs/msg/NavSatFix` | No simulated sensor or ROS topic exists. |
-| UAV-assisted relative position | Stamped relative-position measurement with uncertainty and declared frame | No message type, topic, or producer exists. |
-
-The UAV-assisted input is a noisy relative-position observation of the UGV with respect to the UAV. It does not assume a physical sensing technology. UWB, AprilTags, and camera tracking are possible real-world implementations only.
-
-## Subsystem Ownership
-
-### `cooperative_localization`
-
-Owns:
-
-- Combining localization-related measurements.
-- Maintaining the UGV pose estimate.
-- Handling degraded or unavailable UGV GNSS.
-- Incorporating UAV-assisted corrections.
-- Publishing pose and covariance on the authoritative output.
-
-Does not own terrain classification, obstacle detection, path generation, UAV path planning, mission coordination, or full SLAM.
-
-### `ugv_control`
-
-- Owns the ROS-facing UGV motion-control boundary.
-- Is the likely source or exposure point for UGV wheel odometry.
-- May expose UGV IMU and GNSS measurements if sensor bridging is assigned to this package.
-- Keeps raw UGV measurements separate from the fused localization output.
-
-UGV sensor-bridge ownership remains open.
-
-### `uav_control`
-
-- Owns the PX4/UAV ROS interface.
-- Exposes UAV state needed to interpret a relative-position observation.
-- Currently receives UAV state from `/fmu/out/vehicle_odometry`.
-
-PX4 state is NED and must be converted before use in project-level localization logic. UAV state alone is not a UGV correction; the estimator requires a separate relative-position observation.
-
-### `route_planning`
-
-The planner receives:
-
-- The authoritative UGV pose from `/ugv/localization/pose`.
-- Traversability or map information.
-- A goal or mission target.
-
-All planner inputs that describe positions, obstacles, or goals use the ENU `map` frame. The planner does not depend on estimator implementation details or subscribe directly to raw localization sensors.
-
-### `traversability_mapping`
-
-Localization and traversability mapping are separate subsystems:
-
-- Localization answers: "Where is the UGV?"
-- Traversability mapping answers: "Where can the UGV safely drive?"
-
-Their shared dependency is the ENU `map` frame. UGV pose, traversability data, obstacles, and goals must refer to the same coordinate system so the planner can combine them consistently.
-
-### `fault_management`
-
-Fault management may later:
-
-- Inject UGV GNSS dropout or noise for testing.
-- Report sensor faults.
-- Consume localization-health information.
-
-No final fault-management API is defined.
-
-## Coordinate-Frame Contract
-
-The project-facing navigation frame is `map` using ENU coordinates.
-
-- Localization output is expressed in `map`.
-- Traversability mapping uses `map` for project-facing map data.
-- Path planning uses `map` for pose, obstacles, paths, and goals.
-- Every localization input identifies its source frame and timestamp.
-- Frame conversion is explicit; coordinate conventions are not inferred from topic names.
-
-The Gazebo world already uses ENU, which is consistent with this project-facing convention. PX4 UAV state uses NED and therefore requires conversion before it contributes to localization in `map`. This contract does not define a complete TF tree or assign TF publication ownership.
-
-## GNSS Degradation Contract
-
-When UGV GNSS is degraded or unavailable:
-
-- `/ugv/localization/pose` continues publishing without a deliberate discontinuity.
-- Odometry and IMU continue contributing to the estimate.
-- Reported covariance may increase as drift accumulates.
-- UAV-assisted relative-position observations may reduce drift and covariance.
-
-UAV assistance does not make the estimate exact. Its effect depends on measurement uncertainty, timing, geometry, and estimator behavior.
-
-## Ground-Truth Separation
-
-The system distinguishes:
-
-- Gazebo ground truth: the simulator's actual state.
-- Simulated sensor measurements: observations derived from simulation with explicit noise, timing, degradation, or outage behavior.
-- Operational localization estimate: the fused pose published on `/ugv/localization/pose`.
-
-Ground truth may generate simulated measurements, support debugging, and provide an evaluation reference. It must not be published directly as the operational pose consumed by the planner.
-
-## Open Decisions
-
-- Full TF tree.
-- TF publication ownership.
-- Exact raw sensor topic names.
-- Raw sensor QoS.
-- Exact sensor update rates.
-- Exact sensor noise values.
-- EKF or UKF tuning.
-- Whether UAV relative-position measurements are 2D or 3D.
-- Gazebo-to-ROS bridge ownership.
-- Final fault-management API.
+Expected: all three sensors publish stamped readings, and `/clock` advances while Gazebo runs. A listed topic alone does not prove that its sensor is publishing; check at least one message.
