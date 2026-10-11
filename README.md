@@ -14,6 +14,8 @@ The [goal demo](README_simple_goal_demo.md) adds a stationary UAV camera grid, l
 
 ---
 
+See [simulation setup](docs/simulation_setup.md) for the pinned firmware, ROS messages, UAV models, and magnetometer settings.
+
 ## Tested Environment
 
 | Component | Tested Version / Setting |
@@ -24,8 +26,8 @@ The [goal demo](README_simple_goal_demo.md) adds a stationary UAV camera grid, l
 | Architecture | ARM64 / aarch64 |
 | ROS 2 | Humble |
 | Gazebo Sim | Harmonic / gz-sim8 (tested with 8.14.0) |
-| PX4-Autopilot | `d6f12ad1c4f70ad3230afd7d86e971421e02fef4` |
-| px4_msgs | `86d8239e962f6939e05c3737784f60c02fa884db` |
+| PX4-Autopilot | `0462e3a31e7f0a6f6f05a5e094bee8a52e8759ec` |
+| px4_msgs | `109e8c8e151938f03fee2e62e3e93dc5ff5e2281` |
 | UAV model | PX4 `gz_x500` |
 | Micro XRCE-DDS Agent | 2.4.2 recommended for ROS 2 Humble |
 | DDS transport | UDP |
@@ -270,13 +272,13 @@ git submodule status
 Expected PX4 commit:
 
 ```text
-d6f12ad1c4f70ad3230afd7d86e971421e02fef4
+0462e3a31e7f0a6f6f05a5e094bee8a52e8759ec
 ```
 
 Expected `px4_msgs` commit:
 
 ```text
-86d8239e962f6939e05c3737784f60c02fa884db
+109e8c8e151938f03fee2e62e3e93dc5ff5e2281
 ```
 
 ## Testing the Feature Branch Before Merge
@@ -515,7 +517,7 @@ Typical output includes:
 /fmu/out/vehicle_odometry
 /fmu/out/vehicle_global_position
 /fmu/out/vehicle_local_position_v1
-/fmu/out/vehicle_status_v1
+/fmu/out/vehicle_status_v4
 
 /fmu/in/offboard_control_mode
 /fmu/in/trajectory_setpoint
@@ -683,10 +685,10 @@ Expected:
 
 ```text
 PX4:
-d6f12ad1c4f70ad3230afd7d86e971421e02fef4
+0462e3a31e7f0a6f6f05a5e094bee8a52e8759ec
 
 px4_msgs:
-86d8239e962f6939e05c3737784f60c02fa884db
+109e8c8e151938f03fee2e62e3e93dc5ff5e2281
 ```
 
 ---

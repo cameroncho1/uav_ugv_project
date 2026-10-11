@@ -81,14 +81,15 @@ def generate_launch_description():
             PythonLaunchDescriptionSource(
                 str(localization_share / "launch/ugv_localization.launch.py")),
             launch_arguments={"world": "simple_goal_demo",
-                              "uav_odometry_topic": "/simulation/uav_odometry",
+                              "uav_odometry_topic": "/fmu/out/vehicle_odometry",
+                              "uav_require_airborne": "true", "uav_initial_settle_time": "10.0",
                               "uav_assistance": LaunchConfiguration("uav_assistance")}.items(),
         ),
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(
                 str(localization_share / "launch/sim_uav_sensor.launch.py")),
             launch_arguments={"world": "simple_goal_demo", "uav_model": "x500_mono_cam_down_0",
-                              "publish_anchor": "true"}.items(),
+                              "publish_anchor": "false"}.items(),
             condition=IfCondition(LaunchConfiguration("uav_assistance")),
         ),
         Node(
@@ -128,6 +129,8 @@ def generate_launch_description():
             executable="traversability_mapper",
             name="traversability_mapper",
             parameters=[{
+                "camera_topic": "/world/simple_goal_demo/model/x500_mono_cam_down_0/"
+                                "link/camera_link/sensor/camera/image",
                 "grid_resolution": ParameterValue(
                     LaunchConfiguration("grid_resolution"), value_type=float),
                 "obstacle_luminance_threshold": ParameterValue(

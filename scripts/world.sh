@@ -4,6 +4,8 @@ set -e
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 PX4="$ROOT/external/PX4-Autopilot"
 
+python3 "$ROOT/scripts/check_sim_dependencies.py"
+
 source "$PX4/build/px4_sitl_default/rootfs/gz_env.sh"
 
 export GZ_PARTITION="${GZ_PARTITION:-uav_ugv_sim}"

@@ -89,9 +89,29 @@ A PX4 X500 climbs and hovers while the UGV follows the 31-second nominal route w
 | Independent noisy simulated pose | 0.962 | 0.208 | 1.12 | 98.4% | [JSON](results/flight_simulated/trial_live.json) |
 | Actual PX4 pose, legacy magnetic path | 0.969 | 1.172 | 24.80 | 0.0% | [JSON](results/live_px4_anchor/trial_live.json) |
 
-The simulated-anchor flight validates full-body rotation, acquisition-time matching, and integration with an actual flying Gazebo model. It does not validate PX4's independent absolute-position accuracy or calibrated perception. This is the default observation model in the goal demo.
+The simulated-anchor flight validates full-body rotation, acquisition-time matching, and integration with an actual flying Gazebo model. It does not validate PX4's independent absolute-position accuracy or calibrated perception.
 
-The actual PX4 anchor worsens position error and reports overconfident uncertainty. A [timestamp-matched heading check](results/live_px4_anchor/heading_check.json) from PX4's ULog compares `vehicle_attitude` with `vehicle_attitude_groundtruth` over simulation time 55-75 seconds: mean signed NED heading error is 17.94 degrees across 1,111 samples. [Matched heading samples](results/live_px4_anchor/heading_check.csv) preserve the calculation inputs. The pinned magnetometer bridge uses a legacy frame/unit path; the [upstream fix](https://github.com/PX4/PX4-Autopilot/pull/28877) explains that incompatibility. This source bias is not represented by the reported covariance. Updating firmware, model noise, and magnetometer plugin settings requires fresh validation before live PX4 anchors are suitable for navigation.
+The legacy configuration uses PX4 `d6f12ad1c4f70ad3230afd7d86e971421e02fef4` and px4_msgs `86d8239e962f6939e05c3737784f60c02fa884db`. Its actual PX4 anchor worsens position error and reports overconfident uncertainty. A [timestamp-matched heading check](results/live_px4_anchor/heading_check.json) compares `vehicle_attitude` with `vehicle_attitude_groundtruth` over simulation time 55-75 seconds: mean signed NED heading error is 17.94 degrees across 1,111 samples. [Matched heading samples](results/live_px4_anchor/heading_check.csv) preserve the inputs. The [upstream fix](https://github.com/PX4/PX4-Autopilot/pull/28877) explains the legacy frame/unit incompatibility. This source bias is not represented by the reported covariance.
+
+### Aligned PX4, models, and magnetic settings
+
+These nine fresh-world live trials use the exact revisions and tesla/ENU settings in [simulation setup](../simulation_setup.md). The actual PX4 X500 hovers while both UGV filters receive identical sensor messages and simulated relative vectors. Each trial scores 615 UGV samples over route seconds 10.5-31. UAV heading compares estimated and true ULog attitudes over the same acquisition-time window. [Summary CSV](results/aligned_px4/summary.csv), per-trial JSON, and [representative heading samples](results/aligned_px4/heading_samples_seed_513_startup_off.csv) store the measurements.
+
+| Seed | GPS case | Baseline RMSE (m) | Assisted RMSE (m) | UAV heading RMSE (degrees) |
+| ---: | --- | ---: | ---: | ---: |
+| 513 | off | 0.220 | 0.149 | 0.856 |
+| 513 | on | 0.329 | 0.151 | 0.854 |
+| 513 | startup_off | 0.982 | 0.135 | 0.809 |
+| 514 | off | 0.029 | 0.134 | 0.810 |
+| 514 | on | 0.371 | 0.132 | 0.894 |
+| 514 | startup_off | 1.004 | 0.129 | 0.820 |
+| 515 | off | 0.276 | 0.129 | 0.791 |
+| 515 | on | 0.384 | 0.130 | 0.912 |
+| 515 | startup_off | 1.027 | 0.124 | 0.845 |
+
+All assisted runs have 100% planar 95% ellipse coverage under these conditions. Startup without GPS improves in all three seeds. The seed-514 dropout baseline has lower RMSE than the assisted estimate: a lucky initial GPS fix and stable short-route wheel motion can outperform noisy additional corrections. Assistance is not guaranteed to improve every route. Heading RMSE is 0.79-0.91 degrees with the aligned configuration; the upstream fix describes a residual caused by different earth-field models. These trials still synthesize relative vectors and do not validate camera perception or navigation.
+
+The aligned PX4 and full ROS workspace build successfully. Registered checks report 83 tests, zero failures, and three skipped cppcheck checks due to cppcheck 2.7. Message compatibility tests check wire-field order, shapes, and message versions; world-setting tests reject the legacy magnetic configuration. VehicleStatus uses its declared version-4 topic. Bash syntax and Python lint checks pass. A goal-demo smoke run using the Ogre server renderer receives live PX4-derived corrections and a fused map pose with the camera topic supplied through the mapper's launch parameter. PX4's console runs under a terminal even when ROS launch redirects stdin. This smoke run does not score navigation accuracy.
 
 ## Verification and remaining conditions
 
@@ -101,4 +121,4 @@ The results include 21 paired fixed-observer trials and two flight trials. All G
 
 Run [the evaluation commands](interfaces.md#evaluation-and-reproducibility) to generate full per-sample UGV CSVs, per-trial JSON, logs, and comparison summaries. Checked-in results keep JSON summaries, comparison CSVs, and the PX4 heading diagnostic. Startup scheduling can change which seeded measurements each filter first sees; exact error values vary between fresh worlds. Within a trial both strategies receive the same UGV messages.
 
-The environment is ROS 2 Humble on Ubuntu 22.04, Gazebo Sim 8.15.0, robot_localization 3.5.4, PX4 `d6f12ad1c4f70ad3230afd7d86e971421e02fef4`, and px4_msgs `86d8239e962f6939e05c3737784f60c02fa884db`. Noise and fault values are controlled simulation assumptions. Physical wheel slip, uneven terrain, shared or persistent UAV/GPS bias, camera visibility, calibrated perception, and closed-loop navigation using the fused pose remain untested.
+The runtime is ROS 2 Humble on Ubuntu 22.04, Gazebo Sim 8.15.0, and robot_localization 3.5.4. Each flight section identifies its dependency configuration; the aligned configuration is pinned in `simulation/dependencies.json`. Noise and fault values are controlled simulation assumptions. Physical wheel slip, uneven terrain, shared or persistent UAV/GPS bias, camera visibility, calibrated perception, and closed-loop navigation using the fused pose remain untested.

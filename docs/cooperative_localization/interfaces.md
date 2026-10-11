@@ -40,7 +40,7 @@ Nominal relative standard deviations are `(0.25, 0.15, 0.25)` m in FLU. Simulate
 - `ugv_sensors.launch.py`: bridges and prepares measurements. `world` selects spawn and GPS origin; `measurement_profile` selects `nominal` or `drift`.
 - `ugv_localization.launch.py`: starts the baseline, or adds UAV adapters and fusion with `uav_assistance:=true`. `uav_odometry_topic` selects live PX4 or a compatible test source.
 - `sim_uav_sensor.launch.py`: generates noisy relative observations. Empty `uav_model` selects a fixed observer at map `(2, -2, 4)`; a named model selects its actual Gazebo pose. `publish_anchor:=false` uses an independently supplied UAV anchor.
-- `simple_goal_demo.launch.py`: starts assisted localization with independent noisy simulated anchors and relative observations from the actual flying UAV model. `uav_assistance:=false` selects the baseline. Navigation consumes `/ugv_pose` from Gazebo odometry.
+- `simple_goal_demo.launch.py`: starts assisted localization with actual PX4 anchors and noisy relative observations from the actual flying UAV model. `uav_assistance:=false` selects the baseline. Navigation consumes `/ugv_pose` from Gazebo odometry.
 
 ## Evaluation and reproducibility
 
@@ -55,7 +55,7 @@ colcon build --packages-up-to cooperative_localization mission_manager --symlink
 source install/setup.bash
 cd ..
 
-# PX4 hover with independent simulated anchors and relative sensing.
+# PX4 hover with actual PX4 anchors and simulated relative sensing.
 scripts/run_live_cooperative_trial.sh /tmp/cooperative_live
 
 # Three GPS cases across three seeds.
@@ -75,4 +75,4 @@ GPS_CASES=off ROUTE=long DURATION=91 MEASUREMENT_PROFILE=drift \
 
 Each trial starts a fresh world and stops its processes. Results include scored CSVs, a baseline CSV for paired trials, JSON summaries, and `summary.csv` with one row per strategy. `GZ_PARTITION` can select an isolated Gazebo transport partition; the default is `uav_ugv_sim`. Avoid another world or controller in the same Gazebo partition and ROS domain. The baseline runner remains `scripts/run_localization_trials.sh`. [Measured results](evaluation_results.md) describe tested conditions and stored summaries.
 
-"scripts/run_live_cooperative_trial.sh" flies a PX4 X500 and compares both UGV filters with GPS denied at startup. Its default "ANCHOR_MODE=simulated" uses independent noisy anchors on the flying model. "ANCHOR_MODE=px4" uses the actual PX4 estimator and a ten-second post-takeoff initialization interval. The pinned PX4/Gazebo magnetic path has a measured heading bias; this mode is diagnostic and is unsuitable for navigation until the firmware/model compatibility issue in [measurement design](uav_measurement_design.md#live-px4-compatibility) is resolved. Both modes write the source and observer model into their trial summaries.
+`scripts/run_live_cooperative_trial.sh` flies a PX4 X500 and compares both UGV filters. Its default `ANCHOR_MODE=px4` uses the actual PX4 estimator and a ten-second post-takeoff initialization interval. `GPS_CASE` selects `on`, `off`, or `startup_off` (default). `ANCHOR_MODE=simulated` selects independent noisy anchors on the flying model. Both modes write the source and observer model into their trial summaries. `scripts/run_aligned_anchor_trials.sh` repeats all three GPS cases across seeds 513-515. [Simulation setup](../simulation_setup.md) specifies the aligned dependency configuration and heading-scoring command.

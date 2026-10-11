@@ -1,0 +1,8 @@
+{
+  "minimum_gazebo_version": "8.6.0",
+  "revisions": {
+    "external/PX4-Autopilot": "0462e3a31e7f0a6f6f05a5e094bee8a52e8759ec",
+    "ros2_ws/src/px4_msgs": "109e8c8e151938f03fee2e62e3e93dc5ff5e2281",
+    "external/PX4-Autopilot/Tools/simulation/gz": "a15af9628536914ff7201c992fce5e3cb5d70db9"
+  }
+}

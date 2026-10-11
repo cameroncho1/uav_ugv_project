@@ -27,7 +27,7 @@ ros2 launch mission_manager simple_goal_demo.launch.py
 
 The launch starts the Gazebo world, PX4 SITL, Micro XRCE-DDS Agent, the goal manager, stationary-XY UAV controller, camera grid mapper, local A-star planner, UGV path follower, and RViz. The UAV controller holds its initial horizontal position, streams the altitude setpoint, waits for PX4 preflight checks, then retries Offboard and arm requests until PX4 confirms the state. Keep the launch terminal open; Ctrl+C shuts down the launched processes.
 
-The launch also starts UGV localization. An EKF combines wheel speed, IMU heading, GPS map position, and UAV-derived UGV position on `/ugv/localization/pose` with uncertainty. The UAV adapter converts the independent noisy simulated anchor from PX4 NED/FRD to ENU/FLU. A simulated sensor produces noisy UGV-relative observations from the Gazebo UAV model; a timestamp-matched adapter rotates them into map and includes UAV position and attitude uncertainty. `uav_assistance:=false` selects the GPS/wheel/IMU baseline. [The localization interfaces](docs/cooperative_localization/interfaces.md) define topics, gates, and evaluation commands. The planner and controller use `/ugv_pose` from Gazebo odometry.
+The launch also starts UGV localization. An EKF combines wheel speed, IMU heading, GPS map position, and UAV-derived UGV position on `/ugv/localization/pose` with uncertainty. The UAV adapter converts the live PX4 anchor from NED/FRD to ENU/FLU after takeoff and a ten-second reference-settling interval. A simulated sensor produces noisy UGV-relative observations from the Gazebo UAV model; a timestamp-matched adapter rotates them into map and includes UAV position and attitude uncertainty. `uav_assistance:=false` selects the GPS/wheel/IMU baseline. [The localization interfaces](docs/cooperative_localization/interfaces.md) define topics, gates, and evaluation commands. The planner and controller use `/ugv_pose` from Gazebo odometry.
 
 ROS nodes use `/clock`, and `px4_goal_demo.sh` sets `UXRCE_DDS_SYNCT=0` so PX4 samples use the same time source. When starting PX4 separately for this demo, use that script. UAV observations are simulated position vectors with configured noise; they are independent of the camera occupancy classifier.
 
@@ -39,7 +39,7 @@ ros2 launch mission_manager simple_goal_demo.launch.py goal_x:=4.0 goal_y:=0.0 u
 
 If Gazebo, PX4, and the DDS agent are already running in other terminals, skip starting them again with `start_simulation:=false`. To omit RViz, use `start_rviz:=false`.
 
-In the Gazebo window, add its **Image Display** plugin and select `/world/simple_goal_demo/model/x500_mono_cam_down_0/link/camera_link/sensor/imager/image`. To list camera topics, run `gz topic -l | grep -Ei 'camera|image'`.
+In the Gazebo window, add its **Image Display** plugin and select `/world/simple_goal_demo/model/x500_mono_cam_down_0/link/camera_link/sensor/camera/image`. To list camera topics, run `gz topic -l | grep -Ei 'camera|image'`.
 
 ## Grid Scope
 
@@ -68,4 +68,4 @@ source /opt/ros/humble/setup.bash
 source install/setup.bash
 rviz2 -d install/mission_manager/share/mission_manager/config/simple_goal_demo.rviz
 
-The default UAV anchor and relative vector are simulated with independent noise on the actual flying model. The optional live PX4 anchor has a measured magnetometer-related heading bias with the pinned dependencies; see [measurement design](docs/cooperative_localization/uav_measurement_design.md#live-px4-compatibility) before using it.
+The demo uses actual PX4 anchors and noisy simulated relative vectors. [Simulation setup](docs/simulation_setup.md) defines the matching firmware, ROS messages, UAV models, and ENU/tesla magnetometer settings.

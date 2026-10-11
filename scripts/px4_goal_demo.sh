@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 set -e
 
+# ROS launch redirects stdin. Give PX4's console a terminal to avoid an EOF loop.
+if [[ ! -t 0 ]]; then
+  printf -v launch_command '%q' "$0"
+  exec script -q -c "$launch_command" /dev/null
+fi
+
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 PX4="$ROOT/external/PX4-Autopilot"
 

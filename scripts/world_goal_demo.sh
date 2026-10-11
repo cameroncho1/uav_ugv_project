@@ -5,6 +5,8 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 PX4="$ROOT/external/PX4-Autopilot"
 WORLD="$ROOT/simulation/worlds/simple_goal_demo.sdf"
 
+python3 "$ROOT/scripts/check_sim_dependencies.py"
+
 if [[ -z "${DISPLAY:-}" ]]; then
 	echo "Start this demo from a terminal in the Ubuntu desktop session (DISPLAY is unset)." >&2
 	exit 1

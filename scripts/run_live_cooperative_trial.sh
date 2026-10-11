@@ -11,11 +11,19 @@ export GZ_PARTITION="${GZ_PARTITION:-uav_ugv_sim}" GZ_IP=127.0.0.1
 export PX4_DDS_SYNCT=0
 export PX4_PARAM_UXRCE_DDS_DOM_ID="${ROS_DOMAIN_ID:-0}"
 PX4_BIN="$ROOT/external/PX4-Autopilot/build/px4_sitl_default/bin"
-case "${ANCHOR_MODE:-simulated}" in
+case "${ANCHOR_MODE:-px4}" in
   simulated) publish_anchor=true; odometry_topic=/simulation/uav_odometry; airborne=false; settle=0.0 ;;
   px4) publish_anchor=false; odometry_topic=/fmu/out/vehicle_odometry; airborne=true; settle=10.0 ;;
   *) echo "ANCHOR_MODE must be simulated or px4" >&2; exit 1 ;;
 esac
+gps_case="${GPS_CASE:-startup_off}"
+case "$gps_case" in
+  on|off|startup_off) ;;
+  *) echo "GPS_CASE must be on, off, or startup_off" >&2; exit 1 ;;
+esac
+initial_gps_enabled=true
+if [[ "$gps_case" == startup_off ]]; then initial_gps_enabled=false; fi
+python3 "$ROOT/scripts/check_sim_dependencies.py"
 mkdir -p "$OUTPUT"
 pids=()
 cleanup() {
@@ -33,7 +41,7 @@ printf -v px4_command '%q' "$ROOT/scripts/px4.sh"
 setsid script -q -c "$px4_command" /dev/null >"$OUTPUT/px4.log" 2>&1 & pids+=("$!")
 sleep 20
 setsid ros2 launch cooperative_localization ugv_cooperative_evaluation.launch.py \
-  seed:="${SEED:-513}" initial_gps_enabled:=false \
+  seed:="${SEED:-513}" initial_gps_enabled:="$initial_gps_enabled" \
   uav_model:=x500_0 publish_anchor:="$publish_anchor" \
   uav_odometry_topic:="$odometry_topic" \
   uav_require_airborne:="$airborne" uav_initial_settle_time:="$settle" \
@@ -46,8 +54,8 @@ timeout 90 ros2 topic echo --no-daemon --once /uav/localization/pose \
   >"$OUTPUT/anchor.txt"
 "$PX4_BIN/px4-param" show UXRCE_DDS_SYNCT >"$OUTPUT/time_parameter.txt"
 timeout "${TRIAL_TIMEOUT:-300}" ros2 run cooperative_localization localization_trial.py \
-  --gps startup_off --seed "${SEED:-513}" \
-  --anchor-source "${ANCHOR_MODE:-simulated}" --observer-model x500_0 \
+  --gps "$gps_case" --seed "${SEED:-513}" \
+  --anchor-source "${ANCHOR_MODE:-px4}" --observer-model x500_0 \
   --comparison-topic /evaluation/baseline_pose --output "$OUTPUT/trial_live"
 "$PX4_BIN/px4-commander" land || true
 sleep 5

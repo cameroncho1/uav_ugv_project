@@ -37,6 +37,7 @@ if(BUILD_TESTING)
   ament_add_pytest_test(ugv_fused_pose_test test/test_ugv_fused_pose.py)
   ament_add_pytest_test(localization_trial_test test/test_localization_trial.py)
   ament_add_pytest_test(uav_correction_test test/test_uav_correction.py)
+  ament_add_pytest_test(sim_dependencies_test test/test_sim_dependencies.py)
   find_package(ament_lint_auto REQUIRED)
   # the following line skips the linter which checks for copyrights
   # comment the line when a copyright and license is added to all source files

@@ -232,6 +232,7 @@ class LocalizationTrial(Node):
             "estimate_topic": self.args.estimate_topic,
             "route": self.args.route,
             "duration_s": self.args.duration,
+            "start_simulation_time_s": self.start,
             "measurement_profile": self.args.measurement_profile,
             "anchor_source": self.args.anchor_source,
             "observer_model": self.args.observer_model or "fixed",
