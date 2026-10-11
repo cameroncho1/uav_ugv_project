@@ -10,7 +10,7 @@ Current milestone:
 - Live PX4 odometry received by a custom C++ ROS 2 node
 - ROS 2 package structure for future autonomy development
 
-The [goal demo](README_simple_goal_demo.md) adds a stationary UAV camera grid, local A* planning, and UGV path following. [Cooperative localization](docs/cooperative_localization/subsystem.md) supplies a GPS/wheel/IMU baseline and optional UAV-derived position corrections, with repeatable GPS-loss and fault trials. The demo's navigation uses Gazebo-derived UGV odometry; the fused estimate is published separately.
+The [goal demo](README_simple_goal_demo.md) adds a stationary UAV camera grid, local A* planning, and UGV path following. [Cooperative localization](docs/cooperative_localization/subsystem.md) supplies a GPS/wheel/IMU baseline and optional UAV-derived position corrections, with repeatable GPS-loss and fault trials. Navigation uses the fused pose with acquisition-age, receipt-age, and uncertainty checks. [Navigation](docs/navigation.md) describes the hold and recovery rules.
 
 ---
 

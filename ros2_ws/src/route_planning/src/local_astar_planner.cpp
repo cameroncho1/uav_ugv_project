@@ -11,13 +11,23 @@
 #include <nav_msgs/msg/occupancy_grid.hpp>
 #include <nav_msgs/msg/path.hpp>
 #include <rclcpp/rclcpp.hpp>
+#include <uav_ugv_msgs/pose_guard.hpp>
 
 using namespace std::chrono_literals;
 
-class LocalAstarPlanner : public rclcpp::Node {
+class LocalAstarPlanner : public rclcpp::Node
+{
 public:
-  LocalAstarPlanner() : Node("local_astar_planner") {
+  LocalAstarPlanner()
+  : Node("local_astar_planner"), pose_guard_(pose_limits())
+  {
     max_goal_adjust_cells_ = declare_parameter("max_goal_adjust_cells", 5);
+    max_grid_age_ = declare_parameter("max_grid_age", 2.0);
+    if (!std::isfinite(max_grid_age_) || max_grid_age_ <= 0 ||
+      max_goal_adjust_cells_ < 0 || max_goal_adjust_cells_ > 100)
+    {
+      throw std::invalid_argument("Invalid planner limits");
+    }
 
     auto latched_qos = rclcpp::QoS(1).reliable().transient_local();
 
@@ -27,53 +37,83 @@ public:
       [this](nav_msgs::msg::OccupancyGrid::SharedPtr msg) {
         grid_ = *msg;
         have_grid_ = true;
+        grid_receipt_ = uav_ugv_msgs::steady_time_ns();
       });
 
     goal_sub_ = create_subscription<geometry_msgs::msg::PoseStamped>(
       "/global_goal_pose", latched_qos,
       [this](geometry_msgs::msg::PoseStamped::SharedPtr msg) {
         goal_ = *msg;
-        have_goal_ = true;
+        have_goal_ = msg->header.frame_id == "map" &&
+        std::isfinite(msg->pose.position.x) && std::isfinite(msg->pose.position.y);
       });
-    ugv_pose_sub_ = create_subscription<geometry_msgs::msg::PoseStamped>(
-      "/ugv_pose", 10,
-      [this](geometry_msgs::msg::PoseStamped::SharedPtr msg) {
-        ugv_pose_ = *msg;
-        have_ugv_pose_ = true;
+    ugv_pose_sub_ = create_subscription<geometry_msgs::msg::PoseWithCovarianceStamped>(
+      "/ugv/localization/pose", 10,
+      [this](geometry_msgs::msg::PoseWithCovarianceStamped::SharedPtr msg) {
+        pose_guard_.update(*msg, now().nanoseconds(), uav_ugv_msgs::steady_time_ns());
       });
 
     //publish local path for UGV controller to use
     path_pub_ = create_publisher<nav_msgs::msg::Path>("/local_path", latched_qos);
-    timer_ = create_wall_timer(200ms, [this]() { plan(); });
+    timer_ = create_wall_timer(200ms, [this]() {plan();});
   }
 
 private:
+  uav_ugv_msgs::PoseLimits pose_limits()
+  {
+    return {declare_parameter("max_pose_age", 0.5),
+      declare_parameter("max_position_stddev", 0.5),
+      declare_parameter("max_heading_stddev", 0.2)};
+  }
+
+  bool valid_grid() const
+  {
+    const auto stamp = uav_ugv_msgs::stamp_ns(grid_.header.stamp);
+    const auto age = (now().nanoseconds() - stamp) * 1e-9;
+    const auto & origin = grid_.info.origin;
+    const auto & q = origin.orientation;
+    const auto cells = static_cast<uint64_t>(grid_.info.width) * grid_.info.height;
+    return have_grid_ && grid_.header.frame_id == "map" && stamp > 0 &&
+           age >= -0.05 && age <= max_grid_age_ &&
+           (uav_ugv_msgs::steady_time_ns() - grid_receipt_) * 1e-9 <= max_grid_age_ &&
+           cells > 0 && cells <= 1000000 && grid_.data.size() == cells &&
+           std::isfinite(grid_.info.resolution) && grid_.info.resolution > 0 &&
+           std::isfinite(origin.position.x) && std::isfinite(origin.position.y) &&
+           std::abs(q.x) < 1e-6 && std::abs(q.y) < 1e-6 && std::abs(q.z) < 1e-6 &&
+           std::abs(std::abs(q.w) - 1) < 1e-6;
+  }
+
   struct Cell { int x; int y; };
 
-  bool cell_in_bounds(const Cell &cell) const {
+  bool cell_in_bounds(const Cell & cell) const
+  {
     return cell.x >= 0 && cell.y >= 0 &&
-      cell.x < static_cast<int>(grid_.info.width) &&
-      cell.y < static_cast<int>(grid_.info.height);
+           cell.x < static_cast<int>(grid_.info.width) &&
+           cell.y < static_cast<int>(grid_.info.height);
   }
 
-  std::size_t index_of(const Cell &cell) const {
+  std::size_t index_of(const Cell & cell) const
+  {
     return static_cast<std::size_t>(cell.y) * grid_.info.width +
-      static_cast<std::size_t>(cell.x);
+           static_cast<std::size_t>(cell.x);
   }
 
-  bool traversable(const Cell &cell) const {
+  bool traversable(const Cell & cell) const
+  {
     return cell_in_bounds(cell) && grid_.data[index_of(cell)] >= 0 &&
-      grid_.data[index_of(cell)] < 50;
+           grid_.data[index_of(cell)] < 50;
   }
 
-  Cell world_to_cell(double x, double y) const {
+  Cell world_to_cell(double x, double y) const
+  {
     return {
       static_cast<int>(std::floor((x - grid_.info.origin.position.x) / grid_.info.resolution)),
       static_cast<int>(std::floor((y - grid_.info.origin.position.y) / grid_.info.resolution))
     };
   }
 
-  geometry_msgs::msg::Point cell_center(const Cell &cell) const {
+  geometry_msgs::msg::Point cell_center(const Cell & cell) const
+  {
     geometry_msgs::msg::Point point;
     point.x = grid_.info.origin.position.x + (cell.x + 0.5) * grid_.info.resolution;
     point.y = grid_.info.origin.position.y + (cell.y + 0.5) * grid_.info.resolution;
@@ -81,7 +121,8 @@ private:
     return point;
   }
 
-  bool nearest_free(Cell &cell) const {
+  bool nearest_free(Cell & cell) const
+  {
     if (traversable(cell)) {
       return true;
     }
@@ -110,14 +151,16 @@ private:
     return false;
   }
 
-  double heuristic(const Cell &from, const Cell &to) const {
+  double heuristic(const Cell & from, const Cell & to) const
+  {
     const double dx = std::abs(from.x - to.x);
     const double dy = std::abs(from.y - to.y);
     const double diagonal = std::min(dx, dy);
     return std::max(dx, dy) + (std::sqrt(2.0) - 1.0) * diagonal;
   }
 
-  std::vector<Cell> find_path(Cell start, Cell goal) const {
+  std::vector<Cell> find_path(Cell start, Cell goal) const
+  {
     if (!nearest_free(start) || !nearest_free(goal)) {
       return {};
     }
@@ -147,8 +190,9 @@ private:
       if (current_index == goal_index) {
         std::vector<Cell> path;
         for (std::size_t cursor = goal_index; cursor != cell_count; cursor = parents[cursor]) {
-          path.push_back({static_cast<int>(cursor % grid_.info.width),
-            static_cast<int>(cursor / grid_.info.width)});
+          path.push_back(
+            {static_cast<int>(cursor % grid_.info.width),
+              static_cast<int>(cursor / grid_.info.width)});
           if (cursor == start_index) {
             break;
           }
@@ -167,7 +211,8 @@ private:
         }
         const bool diagonal = dx[direction] != 0 && dy[direction] != 0;
         if (diagonal && (!traversable({current.x + dx[direction], current.y}) ||
-          !traversable({current.x, current.y + dy[direction]}))) {
+          !traversable({current.x, current.y + dy[direction]})))
+        {
           continue;
         }
 
@@ -186,18 +231,31 @@ private:
     return {};
   }
 
-  void plan() {
-    if (!have_grid_ || !have_goal_ || !have_ugv_pose_) {
-      return;
-    }
-
+  void plan()
+  {
     nav_msgs::msg::Path path;
     path.header.frame_id = "map";
     path.header.stamp = now();
-    const Cell start = world_to_cell(ugv_pose_.pose.position.x, ugv_pose_.pose.position.y);
+    if (!pose_guard_.check(now().nanoseconds(), uav_ugv_msgs::steady_time_ns()) ||
+      !have_goal_ || !valid_grid())
+    {
+      path_pub_->publish(path);
+      return;
+    }
+    const auto & ugv_pose_ = pose_guard_.pose();
+    // Bound coordinates before converting floating-point cells to integers.
+    for (const auto & p : {ugv_pose_.position, goal_.pose.position}) {
+      if (std::abs((p.x - grid_.info.origin.position.x) / grid_.info.resolution) > 1000000 ||
+        std::abs((p.y - grid_.info.origin.position.y) / grid_.info.resolution) > 1000000)
+      {
+        path_pub_->publish(path);
+        return;
+      }
+    }
+    const Cell start = world_to_cell(ugv_pose_.position.x, ugv_pose_.position.y);
     const Cell goal = world_to_cell(goal_.pose.position.x, goal_.pose.position.y);
     const auto cells = find_path(start, goal);
-    for (const auto &cell : cells) {
+    for (const auto & cell : cells) {
       geometry_msgs::msg::PoseStamped pose;
       pose.header = path.header;
       pose.pose.position = cell_center(cell);
@@ -209,14 +267,15 @@ private:
       const double min_y = grid_.info.origin.position.y;
       const double max_x = min_x + grid_.info.width * grid_.info.resolution;
       const double max_y = min_y + grid_.info.height * grid_.info.resolution;
-      const char *start_state = !cell_in_bounds(start) ? "outside" :
+      const char * start_state = !cell_in_bounds(start) ? "outside" :
         (traversable(start) ? "free" : "blocked");
-      const char *goal_state = !cell_in_bounds(goal) ? "outside" :
+      const char * goal_state = !cell_in_bounds(goal) ? "outside" :
         (traversable(goal) ? "free" : "blocked");
-      RCLCPP_WARN_THROTTLE(get_logger(), *get_clock(), 2000,
+      RCLCPP_WARN_THROTTLE(
+        get_logger(), *get_clock(), 2000,
         "No local A-star path: UGV (%.2f, %.2f) cell (%d, %d) %s; goal (%.2f, %.2f) "
         "cell (%d, %d) %s; grid x=[%.2f, %.2f), y=[%.2f, %.2f)",
-        ugv_pose_.pose.position.x, ugv_pose_.pose.position.y, start.x, start.y, start_state,
+        ugv_pose_.position.x, ugv_pose_.position.y, start.x, start.y, start_state,
         goal_.pose.position.x, goal_.pose.position.y, goal.x, goal.y, goal_state,
         min_x, max_x, min_y, max_y);
     }
@@ -226,18 +285,20 @@ private:
   int max_goal_adjust_cells_{5};
   bool have_grid_{false};
   bool have_goal_{false};
-  bool have_ugv_pose_{false};
+  uav_ugv_msgs::PoseGuard pose_guard_;
+  double max_grid_age_{2.0};
+  int64_t grid_receipt_{0};
   nav_msgs::msg::OccupancyGrid grid_;
   geometry_msgs::msg::PoseStamped goal_;
-  geometry_msgs::msg::PoseStamped ugv_pose_;
   rclcpp::Subscription<nav_msgs::msg::OccupancyGrid>::SharedPtr grid_sub_;
   rclcpp::Subscription<geometry_msgs::msg::PoseStamped>::SharedPtr goal_sub_;
-  rclcpp::Subscription<geometry_msgs::msg::PoseStamped>::SharedPtr ugv_pose_sub_;
+  rclcpp::Subscription<geometry_msgs::msg::PoseWithCovarianceStamped>::SharedPtr ugv_pose_sub_;
   rclcpp::Publisher<nav_msgs::msg::Path>::SharedPtr path_pub_;
   rclcpp::TimerBase::SharedPtr timer_;
 };
 
-int main(int argc, char **argv) {
+int main(int argc, char ** argv)
+{
   rclcpp::init(argc, argv);
   rclcpp::spin(std::make_shared<LocalAstarPlanner>());
   rclcpp::shutdown();

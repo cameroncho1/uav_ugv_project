@@ -10,9 +10,11 @@ find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(nav_msgs REQUIRED)
+find_package(uav_ugv_msgs REQUIRED)
 
 add_executable(local_astar_planner src/local_astar_planner.cpp)
-ament_target_dependencies(local_astar_planner rclcpp geometry_msgs nav_msgs)
+ament_target_dependencies(local_astar_planner rclcpp geometry_msgs nav_msgs uav_ugv_msgs)
+target_compile_features(local_astar_planner PRIVATE cxx_std_17)
 install(TARGETS local_astar_planner DESTINATION lib/${PROJECT_NAME})
 
 if(BUILD_TESTING)

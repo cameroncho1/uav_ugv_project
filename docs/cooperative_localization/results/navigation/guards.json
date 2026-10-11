@@ -1,0 +1,176 @@
+{
+  "cases": [
+    {
+      "case": "raw_only",
+      "expected_motion": false,
+      "passed": true,
+      "commands_checked": 5,
+      "max_command_magnitude": 0.0,
+      "path_received": true,
+      "path_points": 0
+    },
+    {
+      "case": "valid",
+      "expected_motion": true,
+      "passed": true,
+      "commands_checked": 5,
+      "max_command_magnitude": 0.6085933397748211,
+      "path_received": true,
+      "path_points": 13
+    },
+    {
+      "case": "uncertain_position",
+      "expected_motion": false,
+      "passed": true,
+      "commands_checked": 5,
+      "max_command_magnitude": 0.0,
+      "path_received": true,
+      "path_points": 0
+    },
+    {
+      "case": "recovery",
+      "expected_motion": true,
+      "passed": true,
+      "commands_checked": 5,
+      "max_command_magnitude": 0.6085933397748211,
+      "path_received": true,
+      "path_points": 13
+    },
+    {
+      "case": "uncertain_heading",
+      "expected_motion": false,
+      "passed": true,
+      "commands_checked": 5,
+      "max_command_magnitude": 0.0,
+      "path_received": true,
+      "path_points": 0
+    },
+    {
+      "case": "correlated_xy",
+      "expected_motion": false,
+      "passed": true,
+      "commands_checked": 5,
+      "max_command_magnitude": 0.0,
+      "path_received": true,
+      "path_points": 0
+    },
+    {
+      "case": "wrong_frame",
+      "expected_motion": false,
+      "passed": true,
+      "commands_checked": 5,
+      "max_command_magnitude": 0.0,
+      "path_received": true,
+      "path_points": 0
+    },
+    {
+      "case": "stale_pose",
+      "expected_motion": false,
+      "passed": true,
+      "commands_checked": 5,
+      "max_command_magnitude": 0.0,
+      "path_received": true,
+      "path_points": 0
+    },
+    {
+      "case": "future_pose",
+      "expected_motion": false,
+      "passed": true,
+      "commands_checked": 5,
+      "max_command_magnitude": 0.0,
+      "path_received": true,
+      "path_points": 0
+    },
+    {
+      "case": "recovery",
+      "expected_motion": true,
+      "passed": true,
+      "commands_checked": 5,
+      "max_command_magnitude": 0.6085933397748211,
+      "path_received": true,
+      "path_points": 13
+    },
+    {
+      "case": "missing_pose",
+      "expected_motion": false,
+      "passed": true,
+      "commands_checked": 5,
+      "max_command_magnitude": 0.0,
+      "path_received": true,
+      "path_points": 0
+    },
+    {
+      "case": "recovery",
+      "expected_motion": true,
+      "passed": true,
+      "commands_checked": 5,
+      "max_command_magnitude": 0.6085933397748211,
+      "path_received": true,
+      "path_points": 13
+    },
+    {
+      "case": "frozen_clock",
+      "expected_motion": false,
+      "passed": true,
+      "commands_checked": 5,
+      "max_command_magnitude": 0.0,
+      "path_received": true,
+      "path_points": 0
+    },
+    {
+      "case": "recovery",
+      "expected_motion": true,
+      "passed": true,
+      "commands_checked": 5,
+      "max_command_magnitude": 0.6085933397748211,
+      "path_received": true,
+      "path_points": 13
+    },
+    {
+      "case": "missing_grid",
+      "expected_motion": false,
+      "passed": true,
+      "commands_checked": 4,
+      "max_command_magnitude": 0.0,
+      "path_received": true,
+      "path_points": 0
+    },
+    {
+      "case": "invalid_grid",
+      "expected_motion": false,
+      "passed": true,
+      "commands_checked": 4,
+      "max_command_magnitude": 0.0,
+      "path_received": true,
+      "path_points": 0
+    },
+    {
+      "case": "blocked_grid",
+      "expected_motion": false,
+      "passed": true,
+      "commands_checked": 4,
+      "max_command_magnitude": 0.0,
+      "path_received": true,
+      "path_points": 0
+    },
+    {
+      "case": "recovery",
+      "expected_motion": true,
+      "passed": true,
+      "commands_checked": 4,
+      "max_command_magnitude": 0.6085933397748211,
+      "path_received": true,
+      "path_points": 13
+    },
+    {
+      "case": "goal_reached",
+      "expected_motion": false,
+      "passed": true,
+      "commands_checked": 4,
+      "max_command_magnitude": 0.0,
+      "path_received": true,
+      "path_points": 1
+    }
+  ],
+  "passed": true
+}

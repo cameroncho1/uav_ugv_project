@@ -1,0 +1,18 @@
+/**:
+  ros__parameters:
+    # One standard deviation, meters and radians. Acquisition and receipt ages
+    # both gate navigation. These limits are simulation assumptions.
+    max_pose_age: 0.5
+    max_position_stddev: 0.5
+    max_heading_stddev: 0.2
+ugv_goal_controller:
+  ros__parameters:
+    max_path_age: 1.0
+    lookahead_distance: 0.6
+    max_linear_speed: 0.5
+    max_angular_speed: 1.0
+    goal_tolerance: 0.5
+local_astar_planner:
+  ros__parameters:
+    max_grid_age: 2.0
+    max_goal_adjust_cells: 5

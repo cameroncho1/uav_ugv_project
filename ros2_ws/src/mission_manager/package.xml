@@ -17,6 +17,7 @@
   <exec_depend>traversability_mapping</exec_depend>
   <exec_depend>route_planning</exec_depend>
   <exec_depend>cooperative_localization</exec_depend>
+  <exec_depend>ros_gz_bridge</exec_depend>
   <exec_depend>launch</exec_depend>
   <exec_depend>launch_ros</exec_depend>
   <exec_depend>ament_index_python</exec_depend>

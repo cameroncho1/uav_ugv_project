@@ -40,7 +40,7 @@ Nominal relative standard deviations are `(0.25, 0.15, 0.25)` m in FLU. Simulate
 - `ugv_sensors.launch.py`: bridges and prepares measurements. `world` selects spawn and GPS origin; `measurement_profile` selects `nominal` or `drift`.
 - `ugv_localization.launch.py`: starts the baseline, or adds UAV adapters and fusion with `uav_assistance:=true`. `uav_odometry_topic` selects live PX4 or a compatible test source.
 - `sim_uav_sensor.launch.py`: generates noisy relative observations. Empty `uav_model` selects a fixed observer at map `(2, -2, 4)`; a named model selects its actual Gazebo pose. `publish_anchor:=false` uses an independently supplied UAV anchor.
-- `simple_goal_demo.launch.py`: starts assisted localization with actual PX4 anchors and noisy relative observations from the actual flying UAV model. `uav_assistance:=false` selects the baseline. Navigation consumes `/ugv_pose` from Gazebo odometry.
+- `simple_goal_demo.launch.py`: starts assisted localization with actual PX4 anchors and noisy relative observations from the actual flying UAV model. `uav_assistance:=false` selects the baseline. Navigation consumes `/ugv/localization/pose` with freshness and uncertainty gates; `/ugv/cmd_vel` carries velocity commands.
 
 ## Evaluation and reproducibility
 

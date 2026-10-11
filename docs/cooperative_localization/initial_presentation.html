@@ -671,7 +671,7 @@
       <section class="slide" data-title="Subsystem connections" aria-hidden="true">
         <div class="slide-inner">
           <h2>Subsystem connections</h2>
-          <p class="cite">Target connection: the fused UGV pose and traversability map share the <span class="mono">map</span> frame. The demo planner still uses <span class="mono">/ugv_pose</span>.</p>
+          <p class="cite">Implemented connection: the fused UGV pose and traversability map share the <span class="mono">map</span> frame. The planner consumes the fused pose with freshness and uncertainty checks.</p>
           <svg viewBox="0 0 1200 615" style="max-height:58vh" role="img" aria-label="Data sources (UGV sensors, drone, fault management) feed cooperative localization. Localization publishes one pose. Route planning combines that pose with the traversability map and the mission goal and sends a route to UGV control. Gazebo ground truth is used only for test data and scoring.">
 <defs><marker id="head2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#000"/></marker></defs>
 <text class="b" x="0" y="20">Data sources</text>
@@ -719,7 +719,7 @@
 <text x="364" y="526">Goal, in map frame</text>
 <rect class="heavy" x="700" y="150" width="250" height="230"/>
 <text class="b" x="714" y="180">Route planning</text>
-<text x="714" y="210">Reads /ugv_pose.</text>
+<text x="714" y="210">Reads fused UGV pose.</text>
 <text x="714" y="234">Never reads raw sensors.</text>
 <text x="714" y="258">Outputs a route.</text>
 <polyline points="620,280 698,280" fill="none" stroke="#000" stroke-width="2" stroke-dasharray="6 5" marker-end="url(#head2)"/>
@@ -743,7 +743,7 @@
       <section class="slide" data-title="Pose interface" aria-hidden="true">
         <div class="slide-inner">
           <h2>Pose interface</h2>
-          <p class="cite">The EKF publishes this fused pose topic. The demo planner currently reads <span class="mono">/ugv_pose</span>.</p>
+          <p class="cite">The EKF publishes this fused pose topic. The planner uses this pose with freshness and uncertainty gates.</p>
           <div class="columns">
             <section>
               <h3>Topic definition</h3>
@@ -837,7 +837,7 @@
           <h2>Next steps</h2>
           <ol class="steps">
             <li>Connect the fused pose to navigation with freshness and uncertainty checks.
-              <span>The planner currently reads the demo controller's <span class="mono">/ugv_pose</span>.</span></li>
+              <span>The planner consumes the fused UGV pose and rejects stale or uncertain samples.</span></li>
             <li>Replace the simulated relative vector with a calibrated detector and visibility model.</li>
             <li>Evaluate correlated anchor errors and controller behavior during loss of both position sources.</li>
           </ol>

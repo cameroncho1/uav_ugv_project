@@ -624,7 +624,7 @@
                 <li><span class="mono">/ugv/measurements/imu</span>: noisy inertial reading with covariance.</li>
                 <li>A 2D EKF combines wheel speed, zero sideways speed, IMU heading, and GPS position on <span class="mono">/ugv/localization/pose</span>.</li>
                 <li>A GPS switch and repeatable route test compare the fused pose with Gazebo's true UGV pose.</li>
-                <li>The current planner still reads <span class="mono">/ugv_pose</span> from the demo controller; it does not use the new sensor topics yet.</li>
+                <li>The planner uses the fused UGV pose with freshness and uncertainty checks.</li>
               </ul>
             </section>
           </div>

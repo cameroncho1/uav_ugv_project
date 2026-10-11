@@ -4,7 +4,7 @@
 
 This subsystem supplies a fused UGV position from wheel motion, IMU heading, and GPS. Its input layer bridges the simulated sensors into ROS 2. A measurement adapter projects GPS into the map frame, anchors wheel odometry to the UGV spawn pose, and publishes noisy readings with configured covariance. A planar EKF combines them and publishes `/ugv/localization/pose`. Both Gazebo worlds contain the sensors. [Interfaces](interfaces.md) lists the live topics, frames, error settings, and commands to check them.
 
-The fused pose combines wheel speed, IMU heading, GPS when available, and optional UAV-derived UGV map position. A simulated relative-position sensor, PX4 frame adapter, and timestamp-matched correction producer supply the UAV input. GPS and UAV gates support controlled outages. The goal demo drives and plans from `/ugv_pose`, which the UGV controller makes from Gazebo odometry; the fused estimate is available for integration and evaluation.
+The fused pose combines wheel speed, IMU heading, GPS when available, and optional UAV-derived UGV map position. A simulated relative-position sensor, PX4 frame adapter, and timestamp-matched correction producer supply the UAV input. GPS and UAV gates support controlled outages. The goal demo plans and drives from `/ugv/localization/pose`. Both consumers check frame, acquisition age, receipt age, and position/heading uncertainty before allowing navigation.
 
 ## Sensor Boundary
 
@@ -23,7 +23,7 @@ The implemented baseline publishes one UGV estimate on `/ugv/localization/pose`,
 
 The UAV-assisted correction uses a measured UAV-to-UGV vector in UAV FLU body axes and an independently localized UAV pose in ENU `map`. `uav_pose.py` converts PX4 NED/FRD odometry, preserving sample time and transforming uncertainty. `uav_correction.py` interpolates anchors at observation time, rotates the vector into map, and propagates relative, UAV position, and UAV attitude covariance. The EKF uses the resulting x/y observation. [Measurement design](uav_measurement_design.md) defines equations, rejection rules, research sources, and assumptions.
 
-The path planner and UGV controller can consume the fused topic in place of `/ugv_pose` after accuracy and GPS-loss tests. Terrain mapping, obstacle detection, route planning, and flight control stay in their existing packages.
+The path planner and UGV controller consume the fused topic; [navigation](../navigation.md) defines their limits and verification. Terrain mapping, obstacle detection, route planning, and flight control stay in their existing packages.
 
 ## GPS Degradation and Evaluation
 

@@ -50,18 +50,12 @@ def generate_launch_description():
         ),
         DeclareLaunchArgument("uav_assistance", default_value="true",
                               description="Fuse UAV-assisted position measurements."),
+        DeclareLaunchArgument("initial_gps_enabled", default_value="true",
+                              description="Enable prepared UGV GPS at startup."),
         DeclareLaunchArgument("goal_x", default_value="4.0",
                               description="Goal east coordinate in meters."),
         DeclareLaunchArgument("goal_y", default_value="0.0",
                               description="Goal north coordinate in meters."),
-        DeclareLaunchArgument(
-            "ugv_odom_to_map_x", default_value="-4.0",
-            description="X offset from Gazebo UGV odometry to the map frame.",
-        ),
-        DeclareLaunchArgument(
-            "ugv_odom_to_map_y", default_value="0.0",
-            description="Y offset from Gazebo UGV odometry to the map frame.",
-        ),
         DeclareLaunchArgument("uav_altitude", default_value="4.0",
                               description="UAV target altitude in meters."),
         DeclareLaunchArgument(
@@ -83,6 +77,7 @@ def generate_launch_description():
             launch_arguments={"world": "simple_goal_demo",
                               "uav_odometry_topic": "/fmu/out/vehicle_odometry",
                               "uav_require_airborne": "true", "uav_initial_settle_time": "10.0",
+                              "initial_gps_enabled": LaunchConfiguration("initial_gps_enabled"),
                               "uav_assistance": LaunchConfiguration("uav_assistance")}.items(),
         ),
         IncludeLaunchDescription(
@@ -116,12 +111,7 @@ def generate_launch_description():
             package="ugv_control",
             executable="goal_controller",
             name="ugv_goal_controller",
-            parameters=[{
-                "odom_to_map_x": ParameterValue(
-                    LaunchConfiguration("ugv_odom_to_map_x"), value_type=float),
-                "odom_to_map_y": ParameterValue(
-                    LaunchConfiguration("ugv_odom_to_map_y"), value_type=float),
-            }],
+            parameters=[str(package_share / "config/navigation.yaml")],
             output="screen",
         ),
         Node(
@@ -142,6 +132,13 @@ def generate_launch_description():
             package="route_planning",
             executable="local_astar_planner",
             name="local_astar_planner",
+            parameters=[str(package_share / "config/navigation.yaml")],
+            output="screen",
+        ),
+        Node(
+            package="ros_gz_bridge", executable="parameter_bridge",
+            name="ugv_command_bridge",
+            parameters=[{"config_file": str(package_share / "config/ugv_command_bridge.yaml")}],
             output="screen",
         ),
         Node(
