@@ -8,19 +8,13 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(px4_msgs REQUIRED)
+find_package(geometry_msgs REQUIRED)
 
-add_executable(odometry_listener
-  src/odometry_listener.cpp
-)
-
-ament_target_dependencies(
-  odometry_listener
-  rclcpp
-  px4_msgs
-)
+add_executable(offboard_goal_controller src/offboard_goal_controller.cpp)
+ament_target_dependencies(offboard_goal_controller rclcpp px4_msgs geometry_msgs)
 
 install(
-  TARGETS odometry_listener
+  TARGETS offboard_goal_controller
   DESTINATION lib/${PROJECT_NAME}
 )
 
