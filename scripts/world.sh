@@ -6,7 +6,7 @@ PX4="$ROOT/external/PX4-Autopilot"
 
 source "$PX4/build/px4_sitl_default/rootfs/gz_env.sh"
 
-export GZ_PARTITION=uav_ugv_sim
+export GZ_PARTITION="${GZ_PARTITION:-uav_ugv_sim}"
 export GZ_IP=127.0.0.1
 
 gz sim -v4 -s -r "$ROOT/simulation/worlds/uav_ugv.sdf"

@@ -42,12 +42,14 @@ class LocalizationTrialTest(unittest.TestCase):
         estimate.header.stamp.nanosec = 50000000
         estimate.pose.pose.position.x = 1.5
         estimate.pose.pose.orientation.w = 1.0
+        estimate.pose.covariance[0] = 1.0
+        estimate.pose.covariance[7] = 1.0
         state = SimpleNamespace(
             truth=deque([(1.0, first), (1.1, second)]),
             pending=deque([estimate]), rows=[], start=0.0,
             skip_counts={"before": 0, "after": 0, "gap": 0},
         )
-        trial.LocalizationTrial.score_pending(state)
+        trial.LocalizationTrial.score_messages(state, state.pending, state.rows)
         self.assertEqual(len(state.rows), 1)
         self.assertAlmostEqual(state.rows[0]["true_x_m"], 1.0)
         self.assertAlmostEqual(state.rows[0]["position_error_m"], 0.5)

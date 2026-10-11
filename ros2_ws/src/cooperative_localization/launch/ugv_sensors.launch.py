@@ -3,7 +3,7 @@ from pathlib import Path
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
-from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
+from launch.substitutions import EnvironmentVariable, LaunchConfiguration, PathJoinSubstitution
 from launch_ros.actions import Node
 
 
@@ -21,12 +21,16 @@ def generate_launch_description():
         ),
         DeclareLaunchArgument("seed", default_value="513"),
         DeclareLaunchArgument("initial_gps_enabled", default_value="true"),
+        DeclareLaunchArgument("measurement_profile", default_value="nominal",
+                              choices=["nominal", "drift"]),
         Node(
             package="ros_gz_bridge",
             executable="parameter_bridge",
             name="ugv_sensor_bridge",
             parameters=[{"config_file": str(config)}],
-            additional_env={"GZ_PARTITION": "uav_ugv_sim", "GZ_IP": "127.0.0.1"},
+            additional_env={"GZ_PARTITION": EnvironmentVariable(
+                "GZ_PARTITION", default_value="uav_ugv_sim"),
+                "GZ_IP": "127.0.0.1"},
             output="screen",
         ),
         Node(
@@ -35,6 +39,10 @@ def generate_launch_description():
             name="ugv_measurements",
             parameters=[
                 str(package_share / "config" / "measurement_model.yaml"),
+                PathJoinSubstitution([
+                    str(package_share), "config",
+                    ["measurement_", LaunchConfiguration("measurement_profile"), ".yaml"],
+                ]),
                 PathJoinSubstitution([str(package_share), "config", [world, ".yaml"]]),
                 {"random_seed": seed, "initial_gps_enabled": initial_gps_enabled},
             ],

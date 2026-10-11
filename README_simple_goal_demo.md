@@ -1,6 +1,6 @@
 # Simple UAV–UGV Goal Demo
 
-This milestone keeps the UAV horizontally stationary while it climbs to a camera altitude. A local occupancy grid is derived from the downward camera image, A* plans through the grid from the UGV pose to the fixed goal, and the UGV follows that local path. The flat world uses a solid matte ground color and simple geometric vehicle and goal visuals, with shadows disabled to reduce rendering load. It has no physical obstacles. The image classifier is an initial dark-pixel heuristic, not semantic obstacle detection. There is no global path or global replanning yet.
+The goal demo keeps the UAV horizontally stationary while it climbs to a camera altitude. A local occupancy grid is derived from the downward camera image, A* plans through the grid from the UGV pose to the fixed goal, and the UGV follows that local path. The flat world uses a solid matte ground color and simple geometric vehicle and goal visuals, with shadows disabled to reduce rendering load. It has no physical obstacles. The image classifier is an initial dark-pixel heuristic, not semantic obstacle detection. There is no global path or global replanning yet.
 
 The default local goal is `(4, 0)` in the ROS `map` frame. The UGV starts at `(-4, 0)` and the UAV holds its initial horizontal position at 4 m altitude so its camera footprint covers the route. Gazebo UGV odometry is offset into the map frame with `ugv_odom_to_map_x` and `ugv_odom_to_map_y` (defaults `-4` and `0`); adjust them if you change the UGV spawn pose. Goal and altitude can be changed with launch arguments; if changing the goal coordinates, also update the bullseye pose in the world SDF.
 
@@ -27,7 +27,9 @@ ros2 launch mission_manager simple_goal_demo.launch.py
 
 The launch starts the Gazebo world, PX4 SITL, Micro XRCE-DDS Agent, the goal manager, stationary-XY UAV controller, camera grid mapper, local A-star planner, UGV path follower, and RViz. The UAV controller holds its initial horizontal position, streams the altitude setpoint, waits for PX4 preflight checks, then retries Offboard and arm requests until PX4 confirms the state. Keep the launch terminal open; Ctrl+C shuts down the launched processes.
 
-The launch also starts UGV localization. The bridge publishes `/ugv/sensors/wheel_odom`, `/ugv/sensors/imu`, `/ugv/sensors/gps`, and `/clock` in ROS 2. The adapter publishes noisy readings on `/ugv/measurements/wheel_odom`, `/ugv/measurements/imu`, and `/ugv/measurements/gps_pose`. An EKF combines wheel speed, IMU heading, and GPS map position and publishes `/ugv/localization/pose` with uncertainty. The current planner still uses `/ugv_pose` from the UGV controller; [the localization interface document](docs/cooperative_localization/interfaces.md) describes the fused topic and remaining integration work.
+The launch also starts UGV localization. An EKF combines wheel speed, IMU heading, GPS map position, and UAV-derived UGV position on `/ugv/localization/pose` with uncertainty. The UAV adapter converts the independent noisy simulated anchor from PX4 NED/FRD to ENU/FLU. A simulated sensor produces noisy UGV-relative observations from the Gazebo UAV model; a timestamp-matched adapter rotates them into map and includes UAV position and attitude uncertainty. `uav_assistance:=false` selects the GPS/wheel/IMU baseline. [The localization interfaces](docs/cooperative_localization/interfaces.md) define topics, gates, and evaluation commands. The planner and controller use `/ugv_pose` from Gazebo odometry.
+
+ROS nodes use `/clock`, and `px4_goal_demo.sh` sets `UXRCE_DDS_SYNCT=0` so PX4 samples use the same time source. When starting PX4 separately for this demo, use that script. UAV observations are simulated position vectors with configured noise; they are independent of the camera occupancy classifier.
 
 Change the local goal, camera altitude, grid resolution, or image threshold with launch arguments:
 
@@ -65,3 +67,5 @@ cd ~/uav_ugv_project/ros2_ws
 source /opt/ros/humble/setup.bash
 source install/setup.bash
 rviz2 -d install/mission_manager/share/mission_manager/config/simple_goal_demo.rviz
+
+The default UAV anchor and relative vector are simulated with independent noise on the actual flying model. The optional live PX4 anchor has a measured magnetometer-related heading bias with the pinned dependencies; see [measurement design](docs/cooperative_localization/uav_measurement_design.md#live-px4-compatibility) before using it.

@@ -2,11 +2,12 @@ from pathlib import Path
 
 from ament_index_python.packages import get_package_prefix, get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, ExecuteProcess, IncludeLaunchDescription, SetEnvironmentVariable, TimerAction
+from launch.actions import (DeclareLaunchArgument, ExecuteProcess, IncludeLaunchDescription,
+                            SetEnvironmentVariable, TimerAction)
 from launch.conditions import IfCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
-from launch_ros.actions import Node
+from launch_ros.actions import Node, SetParameter
 from launch_ros.parameter_descriptions import ParameterValue
 
 
@@ -47,8 +48,12 @@ def generate_launch_description():
             "start_rviz", default_value="true",
             description="Start RViz with the simple goal demo configuration.",
         ),
-        DeclareLaunchArgument("goal_x", default_value="4.0", description="Goal east coordinate in meters."),
-        DeclareLaunchArgument("goal_y", default_value="0.0", description="Goal north coordinate in meters."),
+        DeclareLaunchArgument("uav_assistance", default_value="true",
+                              description="Fuse UAV-assisted position measurements."),
+        DeclareLaunchArgument("goal_x", default_value="4.0",
+                              description="Goal east coordinate in meters."),
+        DeclareLaunchArgument("goal_y", default_value="0.0",
+                              description="Goal north coordinate in meters."),
         DeclareLaunchArgument(
             "ugv_odom_to_map_x", default_value="-4.0",
             description="X offset from Gazebo UGV odometry to the map frame.",
@@ -57,7 +62,8 @@ def generate_launch_description():
             "ugv_odom_to_map_y", default_value="0.0",
             description="Y offset from Gazebo UGV odometry to the map frame.",
         ),
-        DeclareLaunchArgument("uav_altitude", default_value="4.0", description="UAV target altitude in meters."),
+        DeclareLaunchArgument("uav_altitude", default_value="4.0",
+                              description="UAV target altitude in meters."),
         DeclareLaunchArgument(
             "grid_resolution", default_value="0.25",
             description="Camera occupancy-grid cell size in meters.",
@@ -68,11 +74,22 @@ def generate_launch_description():
         ),
         SetEnvironmentVariable("GZ_PARTITION", "uav_ugv_sim"),
         SetEnvironmentVariable("GZ_IP", "127.0.0.1"),
+        SetParameter(name="use_sim_time", value=True),
         world,
         agent,
         IncludeLaunchDescription(
-            PythonLaunchDescriptionSource(str(localization_share / "launch/ugv_localization.launch.py")),
-            launch_arguments={"world": "simple_goal_demo"}.items(),
+            PythonLaunchDescriptionSource(
+                str(localization_share / "launch/ugv_localization.launch.py")),
+            launch_arguments={"world": "simple_goal_demo",
+                              "uav_odometry_topic": "/simulation/uav_odometry",
+                              "uav_assistance": LaunchConfiguration("uav_assistance")}.items(),
+        ),
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource(
+                str(localization_share / "launch/sim_uav_sensor.launch.py")),
+            launch_arguments={"world": "simple_goal_demo", "uav_model": "x500_mono_cam_down_0",
+                              "publish_anchor": "true"}.items(),
+            condition=IfCondition(LaunchConfiguration("uav_assistance")),
         ),
         Node(
             package="mission_manager",
@@ -89,7 +106,8 @@ def generate_launch_description():
             executable="offboard_goal_controller",
             name="uav_goal_controller",
             parameters=[{
-                "uav_altitude": ParameterValue(LaunchConfiguration("uav_altitude"), value_type=float),
+                "uav_altitude": ParameterValue(
+                    LaunchConfiguration("uav_altitude"), value_type=float),
             }],
             output="screen",
         ),
@@ -110,7 +128,8 @@ def generate_launch_description():
             executable="traversability_mapper",
             name="traversability_mapper",
             parameters=[{
-                "grid_resolution": ParameterValue(LaunchConfiguration("grid_resolution"), value_type=float),
+                "grid_resolution": ParameterValue(
+                    LaunchConfiguration("grid_resolution"), value_type=float),
                 "obstacle_luminance_threshold": ParameterValue(
                     LaunchConfiguration("obstacle_luminance_threshold"), value_type=float),
             }],

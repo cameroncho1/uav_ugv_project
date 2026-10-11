@@ -1,92 +1,78 @@
-# Cooperative Localization Interfaces
+# Cooperative localization interfaces
 
-## Implemented Sensor Input Layer
+## Topics and frames
 
-Both Gazebo worlds, `simple_goal_demo` and `uav_ugv`, contain the `simple_ugv` differential-drive robot. Its chassis has an IMU and a NavSat sensor. The differential-drive system publishes wheel odometry. `cooperative_localization` launches one Gazebo-to-ROS bridge for the three measurements and simulation clock.
+Estimator inputs preserve acquisition timestamps. Localization nodes use Gazebo `/clock`; PX4 must share this clock with `UXRCE_DDS_SYNCT=0` when its pose is fused. Raw sensors use best-effort sensor QoS. Prepared measurements and fused poses use reliable QoS.
 
-The goal demo starts the bridge, measurement adapter, and EKF through `mission_manager/launch/simple_goal_demo.launch.py`. To run the full localization chain against an already running `uav_ugv` world, use `ros2 launch cooperative_localization ugv_localization.launch.py`. Pass `world:=simple_goal_demo` for that world. `ugv_sensors.launch.py` starts just the bridge and adapter. The bridge topic mapping is in `ros2_ws/src/cooperative_localization/config/ugv_sensor_bridges.yaml`.
+| Topic | ROS message | Frame and meaning |
+| --- | --- | --- |
+| `/ugv/sensors/wheel_odom` | `nav_msgs/Odometry` | Gazebo differential-drive odometry, 20 Hz, relative to spawn; child `simple_ugv/chassis`. |
+| `/ugv/sensors/imu` | `sensor_msgs/Imu` | Chassis-mounted inertial measurement, 50 Hz; `simple_ugv/chassis/imu`. |
+| `/ugv/sensors/gps` | `sensor_msgs/NavSatFix` | WGS84 GPS, 5 Hz; `simple_ugv/chassis/gps`. |
+| `/ugv/measurements/wheel_odom` | `nav_msgs/Odometry` | Noisy pose anchored to map spawn; body forward speed and zero lateral speed. |
+| `/ugv/measurements/imu` | `sensor_msgs/Imu` | Noisy yaw and turn rate in the chassis sensor frame. |
+| `/ugv/measurements/gps_pose` | `geometry_msgs/PoseWithCovarianceStamped` | GPS projected to ENU `map`, with meter noise and covariance; position only. |
+| `/uav/localization/pose` | `geometry_msgs/PoseWithCovarianceStamped` | Independent UAV map position and FLU attitude with covariance. |
+| `/ugv/sensors/uav_relative_pose` | `geometry_msgs/PoseWithCovarianceStamped` | UAV-to-UGV vector in `uav/base_link` (FLU), with position covariance; orientation unused. |
+| `/ugv/measurements/uav_pose` | `geometry_msgs/PoseWithCovarianceStamped` | UGV map position derived from timestamp-matched UAV pose and relative observation; orientation unused. |
+| `/ugv/localization/odometry` | `nav_msgs/Odometry` | Planar EKF output in `map`, 30 Hz. |
+| `/ugv/localization/pose` | `geometry_msgs/PoseWithCovarianceStamped` | EKF pose, timestamp, and covariance copied into the public interface. |
+| `/diagnostics` | `diagnostic_msgs/DiagnosticArray` | UAV correction freshness, accepted count, and rejection counts. |
 
-| ROS 2 topic | Type | Gazebo topic | Rate configured in SDF | Frame in messages |
-| --- | --- | --- | ---: | --- |
-| `/ugv/sensors/wheel_odom` | `nav_msgs/msg/Odometry` | `/simple_ugv/odom` | 20 Hz | `simple_ugv/odom`, child `simple_ugv/chassis` |
-| `/ugv/sensors/imu` | `sensor_msgs/msg/Imu` | `/simple_ugv/imu` | 50 Hz | `simple_ugv/chassis/imu` |
-| `/ugv/sensors/gps` | `sensor_msgs/msg/NavSatFix` | `/simple_ugv/gps` | 5 Hz | `simple_ugv/chassis/gps` |
-| `/clock` | `rosgraph_msgs/msg/Clock` | `/clock` | simulator clock | n/a |
+The bridge maps Gazebo `/simple_ugv/odom`, `/simple_ugv/imu`, `/simple_ugv/gps`, and `/clock` to ROS. Raw wheel and IMU covariance is zero and GPS covariance is unknown. The adapter supplies an explicit uncertainty model while raw topics remain available. GPS is converted through WGS84 ECEF to local ENU. The UGV map spawn is `(1, 0)` in `uav_ugv` and `(-4, 0)` in `simple_goal_demo`.
 
-The bridge direction is Gazebo to ROS. The three sensor topics use ROS `SENSOR_DATA` QoS (best effort); `/clock` uses `CLOCK` QoS. Messages keep Gazebo simulation timestamps. ROS consumers that compare message times against a node clock need `use_sim_time:=true`.
+The baseline EKF fuses body forward and zero lateral wheel velocity, IMU yaw and turn rate, and GPS x/y. It does not fuse integrated wheel pose or GPS placeholder orientation. UAV assistance adds absolute x/y position with a five-sigma innovation threshold. The chassis-to-IMU TF is identity. The EKF does not publish map-to-chassis TF.
 
-## Coordinates and Measurement Meaning
+## UAV observation contract
 
-- Gazebo world coordinates use ENU. The NavSat sensor reports WGS84 latitude, longitude, and altitude using the world's `spherical_coordinates` origin.
-- Wheel odometry is relative to the UGV's starting pose. Its `(0, 0)` is not the `map` origin. In `simple_goal_demo`, the UGV starts at map `(-4, 0)`; in `uav_ugv`, it starts at map `(1, 0)`.
-- IMU orientation, angular velocity, and acceleration come from the sensor on the UGV chassis. The sensor frame is named in each message. No TF transforms are published for these frames.
-- The bridged odometry and IMU covariance arrays contain zeros, and NavSatFix reports unknown position covariance. The worlds do not configure explicit sensor noise. These raw topics remain available for inspection; the adapter below makes noisy measurements with configured covariance for localization tests.
-- PX4 UAV odometry uses NED coordinates. Any UAV measurement joined with UGV data needs an explicit conversion to the shared ENU `map` frame.
+The relative sensor reports the UGV chassis origin relative to the UAV body origin. A perception producer must apply calibrated sensor-to-body extrinsics before publishing. Its position covariance must be finite and positive in the same FLU axes. It must use the shared acquisition clock. A hardware producer can replace the simulator through this interface.
 
-## Prepared Localization Measurements
+`uav_pose.py` accepts PX4 `POSE_FRAME_NED` with valid position, quaternion, and variances. It converts world axes from NED to ENU and body axes from FRD to FLU. `map_origin` supplies the local-to-map translation; the two world YAML files contain the configured origins. `uav_require_airborne:=true uav_initial_settle_time:=10.0` initializes the live reference after takeoff and a reset-free interval in the optional live PX4 diagnostic. `/fmu/out/vehicle_land_detected` supplies the takeoff state. Later pose resets stop anchor output until realignment and restart. Clock mismatches are rejected.
 
-`ugv_measurements.py` subscribes to the three raw ROS sensor topics and publishes these separate inputs. The two world configuration files in `ros2_ws/src/cooperative_localization/config/` contain each world's GPS origin and UGV spawn pose. `measurement_model.yaml` holds their shared error settings. These settings are simulation assumptions for repeatable tests, not measured hardware accuracy.
+`uav_correction.py` uses an exact anchor or interpolates position and quaternion at observation time. The maximum anchor gap is 0.25 s, maximum age 0.5 s, and maximum relative range 30 m. It propagates UAV position and attitude covariance plus rotated relative covariance. It rejects invalid inputs, duplicate stamps, and jumps exceeding a configured motion bound plus five standard deviations. It does not extrapolate or subscribe to UGV truth. [Measurement design](uav_measurement_design.md) gives equations and limits.
 
-| ROS 2 topic | Type | Frame | Meaning |
-| --- | --- | --- | --- |
-| `/ugv/measurements/wheel_odom` | `nav_msgs/msg/Odometry` | `map`; child `simple_ugv/chassis` | Dead-reckoned planar pose anchored to the configured spawn pose, plus forward speed and zero lateral speed for the differential-drive UGV. |
-| `/ugv/measurements/imu` | `sensor_msgs/msg/Imu` | `simple_ugv/chassis/imu` | Planar yaw, angular velocity, and acceleration with configured noise. |
-| `/ugv/measurements/gps_pose` | `geometry_msgs/msg/PoseWithCovarianceStamped` | `map` | WGS84 GPS fix converted to local east/north/up meters, then perturbed in meters. Position only; orientation is unknown. |
+Nominal relative standard deviations are `(0.25, 0.15, 0.25)` m in FLU. Simulated UAV position deviations are `(0.3, 0.3, 0.5)` m in map and attitude deviations `(0.01, 0.01, 0.02)` rad in body axes. Independent seeded random streams make an unchanged message sequence reproducible. These are simulation assumptions, not calibrated sensor specifications.
 
-All outputs keep their input simulation timestamps and use reliable QoS so a later estimator can subscribe with its normal ROS 2 settings. The adapter subscribes to the raw best-effort sensor topics. The GPS origin is the world's `spherical_coordinates` origin. The conversion uses WGS84 Earth-centered coordinates and an east/north/up basis at that origin. The wheel odometry adapter starts at the configured UGV map spawn point and adds incremental motion, rather than treating its raw `(0, 0)` as the map origin. Both worlds spawn the UGV at zero yaw. The adapter does not publish TF or convert PX4's NED frame.
+## Services and launch modes
 
-The configured GPS standard deviations are 1.5 m horizontally and 3 m vertically. Wheel position and yaw error grow with distance traveled, using 0.05 m and 0.02 rad per square root of meter. IMU yaw, angular-velocity, and acceleration standard deviations are 0.02 rad, 0.01 rad/s, and 0.1 m/s². Covariance fields contain the squared settings; unused 3D pose components carry large variance. A fixed random seed makes an unchanged message sequence reproducible. GPS, wheel, and IMU use separate random streams; disabling GPS does not alter the other streams. This simple independent Gaussian model does not represent all real GPS bias, wheel slip, or IMU drift, so filter tuning and evaluation must check its assumptions.
+- `/ugv/localization/set_gps_enabled`: `std_srvs/SetBool`; disables or restores prepared GPS while raw GPS continues.
+- `/ugv/localization/set_uav_enabled`: `std_srvs/SetBool`; disables or restores UAV corrections while other sensors continue.
+- `ugv_sensors.launch.py`: bridges and prepares measurements. `world` selects spawn and GPS origin; `measurement_profile` selects `nominal` or `drift`.
+- `ugv_localization.launch.py`: starts the baseline, or adds UAV adapters and fusion with `uav_assistance:=true`. `uav_odometry_topic` selects live PX4 or a compatible test source.
+- `sim_uav_sensor.launch.py`: generates noisy relative observations. Empty `uav_model` selects a fixed observer at map `(2, -2, 4)`; a named model selects its actual Gazebo pose. `publish_anchor:=false` uses an independently supplied UAV anchor.
+- `simple_goal_demo.launch.py`: starts assisted localization with independent noisy simulated anchors and relative observations from the actual flying UAV model. `uav_assistance:=false` selects the baseline. Navigation consumes `/ugv_pose` from Gazebo odometry.
 
-## Current Demo Consumers
+## Evaluation and reproducibility
 
-The goal demo's UGV controller still reads Gazebo odometry directly and publishes `/ugv_pose` as `geometry_msgs/msg/PoseStamped` in `map`. It applies the demo's configured spawn offset. The local A* planner reads `/ugv_pose`. The raw and prepared localization topics do not drive the controller or planner yet.
+`ugv_evaluation.launch.py` evaluates the baseline. `ugv_cooperative_evaluation.launch.py` runs baseline and assisted filters together on identical sensor messages. `/evaluation/ugv_truth` supplies true pose to the scorer, `/evaluation/ugv_cmd_vel` drives the route, and `/evaluation/baseline_pose` carries the baseline. `/simulation/vehicle_poses` supplies synchronized true poses to the synthetic sensor producer. `/simulation/uav_odometry` supplies noisy PX4-format anchor samples in fixed-observer trials. Those trials omit UAV flight dynamics.
 
-## Fused UGV Position
-
-`ugv_localization.launch.py` starts a planar `robot_localization` EKF and a small output adapter. It also publishes an identity TF from `simple_ugv/chassis` to `simple_ugv/chassis/imu`; the Gazebo IMU is mounted at the chassis link origin. The EKF configuration is `ros2_ws/src/cooperative_localization/config/ugv_ekf.yaml`. The EKF publishes at 30 Hz and continues prediction when an input is late. It does not publish a map-to-chassis TF; consumers use the pose message.
-
-The EKF uses wheel forward velocity to predict movement, zero lateral velocity to constrain sideways drift, IMU yaw and turn rate to track heading, and GPS map x/y to correct position. It does not fuse the wheel's integrated pose a second time or use the GPS message's placeholder orientation. It publishes filtered odometry on `/ugv/localization/odometry`. The output adapter publishes the single fused pose interface:
-
-- Topic: `/ugv/localization/pose`
-- Type: `geometry_msgs/msg/PoseWithCovarianceStamped`
-- Frame: `map` (ENU)
-- Contents: EKF timestamp, position, orientation, and covariance
-
-This is a GPS, wheel, and IMU baseline. The adapter copies the EKF's pose and covariance; it does not perform another filter step. The planner and controller still use `/ugv_pose`. A UAV-assisted measurement producer and correction are not implemented.
-
-The adapter's `/ugv/localization/set_gps_enabled` service accepts `std_srvs/srv/SetBool`. `false` stops `/ugv/measurements/gps_pose`; `true` resumes it. The `initial_gps_enabled` launch argument also starts the adapter with GPS already off for startup-denial trials. The raw GPS topic remains available. Gazebo's true state is for scoring only and is not the fused localization output.
-
-## Repeatable Accuracy Trials
-
-`ugv_evaluation.launch.py` adds `/evaluation/ugv_truth` (`PoseStamped` in `map`) and `/evaluation/ugv_cmd_vel` (`Twist`). These are test-only interfaces. `ugv_truth` reads Gazebo's model pose directly to keep the model name and simulation timestamp. The test runner publishes commands, requests the GPS outage, and writes a CSV with true and estimated x/y plus position and heading error for every matched timestamp. It rejects unmatched samples rather than comparing different times. A JSON file holds before/after metrics and confirms that prepared GPS messages stop after the outage. The estimate topic can be changed with `--estimate-topic` when evaluating another filter.
-
-From the WSL repo root, build the workspace and run the paired trials:
+The scorer matches estimates to interpolated truth at their timestamps and rejects truth gaps over 0.1 s. CSVs hold every scored position, heading error, covariance, and planar normalized estimation error squared (NEES). JSON summaries contain conditions, sensor counts, rejection counts, and error metrics. NEES uses the EKF x/y covariance; 5.991 is the 95% chi-square threshold for two coordinates. Ellipse coverage is a descriptive check on temporally correlated samples, not an independent-sample statistical claim.
 
 ```bash
 source /opt/ros/humble/setup.bash
 cd ros2_ws
-colcon build --packages-select cooperative_localization --symlink-install
+colcon build --packages-up-to cooperative_localization mission_manager --symlink-install
+source install/setup.bash
 cd ..
-scripts/run_localization_trials.sh /tmp/localization_results
+
+# PX4 hover with independent simulated anchors and relative sensing.
+scripts/run_live_cooperative_trial.sh /tmp/cooperative_live
+
+# Three GPS cases across three seeds.
+scripts/run_cooperative_trials.sh /tmp/cooperative_short
+
+# 91-second route with wheel-scale and IMU-heading faults.
+ROUTE=long DURATION=91 MEASUREMENT_PROFILE=drift \
+  scripts/run_cooperative_trials.sh /tmp/cooperative_drift
+
+# GPS loss, outliers, and a 20-second correction outage.
+GPS_CASES=off ROUTE=long DURATION=91 MEASUREMENT_PROFILE=drift \
+  OUTLIER_EVERY=10 DROPOUT_START=35.0 DROPOUT_END=55.0 \
+  scripts/run_cooperative_trials.sh /tmp/cooperative_robust
 ```
 
-The script runs `on`, `off`, and `startup_off` cases for seeds 513, 514, and 515. `off` disables GPS at 10 seconds; `startup_off` never enables it. Set `SEEDS` or `GPS_CASES` to space-separated lists to select other trials. `ESTIMATE_TOPIC` selects another `PoseWithCovarianceStamped` estimate, and `EVALUATION_LAUNCH` selects a launch file in `cooperative_localization` that starts that estimator plus the evaluation command bridge and truth reader. Each trial runs for 31 simulation seconds. Results are `trial_<seed>_<gps>.csv`, matching `.json` files, and `summary.csv` in the chosen output directory. The summary covers 10.5–31 seconds and excludes the immediate switch interval. The script starts and stops its own Gazebo world and ROS launch, so no demo or other world should run at the same time. The generated data stays outside the repository when `/tmp` is used.
+`SEEDS` and `GPS_CASES` accept space-separated lists. `off` disables GPS at route time 10 s; `startup_off` starts with GPS disabled. `ROUTE=long` repeats the short forward/turn/stop pattern. The drift profile injects 15% forward wheel-speed error and 0.002 rad/s growing IMU heading bias. Its covariance still describes Gaussian noise, so these biases are deliberate faults. Outliers add 8 m in body x every tenth sensor sample. Dropout times are relative to `/evaluation/trial_start`.
 
-## Run and Check
+Each trial starts a fresh world and stops its processes. Results include scored CSVs, a baseline CSV for paired trials, JSON summaries, and `summary.csv` with one row per strategy. `GZ_PARTITION` can select an isolated Gazebo transport partition; the default is `uav_ugv_sim`. Avoid another world or controller in the same Gazebo partition and ROS domain. The baseline runner remains `scripts/run_localization_trials.sh`. [Measured results](evaluation_results.md) describe tested conditions and stored summaries.
 
-Install a Gazebo Harmonic build of `ros_gz_bridge` and `robot_localization` alongside ROS 2 Humble. On this Ubuntu 22.04 setup the packages are `ros-humble-ros-gzharmonic-bridge` and `ros-humble-robot-localization`. Build and source the workspace, then launch the demo or launch `ugv_localization.launch.py` while the `uav_ugv` world is running.
-
-```bash
-source /opt/ros/humble/setup.bash
-source ros2_ws/install/setup.bash
-ros2 topic list -t | grep -E '/ugv/sensors/|^/clock'
-ros2 topic echo --once /ugv/sensors/wheel_odom --qos-reliability best_effort
-ros2 topic echo --once /ugv/sensors/imu --qos-reliability best_effort
-ros2 topic echo --once /ugv/sensors/gps --qos-reliability best_effort
-ros2 topic echo --once /ugv/measurements/wheel_odom --qos-reliability best_effort
-ros2 topic echo --once /ugv/measurements/imu --qos-reliability best_effort
-ros2 topic echo --once /ugv/measurements/gps_pose --qos-reliability best_effort
-ros2 topic echo --once /ugv/localization/pose
-```
-
-Expected: all three raw sensors and their prepared measurements publish stamped readings, `/clock` advances, and the fused pose publishes in `map` with nonzero covariance. A listed topic alone does not prove that it is publishing; check at least one message. In the `uav_ugv` world, prepared wheel odometry starts near map `(1, 0)`; in `simple_goal_demo`, it starts near `(-4, 0)`. Individual GPS readings scatter around the spawn point because noise is enabled.
+"scripts/run_live_cooperative_trial.sh" flies a PX4 X500 and compares both UGV filters with GPS denied at startup. Its default "ANCHOR_MODE=simulated" uses independent noisy anchors on the flying model. "ANCHOR_MODE=px4" uses the actual PX4 estimator and a ten-second post-takeoff initialization interval. The pinned PX4/Gazebo magnetic path has a measured heading bias; this mode is diagnostic and is unsuitable for navigation until the firmware/model compatibility issue in [measurement design](uav_measurement_design.md#live-px4-compatibility) is resolved. Both modes write the source and observer model into their trial summaries.

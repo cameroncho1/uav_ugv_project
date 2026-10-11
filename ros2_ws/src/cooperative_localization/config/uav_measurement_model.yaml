@@ -1,0 +1,18 @@
+sim_uav_sensor:
+  ros__parameters:
+    use_sim_time: true
+    frequency: 5.0
+    relative_stddev: [0.25, 0.15, 0.25]
+    anchor_stddev: [0.3, 0.3, 0.5]
+    attitude_stddev: [0.01, 0.01, 0.02]
+uav_pose:
+  ros__parameters:
+    use_sim_time: true
+    max_age: 0.5
+uav_correction:
+  ros__parameters:
+    use_sim_time: true
+    max_age: 0.5
+    max_anchor_gap: 0.25
+    max_range: 30.0
+    max_ugv_speed: 2.0

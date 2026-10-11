@@ -515,7 +515,7 @@
           <div>
             <h1>UGV Localization</h1>
             <p class="lead">Estimates the ground robot's position, including when its GPS is weak or lost. The drone provides corrections.</p>
-            <p class="note">Design only. Not implemented yet.</p>
+            <p class="note">Planar EKF, simulated drone corrections, and repeatable accuracy trials.</p>
           </div>
           <svg viewBox="0 0 520 430" role="img" aria-label="Robot pose and uncertainty on a map with east and north axes">
             <line class="ln" x1="70" y1="350" x2="454" y2="350"/>
@@ -604,7 +604,7 @@
       <section class="slide" data-title="Inputs and output" aria-hidden="true">
         <div class="slide-inner">
           <h2>Inputs and output</h2>
-          <p class="cite">A 2D EKF combines UGV GPS, wheel speed, and IMU heading. A UAV correction is the next input.</p>
+          <p class="cite">A 2D EKF combines UGV GPS, wheel speed, IMU heading, and optional UAV position corrections.</p>
           <div class="flow">
             <div class="stack">
               <div class="box"><strong>UGV GPS</strong><span>Global position when available</span></div>
@@ -617,7 +617,7 @@
               <div class="box heavy">
                 <strong>Localization estimator</strong>
                 <span>2D EKF using robot_localization.</span>
-                <span>GPS-loss behavior and UAV correction need testing and integration.</span>
+                <span>Timestamp-matched drone corrections supply map position during GPS loss.</span>
               </div>
             </div>
             <div class="arrow" aria-hidden="true">&rarr;</div>
@@ -629,7 +629,7 @@
               </div>
             </div>
           </div>
-          <p class="note">The GPS, wheel, and IMU baseline publishes a fused pose with covariance. The UAV relative reading is not implemented.</p>
+          <p class="note">Baseline and UAV-assisted filters publish poses with covariance and share identical UGV measurements in paired trials.</p>
         </div>
       </section>
 
@@ -643,7 +643,7 @@
                 <tr><th>Assumption</th><td>Drone localization stays reliable during robot GPS loss.</td></tr>
                 <tr><th>Measurement</th><td>Noisy robot position relative to the drone.</td></tr>
                 <tr><th>Effect</th><td>Reduces drift and uncertainty.</td></tr>
-                <tr><th>Hardware</th><td>Possible sources: UWB, AprilTags, camera tracking. Not fixed yet.</td></tr>
+                <tr><th>Hardware</th><td>Simulation supplies a full 3D vector. A calibrated camera or tag detector must match this contract; range alone is insufficient.</td></tr>
               </tbody>
             </table>
             <svg viewBox="0 0 640 400" role="img" aria-label="A localized drone observes the true robot position, and the correction moves the drifted estimate toward it">
@@ -684,12 +684,12 @@
 <text x="14" y="123">Available in ROS 2</text>
 <rect class="box" x="0" y="150" width="250" height="90" />
 <text class="b" x="14" y="178">Drone (UAV)</text>
-<text x="14" y="202">Own position, from PX4</text>
-<text x="14" y="223">Robot-relative view planned</text>
+<text x="14" y="202">Independent noisy anchor</text>
+<text x="14" y="223">Noisy relative vector in FLU</text>
 <rect class="box" x="0" y="260" width="250" height="80" />
 <text class="b" x="14" y="288">Fault management</text>
-<text x="14" y="312">GPS-loss control planned</text>
-<text x="14" y="333">API undecided</text>
+<text x="14" y="312">GPS and UAV SetBool gates</text>
+<text x="14" y="333">Standard ROS services</text>
 <rect class="box" x="0" y="380" width="250" height="110" stroke-dasharray="6 5"/>
 <text class="b" x="14" y="408">Gazebo ground truth</text>
 <text x="14" y="432">Makes test sensor data and</text>
@@ -699,12 +699,12 @@
 <polyline points="250,195 348,195" fill="none" stroke="#000" stroke-width="2" stroke-dasharray="6 5" marker-end="url(#head2)"/>
 <polyline points="250,300 348,300" fill="none" stroke="#000" stroke-width="2" stroke-dasharray="6 5" marker-start="url(#head2)" marker-end="url(#head2)"/>
 <rect class="heavy" x="350" y="40" width="270" height="310"/>
-<text class="b" x="364" y="68">UGV EKF baseline</text>
+<text class="b" x="364" y="68">UGV planar EKF</text>
 <text x="364" y="94">Fuses wheel speed, IMU</text>
-<text x="364" y="115">heading, and GPS position.</text>
+<text x="364" y="115">heading, GPS, and UAV x/y.</text>
 <text x="364" y="136">Publishes pose + covariance.</text>
-<text x="364" y="157">GPS-loss and drone help</text>
-<text x="364" y="178">need integration tests.</text>
+<text x="364" y="157">Paired GPS-loss trials</text>
+<text x="364" y="178">score both estimates.</text>
 <line class="thin" x1="350" y1="235" x2="620" y2="235"/>
 <text class="b" x="364" y="258">Output</text>
 <text class="m" x="364" y="280">/ugv/localization/pose</text>
@@ -719,7 +719,7 @@
 <text x="364" y="526">Goal, in map frame</text>
 <rect class="heavy" x="700" y="150" width="250" height="230"/>
 <text class="b" x="714" y="180">Route planning</text>
-<text x="714" y="210">Reads /ugv_pose today.</text>
+<text x="714" y="210">Reads /ugv_pose.</text>
 <text x="714" y="234">Never reads raw sensors.</text>
 <text x="714" y="258">Outputs a route.</text>
 <polyline points="620,280 698,280" fill="none" stroke="#000" stroke-width="2" stroke-dasharray="6 5" marker-end="url(#head2)"/>
@@ -732,11 +732,11 @@
 <text class="b" x="1106" y="255" text-anchor="middle">UGV control</text>
 <text x="1106" y="278" text-anchor="middle">drives the route</text>
 <line x1="0" y1="580" x2="40" y2="580" stroke="#000" stroke-width="2" marker-end="url(#head2)"/><text x="52" y="585">data flow</text>
-<line x1="170" y1="580" x2="210" y2="580" stroke="#000" stroke-width="2" stroke-dasharray="6 5" marker-start="url(#head2)" marker-end="url(#head2)"/><text x="222" y="585">two-way, interface undecided</text>
+<line x1="170" y1="580" x2="210" y2="580" stroke="#000" stroke-width="2" stroke-dasharray="6 5" marker-start="url(#head2)" marker-end="url(#head2)"/><text x="222" y="585">control and health interface</text>
 <rect class="heavy" x="470" y="568" width="30" height="24"/><text x="512" y="585">main pipeline</text>
 <rect class="box" x="700" y="568" width="30" height="24" stroke-dasharray="4 3"/><text x="742" y="585">test and scoring only</text>
 </svg>
-          <p class="note">Package: <span class="mono">cooperative_localization</span>. The baseline fused pose publishes; the planner connection and UAV correction remain open.</p>
+          <p class="note">Package: <span class="mono">cooperative_localization</span>. The fused pose includes optional UAV corrections; the planner connection remains open.</p>
         </div>
       </section>
 
@@ -755,7 +755,7 @@
                   <tr><th>Convention</th><td>ENU: east, north, up</td></tr>
                 </tbody>
               </table>
-              <p class="note">Publishes from the GPS, wheel, and IMU baseline.</p>
+              <p class="note">Publishes from the baseline or UAV-assisted EKF.</p>
             </section>
             <section>
               <h3>Consumers</h3>
@@ -764,7 +764,7 @@
                 <li><strong>Mapping:</strong> publishes traversability data in the same ENU map frame.</li>
                 <li><strong>Coordinates:</strong> pose, obstacles, routes, and goals share one frame.</li>
                 <li><strong>Covariance:</strong> the estimator's uncertainty in the pose.</li>
-                <li><strong>Frames:</strong> drone state is PX4 NED (north, east, down) and needs conversion to map / ENU.</li>
+                <li><strong>Frames:</strong> the PX4-format anchor is converted from NED/FRD to map ENU/FLU.</li>
               </ul>
             </section>
           </div>
@@ -836,10 +836,10 @@
         <div class="slide-inner">
           <h2>Next steps</h2>
           <ol class="steps">
-            <li>Test the EKF against simulator truth and tune its error settings.
+            <li>Connect the fused pose to navigation with freshness and uncertainty checks.
               <span>The planner currently reads the demo controller's <span class="mono">/ugv_pose</span>.</span></li>
-            <li>Add a noisy drone reading of the robot and convert drone axes from NED to ENU.</li>
-            <li>Inject GPS loss and log estimator error against simulator truth for the three test cases.</li>
+            <li>Replace the simulated relative vector with a calibrated detector and visibility model.</li>
+            <li>Evaluate correlated anchor errors and controller behavior during loss of both position sources.</li>
           </ol>
         </div>
       </section>
@@ -859,8 +859,8 @@
             <section>
               <h3>Inside localization</h3>
               <ul>
-                <li>Filter type and tuning.</li>
-                <li>Whether the drone reading is 2D or 3D.</li>
+                <li>How correlated drone errors and occlusion are modeled.</li>
+                <li>Which calibrated detector supplies the full 3D vector.</li>
               </ul>
             </section>
           </div>

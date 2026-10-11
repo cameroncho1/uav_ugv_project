@@ -8,6 +8,7 @@ from copy import deepcopy
 import rclpy
 from geometry_msgs.msg import PoseWithCovarianceStamped, Quaternion
 from nav_msgs.msg import Odometry
+from rclpy.executors import ExternalShutdownException
 from rclpy.node import Node
 from rclpy.qos import QoSProfile, ReliabilityPolicy, qos_profile_sensor_data
 from sensor_msgs.msg import Imu, NavSatFix, NavSatStatus
@@ -96,6 +97,8 @@ class UgvMeasurements(Node):
         self.declare_parameter("imu_linear_acceleration_stddev", 0.1)
         self.declare_parameter("random_seed", 513)
         self.declare_parameter("initial_gps_enabled", True)
+        self.declare_parameter("wheel_speed_scale", 1.0)
+        self.declare_parameter("imu_yaw_bias_rate", 0.0)
 
         def parameter(name):
             return self.get_parameter(name).value
@@ -120,6 +123,9 @@ class UgvMeasurements(Node):
         self.imu_random = random.Random(seed + 2)
         self.gps_random = random.Random(seed + 3)
         self.gps_enabled = parameter("initial_gps_enabled")
+        self.wheel_speed_scale = parameter("wheel_speed_scale")
+        self.imu_yaw_bias_rate = parameter("imu_yaw_bias_rate")
+        self.imu_start = None
         self.last_odom = None
         self.dead_reckoned_x = self.spawn_x
         self.dead_reckoned_y = self.spawn_y
@@ -201,6 +207,7 @@ class UgvMeasurements(Node):
             self.position_variance, self.position_variance, 1e6,
             1e6, 1e6, self.yaw_variance))
         output.twist.twist = deepcopy(message.twist.twist)
+        output.twist.twist.linear.x *= self.wheel_speed_scale
         output.twist.twist.linear.x += self.noise(self.odom_linear_stddev, self.odom_random)
         # A differential-drive UGV has no lateral wheel velocity. This is a useful
         # zero-speed measurement when GPS is unavailable.
@@ -212,10 +219,15 @@ class UgvMeasurements(Node):
         self.odom_pub.publish(output)
 
     def on_imu(self, message):
+        stamp = message.header.stamp.sec + message.header.stamp.nanosec*1e-9
+        if self.imu_start is None:
+            self.imu_start = stamp
+        bias = self.imu_yaw_bias_rate * (stamp-self.imu_start)
         output = Imu()
         output.header = deepcopy(message.header)
         output.orientation = yaw_quaternion(
             yaw_from_quaternion(message.orientation)
+            + bias
             + self.noise(self.imu_orientation_stddev, self.imu_random))
         output.orientation_covariance = [
             1e6, 0.0, 0.0, 0.0, 1e6, 0.0, 0.0, 0.0,
@@ -225,6 +237,7 @@ class UgvMeasurements(Node):
         output.angular_velocity.x += self.noise(self.imu_angular_stddev, self.imu_random)
         output.angular_velocity.y += self.noise(self.imu_angular_stddev, self.imu_random)
         output.angular_velocity.z += self.noise(self.imu_angular_stddev, self.imu_random)
+        output.angular_velocity.z += self.imu_yaw_bias_rate
         output.angular_velocity_covariance = [
             self.imu_angular_stddev**2, 0.0, 0.0,
             0.0, self.imu_angular_stddev**2, 0.0,
@@ -268,9 +281,11 @@ def main(args=None):
     node = UgvMeasurements()
     try:
         rclpy.spin(node)
+    except (KeyboardInterrupt, ExternalShutdownException):
+        pass
     finally:
         node.destroy_node()
-        rclpy.shutdown()
+        rclpy.try_shutdown()
 
 
 if __name__ == "__main__":

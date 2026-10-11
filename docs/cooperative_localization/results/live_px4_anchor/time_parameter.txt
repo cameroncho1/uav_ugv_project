@@ -1,0 +1,4 @@
+Symbols: x = used, + = saved, * = unsaved
+x + UXRCE_DDS_SYNCT [991,1877] : 0
+
+ 1000/1920 parameters used.

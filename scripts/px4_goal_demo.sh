@@ -24,4 +24,5 @@ trap 'kill %1 2>/dev/null || true' EXIT
 PX4_GZ_STANDALONE=1 \
 PX4_GZ_WORLD=simple_goal_demo \
 PX4_GZ_MODEL_POSE="0,0,0.3,0,0,0" \
+PX4_PARAM_UXRCE_DDS_SYNCT=0 \
 make px4_sitl gz_x500_mono_cam_down

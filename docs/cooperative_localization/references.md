@@ -80,7 +80,7 @@ NAVIGATION (Institute of Navigation), West Virginia University. [Link](https://n
 ### Relevance to cooperative localization
 
 - Same pattern as our estimator: several measurement types, different rates, each with stated noise, fused in one EKF.
-- Gives example noise values we can use when setting simulated sensor noise (an open decision in `interfaces.md`).
+- Gives example noise values we can use when setting simulated sensor noise (explicit simulation assumptions in `interfaces.md`).
 - Shows the EKF versus factor graph tradeoff. It supports starting with an EKF and names the factor graph as a future option.
 - Shows that errors in one vehicle's pose spread into the other vehicle's estimate. In our case, UAV pose errors will spread into the UGV correction. We should model UAV pose error, not assume it is perfect.
 - The authors name the reverse direction (UAV helping UGV pose) as future work. That is our subsystem.
@@ -150,7 +150,7 @@ arXiv preprint 2603.08926 (v2, July 2026). Universities of Perugia, ETH Zurich, 
 
 ### Relevance to cooperative localization
 
-- Shows a clean way to treat a UAV-UGV relative-position reading: as a timestamped measurement with its own noise, fused by an EKF. This matches our planned interface.
+- Shows a clean way to treat a UAV-UGV relative-position reading: as a timestamped measurement with its own noise, fused by an EKF. This matches the implemented timestamped measurement interface.
 - Shows a simple outlier check before fusing.
 - The accuracy figures give reasonable ranges for our simulated sensor noise.
 - The frame and attitude bias problem is a warning for our frame contract. A frame or heading mistake shows up as position error.
@@ -220,4 +220,8 @@ Proceedings of the 13th International Conference on Intelligent Autonomous Syste
 
 - No reference here covers Gazebo or PX4 simulation of localization. Find one if the report needs a simulation-validity argument.
 - No reference covers traversability mapping or path planning. Other team members should add their own.
-- All four research papers use real sensors or MATLAB. Our results will be simulation only, so the report should limit its claims to the simulated conditions, as `subsystem.md` already requires.
+- All four research papers use real sensors or MATLAB. Our results are simulation only, so the report should limit its claims to the simulated conditions, as `subsystem.md` already requires.
+
+## Implementation sources
+
+[UAV measurement design](uav_measurement_design.md#research-basis-and-limits) links the PX4 frame and clock guide, ROS covariance convention, robot_localization configuration, and measurement-quality research used by the implemented adapters. [Evaluation results](evaluation_results.md) records paired error and uncertainty measurements under the stated simulation assumptions.

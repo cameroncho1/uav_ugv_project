@@ -2,6 +2,7 @@
 """Drive a repeatable route and score any map-frame pose estimate against Gazebo truth."""
 
 import argparse
+from bisect import bisect_left
 import csv
 import json
 import math
@@ -9,9 +10,11 @@ from collections import deque
 from pathlib import Path
 
 import rclpy
+import numpy as np
+from diagnostic_msgs.msg import DiagnosticArray
 from geometry_msgs.msg import PoseStamped, PoseWithCovarianceStamped, Twist
 from rclpy.node import Node
-from rclpy.qos import qos_profile_sensor_data
+from rclpy.qos import DurabilityPolicy, QoSProfile, qos_profile_sensor_data
 from rosgraph_msgs.msg import Clock
 from std_srvs.srv import SetBool
 
@@ -41,6 +44,9 @@ def metrics(rows):
         "p95_error_m": errors[min(len(errors) - 1, math.ceil(0.95 * len(errors)) - 1)],
         "max_error_m": errors[-1],
         "mean_heading_error_deg": sum(headings) / len(headings),
+        **({"mean_planar_nees": sum(row["planar_nees"] for row in rows)/len(rows),
+            "coverage_95": sum(row["planar_nees"] <= 5.991 for row in rows)/len(rows)}
+           if "planar_nees" in rows[0] else {}),
     }
 
 
@@ -51,8 +57,12 @@ class LocalizationTrial(Node):
         self.start = None
         self.sim_time = None
         self.last_tick_time = None
-        self.truth = deque(maxlen=3000)
+        self.truth = deque(maxlen=20000)
         self.pending = deque()
+        self.baseline_pending = deque()
+        self.baseline_rows = []
+        self.uav_count = 0
+        self.uav_diagnostics = {}
         self.estimate_count = 0
         self.truth_count = 0
         self.skip_counts = {"before": 0, "after": 0, "gap": 0}
@@ -63,12 +73,21 @@ class LocalizationTrial(Node):
         self.gps_after_outage = 0
         self.gps_count = 0
         self.cmd_pub = self.create_publisher(Twist, "/evaluation/ugv_cmd_vel", 10)
+        self.start_pub = self.create_publisher(
+            Clock, "/evaluation/trial_start",
+            QoSProfile(depth=1, durability=DurabilityPolicy.TRANSIENT_LOCAL))
         self.gps_client = self.create_client(SetBool, "/ugv/localization/set_gps_enabled")
         self.create_subscription(Clock, "/clock", self.on_clock, qos_profile_sensor_data)
         self.create_subscription(PoseStamped, "/evaluation/ugv_truth", self.on_truth,
                                  qos_profile_sensor_data)
         self.create_subscription(PoseWithCovarianceStamped, args.estimate_topic,
                                  self.on_estimate, 10)
+        if args.comparison_topic:
+            self.create_subscription(PoseWithCovarianceStamped, args.comparison_topic,
+                                     self.on_baseline, 10)
+        self.create_subscription(PoseWithCovarianceStamped, "/ugv/measurements/uav_pose",
+                                 self.on_uav, 10)
+        self.create_subscription(DiagnosticArray, "/diagnostics", self.on_diagnostics, 10)
         self.create_subscription(PoseWithCovarianceStamped, "/ugv/measurements/gps_pose",
                                  self.on_gps, 10)
 
@@ -76,6 +95,7 @@ class LocalizationTrial(Node):
         self.sim_time = seconds(message.clock)
         if self.start is None and self.gps_client.service_is_ready():
             self.start = self.sim_time
+            self.start_pub.publish(message)
         if self.start is not None and (self.last_tick_time is None or
                                        self.sim_time - self.last_tick_time >= 0.05):
             self.last_tick_time = self.sim_time
@@ -96,24 +116,38 @@ class LocalizationTrial(Node):
         if self.gps_disabled_at is not None and stamp > self.gps_disabled_at + 0.3:
             self.gps_after_outage += 1
 
+    def on_baseline(self, message):
+        if message.header.frame_id == "map":
+            self.baseline_pending.append(message)
+
+    def on_uav(self, message):
+        self.uav_count += 1
+
+    def on_diagnostics(self, message):
+        for status in message.status:
+            if status.name == "cooperative_localization/uav_correction":
+                self.uav_diagnostics = {value.key: int(value.value) for value in status.values}
+
     def score_pending(self):
-        while (self.pending and self.truth and
-               seconds(self.pending[0].header.stamp) <= self.truth[-1][0]):
-            estimate = self.pending.popleft()
+        self.score_messages(self.pending, self.rows)
+        self.score_messages(self.baseline_pending, self.baseline_rows)
+
+    def score_messages(self, pending, rows):
+        times = [sample[0] for sample in self.truth]
+        while (pending and self.truth and
+               seconds(pending[0].header.stamp) <= self.truth[-1][0]):
+            estimate = pending.popleft()
             stamp = seconds(estimate.header.stamp)
             if stamp <= 0 or self.start is None:
                 continue
-            # Estimates arrive in stamp order. Keep only the two truth samples
-            # around the next estimate instead of searching the full history.
-            while len(self.truth) > 1 and self.truth[1][0] <= stamp:
-                self.truth.popleft()
-            before = self.truth[0] if self.truth[0][0] <= stamp else None
-            after = self.truth[1] if len(self.truth) > 1 else None
+            index = bisect_left(times, stamp)
+            after = self.truth[index] if index < len(self.truth) else None
+            before = self.truth[index-1] if index > 0 else None
+            if after is not None and after[0] == stamp:
+                before = after
             if before is None:
                 self.skip_counts["before"] += 1
                 continue
-            if before[0] == stamp:
-                after = before
             if after is None:
                 self.skip_counts["after"] += 1
                 continue
@@ -127,13 +161,21 @@ class LocalizationTrial(Node):
             true_yaw = yaw(before[1].orientation)
             true_yaw += alpha * angle_difference(yaw(after[1].orientation), true_yaw)
             pose = estimate.pose.pose
-            self.rows.append({
+            delta = np.array([pose.position.x-x, pose.position.y-y])
+            c = np.asarray(estimate.pose.covariance).reshape(6, 6)[:2, :2]
+            if not np.all(np.isfinite(c)) or np.linalg.eigvalsh(c).min() <= 0:
+                self.skip_counts["covariance"] = self.skip_counts.get("covariance", 0) + 1
+                continue
+            nees = float(delta @ np.linalg.solve(c, delta))
+            rows.append({
                 "elapsed_s": round(stamp - self.start, 4),
                 "true_x_m": x, "true_y_m": y,
                 "estimate_x_m": pose.position.x, "estimate_y_m": pose.position.y,
                 "position_error_m": math.hypot(pose.position.x - x, pose.position.y - y),
                 "heading_error_deg": math.degrees(abs(angle_difference(
                     yaw(pose.orientation), true_yaw))),
+                "covariance_xx": c[0, 0], "covariance_xy": c[0, 1], "covariance_yy": c[1, 1],
+                "planar_nees": nees,
             })
 
     def tick(self):
@@ -141,16 +183,18 @@ class LocalizationTrial(Node):
             return
         elapsed = self.sim_time - self.start
         command = Twist()
-        if 4 <= elapsed < 10 or 14 <= elapsed < 22 or 25 <= elapsed < 30:
+        route_time = elapsed if self.args.route == "short" else 4 + (elapsed-4) % 27
+        forward = (4 <= route_time < 10 or 14 <= route_time < 22 or 25 <= route_time < 30)
+        if elapsed >= 4 and forward:
             command.linear.x = 0.35
-        elif 10 <= elapsed < 14 or 22 <= elapsed < 25:
+        elif elapsed >= 4 and (10 <= route_time < 14 or 22 <= route_time < 25):
             command.angular.z = 0.4
         self.cmd_pub.publish(command)
         if self.args.gps == "off" and elapsed >= 10 and self.gps_request is None:
             self.gps_request = self.gps_client.call_async(SetBool.Request(data=False))
             self.gps_disabled_at = self.sim_time
         self.score_pending()
-        if elapsed >= 31:
+        if elapsed >= self.args.duration:
             self.cmd_pub.publish(Twist())
             self.done = True
 
@@ -172,7 +216,7 @@ class LocalizationTrial(Node):
         if self.args.gps != "startup_off" and self.gps_count < 10:
             raise RuntimeError("Too few prepared GPS messages for a GPS-on interval")
         before_rows = [row for row in self.rows if 4 <= row["elapsed_s"] < 10]
-        after_rows = [row for row in self.rows if 10.5 <= row["elapsed_s"] < 31]
+        after_rows = [row for row in self.rows if 10.5 <= row["elapsed_s"] < self.args.duration]
         if len(before_rows) < 100 or len(after_rows) < 500:
             raise RuntimeError(
                 f"Too few matched estimates: before={len(before_rows)}, after={len(after_rows)}")
@@ -186,11 +230,32 @@ class LocalizationTrial(Node):
             "scenario": self.args.gps,
             "seed": self.args.seed,
             "estimate_topic": self.args.estimate_topic,
+            "route": self.args.route,
+            "duration_s": self.args.duration,
+            "measurement_profile": self.args.measurement_profile,
+            "anchor_source": self.args.anchor_source,
+            "observer_model": self.args.observer_model or "fixed",
+            "relative_outlier_every": self.args.outlier_every,
+            "relative_dropout_interval_s": [self.args.dropout_start, self.args.dropout_end],
+            "uav_messages": self.uav_count,
+            "uav_diagnostics": self.uav_diagnostics,
             "gps_messages_after_disable": self.gps_after_outage,
             "gps_messages_total": self.gps_count,
             "before_10s": metrics(before_rows),
             "after_10s": metrics(after_rows),
         }
+        if self.args.comparison_topic:
+            baseline_after = [row for row in self.baseline_rows
+                              if 10.5 <= row["elapsed_s"] < self.args.duration]
+            if len(baseline_after) < 500 or self.uav_count < 50:
+                raise RuntimeError("Missing baseline estimates or UAV corrections")
+            summary["comparison_topic"] = self.args.comparison_topic
+            summary["baseline_after_10s"] = metrics(baseline_after)
+            baseline_file = output.with_name(output.name + "_baseline").with_suffix(".csv")
+            with baseline_file.open("w", newline="") as file:
+                writer = csv.DictWriter(file, fieldnames=self.baseline_rows[0].keys())
+                writer.writeheader()
+                writer.writerows(self.baseline_rows)
         output.with_suffix(".json").write_text(json.dumps(summary, indent=2) + "\n")
         print(json.dumps(summary), flush=True)
 
@@ -200,8 +265,19 @@ def main():
     parser.add_argument("--gps", choices=["on", "off", "startup_off"], required=True)
     parser.add_argument("--seed", type=int, required=True)
     parser.add_argument("--estimate-topic", default="/ugv/localization/pose")
+    parser.add_argument("--comparison-topic", default="")
+    parser.add_argument("--route", choices=["short", "long"], default="short")
+    parser.add_argument("--duration", type=float, default=31.)
+    parser.add_argument("--measurement-profile", choices=["nominal", "drift"], default="nominal")
+    parser.add_argument("--anchor-source", default="unspecified")
+    parser.add_argument("--observer-model", default="")
+    parser.add_argument("--outlier-every", type=int, default=0)
+    parser.add_argument("--dropout-start", type=float, default=-1.)
+    parser.add_argument("--dropout-end", type=float, default=-1.)
     parser.add_argument("--output", required=True)
     args, ros_args = parser.parse_known_args()
+    if args.duration < 31:
+        parser.error("Duration must be at least 31 seconds")
     rclpy.init(args=ros_args)
     node = LocalizationTrial(args)
     try:

@@ -6,3 +6,9 @@ ugv_measurements:
     spawn_x: -4.0
     spawn_y: 0.0
     spawn_yaw: 0.0
+uav_pose:
+  ros__parameters:
+    map_origin: [0.0, 0.0, 0.3]
+sim_uav_sensor:
+  ros__parameters:
+    map_origin: [0.0, 0.0, 0.3]

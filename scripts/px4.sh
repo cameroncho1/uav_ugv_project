@@ -6,7 +6,7 @@ PX4="$ROOT/external/PX4-Autopilot"
 
 cd "$PX4"
 
-export GZ_PARTITION=uav_ugv_sim
+export GZ_PARTITION="${GZ_PARTITION:-uav_ugv_sim}"
 export GZ_IP=127.0.0.1
 
 # Disable the "No connection to the GCS" preflight check (no QGroundControl here).
@@ -28,4 +28,5 @@ trap 'kill %1 2>/dev/null || true' EXIT
 PX4_GZ_STANDALONE=1 \
 PX4_GZ_WORLD=uav_ugv \
 PX4_GZ_MODEL_POSE="2,-2,0.3,0,0,0" \
+PX4_PARAM_UXRCE_DDS_SYNCT="${PX4_DDS_SYNCT:-1}" \
 make px4_sitl gz_x500
