@@ -9,6 +9,7 @@ from types import SimpleNamespace
 import rclpy
 from nav_msgs.msg import Odometry
 from sensor_msgs.msg import NavSatFix, NavSatStatus
+from std_srvs.srv import SetBool
 
 
 MODULE_PATH = Path(__file__).resolve().parents[1] / "scripts" / "ugv_measurements.py"
@@ -56,6 +57,8 @@ class UgvMeasurementsTest(unittest.TestCase):
         result = self.odom_messages[-1]
         self.assertLess(abs(result.pose.pose.position.x - (-2.0)), 0.5)
         self.assertAlmostEqual(result.pose.covariance[0], 0.015)
+        self.assertEqual(result.twist.twist.linear.y, 0.0)
+        self.assertAlmostEqual(result.twist.covariance[7], self.node.odom_linear_stddev**2)
 
     def test_gps_origin_projects_to_map_origin_and_no_fix_is_ignored(self):
         self.node.gps_xy_stddev = 0.0
@@ -85,6 +88,39 @@ class UgvMeasurementsTest(unittest.TestCase):
         result = self.odom_messages[-1]
         self.assertAlmostEqual(result.pose.pose.position.x, -2.0)
         self.assertAlmostEqual(result.pose.covariance[0], 0.015)
+
+    def test_gps_gate_stops_and_restores_measurements(self):
+        fix = NavSatFix()
+        fix.latitude = 47.397971057728974
+        fix.longitude = 8.546163739800146
+        self.node.on_gps(fix)
+        self.node.set_gps_enabled(SetBool.Request(data=False), SetBool.Response())
+        self.node.on_gps(fix)
+        self.assertEqual(len(self.gps_messages), 1)
+        self.node.set_gps_enabled(SetBool.Request(data=True), SetBool.Response())
+        self.node.on_gps(fix)
+        self.assertEqual(len(self.gps_messages), 2)
+
+    def test_gps_gate_does_not_change_odom_noise(self):
+        first = Odometry()
+        first.pose.pose.orientation.w = 1.0
+        moved = Odometry()
+        moved.pose.pose.position.x = 2.0
+        moved.pose.pose.orientation.w = 1.0
+        self.node.on_odom(first)
+        self.node.set_gps_enabled(SetBool.Request(data=False), SetBool.Response())
+        self.node.on_odom(moved)
+        disabled_value = self.odom_messages[-1].pose.pose.position.x
+        self.node.destroy_node()
+        self.node = measurements.UgvMeasurements()
+        self.node.odom_pub = SimpleNamespace(publish=self.odom_messages.append)
+        self.node.on_odom(first)
+        fix = NavSatFix()
+        fix.latitude = 47.397971057728974
+        fix.longitude = 8.546163739800146
+        self.node.on_gps(fix)
+        self.node.on_odom(moved)
+        self.assertEqual(self.odom_messages[-1].pose.pose.position.x, disabled_value)
 
 
 if __name__ == "__main__":

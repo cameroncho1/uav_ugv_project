@@ -13,15 +13,20 @@ from launch_ros.actions import Node
 def generate_launch_description():
     package_share = Path(get_package_share_directory("cooperative_localization"))
     world = LaunchConfiguration("world")
+    seed = LaunchConfiguration("seed")
+    initial_gps_enabled = LaunchConfiguration("initial_gps_enabled")
 
     return LaunchDescription([
         DeclareLaunchArgument(
             "world", default_value="uav_ugv", choices=["uav_ugv", "simple_goal_demo"],
             description="Gazebo world whose UGV spawn and GPS origin are used.",
         ),
+        DeclareLaunchArgument("seed", default_value="513"),
+        DeclareLaunchArgument("initial_gps_enabled", default_value="true"),
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(str(package_share / "launch/ugv_sensors.launch.py")),
-            launch_arguments={"world": world}.items(),
+            launch_arguments={"world": world, "seed": seed,
+                              "initial_gps_enabled": initial_gps_enabled}.items(),
         ),
         Node(
             package="tf2_ros",

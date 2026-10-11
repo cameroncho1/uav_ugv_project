@@ -11,6 +11,7 @@ from nav_msgs.msg import Odometry
 from rclpy.node import Node
 from rclpy.qos import QoSProfile, ReliabilityPolicy, qos_profile_sensor_data
 from sensor_msgs.msg import Imu, NavSatFix, NavSatStatus
+from std_srvs.srv import SetBool
 
 
 WGS84_A = 6378137.0
@@ -94,6 +95,7 @@ class UgvMeasurements(Node):
         self.declare_parameter("imu_angular_velocity_stddev", 0.01)
         self.declare_parameter("imu_linear_acceleration_stddev", 0.1)
         self.declare_parameter("random_seed", 513)
+        self.declare_parameter("initial_gps_enabled", True)
 
         def parameter(name):
             return self.get_parameter(name).value
@@ -113,7 +115,11 @@ class UgvMeasurements(Node):
         self.imu_orientation_stddev = parameter("imu_orientation_stddev")
         self.imu_angular_stddev = parameter("imu_angular_velocity_stddev")
         self.imu_accel_stddev = parameter("imu_linear_acceleration_stddev")
-        self.random = random.Random(parameter("random_seed"))
+        seed = parameter("random_seed")
+        self.odom_random = random.Random(seed + 1)
+        self.imu_random = random.Random(seed + 2)
+        self.gps_random = random.Random(seed + 3)
+        self.gps_enabled = parameter("initial_gps_enabled")
         self.last_odom = None
         self.dead_reckoned_x = self.spawn_x
         self.dead_reckoned_y = self.spawn_y
@@ -142,9 +148,17 @@ class UgvMeasurements(Node):
             Imu, "/ugv/sensors/imu", self.on_imu, qos_profile_sensor_data)
         self.create_subscription(
             NavSatFix, "/ugv/sensors/gps", self.on_gps, qos_profile_sensor_data)
+        self.create_service(SetBool, "/ugv/localization/set_gps_enabled", self.set_gps_enabled)
 
-    def noise(self, standard_deviation):
-        return self.random.gauss(0.0, standard_deviation) if standard_deviation else 0.0
+    def set_gps_enabled(self, request, response):
+        self.gps_enabled = request.data
+        response.success = True
+        response.message = "GPS enabled" if self.gps_enabled else "GPS disabled"
+        return response
+
+    @staticmethod
+    def noise(standard_deviation, generator):
+        return generator.gauss(0.0, standard_deviation) if standard_deviation else 0.0
 
     def on_odom(self, message):
         raw_x = message.pose.pose.position.x
@@ -164,11 +178,13 @@ class UgvMeasurements(Node):
             distance = math.hypot(dx, dy)
             step_xy_stddev = self.odom_xy_stddev * math.sqrt(distance)
             step_yaw_stddev = self.odom_yaw_stddev * math.sqrt(distance)
-            self.dead_reckoned_x += cos_spawn * dx - sin_spawn * dy + self.noise(step_xy_stddev)
-            self.dead_reckoned_y += sin_spawn * dx + cos_spawn * dy + self.noise(step_xy_stddev)
+            self.dead_reckoned_x += (
+                cos_spawn * dx - sin_spawn * dy + self.noise(step_xy_stddev, self.odom_random))
+            self.dead_reckoned_y += (
+                sin_spawn * dx + cos_spawn * dy + self.noise(step_xy_stddev, self.odom_random))
             self.dead_reckoned_yaw = wrap_angle(
                 self.dead_reckoned_yaw + wrap_angle(raw_yaw - last_yaw)
-                + self.noise(step_yaw_stddev))
+                + self.noise(step_yaw_stddev, self.odom_random))
             self.position_variance += step_xy_stddev**2
             self.yaw_variance += step_yaw_stddev**2
         self.last_odom = (raw_x, raw_y, raw_yaw)
@@ -185,10 +201,13 @@ class UgvMeasurements(Node):
             self.position_variance, self.position_variance, 1e6,
             1e6, 1e6, self.yaw_variance))
         output.twist.twist = deepcopy(message.twist.twist)
-        output.twist.twist.linear.x += self.noise(self.odom_linear_stddev)
-        output.twist.twist.angular.z += self.noise(self.odom_angular_stddev)
+        output.twist.twist.linear.x += self.noise(self.odom_linear_stddev, self.odom_random)
+        # A differential-drive UGV has no lateral wheel velocity. This is a useful
+        # zero-speed measurement when GPS is unavailable.
+        output.twist.twist.linear.y = 0.0
+        output.twist.twist.angular.z += self.noise(self.odom_angular_stddev, self.odom_random)
         output.twist.covariance = diagonal_covariance((
-            self.odom_linear_stddev**2, 1e6, 1e6, 1e6, 1e6,
+            self.odom_linear_stddev**2, self.odom_linear_stddev**2, 1e6, 1e6, 1e6,
             self.odom_angular_stddev**2))
         self.odom_pub.publish(output)
 
@@ -196,24 +215,25 @@ class UgvMeasurements(Node):
         output = Imu()
         output.header = deepcopy(message.header)
         output.orientation = yaw_quaternion(
-            yaw_from_quaternion(message.orientation) + self.noise(self.imu_orientation_stddev))
+            yaw_from_quaternion(message.orientation)
+            + self.noise(self.imu_orientation_stddev, self.imu_random))
         output.orientation_covariance = [
             1e6, 0.0, 0.0, 0.0, 1e6, 0.0, 0.0, 0.0,
             self.imu_orientation_stddev**2,
         ]
         output.angular_velocity = deepcopy(message.angular_velocity)
-        output.angular_velocity.x += self.noise(self.imu_angular_stddev)
-        output.angular_velocity.y += self.noise(self.imu_angular_stddev)
-        output.angular_velocity.z += self.noise(self.imu_angular_stddev)
+        output.angular_velocity.x += self.noise(self.imu_angular_stddev, self.imu_random)
+        output.angular_velocity.y += self.noise(self.imu_angular_stddev, self.imu_random)
+        output.angular_velocity.z += self.noise(self.imu_angular_stddev, self.imu_random)
         output.angular_velocity_covariance = [
             self.imu_angular_stddev**2, 0.0, 0.0,
             0.0, self.imu_angular_stddev**2, 0.0,
             0.0, 0.0, self.imu_angular_stddev**2,
         ]
         output.linear_acceleration = deepcopy(message.linear_acceleration)
-        output.linear_acceleration.x += self.noise(self.imu_accel_stddev)
-        output.linear_acceleration.y += self.noise(self.imu_accel_stddev)
-        output.linear_acceleration.z += self.noise(self.imu_accel_stddev)
+        output.linear_acceleration.x += self.noise(self.imu_accel_stddev, self.imu_random)
+        output.linear_acceleration.y += self.noise(self.imu_accel_stddev, self.imu_random)
+        output.linear_acceleration.z += self.noise(self.imu_accel_stddev, self.imu_random)
         output.linear_acceleration_covariance = [
             self.imu_accel_stddev**2, 0.0, 0.0,
             0.0, self.imu_accel_stddev**2, 0.0,
@@ -222,6 +242,8 @@ class UgvMeasurements(Node):
         self.imu_pub.publish(output)
 
     def on_gps(self, message):
+        if not self.gps_enabled:
+            return
         has_fix = message.status.status != NavSatStatus.STATUS_NO_FIX
         coordinates = (message.latitude, message.longitude, message.altitude)
         if not has_fix or not all(math.isfinite(value) for value in coordinates):
@@ -231,9 +253,9 @@ class UgvMeasurements(Node):
         output = PoseWithCovarianceStamped()
         output.header = deepcopy(message.header)
         output.header.frame_id = "map"
-        output.pose.pose.position.x = east + self.noise(self.gps_xy_stddev)
-        output.pose.pose.position.y = north + self.noise(self.gps_xy_stddev)
-        output.pose.pose.position.z = up + self.noise(self.gps_z_stddev)
+        output.pose.pose.position.x = east + self.noise(self.gps_xy_stddev, self.gps_random)
+        output.pose.pose.position.y = north + self.noise(self.gps_xy_stddev, self.gps_random)
+        output.pose.pose.position.z = up + self.noise(self.gps_z_stddev, self.gps_random)
         output.pose.pose.orientation.w = 1.0
         output.pose.covariance = diagonal_covariance((
             self.gps_xy_stddev**2, self.gps_xy_stddev**2,

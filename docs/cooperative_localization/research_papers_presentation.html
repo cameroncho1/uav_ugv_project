@@ -622,7 +622,8 @@
                 <li><span class="mono">/ugv/measurements/wheel_odom</span>: motion anchored to the UGV's map spawn point.</li>
                 <li><span class="mono">/ugv/measurements/gps_pose</span>: GPS converted to east/north meters in map.</li>
                 <li><span class="mono">/ugv/measurements/imu</span>: noisy inertial reading with covariance.</li>
-                <li>A 2D EKF combines wheel speed, IMU heading, and GPS position on <span class="mono">/ugv/localization/pose</span>.</li>
+                <li>A 2D EKF combines wheel speed, zero sideways speed, IMU heading, and GPS position on <span class="mono">/ugv/localization/pose</span>.</li>
+                <li>A GPS switch and repeatable route test compare the fused pose with Gazebo's true UGV pose.</li>
                 <li>The current planner still reads <span class="mono">/ugv_pose</span> from the demo controller; it does not use the new sensor topics yet.</li>
               </ul>
             </section>
@@ -640,8 +641,9 @@
                 <li>Use robot_localization for the GPS, wheel, and IMU baseline.</li>
                 <li>Reject stale and out-of-range measurements before fusing.</li>
                 <li>Model UAV pose error, not only UGV sensor noise.</li>
-                <li>Score three cases: nominal GPS, GPS loss without UAV, and GPS loss with UAV.</li>
-                <li>Report uncertainty next to observed error.</li>
+                <li>The current test scores GPS on, GPS lost during the route, and GPS off from startup across three random seeds.</li>
+                <li>Use the same scorer for a future UAV correction and compare its error with both baselines.</li>
+                <li>Check reported uncertainty against observed error before connecting the fused pose to planning.</li>
               </ul>
             </section>
             <section>
