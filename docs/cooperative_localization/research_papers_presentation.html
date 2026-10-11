@@ -605,10 +605,10 @@
       <section class="slide" data-title="Sensor inputs" aria-hidden="true">
         <div class="slide-inner">
           <h2>UGV sensor inputs are connected</h2>
-          <p class="cite">Both Gazebo worlds publish UGV wheel odometry, IMU, and GPS. The localization bridge exposes them in ROS 2.</p>
+          <p class="cite">Both Gazebo worlds publish UGV sensors. A ROS 2 adapter prepares map-frame positions and error estimates for localization.</p>
           <div class="paper-layout">
             <section>
-              <h3>Working input layer</h3>
+              <h3>Raw sensors in ROS 2</h3>
               <ul>
                 <li><span class="mono">/ugv/sensors/wheel_odom</span>: relative motion, 20 Hz.</li>
                 <li><span class="mono">/ugv/sensors/imu</span>: orientation and acceleration, 50 Hz.</li>
@@ -617,10 +617,12 @@
               </ul>
             </section>
             <section>
-              <h3>Connection to navigation</h3>
+              <h3>Prepared for navigation</h3>
               <ul>
-                <li>The next estimator combines these readings with explicit frame conversion and measurement uncertainty.</li>
-                <li>Its agreed output is <span class="mono">/ugv/localization/pose</span> in the shared map frame.</li>
+                <li><span class="mono">/ugv/measurements/wheel_odom</span>: motion anchored to the UGV's map spawn point.</li>
+                <li><span class="mono">/ugv/measurements/gps_pose</span>: GPS converted to east/north meters in map.</li>
+                <li><span class="mono">/ugv/measurements/imu</span>: noisy inertial reading with covariance.</li>
+                <li>The next estimator combines these inputs and publishes <span class="mono">/ugv/localization/pose</span>.</li>
                 <li>The current planner still reads <span class="mono">/ugv_pose</span> from the demo controller; it does not use the new sensor topics yet.</li>
               </ul>
             </section>

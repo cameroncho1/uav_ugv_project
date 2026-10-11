@@ -27,7 +27,7 @@ ros2 launch mission_manager simple_goal_demo.launch.py
 
 The launch starts the Gazebo world, PX4 SITL, Micro XRCE-DDS Agent, the goal manager, stationary-XY UAV controller, camera grid mapper, local A-star planner, UGV path follower, and RViz. The UAV controller holds its initial horizontal position, streams the altitude setpoint, waits for PX4 preflight checks, then retries Offboard and arm requests until PX4 confirms the state. Keep the launch terminal open; Ctrl+C shuts down the launched processes.
 
-The launch also starts the UGV sensor bridge. It publishes `/ugv/sensors/wheel_odom`, `/ugv/sensors/imu`, `/ugv/sensors/gps`, and `/clock` in ROS 2. These raw topics do not feed the demo planner yet. The current planner uses `/ugv_pose` from the UGV controller; [the localization interface document](docs/cooperative_localization/interfaces.md) describes the sensor frames and the planned fused pose output.
+The launch also starts the UGV sensor bridge and measurement adapter. The bridge publishes `/ugv/sensors/wheel_odom`, `/ugv/sensors/imu`, `/ugv/sensors/gps`, and `/clock` in ROS 2. The adapter publishes map-aligned, noisy readings on `/ugv/measurements/wheel_odom`, `/ugv/measurements/imu`, and `/ugv/measurements/gps_pose`. The current planner still uses `/ugv_pose` from the UGV controller; [the localization interface document](docs/cooperative_localization/interfaces.md) describes the frames, error settings, and planned fused pose output.
 
 Change the local goal, camera altitude, grid resolution, or image threshold with launch arguments:
 

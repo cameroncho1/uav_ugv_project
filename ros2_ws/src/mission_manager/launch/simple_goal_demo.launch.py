@@ -70,8 +70,10 @@ def generate_launch_description():
         SetEnvironmentVariable("GZ_IP", "127.0.0.1"),
         world,
         agent,
-        IncludeLaunchDescription(PythonLaunchDescriptionSource(
-            str(localization_share / "launch/ugv_sensors.launch.py"))),
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource(str(localization_share / "launch/ugv_sensors.launch.py")),
+            launch_arguments={"world": "simple_goal_demo"}.items(),
+        ),
         Node(
             package="mission_manager",
             executable="goal_manager",

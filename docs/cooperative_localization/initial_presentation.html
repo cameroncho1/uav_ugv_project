@@ -629,7 +629,7 @@
               </div>
             </div>
           </div>
-          <p class="note">Wheel odometry, IMU, and GPS are bridged. The estimator, UAV relative reading, and useful measurement covariance are not implemented.</p>
+          <p class="note">Wheel odometry, IMU, and GPS are bridged and prepared with test noise and covariance. The estimator and UAV relative reading are not implemented.</p>
         </div>
       </section>
 
@@ -836,12 +836,10 @@
         <div class="slide-inner">
           <h2>Next steps</h2>
           <ol class="steps">
-            <li>Assign measurement noise and covariance to the bridged odometry, IMU, and GPS readings.
-              <span>The raw sensor topics and simulation clock already publish in ROS 2.</span></li>
-            <li>Define the odometry-to-map transform and convert GPS coordinates into the local map frame.
-              <span>Wheel odometry starts at the robot's spawn pose, not the map origin.</span></li>
-            <li>Run an EKF on GPS, odometry, and IMU. Add a relay that publishes the result on the pose topic.
+            <li>Run an EKF on prepared GPS, odometry, and IMU measurements. Add a relay that publishes the result on the pose topic.
               <span>The tool's output message type differs from the pose contract. The relay converts it.</span></li>
+            <li>Test the estimator against simulator truth before sending its pose to the planner.
+              <span>The planner currently reads the demo controller's <span class="mono">/ugv_pose</span>.</span></li>
             <li>Add a noisy drone reading of the robot and convert drone axes from NED to ENU.</li>
             <li>Inject GPS loss and log estimator error against simulator truth for the three test cases.</li>
           </ol>
@@ -856,14 +854,13 @@
               <h3>With other subsystems</h3>
               <ul>
                 <li>Who owns the coordinate transform tree.</li>
-                <li>What noise and covariance to assign each sensor.</li>
+                <li>How to validate and tune the simulated sensor error settings.</li>
                 <li>How fault management will inject GPS loss and read localization health.</li>
               </ul>
             </section>
             <section>
               <h3>Inside localization</h3>
               <ul>
-                <li>Sensor update rates and noise values.</li>
                 <li>Filter type and tuning.</li>
                 <li>Whether the drone reading is 2D or 3D.</li>
               </ul>
