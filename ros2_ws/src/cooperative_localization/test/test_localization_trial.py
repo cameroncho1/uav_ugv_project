@@ -8,6 +8,7 @@ from pathlib import Path
 from types import SimpleNamespace
 
 from geometry_msgs.msg import Pose, PoseWithCovarianceStamped
+from nav_msgs.msg import Odometry
 
 
 MODULE_PATH = Path(__file__).resolve().parents[1] / "scripts" / "localization_trial.py"
@@ -17,6 +18,18 @@ SPEC.loader.exec_module(trial)
 
 
 class LocalizationTrialTest(unittest.TestCase):
+    def test_wheel_frame_contract_and_continuation_after_gps_loss(self):
+        state = SimpleNamespace(wheel_count=0, wheel_after_outage=0, gps_disabled_at=10.)
+        message = Odometry()
+        message.header.frame_id = 'map'
+        message.child_frame_id = 'simple_ugv/chassis'
+        message.header.stamp.sec = 11
+        trial.LocalizationTrial.on_wheel(state, message)
+        self.assertEqual((state.wheel_count, state.wheel_after_outage), (1, 1))
+        message.child_frame_id = 'simple_ugv/fiducial_link'
+        with self.assertRaises(RuntimeError):
+            trial.LocalizationTrial.on_wheel(state, message)
+
     def test_metrics_use_each_sample_and_report_tail_error(self):
         rows = [{"position_error_m": error, "heading_error_deg": 2.0}
                 for error in [0.0, 1.0, 2.0, 10.0]]

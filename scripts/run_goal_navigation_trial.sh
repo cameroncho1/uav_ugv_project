@@ -31,9 +31,17 @@ sleep 15
 setsid ros2 launch mission_manager simple_goal_demo.launch.py \
   start_simulation:=false start_rviz:=false \
   initial_gps_enabled:="${INITIAL_GPS_ENABLED:-false}" \
+  uav_altitude:="${UAV_ALTITUDE:-4.5}" \
+  seed:="${SEED:-513}" shared_position_stddev:="${SHARED_POSITION_STDDEV:-0.0}" \
+  systematic_position_stddev:="${SYSTEMATIC_POSITION_STDDEV:-${SHARED_POSITION_STDDEV:-0.0}}" \
   >"$OUTPUT/launch.log" 2>&1 & pids+=("$!")
 setsid ros2 run cooperative_localization ugv_truth --ros-args \
   -p world:=simple_goal_demo -p use_sim_time:=true >"$OUTPUT/truth.log" 2>&1 & pids+=("$!")
-python3 "$ROOT/scripts/score_goal_navigation.py" "$OUTPUT/results.json" \
-  --timeout "${TRIAL_TIMEOUT:-300}"
+score_args=(--timeout "${TRIAL_TIMEOUT:-600}" --seed "${SEED:-513}"
+  --uav-altitude "${UAV_ALTITUDE:-4.5}"
+  --shared-position-stddev "${SHARED_POSITION_STDDEV:-0.0}"
+  --systematic-position-stddev "${SYSTEMATIC_POSITION_STDDEV:-${SHARED_POSITION_STDDEV:-0.0}}")
+if [[ "${INITIAL_GPS_ENABLED:-false}" == true ]]; then score_args+=(--initial-gps-enabled); fi
+if [[ "${EXPECT_HOLD:-false}" == true ]]; then score_args+=(--expect-hold); fi
+python3 "$ROOT/scripts/score_goal_navigation.py" "$OUTPUT/results.json" "${score_args[@]}"
 "$PX4/build/px4_sitl_default/bin/px4-commander" land || true

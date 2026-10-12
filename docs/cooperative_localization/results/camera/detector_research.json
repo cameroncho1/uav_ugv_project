@@ -1,0 +1,130 @@
+{
+  "fixture_image": "../../../../ros2_ws/src/cooperative_localization/test/fixtures/off_axis_tag.png",
+  "opencv_version": "4.5.4",
+  "method": "Change one parameter at a time from OpenCV defaults on the captured off-axis image",
+  "trials": [
+    {
+      "parameter": "adaptiveThreshWinSizeMin",
+      "value": 3,
+      "detected_ids": [],
+      "rejected_quadrilaterals": 1
+    },
+    {
+      "parameter": "adaptiveThreshWinSizeMin",
+      "value": 5,
+      "detected_ids": [],
+      "rejected_quadrilaterals": 1
+    },
+    {
+      "parameter": "adaptiveThreshWinSizeMin",
+      "value": 7,
+      "detected_ids": [],
+      "rejected_quadrilaterals": 1
+    },
+    {
+      "parameter": "adaptiveThreshWinSizeMax",
+      "value": 23,
+      "detected_ids": [],
+      "rejected_quadrilaterals": 1
+    },
+    {
+      "parameter": "adaptiveThreshWinSizeMax",
+      "value": 33,
+      "detected_ids": [],
+      "rejected_quadrilaterals": 1
+    },
+    {
+      "parameter": "adaptiveThreshWinSizeMax",
+      "value": 53,
+      "detected_ids": [],
+      "rejected_quadrilaterals": 1
+    },
+    {
+      "parameter": "adaptiveThreshConstant",
+      "value": 3,
+      "detected_ids": [],
+      "rejected_quadrilaterals": 1
+    },
+    {
+      "parameter": "adaptiveThreshConstant",
+      "value": 5,
+      "detected_ids": [],
+      "rejected_quadrilaterals": 1
+    },
+    {
+      "parameter": "adaptiveThreshConstant",
+      "value": 7,
+      "detected_ids": [],
+      "rejected_quadrilaterals": 1
+    },
+    {
+      "parameter": "adaptiveThreshConstant",
+      "value": 9,
+      "detected_ids": [],
+      "rejected_quadrilaterals": 1
+    },
+    {
+      "parameter": "adaptiveThreshConstant",
+      "value": 15,
+      "detected_ids": [
+        7
+      ],
+      "rejected_quadrilaterals": 0
+    },
+    {
+      "parameter": "polygonalApproxAccuracyRate",
+      "value": 0.02,
+      "detected_ids": [],
+      "rejected_quadrilaterals": 1
+    },
+    {
+      "parameter": "polygonalApproxAccuracyRate",
+      "value": 0.03,
+      "detected_ids": [],
+      "rejected_quadrilaterals": 1
+    },
+    {
+      "parameter": "polygonalApproxAccuracyRate",
+      "value": 0.05,
+      "detected_ids": [],
+      "rejected_quadrilaterals": 1
+    },
+    {
+      "parameter": "polygonalApproxAccuracyRate",
+      "value": 0.08,
+      "detected_ids": [],
+      "rejected_quadrilaterals": 2
+    },
+    {
+      "parameter": "minDistanceToBorder",
+      "value": 0,
+      "detected_ids": [],
+      "rejected_quadrilaterals": 1
+    },
+    {
+      "parameter": "perspectiveRemovePixelPerCell",
+      "value": 4,
+      "detected_ids": [],
+      "rejected_quadrilaterals": 1
+    },
+    {
+      "parameter": "perspectiveRemovePixelPerCell",
+      "value": 8,
+      "detected_ids": [],
+      "rejected_quadrilaterals": 1
+    },
+    {
+      "parameter": "minOtsuStdDev",
+      "value": 0,
+      "detected_ids": [],
+      "rejected_quadrilaterals": 1
+    },
+    {
+      "parameter": "minOtsuStdDev",
+      "value": 5,
+      "detected_ids": [],
+      "rejected_quadrilaterals": 1
+    }
+  ],
+  "decision": "Try adaptive threshold constants 7 and 15 in order; keep dictionary and geometry gates unchanged."
+}

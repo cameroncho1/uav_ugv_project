@@ -9,6 +9,7 @@ from launch.conditions import IfCondition, UnlessCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
+from launch_ros.parameter_descriptions import ParameterValue
 
 
 def generate_launch_description():
@@ -23,6 +24,9 @@ def generate_launch_description():
             description="Gazebo world whose UGV spawn and GPS origin are used.",
         ),
         DeclareLaunchArgument("seed", default_value="513"),
+        DeclareLaunchArgument("shared_position_stddev", default_value="0.0"),
+        DeclareLaunchArgument("systematic_position_stddev",
+                              default_value=LaunchConfiguration("shared_position_stddev")),
         DeclareLaunchArgument("initial_gps_enabled", default_value="true"),
         DeclareLaunchArgument("measurement_profile", default_value="nominal"),
         DeclareLaunchArgument("uav_assistance", default_value="false"),
@@ -42,6 +46,8 @@ def generate_launch_description():
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(str(package_share / "launch/ugv_sensors.launch.py")),
             launch_arguments={"world": world, "seed": seed,
+                              "shared_position_stddev": LaunchConfiguration(
+                                  "shared_position_stddev"),
                               "measurement_profile": LaunchConfiguration("measurement_profile"),
                               "initial_gps_enabled": initial_gps_enabled}.items(),
         ),
@@ -77,7 +83,10 @@ def generate_launch_description():
             package="cooperative_localization",
             executable="ugv_fused_pose.py",
             name="ugv_fused_pose",
-            parameters=[{"use_sim_time": True}],
+            parameters=[{"use_sim_time": True,
+                         "systematic_position_stddev": ParameterValue(
+                             LaunchConfiguration("systematic_position_stddev"),
+                             value_type=float)}],
             output="screen",
         ),
     ])

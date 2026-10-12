@@ -5,6 +5,7 @@ from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
 from launch.substitutions import EnvironmentVariable, LaunchConfiguration, PathJoinSubstitution
 from launch_ros.actions import Node
+from launch_ros.parameter_descriptions import ParameterValue
 
 
 def generate_launch_description():
@@ -20,6 +21,7 @@ def generate_launch_description():
             description="Gazebo world whose UGV spawn and GPS origin are used.",
         ),
         DeclareLaunchArgument("seed", default_value="513"),
+        DeclareLaunchArgument("shared_position_stddev", default_value="0.0"),
         DeclareLaunchArgument("initial_gps_enabled", default_value="true"),
         DeclareLaunchArgument("measurement_profile", default_value="nominal",
                               choices=["nominal", "drift"]),
@@ -44,7 +46,9 @@ def generate_launch_description():
                     ["measurement_", LaunchConfiguration("measurement_profile"), ".yaml"],
                 ]),
                 PathJoinSubstitution([str(package_share), "config", [world, ".yaml"]]),
-                {"random_seed": seed, "initial_gps_enabled": initial_gps_enabled},
+                {"random_seed": seed, "initial_gps_enabled": initial_gps_enabled,
+                 "shared_position_stddev": ParameterValue(
+                     LaunchConfiguration("shared_position_stddev"), value_type=float)},
             ],
             output="screen",
         ),

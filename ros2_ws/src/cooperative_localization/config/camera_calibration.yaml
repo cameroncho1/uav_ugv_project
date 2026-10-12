@@ -1,0 +1,20 @@
+uav_fiducial_sensor:
+  ros__parameters:
+    use_sim_time: true
+    marker_id: 7
+    marker_size: 0.4
+    # Optical axes: right, down, forward. Body axes: forward, left, up.
+    body_from_optical_rotation: [0.0, -1.0, 0.0, -1.0, 0.0, 0.0, 0.0, 0.0, -1.0]
+    body_from_optical_translation: [0.0, 0.0, -0.18]
+    marker_to_chassis: [0.0, 0.0, -0.12]
+    input_frame: uav/camera_optical_frame
+    pixel_stddev: 0.5
+    principal_point_stddev: 0.25
+    focal_length_stddev: 0.25
+    marker_size_stddev: 0.001
+    mount_position_stddev: 0.01
+    mount_angle_stddev: 0.005
+    max_reprojection_error: 1.5
+    min_edge_pixels: 12.0
+    max_image_age: 0.5
+    max_processing_rate: 5.0

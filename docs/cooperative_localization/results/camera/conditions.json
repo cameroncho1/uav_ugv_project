@@ -1,0 +1,36 @@
+{
+  "runtime": {
+    "ros": "Humble",
+    "ubuntu": "22.04",
+    "gazebo": "8.15.0",
+    "opencv": "4.5.4",
+    "robot_localization": "3.5.4",
+    "renderer": "Ogre server with software rendering"
+  },
+  "dependencies_manifest": "../../../../simulation/dependencies.json",
+  "detector_threshold_constants": [
+    7,
+    15
+  ],
+  "paired_route_duration_simulation_s": 31,
+  "paired_scoring_window_simulation_s": [
+    10.5,
+    31
+  ],
+  "paired_altitude_setpoint_m": 4.5,
+  "minimum_matched_scored_poses": 500,
+  "minimum_received_uav_corrections": 50,
+  "arrival_estimated_tolerance_m": 0.5,
+  "arrival_true_scoring_tolerance_m": 0.85,
+  "model_and_calibration_sha256_lf_normalized": {
+    "simulation/models/cooperative_camera_uav/model.sdf": "3edd99c966a270aaa4621cc0787be466f018c285a85e4e6c812d0525eed2a697",
+    "simulation/models/ugv_fiducial/model.sdf": "f8e38fd6d605362511a3edbd7d4d9905122eefba5946401a709dc2643da2272d",
+    "ros2_ws/src/cooperative_localization/config/camera_calibration.yaml": "dba7708d36bb6c7a19f028c940b7e61a8dcbc0dd27df59cc54270cb6139dd828",
+    "simulation/worlds/simple_goal_demo.sdf": "40cf0575f53ec507e6e66fd6eae063fb8a9834525cb762747520152e4ba9ba54",
+    "simulation/worlds/uav_ugv.sdf": "3f9e38043bacf9b5700393680a90ee1698d0f60ff16adf96d97219f4386460ec"
+  },
+  "wheel_measurement_parent_frame": "map",
+  "wheel_measurement_child_frame": "simple_ugv/chassis",
+  "minimum_wheel_measurements": 100,
+  "minimum_wheel_measurements_after_gps_switch": 100
+}

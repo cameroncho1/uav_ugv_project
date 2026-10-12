@@ -6,8 +6,10 @@ from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import EnvironmentVariable, LaunchConfiguration
+from launch.conditions import IfCondition
+from launch.substitutions import EnvironmentVariable, LaunchConfiguration, PythonExpression
 from launch_ros.actions import Node
+from launch_ros.parameter_descriptions import ParameterValue
 import yaml
 
 
@@ -16,27 +18,35 @@ def generate_launch_description():
     baseline_parameters = yaml.safe_load(
         (share / "config/ugv_ekf.yaml").read_text())["ugv_ekf"]["ros__parameters"]
 
-    def include(file, arguments):
+    def include(file, arguments, condition=None):
         return IncludeLaunchDescription(
             PythonLaunchDescriptionSource(str(share / "launch" / file)),
             launch_arguments=arguments.items(),
+            condition=condition,
         )
 
     return LaunchDescription([
         DeclareLaunchArgument("world", default_value="uav_ugv"),
         DeclareLaunchArgument("seed", default_value="513"),
+        DeclareLaunchArgument("shared_position_stddev", default_value="0.0"),
+        DeclareLaunchArgument("systematic_position_stddev",
+                              default_value=LaunchConfiguration("shared_position_stddev")),
         DeclareLaunchArgument("initial_gps_enabled", default_value="true"),
         DeclareLaunchArgument("measurement_profile", default_value="nominal"),
         DeclareLaunchArgument("outlier_every", default_value="0"),
         DeclareLaunchArgument("dropout_start", default_value="-1.0"),
         DeclareLaunchArgument("dropout_end", default_value="-1.0"),
         DeclareLaunchArgument("uav_model", default_value=""),
+        DeclareLaunchArgument("relative_source", default_value="simulated",
+                              choices=["simulated", "camera"]),
         DeclareLaunchArgument("publish_anchor", default_value="true"),
         DeclareLaunchArgument("uav_odometry_topic", default_value="/simulation/uav_odometry"),
         DeclareLaunchArgument("uav_require_airborne", default_value="false"),
         DeclareLaunchArgument("uav_initial_settle_time", default_value="0.0"),
         include("ugv_localization.launch.py", {
             "world": LaunchConfiguration("world"), "seed": LaunchConfiguration("seed"),
+            "shared_position_stddev": LaunchConfiguration("shared_position_stddev"),
+            "systematic_position_stddev": LaunchConfiguration("systematic_position_stddev"),
             "initial_gps_enabled": LaunchConfiguration("initial_gps_enabled"),
             "measurement_profile": LaunchConfiguration("measurement_profile"),
             "uav_assistance": "true",
@@ -44,17 +54,27 @@ def generate_launch_description():
             "uav_require_airborne": LaunchConfiguration("uav_require_airborne"),
             "uav_initial_settle_time": LaunchConfiguration("uav_initial_settle_time"),
         }),
+        include("uav_camera_sensor.launch.py", {
+            "world": LaunchConfiguration("world"),
+            "uav_model": LaunchConfiguration("uav_model"),
+        }, IfCondition(PythonExpression([
+            "'", LaunchConfiguration("relative_source"), "' == 'camera'"]))),
         include("sim_uav_sensor.launch.py", {
             key: LaunchConfiguration(key) for key in
             ("world", "seed", "outlier_every", "dropout_start",
-             "dropout_end", "uav_model", "publish_anchor")
-        }),
+             "dropout_end", "uav_model", "publish_anchor", "shared_position_stddev")
+        }, IfCondition(PythonExpression([
+            "'", LaunchConfiguration("relative_source"), "' == 'simulated'"]))),
         # This EKF receives the same wheel, IMU, and GPS inputs, without UAV readings.
         Node(package="robot_localization", executable="ekf_node", name="ugv_ekf_baseline",
              parameters=[baseline_parameters],
              remappings=[("odometry/filtered", "/evaluation/baseline_odometry")], output="screen"),
         Node(package="cooperative_localization", executable="ugv_fused_pose.py",
-             name="baseline_pose", parameters=[{"use_sim_time": True}],
+             name="baseline_pose", parameters=[{"use_sim_time": True,
+                                                "systematic_position_stddev": ParameterValue(
+                                                    LaunchConfiguration(
+                                                        "systematic_position_stddev"),
+                                                    value_type=float)}],
              remappings=[("/ugv/localization/odometry", "/evaluation/baseline_odometry"),
                          ("/ugv/localization/pose", "/evaluation/baseline_pose")]),
         Node(package="ros_gz_bridge", executable="parameter_bridge",

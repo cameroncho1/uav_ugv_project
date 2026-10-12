@@ -1,0 +1,24 @@
+{
+  "model": "One persistent ENU x/y Gaussian offset shared by GPS and UAV anchor",
+  "standard_deviation_m": 0.8,
+  "bias_enu_m_by_seed": {
+    "513": [
+      1.5500056513484939,
+      1.0728147503120924,
+      0.0
+    ],
+    "514": [
+      0.1512630058871291,
+      0.0829438883154831,
+      0.0
+    ],
+    "515": [
+      0.1340756742633958,
+      0.43810581985402114,
+      0.0
+    ]
+  },
+  "injection_covariance": "Marginal variance includes 0.64 m^2 on each x/y input axis",
+  "prior": "Public fused pose adds an unreduced 0.64 m^2 to x/y covariance when systematic_position_stddev=0.8",
+  "relative_observation": "Unaffected by this absolute-position fault"
+}

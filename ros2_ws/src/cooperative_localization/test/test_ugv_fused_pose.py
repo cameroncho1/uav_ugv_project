@@ -34,3 +34,15 @@ def test_rejects_non_map_frame():
 
     with pytest.raises(ValueError, match="map frame"):
         fused_pose.pose_from_odometry(odometry)
+
+
+def test_systematic_covariance_does_not_shrink_or_mutate_filter_output():
+    odometry = Odometry()
+    odometry.header.frame_id = "map"
+    odometry.pose.covariance[0] = odometry.pose.covariance[7] = 0.001
+    output = fused_pose.pose_from_odometry(odometry, 0.8)
+    assert output.pose.covariance[0] == pytest.approx(0.641)
+    assert output.pose.covariance[7] == pytest.approx(0.641)
+    assert odometry.pose.covariance[0] == 0.001
+    with pytest.raises(ValueError):
+        fused_pose.pose_from_odometry(odometry, float("nan"))

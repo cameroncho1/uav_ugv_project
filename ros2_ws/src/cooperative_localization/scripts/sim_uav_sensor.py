@@ -15,6 +15,7 @@ from rclpy.qos import DurabilityPolicy, QoSProfile
 from rosgraph_msgs.msg import Clock
 
 from cooperative_math import FRD_TO_FLU, NED_TO_ENU, quaternion, rotation
+from simulation_faults import common_position_bias
 
 
 def vector(position):
@@ -29,12 +30,15 @@ class SimUavSensor(Node):
             return self.declare_parameter(name, default).value
 
         seed = parameter("random_seed", 513)
+        self.shared_std = parameter("shared_position_stddev", 0.0)
+        self.shared_bias = common_position_bias(seed, self.shared_std)
         self.relative_random = random.Random(seed + 10)
         self.anchor_random = random.Random(seed + 11)
         self.relative_std = np.array(parameter("relative_stddev", [.25, .15, .25]))
         self.anchor_std = np.array(parameter("anchor_stddev", [.3, .3, .5]))
         self.attitude_std = np.array(parameter("attitude_stddev", [.01, .01, .02]))
         self.origin = np.array(parameter("map_origin", [2., -2., .3]))
+        self.chassis_offset = np.array(parameter("ugv_chassis_offset", [0., 0., .25]))
         frequency = parameter("frequency", 5.)
         self.publish_anchor = parameter("publish_anchor", True)
         self.outlier_every = parameter("outlier_every", 0)
@@ -46,6 +50,8 @@ class SimUavSensor(Node):
                 or self.origin.shape != (3,) or not np.all(np.isfinite(self.origin))):
             raise ValueError("Sensor deviations must be finite and nonnegative; "
                              "relative noise and frequency must be positive; origin needs xyz")
+        if self.chassis_offset.shape != (3,) or not np.isfinite(self.chassis_offset).all():
+            raise ValueError("UGV chassis offset requires finite xyz")
         if (self.outlier_every < 0 or not np.isfinite(self.dropout_start)
                 or not np.isfinite(self.dropout_end)
                 or (self.dropout_start >= 0 and self.dropout_end <= self.dropout_start)):
@@ -83,7 +89,10 @@ class SimUavSensor(Node):
         uav, ugv = message.poses
         q = uav.orientation
         r = rotation([q.w, q.x, q.y, q.z])
-        relative = r.T @ (vector(ugv.position)-vector(uav.position))
+        ugv_q = ugv.orientation
+        chassis = vector(ugv.position) + rotation(
+            [ugv_q.w, ugv_q.x, ugv_q.y, ugv_q.z]) @ self.chassis_offset
+        relative = r.T @ (chassis-vector(uav.position))
         relative += self.noise(self.relative_random, self.relative_std)
         self.count += 1
         if self.outlier_every and self.count % self.outlier_every == 0:
@@ -103,6 +112,7 @@ class SimUavSensor(Node):
         if not self.publish_anchor:
             return
         position = vector(uav.position) + self.noise(self.anchor_random, self.anchor_std)
+        position += self.shared_bias
         angles = self.noise(self.anchor_random, self.attitude_std)
         angle = np.linalg.norm(angles)
         error_q = (np.array([math.cos(angle/2), *(angles/angle*math.sin(angle/2))])
@@ -114,7 +124,9 @@ class SimUavSensor(Node):
         output.pose_frame = VehicleOdometry.POSE_FRAME_NED
         output.position = (NED_TO_ENU @ (position-self.origin)).astype(np.float32)
         output.q = quaternion(NED_TO_ENU @ measured_rotation @ FRD_TO_FLU).astype(np.float32)
-        output.position_variance = (NED_TO_ENU**2 @ self.anchor_std**2).astype(np.float32)
+        marginal_variance = self.anchor_std**2 + np.array(
+            [self.shared_std**2, self.shared_std**2, 0.0])
+        output.position_variance = (NED_TO_ENU**2 @ marginal_variance).astype(np.float32)
         output.orientation_variance = (self.attitude_std**2).astype(np.float32)
         self.anchor_pub.publish(output)
 

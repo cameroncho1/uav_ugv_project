@@ -12,7 +12,7 @@ The simulator uses Gazebo Harmonic 8.6 or newer and ROS 2 Humble on Ubuntu 22.04
 
 Both project worlds set `use_units_gauss=false` and `use_earth_frame_ned=false` on their magnetometer plugin. Standalone worlds declare their own plugins, so PX4's `server.config` does not configure them. The [upstream PX4 fix](https://github.com/PX4/PX4-Autopilot/pull/28877) explains the unit and frame contract.
 
-The Offboard controller derives the vehicle-status topic suffix from `VehicleStatus::MESSAGE_VERSION`; this configuration uses `/fmu/out/vehicle_status_v4`. The camera model publishes `/world/<world>/model/x500_mono_cam_down_0/link/camera_link/sensor/camera/image`. The goal-demo launch supplies this topic through the mapper's existing `camera_topic` parameter.
+The Offboard controller derives the vehicle-status topic suffix from `VehicleStatus::MESSAGE_VERSION`; this configuration uses `/fmu/out/vehicle_status_v4`. The owned camera model publishes `/world/<world>/model/cooperative_camera_uav_0/link/camera_link/sensor/camera/image` at 5 Hz. It inherits the aligned X500 flight model and uses the mounting geometry in [perception](cooperative_localization/perception.md). The goal-demo launch supplies this topic through the mapper's existing `camera_topic` parameter.
 
 ## Build and check
 
@@ -51,4 +51,4 @@ python3 scripts/score_px4_heading.py /path/to/flight.ulg \
   /tmp/live_513_startup/trial_live.json /tmp/live_513_startup/heading_check
 ```
 
-`GPS_CASE` accepts `on`, `off`, or `startup_off`. The live runner uses actual PX4 anchors by default. `ANCHOR_MODE=simulated` selects the independent noisy anchor fixture. Each run drives a paired baseline and assisted UGV filter on identical UGV measurements, then stops its simulation processes. Accuracy and uncertainty results belong in [evaluation results](cooperative_localization/evaluation_results.md).
+`GPS_CASE` accepts `on`, `off`, or `startup_off`. The live runner uses actual PX4 anchors by default. The live runner defaults to camera observations. `RELATIVE_MODE=simulated` selects the vector fixture; with that fixture, `ANCHOR_MODE=simulated` selects independently noisy synthetic anchors. `run_aligned_anchor_trials.sh` explicitly uses simulated vectors; `run_camera_anchor_trials.sh` uses rendered pixels. Each run drives a paired baseline and assisted UGV filter on identical UGV measurements, then stops its simulation processes. Accuracy and uncertainty results belong in [evaluation results](cooperative_localization/evaluation_results.md).

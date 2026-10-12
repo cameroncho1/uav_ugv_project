@@ -85,8 +85,16 @@
       <attenuation><range>200</range><constant>1</constant></attenuation>
     </light>
 
-    <model name="simple_ugv">
+    <model name="simple_ugv" canonical_link="chassis">
       <pose>-4 0 0 0 0 0</pose>
+      <!-- Known metric roof target; visual-only, fixed to the chassis. -->
+      <include merge="true">
+        <uri>model://ugv_fiducial</uri>
+        <pose relative_to="chassis">0 0 0.12 0 0 0</pose>
+      </include>
+      <joint name="FiducialJoint" type="fixed">
+        <parent>chassis</parent><child>fiducial_link</child>
+      </joint>
       <link name="chassis">
         <pose>0 0 0.25 0 0 0</pose>
         <inertial>
@@ -162,6 +170,8 @@
         <odom_publish_frequency>20</odom_publish_frequency>
         <topic>/simple_ugv/cmd_vel</topic>
         <odom_topic>/simple_ugv/odom</odom_topic>
+        <frame_id>simple_ugv/odom</frame_id>
+        <child_frame_id>simple_ugv/chassis</child_frame_id>
       </plugin>
     </model>
   </world>

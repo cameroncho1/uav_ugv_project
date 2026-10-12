@@ -1,0 +1,46 @@
+[INFO] [launch]: All log files can be found below /home/rylanwwade/.ros/log/2026-10-11-18-17-42-386551-DESKTOP-2OJPRQL-7826
+[INFO] [launch]: Default logging verbosity is set to INFO
+[INFO] [uav_pose.py-1]: process started with pid [7828]
+[INFO] [uav_correction.py-2]: process started with pid [7830]
+[INFO] [parameter_bridge-3]: process started with pid [7832]
+[INFO] [ugv_measurements.py-4]: process started with pid [7834]
+[INFO] [static_transform_publisher-5]: process started with pid [7836]
+[INFO] [ekf_node-6]: process started with pid [7838]
+[INFO] [ugv_fused_pose.py-7]: process started with pid [7840]
+[INFO] [parameter_bridge-8]: process started with pid [7844]
+[INFO] [uav_fiducial_sensor.py-9]: process started with pid [7854]
+[INFO] [ekf_node-10]: process started with pid [7888]
+[INFO] [ugv_fused_pose.py-11]: process started with pid [7894]
+[INFO] [parameter_bridge-12]: process started with pid [7896]
+[INFO] [ugv_truth-13]: process started with pid [7898]
+[static_transform_publisher-5] [INFO] [1791767862.559590142] [ugv_imu_mount]: Spinning until stopped - publishing transform
+[static_transform_publisher-5] translation: ('0.000000', '0.000000', '0.000000')
+[static_transform_publisher-5] rotation: ('0.000000', '0.000000', '0.000000', '1.000000')
+[static_transform_publisher-5] from 'simple_ugv/chassis' to 'simple_ugv/chassis/imu'
+[parameter_bridge-8] [INFO] [1791767862.666102238] [uav_camera_bridge]: Creating GZ->ROS Bridge: [/world/simple_goal_demo/model/cooperative_camera_uav_0/link/camera_link/sensor/camera/image (gz.msgs.Image) -> /world/simple_goal_demo/model/cooperative_camera_uav_0/link/camera_link/sensor/camera/image (sensor_msgs/msg/Image)] (Lazy 0)
+[parameter_bridge-8] [INFO] [1791767862.675618097] [uav_camera_bridge]: Creating GZ->ROS Bridge: [/world/simple_goal_demo/model/cooperative_camera_uav_0/link/camera_link/sensor/camera/camera_info (gz.msgs.CameraInfo) -> /world/simple_goal_demo/model/cooperative_camera_uav_0/link/camera_link/sensor/camera/camera_info (sensor_msgs/msg/CameraInfo)] (Lazy 0)
+[parameter_bridge-3] [INFO] [1791767863.643778145] [ugv_sensor_bridge]: Creating GZ->ROS Bridge: [/clock (gz.msgs.Clock) -> /clock (rosgraph_msgs/msg/Clock)] (Lazy 0)
+[parameter_bridge-3] [INFO] [1791767863.655149819] [ugv_sensor_bridge]: Creating GZ->ROS Bridge: [/simple_ugv/odom (gz.msgs.Odometry) -> /ugv/sensors/wheel_odom (nav_msgs/msg/Odometry)] (Lazy 0)
+[parameter_bridge-3] [INFO] [1791767863.669846186] [ugv_sensor_bridge]: Creating GZ->ROS Bridge: [/simple_ugv/imu (gz.msgs.IMU) -> /ugv/sensors/imu (sensor_msgs/msg/Imu)] (Lazy 0)
+[parameter_bridge-3] [INFO] [1791767863.677573294] [ugv_sensor_bridge]: Creating GZ->ROS Bridge: [/simple_ugv/gps (gz.msgs.NavSat) -> /ugv/sensors/gps (sensor_msgs/msg/NavSatFix)] (Lazy 0)
+[parameter_bridge-12] [INFO] [1791767863.848020743] [ugv_evaluation_command_bridge]: Creating ROS->GZ Bridge: [/evaluation/ugv_cmd_vel (geometry_msgs/msg/Twist) -> /simple_ugv/cmd_vel (gz.msgs.Twist)] (Lazy 0)
+[static_transform_publisher-5] [INFO] [1791768095.764324591] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[ugv_truth-13] [INFO] [1791768095.764351535] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[parameter_bridge-12] [INFO] [1791768095.764394061] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[parameter_bridge-8] [INFO] [1791768095.764448826] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[parameter_bridge-3] [INFO] [1791768095.764472114] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[ekf_node-10] [INFO] [1791768095.764982057] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[ekf_node-6] [INFO] [1791768095.770091429] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[INFO] [parameter_bridge-3]: process has finished cleanly [pid 7832]
+[INFO] [parameter_bridge-8]: process has finished cleanly [pid 7844]
+[INFO] [ugv_truth-13]: process has finished cleanly [pid 7898]
+[INFO] [static_transform_publisher-5]: process has finished cleanly [pid 7836]
+[INFO] [parameter_bridge-12]: process has finished cleanly [pid 7896]
+[INFO] [ekf_node-10]: process has finished cleanly [pid 7888]
+[INFO] [ekf_node-6]: process has finished cleanly [pid 7838]
+[INFO] [ugv_fused_pose.py-11]: process has finished cleanly [pid 7894]
+[INFO] [ugv_measurements.py-4]: process has finished cleanly [pid 7834]
+[INFO] [uav_fiducial_sensor.py-9]: process has finished cleanly [pid 7854]
+[INFO] [ugv_fused_pose.py-7]: process has finished cleanly [pid 7840]
+[INFO] [uav_correction.py-2]: process has finished cleanly [pid 7830]
+[INFO] [uav_pose.py-1]: process has finished cleanly [pid 7828]

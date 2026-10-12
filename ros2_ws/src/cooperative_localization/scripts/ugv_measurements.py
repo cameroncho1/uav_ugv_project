@@ -13,6 +13,7 @@ from rclpy.node import Node
 from rclpy.qos import QoSProfile, ReliabilityPolicy, qos_profile_sensor_data
 from sensor_msgs.msg import Imu, NavSatFix, NavSatStatus
 from std_srvs.srv import SetBool
+from simulation_faults import common_position_bias
 
 
 WGS84_A = 6378137.0
@@ -96,6 +97,7 @@ class UgvMeasurements(Node):
         self.declare_parameter("imu_angular_velocity_stddev", 0.01)
         self.declare_parameter("imu_linear_acceleration_stddev", 0.1)
         self.declare_parameter("random_seed", 513)
+        self.declare_parameter("shared_position_stddev", 0.0)
         self.declare_parameter("initial_gps_enabled", True)
         self.declare_parameter("wheel_speed_scale", 1.0)
         self.declare_parameter("imu_yaw_bias_rate", 0.0)
@@ -119,6 +121,8 @@ class UgvMeasurements(Node):
         self.imu_angular_stddev = parameter("imu_angular_velocity_stddev")
         self.imu_accel_stddev = parameter("imu_linear_acceleration_stddev")
         seed = parameter("random_seed")
+        self.shared_std = parameter("shared_position_stddev")
+        self.shared_bias = common_position_bias(seed, self.shared_std)
         self.odom_random = random.Random(seed + 1)
         self.imu_random = random.Random(seed + 2)
         self.gps_random = random.Random(seed + 3)
@@ -269,9 +273,12 @@ class UgvMeasurements(Node):
         output.pose.pose.position.x = east + self.noise(self.gps_xy_stddev, self.gps_random)
         output.pose.pose.position.y = north + self.noise(self.gps_xy_stddev, self.gps_random)
         output.pose.pose.position.z = up + self.noise(self.gps_z_stddev, self.gps_random)
+        output.pose.pose.position.x += float(self.shared_bias[0])
+        output.pose.pose.position.y += float(self.shared_bias[1])
         output.pose.pose.orientation.w = 1.0
         output.pose.covariance = diagonal_covariance((
-            self.gps_xy_stddev**2, self.gps_xy_stddev**2,
+            self.gps_xy_stddev**2 + self.shared_std**2,
+            self.gps_xy_stddev**2 + self.shared_std**2,
             self.gps_z_stddev**2, 1e6, 1e6, 1e6))
         self.gps_pub.publish(output)
 

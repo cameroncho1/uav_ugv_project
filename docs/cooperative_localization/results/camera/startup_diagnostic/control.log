@@ -1,0 +1,6 @@
+[INFO] [1791767866.377753432] [uav_goal_controller]: Waiting for PX4 odometry and vehicle status; UAV will hold XY
+[INFO] [1791767867.102159660] [uav_goal_controller]: Holding initial horizontal position (N=-0.00, E=-0.02)
+[INFO] [1791767869.084551872] [uav_goal_controller]: Requested PX4 Offboard mode; waiting for confirmation
+[INFO] [1791767870.125488017] [uav_goal_controller]: Requested PX4 arm; waiting for confirmation
+[INFO] [1791767870.229501599] [uav_goal_controller]: PX4 confirmed Offboard mode and armed state
+[INFO] [1791768095.764904784] [rclcpp]: signal_handler(SIGINT/SIGTERM)

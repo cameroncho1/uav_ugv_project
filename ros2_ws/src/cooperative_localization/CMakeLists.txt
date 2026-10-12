@@ -28,8 +28,11 @@ install(TARGETS sim_vehicle_poses DESTINATION lib/${PROJECT_NAME})
 install(DIRECTORY config launch DESTINATION share/${PROJECT_NAME})
 install(PROGRAMS scripts/ugv_measurements.py scripts/ugv_fused_pose.py scripts/localization_trial.py
   scripts/uav_pose.py scripts/uav_correction.py scripts/sim_uav_sensor.py
+  scripts/uav_fiducial_sensor.py
+  scripts/sim_anchor_fault.py
   DESTINATION lib/${PROJECT_NAME})
-install(FILES scripts/cooperative_math.py DESTINATION lib/${PROJECT_NAME})
+install(FILES scripts/cooperative_math.py scripts/fiducial_math.py scripts/simulation_faults.py
+  DESTINATION lib/${PROJECT_NAME})
 
 if(BUILD_TESTING)
   find_package(ament_cmake_pytest REQUIRED)
@@ -38,6 +41,7 @@ if(BUILD_TESTING)
   ament_add_pytest_test(localization_trial_test test/test_localization_trial.py)
   ament_add_pytest_test(uav_correction_test test/test_uav_correction.py)
   ament_add_pytest_test(sim_dependencies_test test/test_sim_dependencies.py)
+  ament_add_pytest_test(fiducial_math_test test/test_fiducial_math.py)
   find_package(ament_lint_auto REQUIRED)
   # the following line skips the linter which checks for copyrights
   # comment the line when a copyright and license is added to all source files

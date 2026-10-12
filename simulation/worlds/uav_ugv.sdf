@@ -105,11 +105,19 @@
       <longitude_deg> 8.546163739800146</longitude_deg>
       <elevation>0</elevation>
     </spherical_coordinates>
-    <model name="simple_ugv">
+    <model name="simple_ugv" canonical_link="chassis">
 
       <pose>1 0 0 0 0 0</pose>
 
       <!-- Main body -->
+      <!-- Known metric roof target; visual-only, fixed to the chassis. -->
+      <include merge="true">
+        <uri>model://ugv_fiducial</uri>
+        <pose relative_to="chassis">0 0 0.12 0 0 0</pose>
+      </include>
+      <joint name="FiducialJoint" type="fixed">
+        <parent>chassis</parent><child>fiducial_link</child>
+      </joint>
       <link name="chassis">
         <pose>0 0 0.25 0 0 0</pose>
 
@@ -320,6 +328,8 @@
 
         <topic>/simple_ugv/cmd_vel</topic>
         <odom_topic>/simple_ugv/odom</odom_topic>
+        <frame_id>simple_ugv/odom</frame_id>
+        <child_frame_id>simple_ugv/chassis</child_frame_id>
       </plugin>
 
     </model>

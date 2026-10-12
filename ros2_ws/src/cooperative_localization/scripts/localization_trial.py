@@ -13,6 +13,7 @@ import rclpy
 import numpy as np
 from diagnostic_msgs.msg import DiagnosticArray
 from geometry_msgs.msg import PoseStamped, PoseWithCovarianceStamped, Twist
+from nav_msgs.msg import Odometry
 from rclpy.node import Node
 from rclpy.qos import DurabilityPolicy, QoSProfile, qos_profile_sensor_data
 from rosgraph_msgs.msg import Clock
@@ -72,6 +73,8 @@ class LocalizationTrial(Node):
         self.gps_disabled_at = None
         self.gps_after_outage = 0
         self.gps_count = 0
+        self.wheel_count = 0
+        self.wheel_after_outage = 0
         self.cmd_pub = self.create_publisher(Twist, "/evaluation/ugv_cmd_vel", 10)
         self.start_pub = self.create_publisher(
             Clock, "/evaluation/trial_start",
@@ -90,6 +93,7 @@ class LocalizationTrial(Node):
         self.create_subscription(DiagnosticArray, "/diagnostics", self.on_diagnostics, 10)
         self.create_subscription(PoseWithCovarianceStamped, "/ugv/measurements/gps_pose",
                                  self.on_gps, 10)
+        self.create_subscription(Odometry, "/ugv/measurements/wheel_odom", self.on_wheel, 10)
 
     def on_clock(self, message):
         self.sim_time = seconds(message.clock)
@@ -119,6 +123,16 @@ class LocalizationTrial(Node):
     def on_baseline(self, message):
         if message.header.frame_id == "map":
             self.baseline_pending.append(message)
+
+    def on_wheel(self, message):
+        if (message.header.frame_id != "map" or
+                message.child_frame_id != "simple_ugv/chassis"):
+            raise RuntimeError("Wheel measurements must use map and simple_ugv/chassis; "
+                               "check the Gazebo canonical link and DiffDrive frames")
+        self.wheel_count += 1
+        if (self.gps_disabled_at is not None and
+                seconds(message.header.stamp) > self.gps_disabled_at + 0.3):
+            self.wheel_after_outage += 1
 
     def on_uav(self, message):
         self.uav_count += 1
@@ -211,6 +225,9 @@ class LocalizationTrial(Node):
                                f"{(self.truth[0][0], self.truth[-1][0]) if self.truth else None}")
         if self.gps_after_outage:
             raise RuntimeError("Prepared GPS messages continued after GPS was disabled")
+        lost_wheels = self.gps_disabled_at is not None and self.wheel_after_outage < 100
+        if self.wheel_count < 100 or lost_wheels:
+            raise RuntimeError("Missing wheel measurements during the localization trial")
         if self.args.gps == "startup_off" and self.gps_count:
             raise RuntimeError("Prepared GPS messages appeared in startup-off trial")
         if self.args.gps != "startup_off" and self.gps_count < 10:
@@ -235,6 +252,10 @@ class LocalizationTrial(Node):
             "start_simulation_time_s": self.start,
             "measurement_profile": self.args.measurement_profile,
             "anchor_source": self.args.anchor_source,
+            "relative_source": getattr(self.args, "relative_source", "simulated"),
+            "uav_altitude_setpoint_m": getattr(self.args, "uav_altitude", None),
+            "shared_position_stddev_m": getattr(self.args, "shared_position_stddev", 0.0),
+            "systematic_position_stddev_m": getattr(self.args, "systematic_position_stddev", 0.0),
             "observer_model": self.args.observer_model or "fixed",
             "relative_outlier_every": self.args.outlier_every,
             "relative_dropout_interval_s": [self.args.dropout_start, self.args.dropout_end],
@@ -242,6 +263,8 @@ class LocalizationTrial(Node):
             "uav_diagnostics": self.uav_diagnostics,
             "gps_messages_after_disable": self.gps_after_outage,
             "gps_messages_total": self.gps_count,
+            "wheel_messages_total": self.wheel_count,
+            "wheel_messages_after_gps_disable": self.wheel_after_outage,
             "before_10s": metrics(before_rows),
             "after_10s": metrics(after_rows),
         }
@@ -271,12 +294,18 @@ def main():
     parser.add_argument("--duration", type=float, default=31.)
     parser.add_argument("--measurement-profile", choices=["nominal", "drift"], default="nominal")
     parser.add_argument("--anchor-source", default="unspecified")
+    parser.add_argument("--relative-source", choices=["simulated", "camera"], default="simulated")
+    parser.add_argument("--uav-altitude", type=float, default=None)
+    parser.add_argument("--shared-position-stddev", type=float, default=0.0)
+    parser.add_argument("--systematic-position-stddev", type=float, default=0.0)
     parser.add_argument("--observer-model", default="")
     parser.add_argument("--outlier-every", type=int, default=0)
     parser.add_argument("--dropout-start", type=float, default=-1.)
     parser.add_argument("--dropout-end", type=float, default=-1.)
     parser.add_argument("--output", required=True)
     args, ros_args = parser.parse_known_args()
+    if not math.isfinite(args.shared_position_stddev) or args.shared_position_stddev < 0:
+        parser.error("Shared position deviation must be finite and nonnegative")
     if args.duration < 31:
         parser.error("Duration must be at least 31 seconds")
     rclpy.init(args=ros_args)
@@ -288,7 +317,7 @@ def main():
         node.save()
     finally:
         node.destroy_node()
-        rclpy.shutdown()
+        rclpy.try_shutdown()
 
 
 if __name__ == "__main__":

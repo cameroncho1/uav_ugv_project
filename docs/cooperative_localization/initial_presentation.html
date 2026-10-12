@@ -643,7 +643,7 @@
                 <tr><th>Assumption</th><td>Drone localization stays reliable during robot GPS loss.</td></tr>
                 <tr><th>Measurement</th><td>Noisy robot position relative to the drone.</td></tr>
                 <tr><th>Effect</th><td>Reduces drift and uncertainty.</td></tr>
-                <tr><th>Hardware</th><td>Simulation supplies a full 3D vector. A calibrated camera or tag detector must match this contract; range alone is insufficient.</td></tr>
+                <tr><th>Hardware</th><td>A calibrated roof-tag detector supplies the full 3D vector from rendered pixels; range alone is insufficient.</td></tr>
               </tbody>
             </table>
             <svg viewBox="0 0 640 400" role="img" aria-label="A localized drone observes the true robot position, and the correction moves the drifted estimate toward it">
@@ -725,7 +725,7 @@
 <polyline points="620,280 698,280" fill="none" stroke="#000" stroke-width="2" stroke-dasharray="6 5" marker-end="url(#head2)"/>
 <polyline points="620,427 660,427 660,318 698,318" fill="none" stroke="#000" stroke-width="2" marker-end="url(#head2)"/>
 <polyline points="620,506 680,506 680,352 698,352" fill="none" stroke="#000" stroke-width="2" marker-end="url(#head2)"/>
-<text x="659" y="270" text-anchor="middle">planned</text>
+<text x="659" y="270" text-anchor="middle">fused pose</text>
 <polyline points="950,260 1010,260" fill="none" stroke="#000" stroke-width="2" marker-end="url(#head2)"/>
 <text x="980" y="250" text-anchor="middle">route</text>
 <rect class="box" x="1012" y="215" width="188" height="90"/>
@@ -838,7 +838,7 @@
           <ol class="steps">
             <li>Connect the fused pose to navigation with freshness and uncertainty checks.
               <span>The planner consumes the fused UGV pose and rejects stale or uncertain samples.</span></li>
-            <li>Replace the simulated relative vector with a calibrated detector and visibility model.</li>
+            <li>Validate the calibrated detector under motion blur, damaged targets, and physical camera calibration.</li>
             <li>Evaluate correlated anchor errors and controller behavior during loss of both position sources.</li>
           </ol>
         </div>

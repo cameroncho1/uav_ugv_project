@@ -1,0 +1,20 @@
+{
+  "px4_build": "passed",
+  "ros_workspace_build": "nine packages passed",
+  "changed_package_build": "cooperative_localization and mission_manager passed",
+  "registered_checks": {
+    "tests": 140,
+    "errors": 0,
+    "failures": 0,
+    "skipped": 6,
+    "skip_reason": "installed cppcheck 2.7 performance exclusion"
+  },
+  "focused_perception_tests": 20,
+  "rendered_visibility_cases": 5,
+  "paired_camera_trials": 9,
+  "paired_shared_error_trials": 6,
+  "goal_arrival_passed": true,
+  "known_uncertainty_hold_passed": true,
+  "root_python_lint_and_bash_syntax": "passed",
+  "claims": "Known simulated geometry and recorded conditions; hardware calibration and unknown-bias detection are not validated."
+}

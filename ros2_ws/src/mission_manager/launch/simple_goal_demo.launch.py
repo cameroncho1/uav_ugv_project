@@ -6,7 +6,7 @@ from launch.actions import (DeclareLaunchArgument, ExecuteProcess, IncludeLaunch
                             SetEnvironmentVariable, TimerAction)
 from launch.conditions import IfCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import LaunchConfiguration
+from launch.substitutions import LaunchConfiguration, PythonExpression
 from launch_ros.actions import Node, SetParameter
 from launch_ros.parameter_descriptions import ParameterValue
 
@@ -52,11 +52,17 @@ def generate_launch_description():
                               description="Fuse UAV-assisted position measurements."),
         DeclareLaunchArgument("initial_gps_enabled", default_value="true",
                               description="Enable prepared UGV GPS at startup."),
+        DeclareLaunchArgument("seed", default_value="513"),
+        DeclareLaunchArgument("shared_position_stddev", default_value="0.0",
+                              description="Simulation-only shared GPS/UAV position fault (m)."),
+        DeclareLaunchArgument("systematic_position_stddev",
+                              default_value=LaunchConfiguration("shared_position_stddev"),
+                              description="Unreduced global position uncertainty prior (m)."),
         DeclareLaunchArgument("goal_x", default_value="4.0",
                               description="Goal east coordinate in meters."),
         DeclareLaunchArgument("goal_y", default_value="0.0",
                               description="Goal north coordinate in meters."),
-        DeclareLaunchArgument("uav_altitude", default_value="4.0",
+        DeclareLaunchArgument("uav_altitude", default_value="4.5",
                               description="UAV target altitude in meters."),
         DeclareLaunchArgument(
             "grid_resolution", default_value="0.25",
@@ -75,17 +81,33 @@ def generate_launch_description():
             PythonLaunchDescriptionSource(
                 str(localization_share / "launch/ugv_localization.launch.py")),
             launch_arguments={"world": "simple_goal_demo",
-                              "uav_odometry_topic": "/fmu/out/vehicle_odometry",
+                              "seed": LaunchConfiguration("seed"),
+                              "shared_position_stddev": LaunchConfiguration(
+                                  "shared_position_stddev"),
+                              "systematic_position_stddev": LaunchConfiguration(
+                                  "systematic_position_stddev"),
+                              "uav_odometry_topic": PythonExpression([
+                                  "'/simulation/biased_uav_odometry' if float('",
+                                  LaunchConfiguration("shared_position_stddev"),
+                                  "') > 0 else '/fmu/out/vehicle_odometry'"]),
                               "uav_require_airborne": "true", "uav_initial_settle_time": "10.0",
                               "initial_gps_enabled": LaunchConfiguration("initial_gps_enabled"),
                               "uav_assistance": LaunchConfiguration("uav_assistance")}.items(),
         ),
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(
-                str(localization_share / "launch/sim_uav_sensor.launch.py")),
-            launch_arguments={"world": "simple_goal_demo", "uav_model": "x500_mono_cam_down_0",
-                              "publish_anchor": "false"}.items(),
+                str(localization_share / "launch/uav_camera_sensor.launch.py")),
             condition=IfCondition(LaunchConfiguration("uav_assistance")),
+        ),
+        Node(
+            package="cooperative_localization", executable="sim_anchor_fault.py",
+            parameters=[{"random_seed": ParameterValue(
+                LaunchConfiguration("seed"), value_type=int),
+                "shared_position_stddev": ParameterValue(
+                    LaunchConfiguration("shared_position_stddev"), value_type=float)}],
+            condition=IfCondition(PythonExpression([
+                "float('", LaunchConfiguration("shared_position_stddev"), "') > 0"])),
+            output="screen",
         ),
         Node(
             package="mission_manager",
@@ -119,7 +141,7 @@ def generate_launch_description():
             executable="traversability_mapper",
             name="traversability_mapper",
             parameters=[{
-                "camera_topic": "/world/simple_goal_demo/model/x500_mono_cam_down_0/"
+                "camera_topic": "/world/simple_goal_demo/model/cooperative_camera_uav_0/"
                                 "link/camera_link/sensor/camera/image",
                 "grid_resolution": ParameterValue(
                     LaunchConfiguration("grid_resolution"), value_type=float),

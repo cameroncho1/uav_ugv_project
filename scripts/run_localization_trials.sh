@@ -42,6 +42,8 @@ for seed in $SEEDS; do
     initial_gps_enabled=true
     if [[ "$gps" == startup_off ]]; then initial_gps_enabled=false; fi
     launch_args=(seed:="$seed" initial_gps_enabled:="$initial_gps_enabled"
+                 shared_position_stddev:="${SHARED_POSITION_STDDEV:-0.0}"
+                 systematic_position_stddev:="${SYSTEMATIC_POSITION_STDDEV:-${SHARED_POSITION_STDDEV:-0.0}}"
                  measurement_profile:="$MEASUREMENT_PROFILE")
     if [[ -n "$COMPARISON_TOPIC" ]]; then
       launch_args+=(outlier_every:="${OUTLIER_EVERY:-0}"
@@ -60,6 +62,8 @@ for seed in $SEEDS; do
       --comparison-topic "$COMPARISON_TOPIC" --route "$ROUTE" --duration "$DURATION" \
       --measurement-profile "$MEASUREMENT_PROFILE" \
       --anchor-source "${ANCHOR_SOURCE:-none}" \
+      --shared-position-stddev "${SHARED_POSITION_STDDEV:-0.0}" \
+      --systematic-position-stddev "${SYSTEMATIC_POSITION_STDDEV:-${SHARED_POSITION_STDDEV:-0.0}}" \
       --outlier-every "${OUTLIER_EVERY:-0}" \
       --dropout-start "${DROPOUT_START:--1.0}" --dropout-end "${DROPOUT_END:--1.0}" \
       --output "$OUTPUT/trial_${seed}_${gps}"

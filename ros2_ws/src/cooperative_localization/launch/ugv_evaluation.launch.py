@@ -18,11 +18,18 @@ def generate_launch_description():
     return LaunchDescription([
         DeclareLaunchArgument("world", default_value="uav_ugv"),
         DeclareLaunchArgument("seed", default_value="513"),
+        DeclareLaunchArgument("shared_position_stddev", default_value="0.0"),
+        DeclareLaunchArgument("systematic_position_stddev",
+                              default_value=LaunchConfiguration("shared_position_stddev")),
         DeclareLaunchArgument("initial_gps_enabled", default_value="true"),
         DeclareLaunchArgument("measurement_profile", default_value="nominal"),
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(str(share / "launch/ugv_localization.launch.py")),
             launch_arguments={"world": world, "seed": seed,
+                              "shared_position_stddev": LaunchConfiguration(
+                                  "shared_position_stddev"),
+                              "systematic_position_stddev": LaunchConfiguration(
+                                  "systematic_position_stddev"),
                               "measurement_profile": LaunchConfiguration("measurement_profile"),
                               "initial_gps_enabled": initial_gps_enabled}.items(),
         ),

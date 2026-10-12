@@ -12,12 +12,14 @@ Estimator inputs preserve acquisition timestamps. Localization nodes use Gazebo 
 | `/ugv/measurements/wheel_odom` | `nav_msgs/Odometry` | Noisy pose anchored to map spawn; body forward speed and zero lateral speed. |
 | `/ugv/measurements/imu` | `sensor_msgs/Imu` | Noisy yaw and turn rate in the chassis sensor frame. |
 | `/ugv/measurements/gps_pose` | `geometry_msgs/PoseWithCovarianceStamped` | GPS projected to ENU `map`, with meter noise and covariance; position only. |
+| `/uav/camera/image` | `sensor_msgs/Image` | Rendered pixels, 5 Hz; acquisition stamp and `uav/camera_optical_frame`. |
+| `/uav/camera/camera_info` | `sensor_msgs/CameraInfo` | Camera intrinsics/distortion in the same optical frame and image dimensions. |
 | `/uav/localization/pose` | `geometry_msgs/PoseWithCovarianceStamped` | Independent UAV map position and FLU attitude with covariance. |
 | `/ugv/sensors/uav_relative_pose` | `geometry_msgs/PoseWithCovarianceStamped` | UAV-to-UGV vector in `uav/base_link` (FLU), with position covariance; orientation unused. |
 | `/ugv/measurements/uav_pose` | `geometry_msgs/PoseWithCovarianceStamped` | UGV map position derived from timestamp-matched UAV pose and relative observation; orientation unused. |
 | `/ugv/localization/odometry` | `nav_msgs/Odometry` | Planar EKF output in `map`, 30 Hz. |
-| `/ugv/localization/pose` | `geometry_msgs/PoseWithCovarianceStamped` | EKF pose, timestamp, and covariance copied into the public interface. |
-| `/diagnostics` | `diagnostic_msgs/DiagnosticArray` | UAV correction freshness, accepted count, and rejection counts. |
+| `/ugv/localization/pose` | `geometry_msgs/PoseWithCovarianceStamped` | EKF pose/time/covariance with the configured systematic x/y uncertainty prior added. |
+| `/diagnostics` | `diagnostic_msgs/DiagnosticArray` | Anchor/correction freshness and rejection counts; camera visibility and reprojection fit. |
 
 The bridge maps Gazebo `/simple_ugv/odom`, `/simple_ugv/imu`, `/simple_ugv/gps`, and `/clock` to ROS. Raw wheel and IMU covariance is zero and GPS covariance is unknown. The adapter supplies an explicit uncertainty model while raw topics remain available. GPS is converted through WGS84 ECEF to local ENU. The UGV map spawn is `(1, 0)` in `uav_ugv` and `(-4, 0)` in `simple_goal_demo`.
 
@@ -27,11 +29,11 @@ The baseline EKF fuses body forward and zero lateral wheel velocity, IMU yaw and
 
 The relative sensor reports the UGV chassis origin relative to the UAV body origin. A perception producer must apply calibrated sensor-to-body extrinsics before publishing. Its position covariance must be finite and positive in the same FLU axes. It must use the shared acquisition clock. A hardware producer can replace the simulator through this interface.
 
-`uav_pose.py` accepts PX4 `POSE_FRAME_NED` with valid position, quaternion, and variances. It converts world axes from NED to ENU and body axes from FRD to FLU. `map_origin` supplies the local-to-map translation; the two world YAML files contain the configured origins. `uav_require_airborne:=true uav_initial_settle_time:=10.0` initializes the live reference after takeoff and a reset-free interval in the optional live PX4 diagnostic. `/fmu/out/vehicle_land_detected` supplies the takeoff state. Later pose resets stop anchor output until realignment and restart. Clock mismatches are rejected.
+`uav_pose.py` accepts PX4 `POSE_FRAME_NED` with valid position, quaternion, and variances. It converts world axes from NED to ENU and body axes from FRD to FLU. `map_origin` supplies the local-to-map translation; the two world YAML files contain the configured origins. `uav_require_airborne:=true uav_initial_settle_time:=10.0` initializes the live reference after takeoff and a reset-free interval. `/fmu/out/vehicle_land_detected` supplies the takeoff state. Later pose resets stop anchor output until realignment and restart. Clock mismatches are rejected.
 
 `uav_correction.py` uses an exact anchor or interpolates position and quaternion at observation time. The maximum anchor gap is 0.25 s, maximum age 0.5 s, and maximum relative range 30 m. It propagates UAV position and attitude covariance plus rotated relative covariance. It rejects invalid inputs, duplicate stamps, and jumps exceeding a configured motion bound plus five standard deviations. It does not extrapolate or subscribe to UGV truth. [Measurement design](uav_measurement_design.md) gives equations and limits.
 
-Nominal relative standard deviations are `(0.25, 0.15, 0.25)` m in FLU. Simulated UAV position deviations are `(0.3, 0.3, 0.5)` m in map and attitude deviations `(0.01, 0.01, 0.02)` rad in body axes. Independent seeded random streams make an unchanged message sequence reproducible. These are simulation assumptions, not calibrated sensor specifications.
+The synthetic vector fixture uses relative standard deviations `(0.25, 0.15, 0.25)` m in FLU. Simulated UAV position deviations are `(0.3, 0.3, 0.5)` m in map and attitude deviations `(0.01, 0.01, 0.02)` rad in body axes. Independent seeded random streams make an unchanged message sequence reproducible. These are simulation assumptions, not calibrated sensor specifications.
 
 ## Services and launch modes
 
@@ -40,7 +42,7 @@ Nominal relative standard deviations are `(0.25, 0.15, 0.25)` m in FLU. Simulate
 - `ugv_sensors.launch.py`: bridges and prepares measurements. `world` selects spawn and GPS origin; `measurement_profile` selects `nominal` or `drift`.
 - `ugv_localization.launch.py`: starts the baseline, or adds UAV adapters and fusion with `uav_assistance:=true`. `uav_odometry_topic` selects live PX4 or a compatible test source.
 - `sim_uav_sensor.launch.py`: generates noisy relative observations. Empty `uav_model` selects a fixed observer at map `(2, -2, 4)`; a named model selects its actual Gazebo pose. `publish_anchor:=false` uses an independently supplied UAV anchor.
-- `simple_goal_demo.launch.py`: starts assisted localization with actual PX4 anchors and noisy relative observations from the actual flying UAV model. `uav_assistance:=false` selects the baseline. Navigation consumes `/ugv/localization/pose` with freshness and uncertainty gates; `/ugv/cmd_vel` carries velocity commands.
+- `simple_goal_demo.launch.py`: starts assisted localization with actual PX4 anchors and calibrated relative observations from camera pixels. `uav_assistance:=false` selects the baseline. Navigation consumes `/ugv/localization/pose` with freshness and uncertainty gates; `/ugv/cmd_vel` carries velocity commands.
 
 ## Evaluation and reproducibility
 
@@ -55,7 +57,7 @@ colcon build --packages-up-to cooperative_localization mission_manager --symlink
 source install/setup.bash
 cd ..
 
-# PX4 hover with actual PX4 anchors and simulated relative sensing.
+# PX4 hover with actual PX4 anchors and rendered camera sensing.
 scripts/run_live_cooperative_trial.sh /tmp/cooperative_live
 
 # Three GPS cases across three seeds.
@@ -75,4 +77,4 @@ GPS_CASES=off ROUTE=long DURATION=91 MEASUREMENT_PROFILE=drift \
 
 Each trial starts a fresh world and stops its processes. Results include scored CSVs, a baseline CSV for paired trials, JSON summaries, and `summary.csv` with one row per strategy. `GZ_PARTITION` can select an isolated Gazebo transport partition; the default is `uav_ugv_sim`. Avoid another world or controller in the same Gazebo partition and ROS domain. The baseline runner remains `scripts/run_localization_trials.sh`. [Measured results](evaluation_results.md) describe tested conditions and stored summaries.
 
-`scripts/run_live_cooperative_trial.sh` flies a PX4 X500 and compares both UGV filters. Its default `ANCHOR_MODE=px4` uses the actual PX4 estimator and a ten-second post-takeoff initialization interval. `GPS_CASE` selects `on`, `off`, or `startup_off` (default). `ANCHOR_MODE=simulated` selects independent noisy anchors on the flying model. Both modes write the source and observer model into their trial summaries. `scripts/run_aligned_anchor_trials.sh` repeats all three GPS cases across seeds 513-515. [Simulation setup](../simulation_setup.md) specifies the aligned dependency configuration and heading-scoring command.
+`scripts/run_live_cooperative_trial.sh` flies a PX4 X500 and compares both UGV filters. Its default `ANCHOR_MODE=px4` uses the actual PX4 estimator and a ten-second post-takeoff initialization interval. `GPS_CASE` selects `on`, `off`, or `startup_off` (default). `RELATIVE_MODE=simulated ANCHOR_MODE=simulated` selects independent noisy anchors and vector observations on the flying model. Camera mode uses actual PX4 anchors. `ANCHOR_TIMEOUT` bounds startup in wall seconds (default 240); `TRIAL_TIMEOUT` bounds scoring in wall seconds (default 300). These timeouts do not change the 31-second simulation route or timestamp/uncertainty gates. Both modes write the source and observer model into their trial summaries. `scripts/run_aligned_anchor_trials.sh` repeats the vector fixture across all three GPS cases and seeds 513-515. `scripts/run_camera_anchor_trials.sh` repeats rendered-camera trials with the same cases and seeds. [Perception](perception.md) defines camera calibration and shared-bias fault settings. [Simulation setup](../simulation_setup.md) specifies the aligned dependency configuration and heading-scoring command.

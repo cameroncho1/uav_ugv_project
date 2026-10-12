@@ -1,0 +1,9 @@
+{
+  "seed": 515,
+  "gps_case": "on",
+  "anchor_timeout_wall_s": 240,
+  "anchor_received": false,
+  "scored_route_started": false,
+  "condition": "Bounded live-anchor initialization did not complete; no accuracy result is accepted.",
+  "log_format": "ANSI codes and trailing whitespace removed"
+}

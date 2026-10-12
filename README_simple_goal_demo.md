@@ -2,11 +2,11 @@
 
 The goal demo keeps the UAV horizontally stationary while it climbs to a camera altitude. A local occupancy grid is derived from the downward camera image, A* plans through the grid from the UGV pose to the fixed goal, and the UGV follows that local path. The flat world uses a solid matte ground color and simple geometric vehicle and goal visuals, with shadows disabled to reduce rendering load. It has no physical obstacles. The image classifier is an initial dark-pixel heuristic, not semantic obstacle detection. There is no global path or global replanning yet.
 
-The default local goal is `(4, 0)` in the ROS `map` frame. The UGV starts at `(-4, 0)` and the UAV holds its initial horizontal position at 4 m altitude so its camera footprint covers the route. The localization world configuration supplies the UGV spawn and independent UAV map origin. Goal and altitude can be changed with launch arguments; if changing the goal coordinates, also update the bullseye pose in the world SDF.
+The default local goal is `(4, 0)` in the ROS `map` frame. The UGV starts at `(-4, 0)` and the UAV holds its initial horizontal position at a 4.5 m altitude setpoint above its PX4 local origin so its camera footprint covers the route. The localization world configuration supplies the UGV spawn and independent UAV map origin. Goal and altitude can be changed with launch arguments; if changing the goal coordinates, also update the bullseye pose in the world SDF.
 
 ## Build
 
-Gazebo Harmonic transport development libraries (`gz-transport13` and `gz-msgs10`), `MicroXRCEAgent`, a built PX4 Gazebo target, the Gazebo Harmonic build of `ros_gz_bridge`, and `robot_localization` must be available. On Ubuntu 22.04 with the OSRF Gazebo package repository, install the ROS packages with `sudo apt install ros-humble-ros-gzharmonic-bridge ros-humble-robot-localization`. From the repository root:
+Gazebo Harmonic transport development libraries (`gz-transport13` and `gz-msgs10`), `MicroXRCEAgent`, a built PX4 Gazebo target, the Gazebo Harmonic build of `ros_gz_bridge`, and `robot_localization` must be available. On Ubuntu 22.04 with the OSRF Gazebo package repository, install the ROS packages with `sudo apt install ros-humble-ros-gzharmonic-bridge ros-humble-robot-localization python3-opencv`. From the repository root:
 
 ```bash
 source /opt/ros/humble/setup.bash
@@ -27,19 +27,19 @@ ros2 launch mission_manager simple_goal_demo.launch.py
 
 The launch starts the Gazebo world, PX4 SITL, Micro XRCE-DDS Agent, the goal manager, stationary-XY UAV controller, camera grid mapper, local A-star planner, UGV path follower, and RViz. The UAV controller holds its initial horizontal position, streams the altitude setpoint, waits for PX4 preflight checks, then retries Offboard and arm requests until PX4 confirms the state. Keep the launch terminal open; Ctrl+C shuts down the launched processes.
 
-The launch also starts UGV localization. An EKF combines wheel speed, IMU heading, GPS map position, and UAV-derived UGV position on `/ugv/localization/pose` with uncertainty. The UAV adapter converts the live PX4 anchor from NED/FRD to ENU/FLU after takeoff and a ten-second reference-settling interval. A simulated sensor produces noisy UGV-relative observations from the Gazebo UAV model; a timestamp-matched adapter rotates them into map and includes UAV position and attitude uncertainty. `uav_assistance:=false` selects the GPS/wheel/IMU baseline. [The localization interfaces](docs/cooperative_localization/interfaces.md) define topics, gates, and evaluation commands. The planner and controller consume `/ugv/localization/pose` and stop on stale or uncertain estimates. [Navigation](docs/navigation.md) lists the configured limits and checks.
+The launch also starts UGV localization. An EKF combines wheel speed, IMU heading, GPS map position, and UAV-derived UGV position on `/ugv/localization/pose` with uncertainty. The UAV adapter converts the live PX4 anchor from NED/FRD to ENU/FLU after takeoff and a ten-second reference-settling interval. A calibrated AprilTag detector produces UGV-relative observations from camera pixels; a timestamp-matched adapter rotates them into map and includes UAV position and attitude uncertainty. `uav_assistance:=false` selects the GPS/wheel/IMU baseline. [The localization interfaces](docs/cooperative_localization/interfaces.md) define topics, gates, and evaluation commands. The planner and controller consume `/ugv/localization/pose` and stop on stale or uncertain estimates. [Navigation](docs/navigation.md) lists the configured limits and checks.
 
-ROS nodes use `/clock`, and `px4_goal_demo.sh` sets `UXRCE_DDS_SYNCT=0` so PX4 samples use the same time source. When starting PX4 separately for this demo, use that script. UAV observations are simulated position vectors with configured noise; they are independent of the camera occupancy classifier.
+ROS nodes use `/clock`, and `px4_goal_demo.sh` sets `UXRCE_DDS_SYNCT=0` so PX4 samples use the same time source. When starting PX4 separately for this demo, use that script. UAV relative observations come from a known 0.4 m roof tag, CameraInfo intrinsics, and body-camera extrinsics. The detector and occupancy classifier use the same rendered images through separate interfaces. [Perception](docs/cooperative_localization/perception.md) gives calibration assumptions, visibility gates, and tests.
 
 Change the local goal, camera altitude, grid resolution, or image threshold with launch arguments:
 
 ```bash
-ros2 launch mission_manager simple_goal_demo.launch.py goal_x:=4.0 goal_y:=0.0 uav_altitude:=4.0 grid_resolution:=0.25 obstacle_luminance_threshold:=32.0
+ros2 launch mission_manager simple_goal_demo.launch.py goal_x:=4.0 goal_y:=0.0 uav_altitude:=4.5 grid_resolution:=0.25 obstacle_luminance_threshold:=32.0
 ```
 
 If Gazebo, PX4, and the DDS agent are already running in other terminals, skip starting them again with `start_simulation:=false`. To omit RViz, use `start_rviz:=false`.
 
-In the Gazebo window, add its **Image Display** plugin and select `/world/simple_goal_demo/model/x500_mono_cam_down_0/link/camera_link/sensor/camera/image`. To list camera topics, run `gz topic -l | grep -Ei 'camera|image'`.
+In the Gazebo window, add its **Image Display** plugin and select `/world/simple_goal_demo/model/cooperative_camera_uav_0/link/camera_link/sensor/camera/image`. To list camera topics, run `gz topic -l | grep -Ei 'camera|image'`.
 
 ## Grid Scope
 
@@ -68,4 +68,4 @@ source /opt/ros/humble/setup.bash
 source install/setup.bash
 rviz2 -d install/mission_manager/share/mission_manager/config/simple_goal_demo.rviz
 
-The demo uses actual PX4 anchors and noisy simulated relative vectors. [Simulation setup](docs/simulation_setup.md) defines the matching firmware, ROS messages, UAV models, and ENU/tesla magnetometer settings.
+The demo uses actual PX4 anchors and calibrated camera-derived relative positions. [Simulation setup](docs/simulation_setup.md) defines the matching firmware, ROS messages, UAV models, and ENU/tesla magnetometer settings.

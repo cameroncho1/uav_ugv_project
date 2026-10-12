@@ -19,10 +19,13 @@ def generate_launch_description():
         "outlier_every": ParameterValue(LaunchConfiguration("outlier_every"), value_type=int),
         "dropout_start": ParameterValue(LaunchConfiguration("dropout_start"), value_type=float),
         "dropout_end": ParameterValue(LaunchConfiguration("dropout_end"), value_type=float),
+        "shared_position_stddev": ParameterValue(
+            LaunchConfiguration("shared_position_stddev"), value_type=float),
     }
     return LaunchDescription([
         DeclareLaunchArgument("world", default_value="uav_ugv"),
         DeclareLaunchArgument("seed", default_value="513"),
+        DeclareLaunchArgument("shared_position_stddev", default_value="0.0"),
         DeclareLaunchArgument("uav_model", default_value=""),
         DeclareLaunchArgument("publish_anchor", default_value="true"),
         DeclareLaunchArgument("outlier_every", default_value="0"),
