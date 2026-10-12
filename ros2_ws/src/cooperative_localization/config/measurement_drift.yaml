@@ -1,5 +1,0 @@
-ugv_measurements:
-  ros__parameters:
-    # Fault injection assumptions, separate from the stated Gaussian covariance.
-    wheel_speed_scale: 1.15
-    imu_yaw_bias_rate: 0.002

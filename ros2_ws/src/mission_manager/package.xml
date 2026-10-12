@@ -26,6 +26,9 @@
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
 
+  <exec_depend>fault_management</exec_depend>
+  <exec_depend>uav_sensing</exec_depend>
+  <exec_depend>simulation_support</exec_depend>
   <export>
     <build_type>ament_cmake</build_type>
   </export>

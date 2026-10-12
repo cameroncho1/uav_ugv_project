@@ -1,0 +1,60 @@
+{
+  "scenario": "off",
+  "seed": 514,
+  "estimate_topic": "/ugv/localization/pose",
+  "route": "long",
+  "duration_s": 91.0,
+  "start_simulation_time_s": 8.444,
+  "measurement_profile": "drift",
+  "anchor_source": "simulated",
+  "relative_source": "simulated",
+  "uav_altitude_setpoint_m": null,
+  "shared_position_stddev_m": 0.0,
+  "systematic_position_stddev_m": 0.0,
+  "observer_model": "fixed",
+  "relative_outlier_every": 10,
+  "relative_dropout_interval_s": [
+    35.0,
+    55.0
+  ],
+  "uav_messages": 273,
+  "uav_diagnostics": {
+    "accepted": 279,
+    "jump_rejected": 31
+  },
+  "gps_messages_after_disable": 0,
+  "gps_messages_total": 53,
+  "wheel_messages_total": 1757,
+  "wheel_messages_after_gps_disable": 1551,
+  "before_10s": {
+    "samples": 180,
+    "mean_error_m": 0.1435059689799498,
+    "rmse_m": 0.168570264945487,
+    "p95_error_m": 0.3329693829427745,
+    "max_error_m": 0.365918473172263,
+    "mean_heading_error_deg": 1.276975379380949,
+    "mean_planar_nees": 0.6806474401066873,
+    "coverage_95": 1.0
+  },
+  "after_10s": {
+    "samples": 2404,
+    "mean_error_m": 0.3300054057122979,
+    "rmse_m": 0.4126348214022246,
+    "p95_error_m": 0.7681160266755231,
+    "max_error_m": 0.7897641603372143,
+    "mean_heading_error_deg": 6.09885477946767,
+    "mean_planar_nees": 1.2262120747484746,
+    "coverage_95": 0.9933444259567388
+  },
+  "comparison_topic": "/evaluation/baseline_pose",
+  "baseline_after_10s": {
+    "samples": 2399,
+    "mean_error_m": 1.0202067644351678,
+    "rmse_m": 1.1399634095493658,
+    "p95_error_m": 1.6489772718061335,
+    "max_error_m": 1.9372577706141618,
+    "mean_heading_error_deg": 6.1026243609571145,
+    "mean_planar_nees": 0.5747197667259285,
+    "coverage_95": 1.0
+  }
+}

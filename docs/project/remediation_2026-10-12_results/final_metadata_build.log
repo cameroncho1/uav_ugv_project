@@ -1,0 +1,19 @@
+[1.425s] WARNING:colcon.colcon_core.package_selection:Some selected packages are already built in one or more underlay workspaces:
+	'fault_management' is in: /home/rylanwwade/uav-fix-20261012/ros2_ws/install/fault_management, /home/rylanwwade/uav-review-20261012-yqu6ytb1/ros2_ws/install/fault_management
+If a package in a merged underlay workspace is overridden and it installs headers, then all packages in the overlay must sort their include directories by workspace order. Failure to do so may result in build failures or undefined behavior at run time.
+If the overridden package is used by another package in any underlay, then the overriding package in the overlay must be API and ABI compatible or undefined behavior at run time may occur.
+
+If you understand the risks and want to override a package anyways, add the following to the command line:
+	--allow-overriding fault_management
+
+This may be promoted to an error in a future release of colcon-override-check.
+Starting >>> fault_management
+[1.443s] WARNING:colcon.colcon_core.shell:The following packages are in the workspace but haven't been built:
+- px4_msgs
+They are being used from the following locations instead:
+- /home/rylanwwade/uav-review-20261012-yqu6ytb1/ros2_ws/install/px4_msgs
+To suppress this warning ignore these packages in the workspace:
+--packages-ignore px4_msgs
+Finished <<< fault_management [4.13s]
+
+Summary: 1 package finished [4.84s]

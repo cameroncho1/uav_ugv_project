@@ -1,127 +1,117 @@
-"""Check the map-frame contracts used by the localization input adapter."""
+"""Preserve measurement validity, acquisition time and supplied uncertainty."""
 
-import importlib.util
-import math
-import unittest
-from pathlib import Path
 from types import SimpleNamespace
-
+import numpy as np
+import pytest
 import rclpy
+from rclpy.time import Time
+from sensor_msgs.msg import Imu, NavSatFix, NavSatStatus
 from nav_msgs.msg import Odometry
-from sensor_msgs.msg import NavSatFix, NavSatStatus
-from std_srvs.srv import SetBool
+from ugv_measurements import UgvMeasurements
 
 
-MODULE_PATH = Path(__file__).resolve().parents[1] / "scripts" / "ugv_measurements.py"
-SPEC = importlib.util.spec_from_file_location("ugv_measurements", MODULE_PATH)
-measurements = importlib.util.module_from_spec(SPEC)
-SPEC.loader.exec_module(measurements)
+@pytest.fixture
+def adapter():
+    rclpy.init()
+    node = UgvMeasurements()
+    clock = SimpleNamespace(nanoseconds=10_000_000_000)
+    node.get_clock = lambda: SimpleNamespace(now=lambda: Time(nanoseconds=clock.nanoseconds))
+    outputs = {key: [] for key in ("gps", "imu", "odom")}
+    for key, value in outputs.items():
+        setattr(node, key + "_pub", SimpleNamespace(publish=value.append))
+    yield node, clock, outputs
+    node.destroy_node()
+    rclpy.try_shutdown()
 
 
-class UgvMeasurementsTest(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        rclpy.init()
-
-    @classmethod
-    def tearDownClass(cls):
-        rclpy.shutdown()
-
-    def setUp(self):
-        self.node = measurements.UgvMeasurements()
-        self.odom_messages = []
-        self.gps_messages = []
-        self.node.odom_pub = SimpleNamespace(publish=self.odom_messages.append)
-        self.node.gps_pub = SimpleNamespace(publish=self.gps_messages.append)
-
-    def tearDown(self):
-        self.node.destroy_node()
-
-    def test_wheel_odom_starts_at_spawn_and_uncertainty_grows_with_motion(self):
-        self.node.spawn_x = -4.0
-        self.node.dead_reckoned_x = -4.0
-        self.node.odom_xy_stddev = 0.0
-        self.node.odom_yaw_stddev = 0.0
-
-        first = Odometry()
-        first.pose.pose.orientation.w = 1.0
-        self.node.on_odom(first)
-        self.assertAlmostEqual(self.odom_messages[-1].pose.pose.position.x, -4.0)
-        self.assertEqual(self.odom_messages[-1].header.frame_id, "map")
-
-        self.node.odom_xy_stddev = 0.05
-        moved = Odometry()
-        moved.pose.pose.position.x = 2.0
-        moved.pose.pose.orientation.w = 1.0
-        self.node.on_odom(moved)
-        result = self.odom_messages[-1]
-        self.assertLess(abs(result.pose.pose.position.x - (-2.0)), 0.5)
-        self.assertAlmostEqual(result.pose.covariance[0], 0.015)
-        self.assertEqual(result.twist.twist.linear.y, 0.0)
-        self.assertAlmostEqual(result.twist.covariance[7], self.node.odom_linear_stddev**2)
-
-    def test_gps_origin_projects_to_map_origin_and_no_fix_is_ignored(self):
-        self.node.gps_xy_stddev = 0.0
-        self.node.gps_z_stddev = 0.0
-        fix = NavSatFix()
-        fix.latitude = 47.397971057728974
-        fix.longitude = 8.546163739800146
-        self.node.on_gps(fix)
-        position = self.gps_messages[-1].pose.pose.position
-        self.assertLess(math.hypot(position.x, position.y), 1e-6)
-        self.assertEqual(self.gps_messages[-1].header.frame_id, "map")
-
-        fix.longitude += 0.0000133  # About one meter east at this latitude.
-        self.node.on_gps(fix)
-        self.assertAlmostEqual(self.gps_messages[-1].pose.pose.position.x, 1.0, delta=0.02)
-
-        fix.status.status = NavSatStatus.STATUS_NO_FIX
-        self.node.on_gps(fix)
-        self.assertEqual(len(self.gps_messages), 2)
-
-    def test_first_odom_sample_keeps_motion_before_adapter_starts(self):
-        self.node.spawn_x = -4.0
-        first = Odometry()
-        first.pose.pose.position.x = 2.0
-        first.pose.pose.orientation.w = 1.0
-        self.node.on_odom(first)
-        result = self.odom_messages[-1]
-        self.assertAlmostEqual(result.pose.pose.position.x, -2.0)
-        self.assertAlmostEqual(result.pose.covariance[0], 0.015)
-
-    def test_gps_gate_stops_and_restores_measurements(self):
-        fix = NavSatFix()
-        fix.latitude = 47.397971057728974
-        fix.longitude = 8.546163739800146
-        self.node.on_gps(fix)
-        self.node.set_gps_enabled(SetBool.Request(data=False), SetBool.Response())
-        self.node.on_gps(fix)
-        self.assertEqual(len(self.gps_messages), 1)
-        self.node.set_gps_enabled(SetBool.Request(data=True), SetBool.Response())
-        self.node.on_gps(fix)
-        self.assertEqual(len(self.gps_messages), 2)
-
-    def test_gps_gate_does_not_change_odom_noise(self):
-        first = Odometry()
-        first.pose.pose.orientation.w = 1.0
-        moved = Odometry()
-        moved.pose.pose.position.x = 2.0
-        moved.pose.pose.orientation.w = 1.0
-        self.node.on_odom(first)
-        self.node.set_gps_enabled(SetBool.Request(data=False), SetBool.Response())
-        self.node.on_odom(moved)
-        disabled_value = self.odom_messages[-1].pose.pose.position.x
-        self.node.destroy_node()
-        self.node = measurements.UgvMeasurements()
-        self.node.odom_pub = SimpleNamespace(publish=self.odom_messages.append)
-        self.node.on_odom(first)
-        fix = NavSatFix()
-        fix.latitude = 47.397971057728974
-        fix.longitude = 8.546163739800146
-        self.node.on_gps(fix)
-        self.node.on_odom(moved)
-        self.assertEqual(self.odom_messages[-1].pose.pose.position.x, disabled_value)
+def fix():
+    m = NavSatFix()
+    m.header.frame_id = "simple_ugv/chassis/gps"
+    m.header.stamp.sec = 10
+    m.latitude = 47.397971057728974
+    m.longitude = 8.546163739800146
+    return m
 
 
-if __name__ == "__main__":
-    unittest.main()
+def test_known_gps_covariance_and_time_survive(adapter):
+    node, _, out = adapter
+    m = fix()
+    m.position_covariance_type = NavSatFix.COVARIANCE_TYPE_KNOWN
+    m.position_covariance = np.diag([100., 64., 9.]).ravel().tolist()
+    node.on_gps(m)
+    c = np.array(out["gps"][0].pose.covariance).reshape(6, 6)
+    np.testing.assert_allclose(c[:3, :3], np.diag([100., 64., 9.]), atol=1e-8)
+    assert out["gps"][0].header.stamp == m.header.stamp
+
+
+def test_unknown_gps_uses_explicit_fallback(adapter):
+    node, _, out = adapter
+    node.on_gps(fix())
+    assert out["gps"][0].pose.covariance[0] == pytest.approx(2.25)
+
+
+@pytest.mark.parametrize("fault", ["no_fix", "stale", "frame", "negative", "zero", "nan", "latitude"])
+def test_bad_gps_is_not_forwarded(adapter, fault):
+    node, _, out = adapter
+    m = fix()
+    if fault == "no_fix": m.status.status = NavSatStatus.STATUS_NO_FIX
+    elif fault == "stale": m.header.stamp.sec = 1
+    elif fault == "frame": m.header.frame_id = "wrong"
+    elif fault == "nan": m.latitude = float("nan")
+    elif fault == "latitude": m.latitude = 91.
+    else:
+        m.position_covariance_type = NavSatFix.COVARIANCE_TYPE_KNOWN
+        m.position_covariance = np.diag([-1. if fault == "negative" else 0., 1., 1.]).ravel().tolist()
+    node.on_gps(m)
+    assert not out["gps"]
+
+
+@pytest.mark.parametrize("fault", ["unavailable", "zero_quaternion", "nan_quaternion"])
+def test_missing_heading_keeps_valid_turn_rate(adapter, fault):
+    node, _, out = adapter
+    m = Imu()
+    m.header.frame_id = "simple_ugv/chassis/imu"
+    m.header.stamp.sec = 10
+    m.angular_velocity.z = .2
+    if fault == "unavailable":
+        m.orientation.w = 1.
+        m.orientation_covariance[0] = -1.
+    elif fault == "nan_quaternion": m.orientation.w = float("nan")
+    elif fault == "zero_quaternion": m.orientation.w = 0.
+    node.on_imu(m)
+    assert out["imu"][0].orientation_covariance[0] == -1.
+    assert out["imu"][0].angular_velocity.z == .2
+    assert out["imu"][0].angular_velocity_covariance[0] > 0
+
+
+def test_imu_known_covariance_and_unavailable_vectors(adapter):
+    node, _, out = adapter
+    m = Imu()
+    m.header.frame_id = "simple_ugv/chassis/imu"
+    m.header.stamp.sec = 10
+    m.orientation.w = 1.
+    m.orientation_covariance = np.diag([.1, .1, .2]).ravel().tolist()
+    m.angular_velocity_covariance[0] = -1.
+    m.linear_acceleration.x = float("nan")
+    node.on_imu(m)
+    assert out["imu"][0].orientation_covariance[8] == .2
+    assert out["imu"][0].angular_velocity_covariance[0] == -1.
+    assert out["imu"][0].linear_acceleration_covariance[0] == -1.
+
+
+def test_wheel_uncertainty_and_clock_epoch(adapter):
+    node, clock, out = adapter
+    m = Odometry()
+    m.header.frame_id = "simple_ugv/odom"
+    m.child_frame_id = "simple_ugv/chassis"
+    m.header.stamp.sec = 10
+    m.twist.twist.linear.x = .3
+    m.twist.covariance[0] = .4
+    node.on_odom(m)
+    node.on_odom(m)
+    assert len(out["odom"]) == 1
+    assert out["odom"][0].twist.covariance[0] == .4
+    clock.nanoseconds = 2_000_000_000
+    m.header.stamp.sec = 2
+    node.on_odom(m)
+    assert len(out["odom"]) == 2

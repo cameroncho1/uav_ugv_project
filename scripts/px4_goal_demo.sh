@@ -14,8 +14,9 @@ source "$PX4/build/px4_sitl_default/rootfs/gz_env.sh"
 export GZ_SIM_RESOURCE_PATH="$ROOT/simulation/models:$GZ_SIM_RESOURCE_PATH"
 
 cd "$PX4"
-export GZ_PARTITION=uav_ugv_sim
+export GZ_PARTITION="${GZ_PARTITION:-uav_ugv_sim}"
 export GZ_IP=127.0.0.1
+export PX4_PARAM_UXRCE_DDS_DOM_ID="${ROS_DOMAIN_ID:-0}"
 
 # The owned camera model reuses the aligned upstream flight model. Create it
 # through the world API, then let PX4 attach without changing its submodule.

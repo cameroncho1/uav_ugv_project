@@ -8,6 +8,7 @@ cd "$PX4"
 
 export GZ_PARTITION="${GZ_PARTITION:-uav_ugv_sim}"
 export GZ_IP=127.0.0.1
+export PX4_PARAM_UXRCE_DDS_DOM_ID="${ROS_DOMAIN_ID:-0}"
 
 # Disable the "No connection to the GCS" preflight check (no QGroundControl here).
 # PX4_PARAM_NAV_DLL_ACT=0 does not work: 0 is PX4's built-in default, so the

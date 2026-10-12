@@ -1,10 +1,13 @@
 <?xml version="1.0"?>
 <package format="3">
   <name>traversability_mapping</name><version>0.0.0</version>
-  <description>Camera-derived local occupancy grid for the UAV-UGV demo.</description>
-  <maintainer email="todo@todo.todo">todo</maintainer><license>TODO</license>
+  <description>Acquisition-stamped camera traversability grids using independent map anchors.</description>
+  <maintainer email="chocamer@usc.edu">Cameron Cho</maintainer>
+  <license>TODO: License declaration</license>
   <buildtool_depend>ament_cmake</buildtool_depend>
-  <depend>rclcpp</depend><depend>nav_msgs</depend><depend>px4_msgs</depend>
-  <depend>libgz-transport13-dev</depend><depend>libgz-msgs10-dev</depend>
+  <exec_depend>rclpy</exec_depend><exec_depend>geometry_msgs</exec_depend>
+  <exec_depend>sensor_msgs</exec_depend><exec_depend>nav_msgs</exec_depend>
+  <exec_depend>localization_common</exec_depend><exec_depend>python3-numpy</exec_depend>
+  <exec_depend>python3-opencv</exec_depend><test_depend>ament_cmake_pytest</test_depend>
   <export><build_type>ament_cmake</build_type></export>
 </package>

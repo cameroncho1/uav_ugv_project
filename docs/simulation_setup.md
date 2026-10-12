@@ -31,7 +31,7 @@ source install/setup.bash
 cd ..
 ```
 
-Rebuild every ROS package that consumes px4_msgs after changing its revision. Sourcing an older workspace can select incompatible generated types. The dependency checker verifies source revisions, consumed message schemas, world plugin settings, model noise units, and the minimum Gazebo version. The world launchers run it before starting Gazebo.
+Rebuild every ROS package that consumes px4_msgs after changing its revision. Sourcing an older workspace can select incompatible generated types. The dependency checker verifies source revisions, consumed message schemas, world plugin settings, model noise units, and the minimum Gazebo version. The world launchers run it before starting Gazebo. They also expose the built `ugv_control` actuator-watchdog library through `GZ_SIM_SYSTEM_PLUGIN_PATH`.
 
 ROS nodes use Gazebo `/clock`. Localization trials set `UXRCE_DDS_SYNCT=0` before PX4 starts, preserving its simulation acquisition timestamps. The DDS domain must match `ROS_DOMAIN_ID`. The [localization interfaces](cooperative_localization/interfaces.md) describe topics and trial commands.
 
@@ -52,3 +52,23 @@ python3 scripts/score_px4_heading.py /path/to/flight.ulg \
 ```
 
 `GPS_CASE` accepts `on`, `off`, or `startup_off`. The live runner uses actual PX4 anchors by default. The live runner defaults to camera observations. `RELATIVE_MODE=simulated` selects the vector fixture; with that fixture, `ANCHOR_MODE=simulated` selects independently noisy synthetic anchors. `run_aligned_anchor_trials.sh` explicitly uses simulated vectors; `run_camera_anchor_trials.sh` uses rendered pixels. Each run drives a paired baseline and assisted UGV filter on identical UGV measurements, then stops its simulation processes. Accuracy and uncertainty results belong in [evaluation results](cooperative_localization/evaluation_results.md).
+
+
+## Dependency metadata and Harmonic overlay
+
+The estimator no longer links Gazebo. `simulation_support` declares transport/message development dependencies; the simulated actuator driver declares Sim/transport/messages/plugin dependencies. The mapper consumes ROS camera data and map anchors instead of linking Gazebo or raw PX4.
+
+[Project rosdep rules](../simulation/rosdep.yaml) map the declared keys to the OSRF Jammy development packages and the Harmonic bridge. The upstream [base definitions](https://raw.githubusercontent.com/ros/rosdistro/master/rosdep/base.yaml) do not supply those version-specific keys. Install the OSRF repository as required by the project setup, then register the overlay before the default sources:
+
+```bash
+# Once, if rosdep has not been initialized.
+sudo rosdep init
+
+# Run from this repository in Linux. as_uri handles paths containing spaces.
+python3 -c 'from pathlib import Path; print("yaml " + Path("simulation/rosdep.yaml").resolve().as_uri())' \
+  | sudo tee /etc/ros/rosdep/sources.list.d/00-uav-ugv-harmonic.list
+rosdep update --rosdistro humble
+rosdep install --from-paths ros2_ws/src --ignore-src --rosdistro humble -y
+```
+
+The full build includes the driver plugin required by both worlds. After changing PX4 message definitions, rebuild every consumer and source the current install; an old generated-message workspace can silently select another version.

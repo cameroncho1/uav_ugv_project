@@ -9,6 +9,8 @@
 #include <rclcpp/rclcpp.hpp>
 #include <ugv_control/path_follower.hpp>
 #include <uav_ugv_msgs/pose_guard.hpp>
+#include <uav_ugv_msgs/grid_geometry.hpp>
+#include <uav_ugv_msgs/route_contract.hpp>
 
 using namespace std::chrono_literals;
 
@@ -29,21 +31,19 @@ public:
       [this](geometry_msgs::msg::PoseWithCovarianceStamped::SharedPtr msg) {
         pose_guard_.update(*msg, now().nanoseconds(), uav_ugv_msgs::steady_time_ns());
       });
-    path_sub_ = create_subscription<nav_msgs::msg::Path>(
-      "/local_path", latched, [this](nav_msgs::msg::Path::SharedPtr msg) {
-        path_ = *msg;
+    path_sub_ = create_subscription<uav_ugv_msgs::msg::PlannedRoute>(
+      "/ugv/navigation/route", latched, [this](uav_ugv_msgs::msg::PlannedRoute::SharedPtr msg) {
+        route_ = *msg;
+        path_ = msg->path;
         path_receipt_ = uav_ugv_msgs::steady_time_ns();
       });
     goal_sub_ = create_subscription<geometry_msgs::msg::PoseStamped>(
       "/global_goal_pose", latched, [this](geometry_msgs::msg::PoseStamped::SharedPtr msg) {
-        const auto changed = msg->pose.position.x != goal_.pose.position.x ||
-        msg->pose.position.y != goal_.pose.position.y ||
-        msg->header.frame_id != goal_.header.frame_id;
+        const auto changed = !uav_ugv_msgs::same_goal(*msg, goal_);
         goal_ = *msg;
-        have_goal_ = msg->header.frame_id == "map" &&
-        std::isfinite(msg->pose.position.x) && std::isfinite(msg->pose.position.y);
+        have_goal_ = uav_ugv_msgs::valid_goal(*msg);
         // Require a route published after this goal change.
-        if (changed) {path_ = nav_msgs::msg::Path();}
+        if (changed) {path_ = nav_msgs::msg::Path(); route_ = uav_ugv_msgs::msg::PlannedRoute();}
       });
     command_pub_ = create_publisher<geometry_msgs::msg::Twist>("/ugv/cmd_vel", 10);
     timer_ = create_wall_timer(100ms, [this]() {control_tick();});
@@ -68,6 +68,11 @@ private:
 
   bool valid_path(int64_t ros_now, int64_t steady_now) const
   {
+    if (!uav_ugv_msgs::route_matches_goal(route_, goal_) ||
+      !uav_ugv_msgs::valid_grid_geometry(route_.clearance_grid)) {return false;}
+    const auto grid_age = (ros_now - uav_ugv_msgs::stamp_ns(route_.clearance_grid.header.stamp)) *
+      1e-9;
+    if (grid_age < -0.05 || grid_age > 2.0) {return false;}
     const auto stamp = uav_ugv_msgs::stamp_ns(path_.header.stamp);
     const auto age = (ros_now - stamp) * 1e-9;
     if (path_.header.frame_id != "map" || path_.poses.empty() || stamp <= 0 ||
@@ -79,6 +84,11 @@ private:
     for (const auto & point : path_.poses) {
       if (point.header.frame_id != "map" || !std::isfinite(point.pose.position.x) ||
         !std::isfinite(point.pose.position.y)) {return false;}
+    }
+    for (std::size_t i = 1; i < path_.poses.size(); ++i) {
+      const auto & a = path_.poses[i - 1].pose.position;
+      const auto & b = path_.poses[i].pose.position;
+      if (!uav_ugv_msgs::clear_segment(route_.clearance_grid, a.x, a.y, b.x, b.y)) {return false;}
     }
     return true;
   }
@@ -103,7 +113,7 @@ private:
         status = "Waiting for a fresh map path";
       } else {
         status = "Following path using the fused pose";
-        command = ugv_control::follow_path(pose, path_, follower_);
+        command = ugv_control::follow_path(pose, path_, follower_, route_.clearance_grid);
       }
     }
     // Publish zero every tick during a hold, including when /clock stops.
@@ -121,9 +131,10 @@ private:
   bool have_goal_{false};
   std::string status_;
   nav_msgs::msg::Path path_;
+  uav_ugv_msgs::msg::PlannedRoute route_;
   geometry_msgs::msg::PoseStamped goal_;
   rclcpp::Subscription<geometry_msgs::msg::PoseWithCovarianceStamped>::SharedPtr pose_sub_;
-  rclcpp::Subscription<nav_msgs::msg::Path>::SharedPtr path_sub_;
+  rclcpp::Subscription<uav_ugv_msgs::msg::PlannedRoute>::SharedPtr path_sub_;
   rclcpp::Subscription<geometry_msgs::msg::PoseStamped>::SharedPtr goal_sub_;
   rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr command_pub_;
   rclcpp::TimerBase::SharedPtr timer_;

@@ -1,0 +1,10 @@
+{
+  "case": "controller_death",
+  "pre_fault_motion_m": 0.24723856368919517,
+  "watchdog_timeout_wall_s": 0.35,
+  "maximum_additional_delivery_period_wall_s": 0.05,
+  "settled_check_after_wall_s": 0.75,
+  "late_truth_samples": 43,
+  "maximum_late_displacement_m": 0.002660247796252578,
+  "passed": true
+}

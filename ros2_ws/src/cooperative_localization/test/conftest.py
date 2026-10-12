@@ -1,6 +1,6 @@
-"""Make the executable adapters' shared module available to source-tree tests."""
+"""Expose this package executable helpers to source-tree tests."""
 
-from pathlib import Path
 import sys
+from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))

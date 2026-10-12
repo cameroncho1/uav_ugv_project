@@ -1,6 +1,5 @@
 ugv_ekf:
   ros__parameters:
-    use_sim_time: true
     frequency: 30.0
     sensor_timeout: 0.3
     two_d_mode: true
@@ -31,6 +30,7 @@ ugv_ekf:
                    false, false, false,
                    false, false, false]
     pose0_queue_size: 10
+    pose0_rejection_threshold: 5.0
 
     # The IMU supplies heading and turn rate, not integrated acceleration.
     imu0: /ugv/measurements/imu

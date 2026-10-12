@@ -20,13 +20,21 @@ export GZ_PARTITION="${GZ_PARTITION:-uav_ugv_sim}" GZ_IP=127.0.0.1
 
 world_pid=""
 launch_pid=""
+score_pid=""
 cleanup() {
-  if [[ -n "$launch_pid" ]]; then kill -INT -- "-$launch_pid" 2>/dev/null || true; wait "$launch_pid" 2>/dev/null || true; fi
-  if [[ -n "$world_pid" ]]; then kill -INT -- "-$world_pid" 2>/dev/null || true; wait "$world_pid" 2>/dev/null || true; fi
+  local groups=()
+  [[ -n "$launch_pid" ]] && groups+=("$launch_pid")
+  [[ -n "$world_pid" ]] && groups+=("$world_pid")
+  [[ -n "$score_pid" ]] && groups+=("$score_pid")
+  stop_process_groups "${groups[@]}"
   launch_pid=""
   world_pid=""
+  score_pid=""
 }
-trap cleanup EXIT INT TERM
+trap cleanup EXIT
+trap 'exit 130' INT
+trap 'exit 143' TERM
+source "$ROOT/scripts/process_cleanup.sh"
 mkdir -p "$OUTPUT"
 
 for seed in $SEEDS; do
@@ -49,7 +57,7 @@ for seed in $SEEDS; do
       launch_args+=(outlier_every:="${OUTLIER_EVERY:-0}"
                     dropout_start:="${DROPOUT_START:--1.0}" dropout_end:="${DROPOUT_END:--1.0}")
     fi
-    setsid ros2 launch cooperative_localization "$EVALUATION_LAUNCH" "${launch_args[@]}" \
+    setsid ros2 launch fault_management "$EVALUATION_LAUNCH" "${launch_args[@]}" \
       >"$OUTPUT/launch_${seed}_${gps}.log" 2>&1 &
     launch_pid=$!
     sleep 4
@@ -57,7 +65,7 @@ for seed in $SEEDS; do
       cat "$OUTPUT/launch_${seed}_${gps}.log" >&2
       exit 1
     fi
-    timeout "${TRIAL_TIMEOUT:-300}" ros2 run cooperative_localization localization_trial.py \
+    setsid timeout "${TRIAL_TIMEOUT:-300}" ros2 run fault_management localization_trial.py \
       --gps "$gps" --seed "$seed" --estimate-topic "$ESTIMATE_TOPIC" \
       --comparison-topic "$COMPARISON_TOPIC" --route "$ROUTE" --duration "$DURATION" \
       --measurement-profile "$MEASUREMENT_PROFILE" \
@@ -66,7 +74,9 @@ for seed in $SEEDS; do
       --systematic-position-stddev "${SYSTEMATIC_POSITION_STDDEV:-${SHARED_POSITION_STDDEV:-0.0}}" \
       --outlier-every "${OUTLIER_EVERY:-0}" \
       --dropout-start "${DROPOUT_START:--1.0}" --dropout-end "${DROPOUT_END:--1.0}" \
-      --output "$OUTPUT/trial_${seed}_${gps}"
+      --output "$OUTPUT/trial_${seed}_${gps}" &
+    score_pid=$!
+    wait "$score_pid"
     cleanup
     sleep 2
   done

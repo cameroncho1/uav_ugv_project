@@ -16,6 +16,15 @@
 - Keep numerical frame and covariance code independent of ROS callbacks and Gazebo transport.
 - Treat injected noise and fault values as simulation assumptions. Limit claims to the recorded test conditions.
 
+## Component ownership
+
+- `cooperative_localization` validates measured inputs, matches independent anchors, fuses measurements, and publishes the authoritative pose. It does not own PX4 subscriptions, image detection, simulator truth, or injected faults.
+- `uav_control` owns the PX4 interface and independent map-anchor producer; `uav_sensing` owns the camera relative-observation producer.
+- `traversability_mapping` owns camera-to-grid projection and acquisition-time matching. It consumes independent map anchors and does not produce localization corrections.
+- `simulation_support` owns Gazebo models, raw sensor bridges, the shared clock bridge, and truth readers. `fault_management` owns synthetic sensor corruption, explicit outage controls, trial driving, and scoring.
+- `route_planning` owns footprint clearance and routes associated with goal revisions. `ugv_control` owns path following and the actuator command watchdog.
+- `localization_common` contains numerical frame, covariance, and geodesy operations without ROS or simulator imports.
+
 ## Documentation and Git
 
 - Describe implemented behavior and measured conditions in present tense. Link results, assumptions, and runnable commands.

@@ -1,299 +1,167 @@
 #!/usr/bin/env python3
-"""Prepare simulated UGV measurements for a map-frame localization filter."""
+"""Validate sensor data and expose measurements in the estimator's frames."""
 
+import copy
 import math
-import random
-from copy import deepcopy
 
+import numpy as np
 import rclpy
-from geometry_msgs.msg import PoseWithCovarianceStamped, Quaternion
+from geometry_msgs.msg import PoseWithCovarianceStamped
+from localization_common.frames import covariance, rotation
+from localization_common.geodesy import geodetic_to_enu, make_enu_origin
 from nav_msgs.msg import Odometry
 from rclpy.executors import ExternalShutdownException
 from rclpy.node import Node
-from rclpy.qos import QoSProfile, ReliabilityPolicy, qos_profile_sensor_data
+from rclpy.qos import qos_profile_sensor_data
 from sensor_msgs.msg import Imu, NavSatFix, NavSatStatus
-from std_srvs.srv import SetBool
-from simulation_faults import common_position_bias
 
 
-WGS84_A = 6378137.0
-WGS84_E2 = 6.69437999014e-3
-
-
-def geodetic_to_ecef(latitude_deg, longitude_deg, altitude):
-    latitude = math.radians(latitude_deg)
-    longitude = math.radians(longitude_deg)
-    sin_latitude = math.sin(latitude)
-    radius = WGS84_A / math.sqrt(1.0 - WGS84_E2 * sin_latitude**2)
-    return (
-        (radius + altitude) * math.cos(latitude) * math.cos(longitude),
-        (radius + altitude) * math.cos(latitude) * math.sin(longitude),
-        (radius * (1.0 - WGS84_E2) + altitude) * sin_latitude,
-    )
-
-
-def geodetic_to_enu(latitude, longitude, altitude, origin):
-    x, y, z = geodetic_to_ecef(latitude, longitude, altitude)
-    east_x, east_y, east_z = origin[3]
-    north_x, north_y, north_z = origin[4]
-    up_x, up_y, up_z = origin[5]
-    dx, dy, dz = x - origin[0], y - origin[1], z - origin[2]
-    return (
-        east_x * dx + east_y * dy + east_z * dz,
-        north_x * dx + north_y * dy + north_z * dz,
-        up_x * dx + up_y * dy + up_z * dz,
-    )
-
-
-def make_enu_origin(latitude_deg, longitude_deg, altitude):
-    latitude = math.radians(latitude_deg)
-    longitude = math.radians(longitude_deg)
-    sin_latitude, cos_latitude = math.sin(latitude), math.cos(latitude)
-    sin_longitude, cos_longitude = math.sin(longitude), math.cos(longitude)
-    return (*geodetic_to_ecef(latitude_deg, longitude_deg, altitude),
-            (-sin_longitude, cos_longitude, 0.0),
-            (-sin_latitude * cos_longitude, -sin_latitude * sin_longitude, cos_latitude),
-            (cos_latitude * cos_longitude, cos_latitude * sin_longitude, sin_latitude))
-
-
-def yaw_from_quaternion(quaternion):
-    return math.atan2(
-        2.0 * (quaternion.w * quaternion.z + quaternion.x * quaternion.y),
-        1.0 - 2.0 * (quaternion.y**2 + quaternion.z**2),
-    )
-
-
-def wrap_angle(angle):
-    return math.atan2(math.sin(angle), math.cos(angle))
-
-
-def yaw_quaternion(yaw):
-    return Quaternion(z=math.sin(yaw / 2.0), w=math.cos(yaw / 2.0))
-
-
-def diagonal_covariance(values):
-    covariance = [0.0] * 36
-    for index, value in enumerate(values):
-        covariance[index * 6 + index] = value
-    return covariance
+def sensor_covariance(values, fallback):
+    """Unknown (all-zero) covariance uses a stated prior; known data is retained."""
+    matrix = covariance(values)
+    return np.diag(np.square(fallback)) if not np.any(matrix) else matrix
 
 
 class UgvMeasurements(Node):
     def __init__(self):
         super().__init__("ugv_measurements")
-        self.declare_parameter("origin_latitude", 47.397971057728974)
-        self.declare_parameter("origin_longitude", 8.546163739800146)
-        self.declare_parameter("origin_altitude", 0.0)
-        self.declare_parameter("spawn_x", 0.0)
-        self.declare_parameter("spawn_y", 0.0)
-        self.declare_parameter("spawn_yaw", 0.0)
-        self.declare_parameter("gps_horizontal_stddev", 1.5)
-        self.declare_parameter("gps_vertical_stddev", 3.0)
-        self.declare_parameter("odom_xy_stddev_per_sqrt_meter", 0.05)
-        self.declare_parameter("odom_yaw_stddev_per_sqrt_meter", 0.02)
-        self.declare_parameter("odom_linear_velocity_stddev", 0.05)
-        self.declare_parameter("odom_angular_velocity_stddev", 0.02)
-        self.declare_parameter("imu_orientation_stddev", 0.02)
-        self.declare_parameter("imu_angular_velocity_stddev", 0.01)
-        self.declare_parameter("imu_linear_acceleration_stddev", 0.1)
-        self.declare_parameter("random_seed", 513)
-        self.declare_parameter("shared_position_stddev", 0.0)
-        self.declare_parameter("initial_gps_enabled", True)
-        self.declare_parameter("wheel_speed_scale", 1.0)
-        self.declare_parameter("imu_yaw_bias_rate", 0.0)
-
-        def parameter(name):
-            return self.get_parameter(name).value
-
-        self.spawn_x = parameter("spawn_x")
-        self.spawn_y = parameter("spawn_y")
-        self.spawn_yaw = parameter("spawn_yaw")
-        self.origin = make_enu_origin(
-            parameter("origin_latitude"), parameter("origin_longitude"),
-            parameter("origin_altitude"))
-        self.gps_xy_stddev = parameter("gps_horizontal_stddev")
-        self.gps_z_stddev = parameter("gps_vertical_stddev")
-        self.odom_xy_stddev = parameter("odom_xy_stddev_per_sqrt_meter")
-        self.odom_yaw_stddev = parameter("odom_yaw_stddev_per_sqrt_meter")
-        self.odom_linear_stddev = parameter("odom_linear_velocity_stddev")
-        self.odom_angular_stddev = parameter("odom_angular_velocity_stddev")
-        self.imu_orientation_stddev = parameter("imu_orientation_stddev")
-        self.imu_angular_stddev = parameter("imu_angular_velocity_stddev")
-        self.imu_accel_stddev = parameter("imu_linear_acceleration_stddev")
-        seed = parameter("random_seed")
-        self.shared_std = parameter("shared_position_stddev")
-        self.shared_bias = common_position_bias(seed, self.shared_std)
-        self.odom_random = random.Random(seed + 1)
-        self.imu_random = random.Random(seed + 2)
-        self.gps_random = random.Random(seed + 3)
-        self.gps_enabled = parameter("initial_gps_enabled")
-        self.wheel_speed_scale = parameter("wheel_speed_scale")
-        self.imu_yaw_bias_rate = parameter("imu_yaw_bias_rate")
-        self.imu_start = None
-        self.last_odom = None
-        self.dead_reckoned_x = self.spawn_x
-        self.dead_reckoned_y = self.spawn_y
-        self.dead_reckoned_yaw = self.spawn_yaw
-        self.position_variance = 0.01
-        self.yaw_variance = 0.0004
-
-        for name in (
-            "gps_xy_stddev", "gps_z_stddev", "odom_xy_stddev", "odom_yaw_stddev",
-            "odom_linear_stddev", "odom_angular_stddev", "imu_orientation_stddev",
-            "imu_angular_stddev", "imu_accel_stddev",
-        ):
-            if getattr(self, name) < 0.0:
-                raise ValueError(f"{name} must be nonnegative")
-
-        output_qos = QoSProfile(depth=10, reliability=ReliabilityPolicy.RELIABLE)
-        self.odom_pub = self.create_publisher(
-            Odometry, "/ugv/measurements/wheel_odom", output_qos)
-        self.imu_pub = self.create_publisher(
-            Imu, "/ugv/measurements/imu", output_qos)
+        latitude = self.declare_parameter("origin_latitude", 47.397971057728974).value
+        longitude = self.declare_parameter("origin_longitude", 8.546163739800146).value
+        altitude = self.declare_parameter("origin_altitude", 0.0).value
+        self.origin = make_enu_origin(latitude, longitude, altitude)
+        self.basis = np.array(self.origin[3:])
+        self.max_age = self.declare_parameter("max_age", .5).value
+        self.gps_fallback = np.array(self.declare_parameter(
+            "unknown_gps_stddev", [1.5, 1.5, 3.0]).value)
+        self.wheel_fallback = np.array(self.declare_parameter(
+            "unknown_wheel_velocity_stddev", [.05, .05, .02]).value)
+        self.imu_orientation_fallback = self.declare_parameter(
+            "unknown_imu_orientation_stddev", .02).value
+        self.imu_rate_fallback = self.declare_parameter("unknown_imu_rate_stddev", .01).value
+        self.imu_acceleration_fallback = self.declare_parameter(
+            "unknown_imu_acceleration_stddev", .1).value
+        values = [self.max_age, self.imu_orientation_fallback,
+                  self.imu_rate_fallback, self.imu_acceleration_fallback]
+        if (any(not math.isfinite(v) or v <= 0 for v in values)
+                or any(v.shape != (3,) or not np.isfinite(v).all() or np.any(v <= 0)
+                       for v in (self.gps_fallback, self.wheel_fallback))):
+            raise ValueError("Measurement limits and unknown-covariance priors must be positive")
+        self.last_clock = None
+        self.last_stamps = {}
+        self.odom_pub = self.create_publisher(Odometry, "/ugv/measurements/wheel_odom", 10)
+        self.imu_pub = self.create_publisher(Imu, "/ugv/measurements/imu", 10)
         self.gps_pub = self.create_publisher(
-            PoseWithCovarianceStamped, "/ugv/measurements/gps_pose", output_qos)
-        self.create_subscription(
-            Odometry, "/ugv/sensors/wheel_odom", self.on_odom, qos_profile_sensor_data)
-        self.create_subscription(
-            Imu, "/ugv/sensors/imu", self.on_imu, qos_profile_sensor_data)
-        self.create_subscription(
-            NavSatFix, "/ugv/sensors/gps", self.on_gps, qos_profile_sensor_data)
-        self.create_service(SetBool, "/ugv/localization/set_gps_enabled", self.set_gps_enabled)
+            PoseWithCovarianceStamped, "/ugv/measurements/gps_pose", 10)
+        for cls, topic, callback in ((Odometry, "wheel_odom", self.on_odom),
+                                     (Imu, "imu", self.on_imu),
+                                     (NavSatFix, "gps", self.on_gps)):
+            self.create_subscription(cls, "/ugv/sensors/" + topic, callback,
+                                     qos_profile_sensor_data)
 
-    def set_gps_enabled(self, request, response):
-        self.gps_enabled = request.data
-        response.success = True
-        response.message = "GPS enabled" if self.gps_enabled else "GPS disabled"
-        return response
-
-    @staticmethod
-    def noise(standard_deviation, generator):
-        return generator.gauss(0.0, standard_deviation) if standard_deviation else 0.0
+    def valid_time(self, message, sensor):
+        now = self.get_clock().now().nanoseconds
+        if self.last_clock is not None and now < self.last_clock:
+            self.last_stamps.clear()
+        self.last_clock = now
+        stamp = message.header.stamp.sec * 10**9 + message.header.stamp.nanosec
+        if (stamp <= self.last_stamps.get(sensor, 0)
+                or not -.05e9 <= now - stamp <= self.max_age * 1e9):
+            return False
+        self.last_stamps[sensor] = stamp
+        return True
 
     def on_odom(self, message):
-        raw_x = message.pose.pose.position.x
-        raw_y = message.pose.pose.position.y
-        raw_yaw = yaw_from_quaternion(message.pose.pose.orientation)
-        cos_spawn, sin_spawn = math.cos(self.spawn_yaw), math.sin(self.spawn_yaw)
-        if self.last_odom is None:
-            self.dead_reckoned_x = self.spawn_x + cos_spawn * raw_x - sin_spawn * raw_y
-            self.dead_reckoned_y = self.spawn_y + sin_spawn * raw_x + cos_spawn * raw_y
-            self.dead_reckoned_yaw = wrap_angle(self.spawn_yaw + raw_yaw)
-            distance = math.hypot(raw_x, raw_y)
-            self.position_variance += self.odom_xy_stddev**2 * distance
-            self.yaw_variance += self.odom_yaw_stddev**2 * distance
-        else:
-            last_x, last_y, last_yaw = self.last_odom
-            dx, dy = raw_x - last_x, raw_y - last_y
-            distance = math.hypot(dx, dy)
-            step_xy_stddev = self.odom_xy_stddev * math.sqrt(distance)
-            step_yaw_stddev = self.odom_yaw_stddev * math.sqrt(distance)
-            self.dead_reckoned_x += (
-                cos_spawn * dx - sin_spawn * dy + self.noise(step_xy_stddev, self.odom_random))
-            self.dead_reckoned_y += (
-                sin_spawn * dx + cos_spawn * dy + self.noise(step_xy_stddev, self.odom_random))
-            self.dead_reckoned_yaw = wrap_angle(
-                self.dead_reckoned_yaw + wrap_angle(raw_yaw - last_yaw)
-                + self.noise(step_yaw_stddev, self.odom_random))
-            self.position_variance += step_xy_stddev**2
-            self.yaw_variance += step_yaw_stddev**2
-        self.last_odom = (raw_x, raw_y, raw_yaw)
-
-        output = Odometry()
-        output.header = deepcopy(message.header)
-        output.header.frame_id = "map"
-        output.child_frame_id = message.child_frame_id
-        output.pose.pose.position.x = self.dead_reckoned_x
-        output.pose.pose.position.y = self.dead_reckoned_y
-        output.pose.pose.position.z = message.pose.pose.position.z
-        output.pose.pose.orientation = yaw_quaternion(self.dead_reckoned_yaw)
-        output.pose.covariance = diagonal_covariance((
-            self.position_variance, self.position_variance, 1e6,
-            1e6, 1e6, self.yaw_variance))
-        output.twist.twist = deepcopy(message.twist.twist)
-        output.twist.twist.linear.x *= self.wheel_speed_scale
-        output.twist.twist.linear.x += self.noise(self.odom_linear_stddev, self.odom_random)
-        # A differential-drive UGV has no lateral wheel velocity. This is a useful
-        # zero-speed measurement when GPS is unavailable.
-        output.twist.twist.linear.y = 0.0
-        output.twist.twist.angular.z += self.noise(self.odom_angular_stddev, self.odom_random)
-        output.twist.covariance = diagonal_covariance((
-            self.odom_linear_stddev**2, self.odom_linear_stddev**2, 1e6, 1e6, 1e6,
-            self.odom_angular_stddev**2))
+        if (message.header.frame_id not in ("map", "simple_ugv/odom", "ugv/odom")
+                or message.child_frame_id != "simple_ugv/chassis"
+                or not self.valid_time(message, "wheel")):
+            return
+        twist = message.twist.twist
+        if not all(math.isfinite(v) for v in (twist.linear.x, twist.linear.y, twist.angular.z)):
+            return
+        try:
+            matrix = covariance(message.twist.covariance, 6).copy()
+        except ValueError:
+            return
+        for i, fallback in zip((0, 1, 5), self.wheel_fallback):
+            if matrix[i, i] == 0:
+                matrix[i, i] = fallback**2
+        output = copy.deepcopy(message)
+        # The EKF consumes body velocities only; an integrated pose is not fused.
+        output.twist.covariance = matrix.ravel().tolist()
         self.odom_pub.publish(output)
 
     def on_imu(self, message):
-        stamp = message.header.stamp.sec + message.header.stamp.nanosec*1e-9
-        if self.imu_start is None:
-            self.imu_start = stamp
-        bias = self.imu_yaw_bias_rate * (stamp-self.imu_start)
-        output = Imu()
-        output.header = deepcopy(message.header)
-        output.orientation = yaw_quaternion(
-            yaw_from_quaternion(message.orientation)
-            + bias
-            + self.noise(self.imu_orientation_stddev, self.imu_random))
-        output.orientation_covariance = [
-            1e6, 0.0, 0.0, 0.0, 1e6, 0.0, 0.0, 0.0,
-            self.imu_orientation_stddev**2,
-        ]
-        output.angular_velocity = deepcopy(message.angular_velocity)
-        output.angular_velocity.x += self.noise(self.imu_angular_stddev, self.imu_random)
-        output.angular_velocity.y += self.noise(self.imu_angular_stddev, self.imu_random)
-        output.angular_velocity.z += self.noise(self.imu_angular_stddev, self.imu_random)
-        output.angular_velocity.z += self.imu_yaw_bias_rate
-        output.angular_velocity_covariance = [
-            self.imu_angular_stddev**2, 0.0, 0.0,
-            0.0, self.imu_angular_stddev**2, 0.0,
-            0.0, 0.0, self.imu_angular_stddev**2,
-        ]
-        output.linear_acceleration = deepcopy(message.linear_acceleration)
-        output.linear_acceleration.x += self.noise(self.imu_accel_stddev, self.imu_random)
-        output.linear_acceleration.y += self.noise(self.imu_accel_stddev, self.imu_random)
-        output.linear_acceleration.z += self.noise(self.imu_accel_stddev, self.imu_random)
-        output.linear_acceleration_covariance = [
-            self.imu_accel_stddev**2, 0.0, 0.0,
-            0.0, self.imu_accel_stddev**2, 0.0,
-            0.0, 0.0, self.imu_accel_stddev**2,
-        ]
+        if (message.header.frame_id != "simple_ugv/chassis/imu"
+                or not self.valid_time(message, "imu")):
+            return
+        output = copy.deepcopy(message)
+        q = message.orientation
+        try:
+            if message.orientation_covariance[0] == -1:
+                raise ValueError("Orientation unavailable")
+            rotation((q.w, q.x, q.y, q.z))
+            norm = math.sqrt(q.w*q.w + q.x*q.x + q.y*q.y + q.z*q.z)
+            output.orientation.w, output.orientation.x, output.orientation.y, output.orientation.z = (
+                float(v / norm) for v in (q.w, q.x, q.y, q.z))
+            c = sensor_covariance(message.orientation_covariance,
+                                  [self.imu_orientation_fallback] * 3)
+            output.orientation_covariance = c.ravel().tolist()
+        except ValueError:
+            output.orientation_covariance = [-1.] + [0.] * 8
+        for field, prior in (("angular_velocity", self.imu_rate_fallback),
+                             ("linear_acceleration", self.imu_acceleration_fallback)):
+            vector = getattr(message, field)
+            values = getattr(message, field + "_covariance")
+            try:
+                if values[0] == -1 or not all(math.isfinite(v) for v in
+                                             (vector.x, vector.y, vector.z)):
+                    raise ValueError("IMU component unavailable")
+                c = sensor_covariance(values, [prior] * 3)
+                setattr(output, field + "_covariance", c.ravel().tolist())
+            except ValueError:
+                setattr(output, field + "_covariance", [-1.] + [0.] * 8)
         self.imu_pub.publish(output)
 
     def on_gps(self, message):
-        if not self.gps_enabled:
+        if (message.header.frame_id != "simple_ugv/chassis/gps"
+                or message.status.status < NavSatStatus.STATUS_FIX
+                or not self.valid_time(message, "gps")):
             return
-        has_fix = message.status.status != NavSatStatus.STATUS_NO_FIX
-        coordinates = (message.latitude, message.longitude, message.altitude)
-        if not has_fix or not all(math.isfinite(value) for value in coordinates):
+        try:
+            position = geodetic_to_enu(message.latitude, message.longitude,
+                                       message.altitude, self.origin)
+            if message.position_covariance_type == NavSatFix.COVARIANCE_TYPE_UNKNOWN:
+                c = np.diag(self.gps_fallback**2)
+            else:
+                c = covariance(message.position_covariance)
+                if np.linalg.eigvalsh(c[:2, :2]).min() <= 0:
+                    raise ValueError("GPS horizontal covariance must be positive")
+                fix_basis = np.array(make_enu_origin(
+                    message.latitude, message.longitude, message.altitude)[3:])
+                transform = self.basis @ fix_basis.T
+                c = transform @ c @ transform.T
+        except ValueError:
             return
-        east, north, up = geodetic_to_enu(
-            message.latitude, message.longitude, message.altitude, self.origin)
         output = PoseWithCovarianceStamped()
-        output.header = deepcopy(message.header)
+        output.header = copy.deepcopy(message.header)
         output.header.frame_id = "map"
-        output.pose.pose.position.x = east + self.noise(self.gps_xy_stddev, self.gps_random)
-        output.pose.pose.position.y = north + self.noise(self.gps_xy_stddev, self.gps_random)
-        output.pose.pose.position.z = up + self.noise(self.gps_z_stddev, self.gps_random)
-        output.pose.pose.position.x += float(self.shared_bias[0])
-        output.pose.pose.position.y += float(self.shared_bias[1])
-        output.pose.pose.orientation.w = 1.0
-        output.pose.covariance = diagonal_covariance((
-            self.gps_xy_stddev**2 + self.shared_std**2,
-            self.gps_xy_stddev**2 + self.shared_std**2,
-            self.gps_z_stddev**2, 1e6, 1e6, 1e6))
+        p = output.pose.pose.position
+        p.x, p.y, p.z = (float(v) for v in position)
+        output.pose.pose.orientation.w = 1.
+        full = np.zeros((6, 6))
+        full[:3, :3] = c
+        full[3:, 3:] = np.eye(3) * 1e6
+        output.pose.covariance = full.ravel().tolist()
         self.gps_pub.publish(output)
 
 
-def main(args=None):
-    rclpy.init(args=args)
+def main():
+    rclpy.init()
     node = UgvMeasurements()
     try:
         rclpy.spin(node)
     except (KeyboardInterrupt, ExternalShutdownException):
         pass
-    except RuntimeError:
-        # ROS can close the context while the executor creates its wait set.
-        if rclpy.ok():
-            raise
     finally:
         node.destroy_node()
         rclpy.try_shutdown()

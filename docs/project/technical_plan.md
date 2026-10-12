@@ -23,7 +23,7 @@ Consumes the traversability map, computes an optimized global route subject to f
 
 ### 4. Cooperative UGV Localization
 
-Owns resilient UGV pose estimation when UGV GNSS is degraded or unavailable. Fuses GNSS, wheel odometry, IMU, and UAV-assisted position corrections from calibrated camera observations and independent PX4 anchors into one pose-with-uncertainty output for planning. Synthetic observations support controlled fault trials. See the [Cooperative Localization Subsystem Specification](../cooperative_localization/subsystem.md).
+Owns resilient UGV pose estimation when UGV GNSS is degraded or unavailable. Fuses measured GNSS, wheel odometry, IMU, and UAV-relative observations through a sensing-independent interface into one pose-with-uncertainty output for planning. Perception, PX4 state exposure, simulation and injected faults remain with their stated owners. See the [Cooperative Localization Subsystem Specification](../cooperative_localization/subsystem.md).
 
 ### 5. Fault Detection and Evaluation Framework
 

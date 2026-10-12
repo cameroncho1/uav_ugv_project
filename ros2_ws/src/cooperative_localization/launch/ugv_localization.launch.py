@@ -1,92 +1,46 @@
-"""Run the UGV sensor adapter and its map-frame EKF."""
+"""Estimator only: validated measurements, optional corrections and fused pose."""
 
 from pathlib import Path
-
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
+from launch.actions import DeclareLaunchArgument
 from launch.conditions import IfCondition, UnlessCondition
-from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 from launch_ros.parameter_descriptions import ParameterValue
 
 
 def generate_launch_description():
-    package_share = Path(get_package_share_directory("cooperative_localization"))
-    world = LaunchConfiguration("world")
-    seed = LaunchConfiguration("seed")
-    initial_gps_enabled = LaunchConfiguration("initial_gps_enabled")
-
+    share = Path(get_package_share_directory("cooperative_localization"))
+    clock = {"use_sim_time": ParameterValue(LaunchConfiguration("use_sim_time"), value_type=bool)}
     return LaunchDescription([
-        DeclareLaunchArgument(
-            "world", default_value="uav_ugv", choices=["uav_ugv", "simple_goal_demo"],
-            description="Gazebo world whose UGV spawn and GPS origin are used.",
-        ),
-        DeclareLaunchArgument("seed", default_value="513"),
-        DeclareLaunchArgument("shared_position_stddev", default_value="0.0"),
-        DeclareLaunchArgument("systematic_position_stddev",
-                              default_value=LaunchConfiguration("shared_position_stddev")),
-        DeclareLaunchArgument("initial_gps_enabled", default_value="true"),
-        DeclareLaunchArgument("measurement_profile", default_value="nominal"),
+        DeclareLaunchArgument("use_sim_time", default_value="false"),
+        DeclareLaunchArgument("origin_latitude", default_value="47.397971057728974"),
+        DeclareLaunchArgument("origin_longitude", default_value="8.546163739800146"),
+        DeclareLaunchArgument("origin_altitude", default_value="0.0"),
         DeclareLaunchArgument("uav_assistance", default_value="false"),
-        DeclareLaunchArgument("uav_odometry_topic", default_value="/fmu/out/vehicle_odometry"),
-        DeclareLaunchArgument("uav_require_airborne", default_value="false"),
-        DeclareLaunchArgument("uav_initial_settle_time", default_value="0.0"),
-        IncludeLaunchDescription(
-            PythonLaunchDescriptionSource(str(package_share / "launch/uav_correction.launch.py")),
-            launch_arguments={
-                "world": world,
-                "uav_odometry_topic": LaunchConfiguration("uav_odometry_topic"),
-                "uav_require_airborne": LaunchConfiguration("uav_require_airborne"),
-                "uav_initial_settle_time": LaunchConfiguration("uav_initial_settle_time"),
-            }.items(),
-            condition=IfCondition(LaunchConfiguration("uav_assistance")),
-        ),
-        IncludeLaunchDescription(
-            PythonLaunchDescriptionSource(str(package_share / "launch/ugv_sensors.launch.py")),
-            launch_arguments={"world": world, "seed": seed,
-                              "shared_position_stddev": LaunchConfiguration(
-                                  "shared_position_stddev"),
-                              "measurement_profile": LaunchConfiguration("measurement_profile"),
-                              "initial_gps_enabled": initial_gps_enabled}.items(),
-        ),
-        Node(
-            package="tf2_ros",
-            executable="static_transform_publisher",
-            name="ugv_imu_mount",
-            arguments=[
-                "--x", "0", "--y", "0", "--z", "0",
-                "--roll", "0", "--pitch", "0", "--yaw", "0",
-                "--frame-id", "simple_ugv/chassis",
-                "--child-frame-id", "simple_ugv/chassis/imu",
-            ],
-            output="screen",
-        ),
-        Node(
-            package="robot_localization",
-            executable="ekf_node",
-            name="ugv_ekf",
-            parameters=[str(package_share / "config/ugv_ekf.yaml")],
-            condition=UnlessCondition(LaunchConfiguration("uav_assistance")),
-            remappings=[("odometry/filtered", "/ugv/localization/odometry")],
-            output="screen",
-        ),
-        Node(
-            package="robot_localization", executable="ekf_node", name="ugv_ekf",
-            parameters=[str(package_share / "config/ugv_ekf.yaml"),
-                        str(package_share / "config/ugv_uav_ekf.yaml")],
-            condition=IfCondition(LaunchConfiguration("uav_assistance")),
-            remappings=[("odometry/filtered", "/ugv/localization/odometry")], output="screen",
-        ),
-        Node(
-            package="cooperative_localization",
-            executable="ugv_fused_pose.py",
-            name="ugv_fused_pose",
-            parameters=[{"use_sim_time": True,
-                         "systematic_position_stddev": ParameterValue(
-                             LaunchConfiguration("systematic_position_stddev"),
-                             value_type=float)}],
-            output="screen",
-        ),
+        DeclareLaunchArgument("systematic_position_stddev", default_value="0.0"),
+        Node(package="cooperative_localization", executable="ugv_measurements.py",
+             parameters=[str(share / "config/measurements.yaml"), clock,
+                         {key: ParameterValue(LaunchConfiguration(key), value_type=float)
+                          for key in ("origin_latitude", "origin_longitude", "origin_altitude")}],
+             output="screen"),
+        Node(package="tf2_ros", executable="static_transform_publisher", name="ugv_imu_mount",
+             arguments=["--frame-id", "simple_ugv/chassis", "--child-frame-id",
+                        "simple_ugv/chassis/imu"], parameters=[clock]),
+        Node(package="cooperative_localization", executable="uav_correction.py",
+             parameters=[str(share / "config/uav_correction.yaml"), clock],
+             condition=IfCondition(LaunchConfiguration("uav_assistance")), output="screen"),
+        Node(package="robot_localization", executable="ekf_node", name="ugv_ekf",
+             parameters=[str(share / "config/ugv_ekf.yaml"), clock],
+             condition=UnlessCondition(LaunchConfiguration("uav_assistance")),
+             remappings=[("odometry/filtered", "/ugv/localization/odometry")]),
+        Node(package="robot_localization", executable="ekf_node", name="ugv_ekf",
+             parameters=[str(share / "config/ugv_ekf.yaml"),
+                         str(share / "config/ugv_uav_ekf.yaml"), clock],
+             condition=IfCondition(LaunchConfiguration("uav_assistance")),
+             remappings=[("odometry/filtered", "/ugv/localization/odometry")]),
+        Node(package="cooperative_localization", executable="ugv_fused_pose.py",
+             parameters=[clock, {"systematic_position_stddev": ParameterValue(
+                 LaunchConfiguration("systematic_position_stddev"), value_type=float)}]),
     ])

@@ -1,40 +1,136 @@
-# Cooperative UGV Localization
+# Cooperative Localization Subsystem Specification
 
-## Purpose and Current State
+## Purpose
 
-This subsystem supplies a fused UGV position from wheel motion, IMU heading, and GPS. Its input layer bridges the simulated sensors into ROS 2. A measurement adapter projects GPS into the map frame, anchors wheel odometry to the UGV spawn pose, and publishes noisy readings with configured covariance. A planar EKF combines them and publishes `/ugv/localization/pose`. Both Gazebo worlds contain the sensors. [Interfaces](interfaces.md) lists the live topics, frames, error settings, and commands to check them.
+The cooperative localization subsystem estimates the UGV's current pose. Its purpose is to maintain a useful pose estimate when UGV GNSS measurements are degraded or unavailable.
 
-The fused pose combines wheel speed, IMU heading, GPS when available, and optional UAV-derived UGV map position. A calibrated camera detector, PX4 frame adapter, and timestamp-matched correction producer supply the live UAV input. A synthetic vector fixture supports controlled measurement tests. GPS and UAV gates support controlled outages. The goal demo plans and drives from `/ugv/localization/pose`. Both consumers check frame, acquisition age, receipt age, and position/heading uncertainty before allowing navigation.
+The subsystem supports resilient UGV navigation in degraded-GNSS defense and search-and-rescue scenarios. Its scope does not include complete GNSS denial affecting both the UAV and UGV. The initial operating assumption is that the UAV retains reliable localization while UGV GNSS is degraded.
 
-## Sensor Boundary
+## Subsystem Boundary
 
-`cooperative_localization` owns the ROS-facing raw sensor topic names and their Gazebo bridge configuration:
+`cooperative_localization` owns:
 
-- `/ugv/sensors/wheel_odom`: `nav_msgs/msg/Odometry`, 20 Hz in Gazebo.
-- `/ugv/sensors/imu`: `sensor_msgs/msg/Imu`, 50 Hz in Gazebo.
-- `/ugv/sensors/gps`: `sensor_msgs/msg/NavSatFix`, 5 Hz in Gazebo.
-- `/clock`: Gazebo simulation time for consumers that enable `use_sim_time`.
+- Combining localization-related measurements.
+- Maintaining the UGV pose estimate.
+- Handling degraded or unavailable UGV GNSS.
+- Incorporating UAV-assisted corrections.
+- Publishing the authoritative pose and its covariance.
 
-These are raw simulation measurements. Wheel odometry is relative to the UGV spawn pose; GPS is geodetic; IMU is in its chassis sensor frame. Their raw covariance fields do not provide a useful uncertainty model. `ugv_measurements.py` publishes prepared wheel odometry and GPS position in ENU `map`, and an IMU reading in its original sensor frame. It adds configurable independent Gaussian noise and corresponding covariance; the raw inputs remain unchanged. The values are test assumptions, not hardware calibration.
+It does not own:
 
-## Fused Pose and Boundaries
+- Terrain classification or traversability assessment.
+- Obstacle detection.
+- Path generation.
+- UAV path planning or flight control.
+- Mission coordination.
+- Full simultaneous localization and mapping (SLAM).
 
-The implemented baseline publishes one UGV estimate on `/ugv/localization/pose`, type `geometry_msgs/msg/PoseWithCovarianceStamped`, in the ENU `map` frame. `robot_localization` runs the 2D EKF. It predicts from wheel forward speed, constrains lateral speed to zero for the differential-drive UGV, tracks heading with IMU yaw and turn rate, and corrects map x/y with GPS. The output adapter copies the EKF pose and covariance into the agreed message type and adds the configured unreduced systematic x/y uncertainty prior. An identity TF relates the chassis and the IMU mounted at its origin.
+## Expected Inputs
 
-The UAV-assisted correction uses a measured UAV-to-UGV vector in UAV FLU body axes and an independently localized UAV pose in ENU `map`. `uav_pose.py` converts PX4 NED/FRD odometry, preserving sample time and transforming uncertainty. `uav_correction.py` interpolates anchors at observation time, rotates the vector into map, and propagates relative, UAV position, and UAV attitude covariance. The EKF uses the resulting x/y observation. [Measurement design](uav_measurement_design.md) defines equations, rejection rules, research sources, and assumptions.
+The estimator is implemented to accept these measured inputs:
 
-The path planner and UGV controller consume the fused topic; [navigation](../navigation.md) defines their limits and verification. Terrain mapping, obstacle detection, route planning, and flight control stay in their existing packages.
+- UGV GNSS measurements.
+- UGV wheel odometry.
+- UGV IMU measurements.
+- A UAV-assisted relative-position measurement.
 
-## GPS Degradation and Evaluation
+[Interfaces](interfaces.md) defines the measured topic names. Each measurement used by the estimator requires a timestamp, an identified coordinate frame, and an uncertainty model.
 
-The measurement adapter exposes `/ugv/localization/set_gps_enabled` (`std_srvs/srv/SetBool`). Setting `data: false` stops prepared GPS pose messages while wheel and IMU measurements continue. Setting `data: true` restores GPS. The raw Gazebo GPS topic continues publishing, which lets the same simulator run both cases. Sensor types have separate seeded random streams so GPS gating does not change wheel or IMU noise.
+## UAV-Assisted Measurement
 
-`ugv_evaluation.launch.py` adds a test-only command bridge and true-pose reader. `scripts/run_localization_trials.sh` starts a fresh `uav_ugv` world for each seed and GPS case, drives a forward/turn route, and tests GPS always on, GPS switched off at 10 seconds, and GPS off from startup. The scorer matches estimates to true positions by simulation timestamp and records each position and heading error. It reports mean, RMSE, 95th percentile, and maximum position error for the 10.5–31 second window. Truth is read only by the scorer; the EKF never receives it. The estimate topic is configurable so later localization strategies can use the same route and scoring method.
+For the initial system, UAV assistance is a noisy relative-position observation of the UGV with respect to the UAV. The UAV is assumed to retain reliable localization while UGV GNSS is degraded.
 
-`ugv_cooperative_evaluation.launch.py` runs independent baseline and assisted EKFs on the same sensor messages and route. The scorer records both estimates, planar covariance, position and heading error, normalized error, and 95% ellipse coverage. A 91-second route repeats turns and stops. The `drift` profile injects 15% wheel-speed scale error and 0.002 rad/s heading bias growth. The relative sensor supports periodic 8 m outliers and timed dropouts. Fault timing uses the runner's published simulation start time.
+The simulation and estimator interface remain independent of the physical sensing technology. UWB, AprilTags, and camera tracking are possible real-world implementations, not architectural commitments.
 
-The fixed-observer evaluation models a UAV at map `(2, -2, 4)` with noisy independent localization; those trials omit flight dynamics. Named-model sensing generates relative observations and independent noisy anchors from a flying Gazebo UAV. Actual PX4 anchors use the aligned dependency configuration in [simulation setup](../simulation_setup.md). Gaussian noise values are test assumptions. Rendered perception, occlusion, shared position bias, and navigation have separate tests in [perception](perception.md) and [navigation](../navigation.md). Physical traction faults remain outside the measured conditions. Claims apply only to the simulated conditions tested.
+## Estimation Approach
 
-[Measured results](evaluation_results.md) list baseline-only trials and paired baseline/assisted trials with their sensor assumptions and uncertainty scores.
+A planar `robot_localization` EKF fuses body wheel velocity, IMU heading/turn rate, map GNSS x/y, and optional UAV-derived x/y observations. Integrated wheel pose and placeholder GNSS/UAV orientation are not fused. Numerical operations live in `localization_common`, independently of ROS callbacks and simulator transport.
 
-The initial scope assumes the UAV retains reliable localization while UGV GPS is degraded. It does not cover loss of both vehicles' global reference or full SLAM.
+The estimator must tolerate missing, degraded, stale, or rejected measurements without substituting Gazebo ground truth for operational sensor data. Measurement validity, timing, and uncertainty must be represented consistently enough for the estimator to distinguish nominal data from degraded data.
+
+## GNSS Degradation Behavior
+
+When UGV GNSS becomes degraded or unavailable:
+
+- The authoritative pose output remains continuous.
+- Odometry and IMU measurements continue contributing to the estimate.
+- Pose uncertainty may increase as uncorrected drift accumulates.
+- UAV-assisted relative-position observations may reduce drift and uncertainty.
+
+A UAV correction improves the estimate according to its modeled uncertainty; it does not make localization exact or eliminate all accumulated error.
+
+## Authoritative Output
+
+The subsystem publishes one authoritative UGV localization estimate using the preferred interface:
+
+- Topic: `/ugv/localization/pose`
+- Message type: `geometry_msgs/msg/PoseWithCovarianceStamped`
+- Frame: `map`
+- Coordinate convention: ENU
+
+This interface is the project default unless a future integration issue requires a documented change. It is the implemented design contract.
+
+The message contains:
+
+- Position.
+- Orientation.
+- Timestamp.
+- Covariance, representing the estimator's uncertainty in the pose.
+
+The path planner and other downstream navigation components consume this single authoritative pose. They do not subscribe directly to GNSS, wheel odometry, IMU, or UAV-assisted correction topics as independent pose sources.
+
+## Ground-Truth Separation
+
+Three data categories must remain distinct:
+
+- **Gazebo ground truth:** The simulator's actual UGV state.
+- **Simulated sensor measurements:** Noisy, delayed, degraded, or unavailable observations derived from the simulation.
+- **Operational localization estimate:** The estimator output published on `/ugv/localization/pose`.
+
+Ground truth may be used to:
+
+- Generate simulated measurements.
+- Debug the simulation and estimator.
+- Evaluate estimator error.
+
+Ground truth must not be forwarded directly as the operational localization estimate consumed by the path planner. When ground truth contributes to a simulated input, it must pass through an explicit sensor or measurement model.
+
+## Evaluation
+
+Evaluation should compare at least these operating cases:
+
+- Nominal UGV GNSS.
+- UGV GNSS loss without UAV assistance.
+- UGV GNSS loss with UAV assistance.
+
+Relevant metrics include:
+
+- Position root-mean-square error.
+- Mean position error.
+- Maximum position error.
+- Heading error.
+- Reported localization uncertainty and its consistency with observed error.
+- Downstream UGV path-following error.
+
+Results should identify the tested GNSS degradation, measurement noise, outage duration, estimator configuration, and ground-truth reference. Claims should remain limited to the simulated conditions evaluated.
+
+## Implementation and Ownership Decisions
+
+| Responsibility | Owner and implemented boundary |
+| --- | --- |
+| Validity, timing, covariance, geodetic adaptation, fusion | `cooperative_localization` consumes measured inputs and the independent anchor/relative-observation contracts. Known GNSS covariance is retained; unavailable IMU components remain unavailable. GNSS and UAV innovations have five-sigma gates after anchoring. |
+| PX4 state and local-reference policy | `uav_control` publishes `/uav/localization/pose`, converting NED/FRD to ENU/FLU with configured map origin and covariance. |
+| Relative sensing | `uav_sensing` supplies the calibrated camera producer. It is a selectable producer, not an estimator dependency or commitment to one sensing technology. |
+| Gazebo integration and shared clock | `simulation_support` owns raw `/simulation/ugv/*` bridges, `/clock`, worlds/models, and truth readers. This resolves the previous bridge/clock ownership decisions. |
+| Synthetic noise, faults, and evaluation | `fault_management` converts raw simulated observations to `/ugv/sensors/*` with explicit error models. Its `/evaluation/set_gps_enabled` service applies test outages. Focused estimator tests remain in localization. |
+| Planning and actuation | `route_planning` publishes goal-associated clearance routes; `ugv_control` consumes them and owns the actuator watchdog. |
+
+The normal estimator launch starts no Gazebo bridge, PX4 subscriber, detector, synthetic sensor, or test driver. Demo/evaluation launches explicitly assemble those owners. Acquisition times remain attached to measurements. Rewinding `/clock` clears time-dependent queues before a new epoch is accepted.
+
+The public fused covariance includes a separately configured systematic x/y uncertainty prior. Its default is zero in the operational launch. Evaluation launches may match it to a known injected offset; it does not detect or remove unknown global bias.
+
+[Evaluation commands](interfaces.md#evaluation-and-reproducibility) include paired filters, rendered visibility, closed-loop path tracking, and physical command-loss checks. Historic results retain their conditions and revision; new validation is recorded separately.
+
+## Scope Limits
+
+The initial subsystem assumes a reliably localized UAV can provide useful relative-position information to a UGV experiencing degraded GNSS. It does not establish localization when both vehicles lack a reliable global reference, and it does not provide mapping, perception, planning, control, mission management, or full SLAM.

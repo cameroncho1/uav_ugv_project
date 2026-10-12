@@ -151,11 +151,13 @@
           </material>
         </visual>
         <sensor name="imu" type="imu">
+          <gz_frame_id>simple_ugv/chassis/imu</gz_frame_id>
           <always_on>true</always_on>
           <update_rate>50</update_rate>
           <topic>/simple_ugv/imu</topic>
         </sensor>
         <sensor name="gps" type="navsat">
+          <gz_frame_id>simple_ugv/chassis/gps</gz_frame_id>
           <always_on>true</always_on>
           <update_rate>5</update_rate>
           <topic>/simple_ugv/gps</topic>
@@ -314,6 +316,11 @@
 
 
       <!-- Differential drive controller -->
+      <plugin filename="libugv_command_watchdog.so" name="ugv_control::CommandWatchdog">
+        <input_topic>/simple_ugv/drive_cmd_vel</input_topic>
+        <output_topic>/simple_ugv/cmd_vel</output_topic>
+        <timeout>0.35</timeout>
+      </plugin>
       <plugin
         filename="gz-sim-diff-drive-system"
         name="gz::sim::systems::DiffDrive">

@@ -65,7 +65,8 @@
         <visual name="inner_ring">
           <pose>0 0 0.025 0 0 0</pose>
           <geometry><cylinder><radius>0.52</radius><length>0.012</length></cylinder></geometry>
-          <material><ambient>0.12 0.16 0.12 1</ambient><diffuse>0.12 0.16 0.12 1</diffuse></material>
+          <!-- Visual-only goal annotation stays above the dark-obstacle threshold. -->
+          <material><ambient>0.30 0.34 0.30 1</ambient><diffuse>0.30 0.34 0.30 1</diffuse></material>
         </visual>
         <visual name="goal_center">
           <pose>0 0 0.034 0 0 0</pose>
@@ -112,11 +113,13 @@
           </material>
         </visual>
         <sensor name="imu" type="imu">
+          <gz_frame_id>simple_ugv/chassis/imu</gz_frame_id>
           <always_on>true</always_on>
           <update_rate>50</update_rate>
           <topic>/simple_ugv/imu</topic>
         </sensor>
         <sensor name="gps" type="navsat">
+          <gz_frame_id>simple_ugv/chassis/gps</gz_frame_id>
           <always_on>true</always_on>
           <update_rate>5</update_rate>
           <topic>/simple_ugv/gps</topic>
@@ -162,6 +165,11 @@
         <parent>chassis</parent><child>right_wheel</child>
         <axis><xyz expressed_in="__model__">0 1 0</xyz><limit><lower>-1e16</lower><upper>1e16</upper></limit></axis>
       </joint>
+      <plugin filename="libugv_command_watchdog.so" name="ugv_control::CommandWatchdog">
+        <input_topic>/simple_ugv/drive_cmd_vel</input_topic>
+        <output_topic>/simple_ugv/cmd_vel</output_topic>
+        <timeout>0.35</timeout>
+      </plugin>
       <plugin filename="gz-sim-diff-drive-system" name="gz::sim::systems::DiffDrive">
         <left_joint>left_wheel_joint</left_joint>
         <right_joint>right_wheel_joint</right_joint>

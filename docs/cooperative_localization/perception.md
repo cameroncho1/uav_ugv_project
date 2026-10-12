@@ -2,6 +2,8 @@
 
 ## Implemented sensor path
 
+The separately owned `uav_sensing` producer implements the current AprilTag choice; localization retains a sensing-independent relative-position contract. `uav_control` supplies the independent PX4 anchor, and `fault_management` owns simulated corruption and evaluation.
+
 The goal demo and live camera trials use Gazebo camera pixels and `CameraInfo`. The detector subscribes only to `/uav/camera/image` and `/uav/camera/camera_info`. It does not subscribe to simulator poses, UGV estimates, GPS, or UAV odometry. The independent PX4 anchor enters the existing timestamp-matched correction adapter separately.
 
 ```mermaid
@@ -21,7 +23,7 @@ The [owned camera model](../../simulation/models/cooperative_camera_uav/model.sd
 
 The camera demo uses a 4.5 m altitude setpoint above PX4's local origin. A roof marker sits above the ground and closer to the camera than the ground plane; its field-of-view margin is therefore smaller than the mapper's ground footprint. The controller holds yaw at zero in PX4 NED, corresponding to north-facing FLU in map. This aligns the wider image dimension with the east-west route. The extra altitude gives the full tag room at both ends of the eight-meter route under that heading. At this height the nominal tag edge is about 50 pixels, above the 12-pixel detection limit. The vector fixture retains its 4 m setpoint; live summaries record the configured value.
 
-[Calibration YAML](../../ros2_ws/src/cooperative_localization/config/camera_calibration.yaml) defines body-from-optical rotation/translation and marker-to-chassis offset. Camera optical axes are right/down/forward; body axes are forward/left/up. The owned sensor labels images and calibration `uav/camera_optical_frame`. The detector publishes its static transform from the same calibration and converts the resulting point to `uav/base_link`.
+[Calibration YAML](../../ros2_ws/src/uav_sensing/config/camera_calibration.yaml) defines body-from-optical rotation/translation and marker-to-chassis offset. Camera optical axes are right/down/forward; body axes are forward/left/up. The owned sensor labels images and calibration `uav/camera_optical_frame`. The detector publishes its static transform from the same calibration and converts the resulting point to `uav/base_link`.
 
 The detector tries adaptive threshold constants 7 and 15, refines tag corners, checks target ID, and solves the metric square pose. It evaluates IPPE square candidates and an iterative homography-initialized candidate. The iterative candidate covers IPPE's numerical singularity at an exactly front-parallel square. Positive depth, finite geometry, minimum 12-pixel edge length, nondegenerate projection, and at most 1.5-pixel RMS coordinate reprojection error are required. Duplicate copies of the target ID are ambiguous and produce no observation.
 

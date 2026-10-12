@@ -7,13 +7,11 @@ import numpy as np
 import pytest
 import rclpy
 from geometry_msgs.msg import PoseWithCovarianceStamped
-from px4_msgs.msg import VehicleLandDetected, VehicleOdometry
 from std_srvs.srv import SetBool
 
-from cooperative_math import (FRD_TO_FLU, NED_TO_ENU, covariance, interpolate,
+from localization_common.frames import (FRD_TO_FLU, NED_TO_ENU, covariance, interpolate,
                               px4_pose, quaternion, rotation, ugv_position)
 from uav_correction import UavCorrection
-from uav_pose import UavPose
 
 
 def test_px4_conversion_includes_world_and_body_axes_and_origin():
@@ -146,55 +144,19 @@ def test_disabled_correction_and_wrong_frame_do_not_publish(correction):
     assert node.counters["invalid_relative"] == 1
 
 
-def test_px4_adapter_rejects_clock_mismatch_unknown_frame_and_reset():
-    rclpy.init()
-    node = UavPose()
-    output = []
-    node.publisher = SimpleNamespace(publish=output.append)
-    message = VehicleOdometry()
-    message.timestamp_sample = node.get_clock().now().nanoseconds // 1000
-    message.q = np.array([1., 0., 0., 0.], dtype=np.float32)
-    node.on_odometry(message)
-    assert not output
-    message.pose_frame = VehicleOdometry.POSE_FRAME_NED
-    node.on_odometry(message)
-    assert len(output) == 1
-    message.timestamp_sample += 1000
-    message.reset_counter = 1
-    node.on_odometry(message)
-    assert len(output) == 1
-    message.timestamp_sample = 10
-    node.on_odometry(message)
-    assert len(output) == 1
-    node.destroy_node()
-    rclpy.shutdown()
 
 
-def test_live_anchor_waits_for_takeoff_and_stable_reference():
-    rclpy.init()
-    node = UavPose()
-    node.require_airborne = True
-    node.settle_time = .1
-    output = []
-    node.publisher = SimpleNamespace(publish=output.append)
-    stamp = node.get_clock().now().nanoseconds // 1000 - 300000
-    message = VehicleOdometry(timestamp_sample=stamp, pose_frame=VehicleOdometry.POSE_FRAME_NED)
-    message.q = np.array([1., 0., 0., 0.], dtype=np.float32)
-    node.on_odometry(message)
-    assert not output
-    node.on_landing(VehicleLandDetected(timestamp=stamp, landed=False))
-    node.on_odometry(message)
-    assert not output
-    message.timestamp_sample += 50000
-    message.reset_counter = 1
-    node.on_odometry(message)
-    assert not output
-    message.timestamp_sample += 150000
-    node.on_odometry(message)
+def test_multiple_pending_readings_rewind_without_crash_and_recover(correction):
+    from rclpy.time import Time
+    node, output = correction
+    now = SimpleNamespace(nanoseconds=10_000_000_000)
+    node.get_clock = lambda: SimpleNamespace(now=lambda: Time(nanoseconds=now.nanoseconds))
+    for stamp in (9_800_000_000, 9_900_000_000):
+        node.on_relative(reading(node, stamp, [1., 0., -4.], "uav/base_link"))
+    assert len(node.pending) == 2
+    now.nanoseconds = 2_000_000_000
+    node.process()
+    assert not node.pending and not output
+    node.on_anchor(reading(node, now.nanoseconds, [0., 0., 4.], "map"))
+    node.on_relative(reading(node, now.nanoseconds, [1., 0., -4.], "uav/base_link"))
     assert len(output) == 1
-    message.timestamp_sample += 1000
-    message.reset_counter = 2
-    node.on_odometry(message)
-    assert len(output) == 1
-    node.destroy_node()
-    rclpy.shutdown()

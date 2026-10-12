@@ -7,7 +7,7 @@ import json
 from pathlib import Path
 
 import numpy as np
-from pyulog import ULog
+from evaluation_math import matched_heading
 
 
 def heading(data):
@@ -30,6 +30,7 @@ def main():
     trial = json.loads(args.trial.read_text())
     start = trial["start_simulation_time_s"] + 10.5
     end = trial["start_simulation_time_s"] + trial["duration_s"]
+    from pyulog import ULog
     data = {dataset.name: dataset.data for dataset in ULog(str(args.ulog)).data_list}
     truth = data["vehicle_attitude_groundtruth"]
     estimate = data["vehicle_attitude"]
@@ -40,8 +41,11 @@ def main():
     if len(times) < 100:
         raise ValueError("Insufficient logged heading samples in the trial scoring window")
     true_heading = heading(truth)[selected]
-    estimated_heading = np.interp(times, estimate_times, heading(estimate))
-    errors = (estimated_heading-true_heading+np.pi) % (2*np.pi)-np.pi
+    valid, estimated_heading, errors, skipped = matched_heading(
+        times, true_heading, estimate_times, heading(estimate))
+    times, true_heading = times[valid], true_heading[valid]
+    if len(times) < 100:
+        raise ValueError("Insufficient covered, gap-checked estimate/truth matches")
     errors_deg = np.degrees(errors)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     with args.output.with_suffix(".csv").open("w", newline="") as file:
@@ -51,7 +55,7 @@ def main():
         writer.writerows(zip(times, np.degrees(estimated_heading),
                              np.degrees(true_heading), errors_deg))
     result = {
-        "samples": len(times), "window_s": [start, end],
+        "samples": len(times), "skipped": skipped, "maximum_estimate_gap_s": 0.1, "window_s": [start, end],
         "source_ulog": args.ulog.name,
         "signed_heading_bias_deg": float(errors_deg.mean()),
         "rmse_heading_deg": float(np.sqrt(np.mean(errors_deg**2))),

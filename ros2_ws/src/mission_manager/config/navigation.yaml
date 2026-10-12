@@ -15,4 +15,5 @@ ugv_goal_controller:
 local_astar_planner:
   ros__parameters:
     max_grid_age: 2.0
-    max_goal_adjust_cells: 5
+    robot_radius: 0.5
+    obstacle_clearance: 0.05

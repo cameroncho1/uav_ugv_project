@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>localization_common</name>
+  <version>0.0.0</version>
+  <description>ROS-independent numerical frame and covariance operations.</description>
+  <maintainer email="rylanwwade@gmail.com">Rylan Wade</maintainer>
+  <license>TODO: License declaration</license>
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <buildtool_depend>ament_cmake_python</buildtool_depend>
+  <exec_depend>python3-numpy</exec_depend>
+  <test_depend>ament_cmake_pytest</test_depend>
+  <export><build_type>ament_cmake</build_type></export>
+</package>

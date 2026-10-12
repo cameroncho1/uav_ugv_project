@@ -12,5 +12,6 @@ export GZ_SIM_RESOURCE_PATH="$ROOT/simulation/models:$GZ_SIM_RESOURCE_PATH"
 
 export GZ_PARTITION="${GZ_PARTITION:-uav_ugv_sim}"
 export GZ_IP=127.0.0.1
+export GZ_SIM_SYSTEM_PLUGIN_PATH="$ROOT/ros2_ws/install/ugv_control/lib:${GZ_SIM_SYSTEM_PLUGIN_PATH:-}"
 
 gz sim -v4 -s -r "$ROOT/simulation/worlds/uav_ugv.sdf"

@@ -1,0 +1,20 @@
+gz-sim8:
+  ubuntu:
+    jammy:
+    - libgz-sim8-dev
+gz-msgs10:
+  ubuntu:
+    jammy:
+    - libgz-msgs10-dev
+gz-transport13:
+  ubuntu:
+    jammy:
+    - libgz-transport13-dev
+gz-plugin2:
+  ubuntu:
+    jammy:
+    - libgz-plugin2-dev
+ros_gz_bridge:
+  ubuntu:
+    jammy:
+    - ros-humble-ros-gzharmonic-bridge

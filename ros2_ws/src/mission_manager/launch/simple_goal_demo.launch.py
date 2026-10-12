@@ -6,7 +6,7 @@ from launch.actions import (DeclareLaunchArgument, ExecuteProcess, IncludeLaunch
                             SetEnvironmentVariable, TimerAction)
 from launch.conditions import IfCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import LaunchConfiguration, PythonExpression
+from launch.substitutions import EnvironmentVariable, LaunchConfiguration, PythonExpression
 from launch_ros.actions import Node, SetParameter
 from launch_ros.parameter_descriptions import ParameterValue
 
@@ -14,6 +14,9 @@ from launch_ros.parameter_descriptions import ParameterValue
 def generate_launch_description():
     project_root = Path(get_package_prefix("mission_manager")).parents[2]
     package_share = Path(get_package_share_directory("mission_manager"))
+    fault_share = Path(get_package_share_directory("fault_management"))
+    sensing_share = Path(get_package_share_directory("uav_sensing"))
+    uav_share = Path(get_package_share_directory("uav_control"))
     localization_share = Path(get_package_share_directory("cooperative_localization"))
     start_simulation = LaunchConfiguration("start_simulation")
     start_rviz = LaunchConfiguration("start_rviz")
@@ -72,43 +75,48 @@ def generate_launch_description():
             "obstacle_luminance_threshold", default_value="32.0",
             description="Dark-pixel threshold used by the initial camera occupancy heuristic.",
         ),
-        SetEnvironmentVariable("GZ_PARTITION", "uav_ugv_sim"),
+        SetEnvironmentVariable("GZ_PARTITION",
+                               EnvironmentVariable("GZ_PARTITION", default_value="uav_ugv_sim")),
         SetEnvironmentVariable("GZ_IP", "127.0.0.1"),
+        SetEnvironmentVariable("PX4_PARAM_UXRCE_DDS_DOM_ID",
+                               EnvironmentVariable("ROS_DOMAIN_ID", default_value="0")),
         SetParameter(name="use_sim_time", value=True),
         world,
         agent,
         IncludeLaunchDescription(
+            PythonLaunchDescriptionSource(str(fault_share / "launch/sim_ugv_sensors.launch.py")),
+            launch_arguments={"world": "simple_goal_demo", "seed": LaunchConfiguration("seed"),
+                              "shared_position_stddev":
+                                  LaunchConfiguration("shared_position_stddev"),
+                              "initial_gps_enabled":
+                                  LaunchConfiguration("initial_gps_enabled")}.items()),
+        IncludeLaunchDescription(
             PythonLaunchDescriptionSource(
                 str(localization_share / "launch/ugv_localization.launch.py")),
-            launch_arguments={"world": "simple_goal_demo",
-                              "seed": LaunchConfiguration("seed"),
-                              "shared_position_stddev": LaunchConfiguration(
-                                  "shared_position_stddev"),
-                              "systematic_position_stddev": LaunchConfiguration(
-                                  "systematic_position_stddev"),
-                              "uav_odometry_topic": PythonExpression([
+            launch_arguments={"use_sim_time": "true",
+                              "systematic_position_stddev":
+                                  LaunchConfiguration("systematic_position_stddev"),
+                              "uav_assistance": LaunchConfiguration("uav_assistance")}.items()),
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource(str(uav_share / "launch/uav_pose.launch.py")),
+            launch_arguments={"use_sim_time": "true", "map_origin": "[0.0, 0.0, 0.3]",
+                              "odometry_topic": PythonExpression([
                                   "'/simulation/biased_uav_odometry' if float('",
                                   LaunchConfiguration("shared_position_stddev"),
                                   "') > 0 else '/fmu/out/vehicle_odometry'"]),
-                              "uav_require_airborne": "true", "uav_initial_settle_time": "10.0",
-                              "initial_gps_enabled": LaunchConfiguration("initial_gps_enabled"),
-                              "uav_assistance": LaunchConfiguration("uav_assistance")}.items(),
-        ),
+                              "require_airborne": "true", "initial_settle_time": "10.0"}.items()),
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(
-                str(localization_share / "launch/uav_camera_sensor.launch.py")),
-            condition=IfCondition(LaunchConfiguration("uav_assistance")),
-        ),
-        Node(
-            package="cooperative_localization", executable="sim_anchor_fault.py",
-            parameters=[{"random_seed": ParameterValue(
-                LaunchConfiguration("seed"), value_type=int),
-                "shared_position_stddev": ParameterValue(
-                    LaunchConfiguration("shared_position_stddev"), value_type=float)}],
-            condition=IfCondition(PythonExpression([
-                "float('", LaunchConfiguration("shared_position_stddev"), "') > 0"])),
-            output="screen",
-        ),
+                str(sensing_share / "launch/uav_camera_sensor.launch.py")),
+            launch_arguments={"detect_ugv": LaunchConfiguration("uav_assistance")}.items()),
+        Node(package="fault_management", executable="sim_anchor_fault.py",
+             parameters=[{"random_seed": ParameterValue(
+                 LaunchConfiguration("seed"), value_type=int),
+                          "shared_position_stddev": ParameterValue(
+                              LaunchConfiguration("shared_position_stddev"), value_type=float)}],
+             condition=IfCondition(PythonExpression([
+                 "float('", LaunchConfiguration("shared_position_stddev"), "') > 0"])),
+             output="screen"),
         Node(
             package="mission_manager",
             executable="goal_manager",
@@ -141,8 +149,6 @@ def generate_launch_description():
             executable="traversability_mapper",
             name="traversability_mapper",
             parameters=[{
-                "camera_topic": "/world/simple_goal_demo/model/cooperative_camera_uav_0/"
-                                "link/camera_link/sensor/camera/image",
                 "grid_resolution": ParameterValue(
                     LaunchConfiguration("grid_resolution"), value_type=float),
                 "obstacle_luminance_threshold": ParameterValue(

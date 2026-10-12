@@ -1,5 +1,7 @@
 # UGV Localization Evaluation
 
+The results below are retained October 11 evidence. [October 12 remediation and validation](../project/remediation_2026-10-12.md) records the current ownership, fixes, paired reruns, and physical tracking results. Earlier numbers are not reclassified as tests of the repaired code.
+
 ## Baseline-only short route
 
 The `uav_ugv` Gazebo world runs a 31-second forward-and-turn route. The scorer compares `/ugv/localization/pose` with the `simple_ugv` model's true map pose at matching simulation timestamps. Each row below uses 615 pose samples from 10.5 to 31 seconds. Position error is the 2D distance between estimated and true x/y. The measurement model uses 1.5 m horizontal GPS standard deviation and the wheel and IMU settings in `measurement_model.yaml`.
@@ -117,7 +119,7 @@ The aligned PX4 and full ROS workspace build successfully. Registered checks rep
 
 The planner and controller use the fused pose with the limits in [navigation](../navigation.md). [Nineteen ROS integration cases](results/navigation/guards.json) verify continuous zero commands on bad/stale/uncertain inputs, frozen ROS time, missing or blocked maps, and arrival. Valid inputs restore motion. The old raw-pose topic cannot authorize motion. Registered checks report 111 tests, zero failures, and six skipped cppcheck checks due to cppcheck 2.7.
 
-The EKF initialization uses large x/y uncertainty for an unknown map origin. [Nine fresh-world paired trials](results/navigation/summary.csv) repeat seeds 513-515 with all three GPS cases and the fixed-observer simulated sensor. Each strategy has 591-615 scored samples. Assisted RMSE is 0.184-0.250 m. Startup without GPS has assisted RMSE 0.185-0.242 m versus baseline 0.933-1.016 m. Assisted 95% ellipse coverage is 99.0-99.8%. The unanchored baseline retains approximately `1e6 mÂ²` x/y variance; coverage of its unknown origin does not demonstrate accurate localization. No navigation controller drives these paired scoring routes.
+The EKF initialization uses large x/y uncertainty for an unknown map origin. [Nine fresh-world paired trials](results/navigation/summary.csv) repeat seeds 513-515 with all three GPS cases and the fixed-observer simulated sensor. Each strategy has 591-615 scored samples. Assisted RMSE is 0.184-0.250 m. Startup without GPS has assisted RMSE 0.185-0.242 m versus baseline 0.933-1.016 m. Assisted 95% ellipse coverage is 99.0-99.8%. The unanchored baseline retains approximately `1e6 mÃ‚Â²` x/y variance; coverage of its unknown origin does not demonstrate accurate localization. No navigation controller drives these paired scoring routes.
 
 A [physical goal trial with the upstream 30 Hz camera](results/navigation/goal_upstream_camera.json) fails to arrive within 300 wall seconds. It starts with GPS disabled, begins motion after 30.0 wall seconds, and stops repeatedly on stale fused poses. The world then stops advancing; true remaining goal distance is 7.762 m. This run verifies the hold behavior under a stalled runtime and does not establish goal arrival. The runner stops its owned process groups, including a renderer that does not finish graceful shutdown. The camera-specific evaluation below uses the owned 5 Hz model and reports physical arrival separately.
 
@@ -132,16 +134,16 @@ The owned camera hovers at world z=4 m in a static fixture. The roof marker is a
 | Case | Observations | Maximum 3D position error (m) | Result |
 | --- | ---: | ---: | --- |
 | Visible | 10 | 0.0230 | Pass |
-| Partial visual occlusion | 0 | — | Pass |
-| Full visual occlusion | 0 | — | Pass |
+| Partial visual occlusion | 0 | â€” | Pass |
+| Full visual occlusion | 0 | â€” | Pass |
 | Recovery | 14 | 0.0230 | Pass |
 | Off-axis target `(1, -0.5)` m | 15 | 0.0113 | Pass |
 
-The [default-threshold fixture](results/camera/fixture_default_threshold.json) detects the centered target and recovery but misses the off-axis target. The captured image contains the correct ID. An offline detector-parameter sweep identifies adaptive threshold constant 15 as a successful candidate; constants 7 then 15 recover it without changing dictionary or geometry gates. [Research summary](results/camera/detector_research.json) and the [regression image](../../ros2_ws/src/cooperative_localization/test/fixtures/off_axis_tag.png) preserve this case. Partial/full occlusion still produce no observations with both attempts. These checks cover the stated synthetic images; they do not quantify a real-camera false-detection rate.
+The [default-threshold fixture](results/camera/fixture_default_threshold.json) detects the centered target and recovery but misses the off-axis target. The captured image contains the correct ID. An offline detector-parameter sweep identifies adaptive threshold constant 15 as a successful candidate; constants 7 then 15 recover it without changing dictionary or geometry gates. [Research summary](results/camera/detector_research.json) and the [regression image](../../ros2_ws/src/uav_sensing/test/fixtures/off_axis_tag.png) preserve this case. Partial/full occlusion still produce no observations with both attempts. These checks cover the stated synthetic images; they do not quantify a real-camera false-detection rate.
 
 ### Actual PX4 anchors and camera observations
 
-Nine fresh-world trials use the aligned PX4 dependency configuration, the owned 5 Hz camera, a 4.5 m altitude setpoint, and the 31-second nominal route. Both filters receive identical wheel/IMU/GPS messages; only the assisted filter receives camera-derived corrections. Each strategy contributes 614–615 timestamp-matched poses over route seconds 10.5–31. The summaries include acquisition-time rejection counts, GPS gates, wheel counts, and observation source. [Comparison CSV](results/camera/anchors/summary.csv) and per-trial JSON preserve the measured values; [conditions](results/camera/conditions.json) record runtime versions and model/calibration fingerprints.
+Nine fresh-world trials use the aligned PX4 dependency configuration, the owned 5 Hz camera, a 4.5 m altitude setpoint, and the 31-second nominal route. Both filters receive identical wheel/IMU/GPS messages; only the assisted filter receives camera-derived corrections. Each strategy contributes 614â€“615 timestamp-matched poses over route seconds 10.5â€“31. The summaries include acquisition-time rejection counts, GPS gates, wheel counts, and observation source. [Comparison CSV](results/camera/anchors/summary.csv) and per-trial JSON preserve the measured values; [conditions](results/camera/conditions.json) record runtime versions and model/calibration fingerprints.
 
 | Seed | GPS case | Baseline RMSE (m) | Assisted RMSE (m) | Assisted 95% coverage | UAV corrections | Wheel readings |
 | ---: | --- | ---: | ---: | ---: | ---: | ---: |
@@ -155,7 +157,7 @@ Nine fresh-world trials use the aligned PX4 dependency configuration, the owned 
 | 515 | on | 0.359 | 0.096 | 100.0% | 59 | 597 |
 | 515 | startup_off | 3.867 | 0.128 | 100.0% | 95 | 597 |
 
-Assisted RMSE is 0.096–0.157 m under these conditions. The startup-without-GPS baseline retains its roughly 4 m unknown-origin error in this world; assistance supplies an absolute anchor. Dropout cases retain 398 wheel readings after GPS loss, and every startup-off case records zero GPS readings. Coverage of 100% describes these correlated samples and indicates conservative uncertainty; it is not a calibrated hardware confidence guarantee. Separate configurations do not share identical sensor sequences.
+Assisted RMSE is 0.096â€“0.157 m under these conditions. The startup-without-GPS baseline retains its roughly 4 m unknown-origin error in this world; assistance supplies an absolute anchor. Dropout cases retain 398 wheel readings after GPS loss, and every startup-off case records zero GPS readings. Coverage of 100% describes these correlated samples and indicates conservative uncertainty; it is not a calibrated hardware confidence guarantee. Separate configurations do not share identical sensor sequences.
 
 ### Goal arrival using camera corrections
 

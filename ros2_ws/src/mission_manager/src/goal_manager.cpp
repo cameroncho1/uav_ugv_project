@@ -33,7 +33,11 @@ private:
   {
     geometry_msgs::msg::PoseStamped goal;
     goal.header.frame_id = "map";
-    goal.header.stamp = now();
+    const auto current = now();
+    if (current.nanoseconds() <= 0) {return;}
+    if (revision_.nanoseconds() == 0 || current < last_clock_) {revision_ = current;}
+    last_clock_ = current;
+    goal.header.stamp = revision_;
     goal.pose.position.x = goal_x_;
     goal.pose.position.y = goal_y_;
     goal.pose.orientation.w = 1.0;
@@ -64,6 +68,7 @@ private:
   rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr goal_pub_;
   rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr marker_pub_;
   rclcpp::TimerBase::SharedPtr timer_;
+  rclcpp::Time revision_{0, 0, RCL_ROS_TIME}, last_clock_{0, 0, RCL_ROS_TIME};
 };
 
 int main(int argc, char ** argv)

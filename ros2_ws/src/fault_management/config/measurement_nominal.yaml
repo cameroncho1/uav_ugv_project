@@ -1,0 +1,4 @@
+sim_ugv_sensors:
+  ros__parameters:
+    wheel_speed_scale: 1.0
+    imu_yaw_bias_rate: 0.0

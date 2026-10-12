@@ -12,7 +12,7 @@ from rclpy.node import Node
 from rclpy.qos import qos_profile_sensor_data
 from std_srvs.srv import SetBool
 
-from cooperative_math import covariance, interpolate, rotation, ugv_position
+from localization_common.frames import covariance, interpolate, rotation, ugv_position
 
 
 def stamp_ns(message):
@@ -119,8 +119,11 @@ class UavCorrection(Node):
         return None
 
     def process(self):
-        for _ in range(len(self.pending)):
-            stamp, relative, c, ros_stamp = self.pending.popleft()
+        # Observe rewinds before taking a batch. valid_time() may clear queues.
+        self.valid_time(0)
+        batch = list(self.pending)
+        self.pending.clear()
+        for stamp, relative, c, ros_stamp in batch:
             if not self.valid_time(stamp):
                 self.counters["expired"] += 1
                 continue

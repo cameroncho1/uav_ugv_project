@@ -10,7 +10,7 @@ Current milestone:
 - Live PX4 odometry received by a custom C++ ROS 2 node
 - ROS 2 package structure for future autonomy development
 
-The [goal demo](README_simple_goal_demo.md) adds a stationary UAV camera grid, local A* planning, and UGV path following. [Cooperative localization](docs/cooperative_localization/subsystem.md) supplies a GPS/wheel/IMU baseline and optional UAV-derived position corrections from rendered AprilTag detections and independent PX4 anchors, with repeatable GPS-loss, occlusion, and shared-position-error trials. [Perception](docs/cooperative_localization/perception.md) defines the known simulation calibration and its limits. Navigation uses the fused pose with acquisition-age, receipt-age, and uncertainty checks. [Navigation](docs/navigation.md) describes the hold and recovery rules.
+The [goal demo](README_simple_goal_demo.md) adds a stationary UAV camera grid, local A* planning, and UGV path following. [Cooperative localization](docs/cooperative_localization/subsystem.md) supplies a GPS/wheel/IMU baseline and optional UAV-derived position corrections from rendered AprilTag detections and independent PX4 anchors, with repeatable GPS-loss, occlusion, and shared-position-error trials. [Perception](docs/cooperative_localization/perception.md) defines the known simulation calibration and its limits. Navigation uses the fused pose with acquisition-age, receipt-age, and uncertainty checks. [Navigation](docs/navigation.md) describes goal-associated routes, footprint clearance, hold/recovery, and actuator command expiry. [The October 12 remediation](docs/project/remediation_2026-10-12.md) records all 20 audit fixes and measured validation.
 
 ---
 
@@ -58,6 +58,9 @@ uav_ugv_project/
 │       ├── ugv_control/
 │       ├── traversability_mapping/
 │       ├── route_planning/
+│       ├── localization_common/
+│       ├── uav_sensing/
+│       ├── simulation_support/
 │       ├── cooperative_localization/
 │       ├── fault_management/
 │       ├── mission_manager/
@@ -71,14 +74,17 @@ uav_ugv_project/
 └── README.md
 ```
 
-## ROS 2 Package Responsibilities (Just an outline for now, subject to change)
+## ROS 2 Package Responsibilities
 
-- `uav_control`: PX4/UAV interface, including the Offboard goal controller.
-- `ugv_control`: UGV state and motion control.
+- `uav_control`: PX4/UAV interface, Offboard control, and independent ENU map anchors.
+- `uav_sensing`: Calibrated camera-relative observations; a replaceable producer.
+- `localization_common`: ROS-independent frame, geodesy, and covariance math.
+- `simulation_support`: Gazebo truth/raw sensor bridges, geometry, and shared `/clock`.
+- `ugv_control`: Goal-associated path following and the simulated actuator command watchdog.
 - `traversability_mapping`: UAV perception data to terrain/hazard/traversability map.
 - `route_planning`: UGV path planning and dynamic replanning.
 - `cooperative_localization`: UAV-assisted UGV localization for GPS-denied scenarios.
-- `fault_management`: Sensor, communication, and vehicle-health monitoring.
+- `fault_management`: Explicit simulated sensor corruption, fault controls, and evaluation assemblies. Production fault/health policy remains an open integration decision.
 - `mission_manager`: High-level UAV/UGV mission coordination.
 - `uav_ugv_msgs`: Custom ROS 2 messages shared between project packages.
 

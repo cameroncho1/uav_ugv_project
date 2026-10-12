@@ -8,6 +8,7 @@ source /opt/ros/humble/setup.bash
 source "$ROOT/ros2_ws/install/setup.bash"
 set -u
 export GZ_PARTITION="${GZ_PARTITION:-uav_ugv_sim}" GZ_IP=127.0.0.1
+export GZ_SIM_SYSTEM_PLUGIN_PATH="$ROOT/ros2_ws/install/ugv_control/lib:${GZ_SIM_SYSTEM_PLUGIN_PATH:-}"
 export PX4_DDS_SYNCT=0
 export PX4_PARAM_UXRCE_DDS_DOM_ID="${ROS_DOMAIN_ID:-0}"
 PX4_BIN="$ROOT/external/PX4-Autopilot/build/px4_sitl_default/bin"
@@ -36,16 +37,16 @@ esac
 initial_gps_enabled=true
 if [[ "$gps_case" == startup_off ]]; then initial_gps_enabled=false; fi
 python3 "$ROOT/scripts/check_sim_dependencies.py"
+source "$ROOT/scripts/process_cleanup.sh"
 mkdir -p "$OUTPUT"
 pids=()
 cleanup() {
-  for pid in "${pids[@]}"; do kill -INT -- "-$pid" 2>/dev/null || true; done
-  sleep 3
-  for pid in "${pids[@]}"; do kill -TERM -- "-$pid" 2>/dev/null || true; done
-  sleep 3
-  for pid in "${pids[@]}"; do kill -KILL -- "-$pid" 2>/dev/null || true; done
+  stop_process_groups "${pids[@]}"
+  pids=()
 }
-trap cleanup EXIT INT TERM
+trap cleanup EXIT
+trap 'exit 130' INT
+trap 'exit 143' TERM
 
 if [[ "$relative_mode" == camera ]]; then
   # Upstream setup reads optional environment variables without defaults.
@@ -64,7 +65,7 @@ setsid MicroXRCEAgent udp4 -p 8888 >"$OUTPUT/dds.log" 2>&1 & pids+=("$!")
 printf -v px4_command '%q' "$ROOT/scripts/$px4_script"
 setsid script -q -c "$px4_command" /dev/null >"$OUTPUT/px4.log" 2>&1 & pids+=("$!")
 sleep 20
-setsid ros2 launch cooperative_localization ugv_cooperative_evaluation.launch.py \
+setsid ros2 launch fault_management ugv_cooperative_evaluation.launch.py \
   seed:="${SEED:-513}" initial_gps_enabled:="$initial_gps_enabled" \
   world:="$world" relative_source:="$relative_mode" \
   uav_model:="$uav_model" publish_anchor:="$publish_anchor" \
@@ -75,15 +76,21 @@ sleep 4
 setsid ros2 run uav_control offboard_goal_controller --ros-args -p use_sim_time:=true \
   -p uav_altitude:="$uav_altitude" \
   >"$OUTPUT/control.log" 2>&1 & pids+=("$!")
-timeout "${ANCHOR_TIMEOUT:-240}" ros2 topic echo --no-daemon --once /uav/localization/pose \
+setsid timeout "${ANCHOR_TIMEOUT:-240}" ros2 topic echo --no-daemon --once /uav/localization/pose \
   geometry_msgs/msg/PoseWithCovarianceStamped \
-  >"$OUTPUT/anchor.txt"
+  >"$OUTPUT/anchor.txt" &
+anchor_pid=$!
+pids+=("$anchor_pid")
+wait "$anchor_pid"
 "$PX4_BIN/px4-param" show UXRCE_DDS_SYNCT >"$OUTPUT/time_parameter.txt"
-timeout "${TRIAL_TIMEOUT:-300}" ros2 run cooperative_localization localization_trial.py \
+setsid timeout "${TRIAL_TIMEOUT:-300}" ros2 run fault_management localization_trial.py \
   --gps "$gps_case" --seed "${SEED:-513}" \
   --anchor-source "${ANCHOR_MODE:-px4}" --observer-model "$uav_model" \
   --relative-source "$relative_mode" \
   --uav-altitude "$uav_altitude" \
-  --comparison-topic /evaluation/baseline_pose --output "$OUTPUT/trial_live"
+  --comparison-topic /evaluation/baseline_pose --output "$OUTPUT/trial_live" &
+score_pid=$!
+pids+=("$score_pid")
+wait "$score_pid"
 "$PX4_BIN/px4-commander" land || true
 sleep 5

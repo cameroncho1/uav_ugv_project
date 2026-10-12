@@ -1,0 +1,10 @@
+{
+  "case": "command_transport_loss",
+  "pre_fault_motion_m": 0.24402396863293263,
+  "watchdog_timeout_wall_s": 0.35,
+  "maximum_additional_delivery_period_wall_s": 0.05,
+  "settled_check_after_wall_s": 0.75,
+  "late_truth_samples": 44,
+  "maximum_late_displacement_m": 0.0026785185540684525,
+  "passed": true
+}

@@ -1,0 +1,21 @@
+{
+  "clock": "wall",
+  "ros_domain_id": "103",
+  "initial_absolute_position_map_xy": [
+    1200.0,
+    -400.0
+  ],
+  "outlier_east_m": 2200.0,
+  "innovation_threshold_sigma": 5.0,
+  "startup_anchor_error_m": 6.503085320229255e-05,
+  "degraded_published_x_variance_m2": 100.0,
+  "maximum_outlier_phase_error_m": 5.944648563517652e-05,
+  "recovered_anchor_error_m": 1.2505963050239971e-05,
+  "sample_counts": [
+    56,
+    37,
+    37,
+    38
+  ],
+  "passed": true
+}

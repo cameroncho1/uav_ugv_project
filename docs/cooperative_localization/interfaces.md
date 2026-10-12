@@ -1,80 +1,118 @@
 # Cooperative localization interfaces
 
+## Stable contract and ownership
+
+- The requirements baseline is `65ba304`. Localization owns measured-input validation/fusion and one authoritative UGV pose. Relative sensing remains independent of sensing technology.
+- Shared global positions use ENU `map`; ROS body axes use FLU. PX4 NED/FRD conversion, covariance, and local-origin alignment are explicit in the UAV interface owner.
+- Acquisition stamps are preserved. Simulation assembly uses `/clock`; actual PX4 anchors use `UXRCE_DDS_SYNCT=0` and the matching ROS DDS domain.
+- Simulator truth is used only for synthesis and scoring. Estimation and navigation consume the stated measurement interfaces. The fused UGV pose is never fed into its UAV correction producer.
+
+| Owner | Responsibility |
+| --- | --- |
+| `cooperative_localization` | Geodetic adaptation, validity/time/uncertainty handling, cooperative correction matching, EKF, authoritative pose. |
+| `uav_control` | PX4 interface, reference initialization/resets, independent map-anchor publication. |
+| `uav_sensing` | Camera calibration/detection and body-relative position producer. |
+| `traversability_mapping` | Acquisition-matched camera-to-grid projection. |
+| `simulation_support` | World/model integration, raw sensor bridge, shared `/clock` bridge, truth readers. |
+| `fault_management` | Synthetic measurements, explicit injected outages/errors, paired trials and scoring. |
+| `route_planning` / `ugv_control` | Clearance routes associated with goal revisions / path following and actuator command expiry. |
+| `localization_common` | Frame, covariance and geodesy math without ROS or simulator imports. |
+
+UGV bridging and clock ownership were open in the baseline and are now assigned to integration. Global map-to-body TF publication and hardware sensor calibration remain open; they are not silently assigned to the estimator.
+
 ## Topics and frames
 
-Estimator inputs preserve acquisition timestamps. Localization nodes use Gazebo `/clock`; PX4 must share this clock with `UXRCE_DDS_SYNCT=0` when its pose is fused. Raw sensors use best-effort sensor QoS. Prepared measurements and fused poses use reliable QoS.
+Raw simulated data uses sensor QoS. Prepared inputs and fused poses use reliable publishers; acquisition timestamps are unchanged.
 
-| Topic | ROS message | Frame and meaning |
+| Topic | ROS message | Meaning |
 | --- | --- | --- |
-| `/ugv/sensors/wheel_odom` | `nav_msgs/Odometry` | Gazebo differential-drive odometry, 20 Hz, relative to spawn; child `simple_ugv/chassis`. |
-| `/ugv/sensors/imu` | `sensor_msgs/Imu` | Chassis-mounted inertial measurement, 50 Hz; `simple_ugv/chassis/imu`. |
-| `/ugv/sensors/gps` | `sensor_msgs/NavSatFix` | WGS84 GPS, 5 Hz; `simple_ugv/chassis/gps`. |
-| `/ugv/measurements/wheel_odom` | `nav_msgs/Odometry` | Noisy pose anchored to map spawn; body forward speed and zero lateral speed. |
-| `/ugv/measurements/imu` | `sensor_msgs/Imu` | Noisy yaw and turn rate in the chassis sensor frame. |
-| `/ugv/measurements/gps_pose` | `geometry_msgs/PoseWithCovarianceStamped` | GPS projected to ENU `map`, with meter noise and covariance; position only. |
-| `/uav/camera/image` | `sensor_msgs/Image` | Rendered pixels, 5 Hz; acquisition stamp and `uav/camera_optical_frame`. |
-| `/uav/camera/camera_info` | `sensor_msgs/CameraInfo` | Camera intrinsics/distortion in the same optical frame and image dimensions. |
-| `/uav/localization/pose` | `geometry_msgs/PoseWithCovarianceStamped` | Independent UAV map position and FLU attitude with covariance. |
-| `/ugv/sensors/uav_relative_pose` | `geometry_msgs/PoseWithCovarianceStamped` | UAV-to-UGV vector in `uav/base_link` (FLU), with position covariance; orientation unused. |
-| `/ugv/measurements/uav_pose` | `geometry_msgs/PoseWithCovarianceStamped` | UGV map position derived from timestamp-matched UAV pose and relative observation; orientation unused. |
-| `/ugv/localization/odometry` | `nav_msgs/Odometry` | Planar EKF output in `map`, 30 Hz. |
-| `/ugv/localization/pose` | `geometry_msgs/PoseWithCovarianceStamped` | EKF pose/time/covariance with the configured systematic x/y uncertainty prior added. |
-| `/diagnostics` | `diagnostic_msgs/DiagnosticArray` | Anchor/correction freshness and rejection counts; camera visibility and reprojection fit. |
+| `/simulation/ugv/wheel_odom` | `nav_msgs/Odometry` | Raw Gazebo DiffDrive odometry; parent `simple_ugv/odom`, child `simple_ugv/chassis`. |
+| `/simulation/ugv/imu` | `sensor_msgs/Imu` | Raw simulated IMU, frame `simple_ugv/chassis/imu`. |
+| `/simulation/ugv/gps` | `sensor_msgs/NavSatFix` | Raw WGS84 simulator fix, frame `simple_ugv/chassis/gps`. |
+| `/ugv/sensors/wheel_odom`, `/ugv/sensors/imu`, `/ugv/sensors/gps` | Corresponding sensor messages | Measured interface. Simulation assembly supplies explicit noise/covariance here; a hardware producer can supply measured values directly. |
+| `/ugv/measurements/wheel_odom` | `nav_msgs/Odometry` | Validated body velocities and covariance. Integrated pose is not fused. |
+| `/ugv/measurements/imu` | `sensor_msgs/Imu` | Validated components; `-1` availability markers remain attached to missing components. |
+| `/ugv/measurements/gps_pose` | `geometry_msgs/PoseWithCovarianceStamped` | WGS84 projected into map ENU with known covariance rotated from the fix's tangent basis. Orientation is unused. |
+| `/uav/localization/pose` | `geometry_msgs/PoseWithCovarianceStamped` | Independent UAV position/FLU attitude and covariance in map. |
+| `/ugv/sensors/uav_relative_pose` | `geometry_msgs/PoseWithCovarianceStamped` | Chassis origin relative to UAV body origin in `uav/base_link` FLU. Orientation is unused. |
+| `/ugv/measurements/uav_pose` | `geometry_msgs/PoseWithCovarianceStamped` | UGV map position from a timestamp-matched independent anchor plus relative observation. |
+| `/ugv/localization/odometry` | `nav_msgs/Odometry` | Internal planar EKF output. |
+| `/ugv/localization/pose` | `geometry_msgs/PoseWithCovarianceStamped` | Authoritative map pose/covariance, including the configured unreduced systematic x/y prior. |
+| `/uav/camera/image`, `/uav/camera/camera_info` | `sensor_msgs/Image`, `sensor_msgs/CameraInfo` | Rendered/measured optical data; `uav/camera_optical_frame`. |
+| `/local_grid` | `nav_msgs/OccupancyGrid` | Acquisition-stamped map projection with matched camera anchor and calibrated mount. |
+| `/ugv/navigation/route` | `uav_ugv_msgs/PlannedRoute` | Goal revision, path and the conservative footprint-clearance grid used to plan it. |
+| `/local_path` | `nav_msgs/Path` | Visualization and evaluation reference; does not authorize motion. |
+| `/ugv/cmd_vel` | `geometry_msgs/Twist` | Controller command. Integration bridges it to `/simple_ugv/drive_cmd_vel`; the actuator watchdog alone forwards fresh commands to DiffDrive. |
+| `/evaluation/ugv_truth` | `geometry_msgs/PoseStamped` | Scoring-only simulator state. |
 
-The bridge maps Gazebo `/simple_ugv/odom`, `/simple_ugv/imu`, `/simple_ugv/gps`, and `/clock` to ROS. Raw wheel and IMU covariance is zero and GPS covariance is unknown. The adapter supplies an explicit uncertainty model while raw topics remain available. GPS is converted through WGS84 ECEF to local ENU. The UGV map spawn is `(1, 0)` in `uav_ugv` and `(-4, 0)` in `simple_goal_demo`.
+## Validity, uncertainty and clocks
 
-The baseline EKF fuses body forward and zero lateral wheel velocity, IMU yaw and turn rate, and GPS x/y. It does not fuse integrated wheel pose or GPS placeholder orientation. UAV assistance adds absolute x/y position with a five-sigma innovation threshold. The chassis-to-IMU TF is identity. The EKF does not publish map-to-chassis TF.
+The operational adapter checks frames, finite coordinates, component availability and acquisition age (0.5 s). Duplicate/out-of-order stamps are rejected within an epoch; an actual ROS-clock rewind clears epoch state. Known GNSS covariance is preserved and transformed; invalid known covariance is rejected. Unknown covariance uses explicit fallback priors from `measurements.yaml`, not injected randomness.
 
-## UAV observation contract
+IMU orientation requires a valid unit quaternion. Missing/invalid orientation is marked unavailable while valid rate/acceleration components remain usable. The EKF uses yaw and turn rate; missing heading does not become a synthetic zero-heading observation. GNSS and UAV x/y innovations use five-sigma rejection thresholds. An unknown global origin starts with `1e6 m^2` x/y variance, allowing an initial absolute anchor without pretending wheel/IMU data locate the origin.
 
-The relative sensor reports the UGV chassis origin relative to the UAV body origin. A perception producer must apply calibrated sensor-to-body extrinsics before publishing. Its position covariance must be finite and positive in the same FLU axes. It must use the shared acquisition clock. A hardware producer can replace the simulator through this interface.
+The independent UAV adapter accepts NED/FRD PX4 samples with finite variances and a matching clock. `map_origin` is a stated alignment. Optional takeoff initialization requires airborne status and a reset-free interval. A later PX4 reference reset stops anchors pending realignment/restart. A ROS-clock rewind resets temporal initialization state. Origin guesses from UGV truth or fused pose are prohibited.
 
-`uav_pose.py` accepts PX4 `POSE_FRAME_NED` with valid position, quaternion, and variances. It converts world axes from NED to ENU and body axes from FRD to FLU. `map_origin` supplies the local-to-map translation; the two world YAML files contain the configured origins. `uav_require_airborne:=true uav_initial_settle_time:=10.0` initializes the live reference after takeoff and a reset-free interval. `/fmu/out/vehicle_land_detected` supplies the takeoff state. Later pose resets stop anchor output until realignment and restart. Clock mismatches are rejected.
+Corrections use exact anchors or interpolation with at most 0.25 s anchor gaps, 0.5 s acquisition age, and 30 m range. UAV position/attitude and relative uncertainty are propagated. No extrapolation is performed. Pending batches are detached before processing so clock resets cannot invalidate queue iteration.
 
-`uav_correction.py` uses an exact anchor or interpolates position and quaternion at observation time. The maximum anchor gap is 0.25 s, maximum age 0.5 s, and maximum relative range 30 m. It propagates UAV position and attitude covariance plus rotated relative covariance. It rejects invalid inputs, duplicate stamps, and jumps exceeding a configured motion bound plus five standard deviations. It does not extrapolate or subscribe to UGV truth. [Measurement design](uav_measurement_design.md) gives equations and limits.
+## Launch modes and controls
 
-The synthetic vector fixture uses relative standard deviations `(0.25, 0.15, 0.25)` m in FLU. Simulated UAV position deviations are `(0.3, 0.3, 0.5)` m in map and attitude deviations `(0.01, 0.01, 0.02)` rad in body axes. Independent seeded random streams make an unchanged message sequence reproducible. These are simulation assumptions, not calibrated sensor specifications.
+| Launch / service | Implemented role |
+| --- | --- |
+| `cooperative_localization ugv_localization.launch.py` | Operational estimator only. Defaults to wall time and no assistance. Accepts explicit GNSS datum and systematic prior; no simulator, PX4 or camera producer starts here. |
+| `uav_control uav_pose.launch.py` | Independent anchor producer with explicit topic, map origin, clock, airborne and settle settings. |
+| `uav_sensing uav_camera_sensor.launch.py` | Camera bridge and optional detector (`detect_ugv`). |
+| `simulation_support ugv_sensors.launch.py` | Raw Gazebo sensors and shared clock. |
+| `fault_management sim_ugv_sensors.launch.py` | Explicit simulated sensor corruption; nominal/drift profiles and seeded uncertainty. |
+| `fault_management ugv_evaluation.launch.py` | Baseline evaluation assembly. |
+| `fault_management ugv_cooperative_evaluation.launch.py` | Paired baseline/assisted filters receiving identical UGV messages inside each trial. |
+| `/evaluation/set_gps_enabled` | Evaluation-only `std_srvs/SetBool` gate on simulated measured GPS. Raw simulated GPS continues. |
+| `/ugv/localization/set_uav_enabled` | Estimator selection of UAV corrections; observation/anchor producers remain independent. |
 
-## Services and launch modes
-
-- `/ugv/localization/set_gps_enabled`: `std_srvs/SetBool`; disables or restores prepared GPS while raw GPS continues.
-- `/ugv/localization/set_uav_enabled`: `std_srvs/SetBool`; disables or restores UAV corrections while other sensors continue.
-- `ugv_sensors.launch.py`: bridges and prepares measurements. `world` selects spawn and GPS origin; `measurement_profile` selects `nominal` or `drift`.
-- `ugv_localization.launch.py`: starts the baseline, or adds UAV adapters and fusion with `uav_assistance:=true`. `uav_odometry_topic` selects live PX4 or a compatible test source.
-- `sim_uav_sensor.launch.py`: generates noisy relative observations. Empty `uav_model` selects a fixed observer at map `(2, -2, 4)`; a named model selects its actual Gazebo pose. `publish_anchor:=false` uses an independently supplied UAV anchor.
-- `simple_goal_demo.launch.py`: starts assisted localization with actual PX4 anchors and calibrated relative observations from camera pixels. `uav_assistance:=false` selects the baseline. Navigation consumes `/ugv/localization/pose` with freshness and uncertainty gates; `/ugv/cmd_vel` carries velocity commands.
+Camera evaluation defaults select `simple_goal_demo`, `cooperative_camera_uav_0`, actual PX4 odometry, no synthetic anchor publisher, and live initialization. Synthetic defaults select the fixed observer in `uav_ugv`. Incompatible camera/synthetic-anchor combinations fail before launch. `GZ_PARTITION` and `ROS_DOMAIN_ID` propagate through the assembly; avoid unrelated publishers in the same partition/domain.
 
 ## Evaluation and reproducibility
-
-`ugv_evaluation.launch.py` evaluates the baseline. `ugv_cooperative_evaluation.launch.py` runs baseline and assisted filters together on identical sensor messages. `/evaluation/ugv_truth` supplies true pose to the scorer, `/evaluation/ugv_cmd_vel` drives the route, and `/evaluation/baseline_pose` carries the baseline. `/simulation/vehicle_poses` supplies synchronized true poses to the synthetic sensor producer. `/simulation/uav_odometry` supplies noisy PX4-format anchor samples in fixed-observer trials. Those trials omit UAV flight dynamics.
-
-The scorer matches estimates to interpolated truth at their timestamps and rejects truth gaps over 0.1 s. CSVs hold every scored position, heading error, covariance, and planar normalized estimation error squared (NEES). JSON summaries contain conditions, sensor counts, rejection counts, and error metrics. NEES uses the EKF x/y covariance; 5.991 is the 95% chi-square threshold for two coordinates. Ellipse coverage is a descriptive check on temporally correlated samples, not an independent-sample statistical claim.
 
 ```bash
 source /opt/ros/humble/setup.bash
 cd ros2_ws
-colcon build --packages-up-to cooperative_localization mission_manager --symlink-install
+colcon build --symlink-install
+colcon test --executor sequential
+colcon test-result --verbose
 source install/setup.bash
 cd ..
 
-# PX4 hover with actual PX4 anchors and rendered camera sensing.
-scripts/run_live_cooperative_trial.sh /tmp/cooperative_live
+# Nine nominal paired trials: three seeds, three GPS cases.
+scripts/run_cooperative_trials.sh /tmp/cooperative_nominal
 
-# Three GPS cases across three seeds.
-scripts/run_cooperative_trials.sh /tmp/cooperative_short
-
-# 91-second route with wheel-scale and IMU-heading faults.
+# Same matrix with long wheel/heading drift.
 ROUTE=long DURATION=91 MEASUREMENT_PROFILE=drift \
   scripts/run_cooperative_trials.sh /tmp/cooperative_drift
 
-# GPS loss, outliers, and a 20-second correction outage.
+# Three long GPS-loss trials with outliers and a 20 s relative-sensor outage.
 GPS_CASES=off ROUTE=long DURATION=91 MEASUREMENT_PROFILE=drift \
   OUTLIER_EVERY=10 DROPOUT_START=35.0 DROPOUT_END=55.0 \
   scripts/run_cooperative_trials.sh /tmp/cooperative_robust
+
+# Acquisition-stamped rendered observations and actual PX4 anchors.
+scripts/run_camera_perception_trial.sh /tmp/camera_visibility
+scripts/run_camera_anchor_trials.sh /tmp/camera_anchors
+scripts/run_goal_navigation_trial.sh /tmp/camera_goal
+
+# Actual planner/controller and actuator-loss checks.
+ROS_DOMAIN_ID=55 python3 scripts/test_navigation_guards.py /tmp/navigation_guards.json
+ROS_DOMAIN_ID=56 python3 scripts/test_actuator_watchdog.py /tmp/watchdog
+
+# Physical closed-loop tracking under the same configured seeds/map/goal.
+ROS_DOMAIN_ID=57 python3 scripts/run_path_tracking_trials.py /tmp/path_tracking
 ```
 
-`SEEDS` and `GPS_CASES` accept space-separated lists. `off` disables GPS at route time 10 s; `startup_off` starts with GPS disabled. `ROUTE=long` repeats the short forward/turn/stop pattern. The drift profile injects 15% forward wheel-speed error and 0.002 rad/s growing IMU heading bias. Its covariance still describes Gaussian noise, so these biases are deliberate faults. Outliers add 8 m in body x every tenth sensor sample. Dropout times are relative to `/evaluation/trial_start`.
+`off` disables measured GPS at route time 10 s; `startup_off` starts disabled. The drift profile injects 15% forward-speed error and 0.002 rad/s growing heading bias. Relative outliers add 8 m every tenth sample; relative dropout uses `/evaluation/trial_start`. Noise/fault values are controlled assumptions, not hardware specifications.
 
-Each trial starts a fresh world and stops its processes. Results include scored CSVs, a baseline CSV for paired trials, JSON summaries, and `summary.csv` with one row per strategy. `GZ_PARTITION` can select an isolated Gazebo transport partition; the default is `uav_ugv_sim`. Avoid another world or controller in the same Gazebo partition and ROS domain. The baseline runner remains `scripts/run_localization_trials.sh`. [Measured results](evaluation_results.md) describe tested conditions and stored summaries.
+The localization scorer interpolates truth at acquisition times and rejects truth gaps over 0.1 s. It records per-sample position/heading/covariance, planar NEES, coverage, sensor counts and conditions. Repeated samples are temporally correlated. Heading-log scoring also rejects out-of-range estimate times, nonmonotonic logs and gaps over 0.1 s.
 
-`scripts/run_live_cooperative_trial.sh` flies a PX4 X500 and compares both UGV filters. Its default `ANCHOR_MODE=px4` uses the actual PX4 estimator and a ten-second post-takeoff initialization interval. `GPS_CASE` selects `on`, `off`, or `startup_off` (default). `RELATIVE_MODE=simulated ANCHOR_MODE=simulated` selects independent noisy anchors and vector observations on the flying model. Camera mode uses actual PX4 anchors. `ANCHOR_TIMEOUT` bounds startup in wall seconds (default 240); `TRIAL_TIMEOUT` bounds scoring in wall seconds (default 300). These timeouts do not change the 31-second simulation route or timestamp/uncertainty gates. Both modes write the source and observer model into their trial summaries. `scripts/run_aligned_anchor_trials.sh` repeats the vector fixture across all three GPS cases and seeds 513-515. `scripts/run_camera_anchor_trials.sh` repeats rendered-camera trials with the same cases and seeds. [Perception](perception.md) defines camera calibration and shared-bias fault settings. [Simulation setup](../simulation_setup.md) specifies the aligned dependency configuration and heading-scoring command.
+Closed-loop scoring records route snapshots and truth matched to the most recent planned route at or before acquisition time (maximum reference age 1 s). CSVs preserve physical point-to-polyline cross-track error; summaries include RMSE, mean, maximum, p95, traveled distance and reduction in physical distance to the fixed goal. Separate baseline/assisted closed-loop worlds use the same configured seeds/map/goal, but their trajectories and sensor sequences differ. The free-grid fixture isolates tracking from camera-map accuracy.
+
+Arrival requires a full fresh one-second stopped interval, estimated distance at most 0.5 m, and the declared physical tolerance (0.85 m for the camera demo). A deadline during dwell cannot pass. Hold checks require fresh sensors and sufficient evidence. Every runner bounds process-group cleanup and stops only its owned processes. Use persistent directories for retained results; `/tmp` may clear when WSL restarts.
+
+[Results](evaluation_results.md), [navigation](../navigation.md), [perception](perception.md) and [simulation setup](../simulation_setup.md) distinguish recorded conditions and remaining limits.

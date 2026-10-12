@@ -1,0 +1,203 @@
+#!/usr/bin/env python3
+"""Build acquisition-stamped grids using independently localized camera poses."""
+
+from collections import deque
+import time
+import cv2
+import numpy as np
+import rclpy
+from geometry_msgs.msg import PoseWithCovarianceStamped
+from localization_common.frames import covariance, interpolate, rotation
+from nav_msgs.msg import OccupancyGrid
+from rclpy.executors import ExternalShutdownException
+from rclpy.node import Node
+from rclpy.qos import DurabilityPolicy, QoSProfile, qos_profile_sensor_data
+from sensor_msgs.msg import CameraInfo, Image
+from grid_projection import project_grid, robot_projection_mask
+
+
+def stamp_ns(message):
+    return message.header.stamp.sec * 10**9 + message.header.stamp.nanosec
+
+
+def state(message):
+    p, q = message.pose.pose.position, message.pose.pose.orientation
+    position = np.array([p.x, p.y, p.z])
+    attitude = np.array([q.w, q.x, q.y, q.z])
+    rotation(attitude)
+    c = covariance(message.pose.covariance, 6)
+    if message.header.frame_id != "map" or not np.isfinite(position).all():
+        raise ValueError("Invalid map anchor")
+    return position, attitude / np.linalg.norm(attitude), c
+
+
+def sample_at(samples, stamp, max_gap):
+    for i, (time_ns, value) in enumerate(samples):
+        if time_ns == stamp:
+            return value
+        if time_ns > stamp:
+            if i == 0 or time_ns - samples[i - 1][0] > max_gap:
+                return None
+            before, first = samples[i - 1]
+            return interpolate(first, value, (stamp - before) / (time_ns - before))
+    return None
+
+
+class TraversabilityMapper(Node):
+    def __init__(self):
+        super().__init__("traversability_mapper")
+        cv2.setNumThreads(1)
+        self.resolution = self.declare_parameter("grid_resolution", .25).value
+        self.threshold = self.declare_parameter("obstacle_luminance_threshold", 32.).value
+        self.max_age = self.declare_parameter("max_image_age", .5).value
+        self.max_gap = self.declare_parameter("max_anchor_gap", .25).value
+        self.radius = self.declare_parameter("ugv_body_radius", .5).value
+        self.body_height = self.declare_parameter("ugv_body_height", .5).value
+        self.ground_z = self.declare_parameter("ground_z", 0.).value
+        self.mount = np.array(self.declare_parameter("body_from_optical_rotation",
+            [0., -1., 0., -1., 0., 0., 0., 0., -1.]).value).reshape(3, 3)
+        self.translation = np.array(self.declare_parameter("body_from_optical_translation",
+                                                           [0., 0., -.18]).value)
+        if (not all(np.isfinite(v) and v > 0 for v in
+                    (self.resolution, self.max_age, self.max_gap, self.radius, self.body_height))
+                or not np.isfinite(self.threshold) or not 0 <= self.threshold <= 255
+                or not np.isfinite(self.ground_z) or self.translation.shape != (3,)
+                or not np.isfinite(self.translation).all()
+                or not np.allclose(self.mount.T @ self.mount, np.eye(3), atol=1e-6)
+                or not np.isclose(np.linalg.det(self.mount), 1.)):
+            raise ValueError("Invalid mapping geometry or timing")
+        self.anchors = deque(maxlen=200)
+        self.ugv = deque(maxlen=200)
+        self.pending = deque(maxlen=10)
+        self.last_clock = self.last_image = None
+        self.info = None
+        self.grid_pub = self.create_publisher(OccupancyGrid, "/local_grid",
+            QoSProfile(depth=1, durability=DurabilityPolicy.TRANSIENT_LOCAL))
+        self.create_subscription(CameraInfo, "/uav/camera/camera_info", self.on_info,
+                                 qos_profile_sensor_data)
+        self.create_subscription(Image, "/uav/camera/image", self.on_image, qos_profile_sensor_data)
+        self.create_subscription(PoseWithCovarianceStamped, "/uav/localization/pose",
+                                 self.on_anchor, qos_profile_sensor_data)
+        self.create_subscription(PoseWithCovarianceStamped, "/ugv/localization/pose",
+                                 self.on_ugv, qos_profile_sensor_data)
+        self.create_timer(.02, self.process)
+
+    def observe_clock(self):
+        now = self.get_clock().now().nanoseconds
+        if self.last_clock is not None and now < self.last_clock:
+            self.anchors.clear()
+            self.ugv.clear()
+            self.pending.clear()
+            self.last_image = None
+        self.last_clock = now
+        return now
+
+    def on_info(self, message):
+        self.info = message
+
+    def append_state(self, message, samples):
+        now = self.observe_clock()
+        stamp = stamp_ns(message)
+        if stamp <= 0 or not -.05e9 <= now - stamp <= self.max_age * 1e9:
+            return
+        try:
+            value = state(message)
+        except ValueError:
+            return
+        if not samples or stamp > samples[-1][0]:
+            samples.append((stamp, value))
+
+    def on_anchor(self, message):
+        self.append_state(message, self.anchors)
+        self.process()
+
+    def on_ugv(self, message):
+        self.append_state(message, self.ugv)
+        self.process()
+
+    def on_image(self, message):
+        now = self.observe_clock()
+        stamp = stamp_ns(message)
+        if (stamp <= 0 or not -.05e9 <= now - stamp <= self.max_age * 1e9
+                or (self.last_image is not None and stamp <= self.last_image)):
+            return
+        self.last_image = stamp
+        self.pending.append((message, self.info, time.monotonic()))
+        self.process()
+
+    def process(self):
+        now = self.observe_clock()
+        batch = list(self.pending)
+        self.pending.clear()
+        for image, info, receipt in batch:
+            stamp = stamp_ns(image)
+            if now - stamp > self.max_age * 1e9 or time.monotonic() - receipt > self.max_age:
+                continue
+            anchor = sample_at(self.anchors, stamp, self.max_gap * 1e9)
+            if anchor is None:
+                self.pending.append((image, info, receipt))
+                continue
+            if (info is None or image.header.frame_id != "uav/camera_optical_frame"
+                    or info.header.frame_id != image.header.frame_id
+                    or (info.width, info.height) != (image.width, image.height)
+                    or info.distortion_model not in ("", "plumb_bob")):
+                continue
+            channels = {"mono8": 1, "rgb8": 3, "bgr8": 3, "rgba8": 4, "bgra8": 4}
+            count = channels.get(image.encoding)
+            if (count is None or image.width <= 0 or image.height <= 0
+                    or image.step < image.width * count
+                    or len(image.data) != image.step * image.height):
+                continue
+            raw = np.frombuffer(image.data, np.uint8).reshape(image.height, image.step)
+            pixels = raw[:, :image.width * count].reshape(image.height, image.width, count)
+            gray = (pixels[:, :, 0] if count == 1 else cv2.cvtColor(pixels,
+                cv2.COLOR_RGB2GRAY if image.encoding.startswith("rgb") else cv2.COLOR_BGR2GRAY))
+            body_rotation = rotation(anchor[1])
+            camera = anchor[0] + body_rotation @ self.translation
+            camera[2] -= self.ground_z
+            try:
+                origin, data, x, y = project_grid(gray, info.k, info.d, camera,
+                    body_rotation @ self.mount, self.resolution, self.threshold)
+            except (ValueError, cv2.error, np.linalg.LinAlgError):
+                continue
+            vehicle = sample_at(self.ugv, stamp, self.max_gap * 1e9)
+            if self.ugv and vehicle is None:
+                self.pending.append((image, info, receipt))
+                continue
+            # Remove this robot's visible body only with a timestamp-matched,
+            # bounded-uncertainty public pose. This does not feed localization.
+            if vehicle is not None and np.linalg.eigvalsh(vehicle[2][:2, :2]).max() <= .25:
+                if camera[2] <= self.body_height:
+                    continue
+                body = robot_projection_mask(x, y, camera, vehicle[0],
+                    self.radius + self.resolution / np.sqrt(2), self.body_height)
+                data[body & (data >= 0)] = 0
+            if self.observe_clock() - stamp > self.max_age * 1e9:
+                continue
+            grid = OccupancyGrid()
+            grid.header.stamp = image.header.stamp
+            grid.header.frame_id = "map"
+            grid.info.resolution = float(self.resolution)
+            grid.info.width, grid.info.height = data.shape[1], data.shape[0]
+            grid.info.origin.position.x = float(origin[0])
+            grid.info.origin.position.y = float(origin[1])
+            grid.info.origin.position.z = float(self.ground_z)
+            grid.info.origin.orientation.w = 1.
+            grid.data = data.ravel().tolist()
+            self.grid_pub.publish(grid)
+
+
+def main():
+    rclpy.init()
+    node = TraversabilityMapper()
+    try:
+        rclpy.spin(node)
+    except (KeyboardInterrupt, ExternalShutdownException):
+        pass
+    finally:
+        node.destroy_node()
+        rclpy.try_shutdown()
+
+
+if __name__ == "__main__":
+    main()

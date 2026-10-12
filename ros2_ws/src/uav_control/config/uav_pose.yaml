@@ -1,0 +1,4 @@
+uav_pose:
+  ros__parameters:
+    use_sim_time: true
+    max_age: 0.5

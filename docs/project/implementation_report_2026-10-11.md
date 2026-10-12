@@ -1,5 +1,7 @@
 # Implementation report: October 11, 2026
 
+Historical report: behavior and numerical results below describe October 11. Current code links follow the October 12 ownership moves; [remediation](remediation_2026-10-12.md) records the fixes and replacement validation.
+
 ## Summary and scope
 
 - The project runs a simulated UAV-assisted UGV navigation system: camera pixels produce a relative UGV position; a timestamp-matched PX4 anchor converts it into map position; an EKF fuses it with wheel, IMU, and available GPS measurements; guarded navigation produces velocity commands.
@@ -19,7 +21,7 @@
 - **Attribution:** the mapper and original goal-demo implementation come from Cameron Cho's `b782b72`, already merged into `main`. This merge integrates that work; it does not establish authorship of it as localization work.
 - **Verification:** the first-parent patch identifies the imported demo files; the second-parent comparison shows the branch documentation and launcher work retained alongside them. Full workspace builds and the final goal trial provide integration evidence for the resulting system.
 - **Limit:** the mapper classifies image brightness. The demo world has no physical obstacles. Importing the demo does not establish obstacle detection accuracy or localization accuracy.
-- **Evidence:** [goal-demo instructions](../../README_simple_goal_demo.md), [mapper source](../../ros2_ws/src/traversability_mapping/src/traversability_mapper.cpp), [demo launch](../../ros2_ws/src/mission_manager/launch/simple_goal_demo.launch.py), and [goal world](../../simulation/worlds/simple_goal_demo.sdf).
+- **Evidence:** [goal-demo instructions](../../README_simple_goal_demo.md), [mapper source](../../ros2_ws/src/traversability_mapping/scripts/traversability_mapper), [demo launch](../../ros2_ws/src/mission_manager/launch/simple_goal_demo.launch.py), and [goal world](../../simulation/worlds/simple_goal_demo.sdf).
 
 ## 2. Apply the PX4 preflight setting after startup
 
@@ -50,7 +52,7 @@
 - **Result:** configured raw rates are 20 Hz wheel odometry, 50 Hz IMU, and 5 Hz GPS. The demo launch includes the sensor chain; docs and presentations describe those interfaces.
 - **Verification:** subsequent localization trials exercise the bridged inputs. Final camera comparisons also require valid wheel messages and verify GPS presence or absence.
 - **Limit:** raw simulation covariance is zero or unknown. These raw messages require the measurement model described in section 5 before fusion.
-- **Evidence:** [bridge configuration](../../ros2_ws/src/cooperative_localization/config/ugv_sensor_bridges.yaml), [sensor launch](../../ros2_ws/src/cooperative_localization/launch/ugv_sensors.launch.py), and [interfaces](../cooperative_localization/interfaces.md).
+- **Evidence:** [bridge configuration](../../ros2_ws/src/simulation_support/config/ugv_sensor_bridges.yaml), [sensor launch](../../ros2_ws/src/simulation_support/launch/ugv_sensors.launch.py), and [interfaces](../cooperative_localization/interfaces.md).
 
 ## 5. Prepare measurements in the map frame
 
@@ -61,7 +63,7 @@
 - **Decision:** preserve acquisition timestamps, leave raw messages intact, and publish configured noise with matching covariance. Unused pose components carry large uncertainty.
 - **Verification:** tests cover the GPS origin, an approximately one-meter east displacement, invalid GPS fixes, spawn offsets, uncertainty growth, and motion occurring before the adapter starts.
 - **Limit:** noise values are simulation assumptions. Prepared wheel pose includes a configured spawn offset, but the EKF uses wheel velocity; that configured pose does not supply a global anchor to the filter.
-- **Evidence:** [measurement adapter](../../ros2_ws/src/cooperative_localization/scripts/ugv_measurements.py), [noise configuration](../../ros2_ws/src/cooperative_localization/config/measurement_model.yaml), and [world configuration](../../ros2_ws/src/cooperative_localization/config/simple_goal_demo.yaml).
+- **Evidence:** [measurement adapter](../../ros2_ws/src/cooperative_localization/scripts/ugv_measurements.py), [noise configuration](../../ros2_ws/src/fault_management/config/measurement_model.yaml), and [world configuration](../../ros2_ws/src/simulation_support/config/simple_goal_demo.yaml).
 
 ## 6. Add the baseline UGV estimator
 
@@ -86,7 +88,7 @@
 - **Result:** baseline RMSE is 0.288-0.406 m with GPS on, 0.116-0.455 m after dropout, and 0.922-1.009 m with GPS denied from startup.
 - **Verification:** the commit records 33 registered checks, zero failures, and one skipped check. Tests cover GPS gating, independent noise streams, timestamp interpolation, angle wrapping, and metric calculations.
 - **Limit:** stable short-route wheel motion can outperform noisy GPS after a good initial fix. These results do not establish long-term drift performance. The startup-denied error reflects an unknown global origin.
-- **Evidence:** [baseline results](../cooperative_localization/evaluation_results.md#baseline-only-short-route), [scorer](../../ros2_ws/src/cooperative_localization/scripts/localization_trial.py), and [trial runner](../../scripts/run_localization_trials.sh).
+- **Evidence:** [baseline results](../cooperative_localization/evaluation_results.md#baseline-only-short-route), [scorer](../../ros2_ws/src/fault_management/scripts/localization_trial.py), and [trial runner](../../scripts/run_localization_trials.sh).
 
 ## 8. Add UAV-assisted localization and harder trials
 
@@ -108,7 +110,7 @@
 - **Verification:** 74 registered checks report zero failures and three skipped cppcheck checks. A 10,000-sample Monte Carlo check agrees with propagated covariance diagonals within 5%. Callback tests cover timestamps, missing anchors, frames, disabled corrections, outliers, PX4 resets, and airborne initialization.
 - **Documentation:** adds the measurement-design research and equations, retained result summaries and plot, shared `AGENTS.md`, and the `CLAUDE.md` import.
 - **Limit:** these controlled vector trials do not validate pixel perception. Position-only UAV corrections do not solve heading drift; both strategies retain about 6.1-6.5 degrees mean heading error in the drift trials.
-- **Evidence:** [measurement design](../cooperative_localization/uav_measurement_design.md), [frame/covariance math](../../ros2_ws/src/cooperative_localization/scripts/cooperative_math.py), [correction adapter](../../ros2_ws/src/cooperative_localization/scripts/uav_correction.py), [nominal results](../cooperative_localization/results/short_nominal/summary.csv), [drift results](../cooperative_localization/results/drift/summary.csv), and [fault results](../cooperative_localization/results/robust/summary.csv).
+- **Evidence:** [measurement design](../cooperative_localization/uav_measurement_design.md), [frame/covariance math](../../ros2_ws/src/localization_common/localization_common/frames.py), [correction adapter](../../ros2_ws/src/cooperative_localization/scripts/uav_correction.py), [nominal results](../cooperative_localization/results/short_nominal/summary.csv), [drift results](../cooperative_localization/results/drift/summary.csv), and [fault results](../cooperative_localization/results/robust/summary.csv).
 
 ## 9. Align PX4, UAV models, and magnetometer settings
 
@@ -164,7 +166,7 @@
   - The known shared-error hold trial has fresh perception/localization inputs, position standard deviation at least 0.851 m, and 1,217 zero commands. The hold is caused by uncertainty exceeding the navigation limit.
 - **Verification:** PX4 and all nine ROS packages build. The retained verification record reports 140 registered checks, zero errors, zero failures, and six skipped cppcheck checks due to installed cppcheck 2.7. Twenty focused perception tests pass, including a 600-sample shared-principal-point covariance experiment.
 - **Limit:** calibration is known simulation geometry, not a measured physical-camera calibration. The covariance is a local approximation conditional on correct target identity. The goal result does not establish 0.5 m physical arrival accuracy or real-time performance.
-- **Evidence:** [perception design](../cooperative_localization/perception.md), [geometry implementation](../../ros2_ws/src/cooperative_localization/scripts/fiducial_math.py), [sensor adapter](../../ros2_ws/src/cooperative_localization/scripts/uav_fiducial_sensor.py), [calibration](../../ros2_ws/src/cooperative_localization/config/camera_calibration.yaml), [camera trial results](../cooperative_localization/results/camera/anchors/summary.csv), [arrival](../cooperative_localization/results/camera/goal.json), [hold](../cooperative_localization/results/camera/hold.json), and [verification](../cooperative_localization/results/camera/verification.json).
+- **Evidence:** [perception design](../cooperative_localization/perception.md), [geometry implementation](../../ros2_ws/src/uav_sensing/scripts/fiducial_math.py), [sensor adapter](../../ros2_ws/src/uav_sensing/scripts/uav_fiducial_sensor.py), [calibration](../../ros2_ws/src/uav_sensing/config/camera_calibration.yaml), [camera trial results](../cooperative_localization/results/camera/anchors/summary.csv), [arrival](../cooperative_localization/results/camera/goal.json), [hold](../cooperative_localization/results/camera/hold.json), and [verification](../cooperative_localization/results/camera/verification.json).
 
 ## What research and iteration caught
 

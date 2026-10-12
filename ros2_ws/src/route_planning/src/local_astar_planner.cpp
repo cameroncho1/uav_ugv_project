@@ -12,6 +12,8 @@
 #include <nav_msgs/msg/path.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <uav_ugv_msgs/pose_guard.hpp>
+#include <uav_ugv_msgs/grid_geometry.hpp>
+#include <uav_ugv_msgs/route_contract.hpp>
 
 using namespace std::chrono_literals;
 
@@ -21,10 +23,12 @@ public:
   LocalAstarPlanner()
   : Node("local_astar_planner"), pose_guard_(pose_limits())
   {
-    max_goal_adjust_cells_ = declare_parameter("max_goal_adjust_cells", 5);
     max_grid_age_ = declare_parameter("max_grid_age", 2.0);
+    robot_radius_ = declare_parameter("robot_radius", 0.5);
+    clearance_ = declare_parameter("obstacle_clearance", 0.05);
     if (!std::isfinite(max_grid_age_) || max_grid_age_ <= 0 ||
-      max_goal_adjust_cells_ < 0 || max_goal_adjust_cells_ > 100)
+      !std::isfinite(robot_radius_) || robot_radius_ <= 0 || robot_radius_ > 5 ||
+      !std::isfinite(clearance_) || clearance_ < 0 || clearance_ > 5)
     {
       throw std::invalid_argument("Invalid planner limits");
     }
@@ -44,8 +48,7 @@ public:
       "/global_goal_pose", latched_qos,
       [this](geometry_msgs::msg::PoseStamped::SharedPtr msg) {
         goal_ = *msg;
-        have_goal_ = msg->header.frame_id == "map" &&
-        std::isfinite(msg->pose.position.x) && std::isfinite(msg->pose.position.y);
+        have_goal_ = uav_ugv_msgs::valid_goal(*msg);
       });
     ugv_pose_sub_ = create_subscription<geometry_msgs::msg::PoseWithCovarianceStamped>(
       "/ugv/localization/pose", 10,
@@ -55,6 +58,8 @@ public:
 
     //publish local path for UGV controller to use
     path_pub_ = create_publisher<nav_msgs::msg::Path>("/local_path", latched_qos);
+    route_pub_ = create_publisher<uav_ugv_msgs::msg::PlannedRoute>(
+      "/ugv/navigation/route", latched_qos);
     timer_ = create_wall_timer(200ms, [this]() {plan();});
   }
 
@@ -100,8 +105,8 @@ private:
 
   bool traversable(const Cell & cell) const
   {
-    return cell_in_bounds(cell) && grid_.data[index_of(cell)] >= 0 &&
-           grid_.data[index_of(cell)] < 50;
+    return cell_in_bounds(cell) && safety_grid_.data[index_of(cell)] >= 0 &&
+           safety_grid_.data[index_of(cell)] < 50;
   }
 
   Cell world_to_cell(double x, double y) const
@@ -121,36 +126,6 @@ private:
     return point;
   }
 
-  bool nearest_free(Cell & cell) const
-  {
-    if (traversable(cell)) {
-      return true;
-    }
-    const Cell original = cell;
-    double best_distance = std::numeric_limits<double>::infinity();
-    bool found = false;
-    for (int radius = 1; radius <= max_goal_adjust_cells_; ++radius) {
-      for (int dy = -radius; dy <= radius; ++dy) {
-        for (int dx = -radius; dx <= radius; ++dx) {
-          Cell candidate{original.x + dx, original.y + dy};
-          if (!traversable(candidate)) {
-            continue;
-          }
-          const double distance = static_cast<double>(dx * dx + dy * dy);
-          if (distance < best_distance) {
-            best_distance = distance;
-            cell = candidate;
-            found = true;
-          }
-        }
-      }
-      if (found) {
-        return true;
-      }
-    }
-    return false;
-  }
-
   double heuristic(const Cell & from, const Cell & to) const
   {
     const double dx = std::abs(from.x - to.x);
@@ -161,7 +136,7 @@ private:
 
   std::vector<Cell> find_path(Cell start, Cell goal) const
   {
-    if (!nearest_free(start) || !nearest_free(goal)) {
+    if (!traversable(start) || !traversable(goal)) {
       return {};
     }
 
@@ -239,16 +214,17 @@ private:
     if (!pose_guard_.check(now().nanoseconds(), uav_ugv_msgs::steady_time_ns()) ||
       !have_goal_ || !valid_grid())
     {
-      path_pub_->publish(path);
+      publish_route(path);
       return;
     }
+    safety_grid_ = uav_ugv_msgs::inflate_grid(grid_, robot_radius_ + clearance_);
     const auto & ugv_pose_ = pose_guard_.pose();
     // Bound coordinates before converting floating-point cells to integers.
     for (const auto & p : {ugv_pose_.position, goal_.pose.position}) {
       if (std::abs((p.x - grid_.info.origin.position.x) / grid_.info.resolution) > 1000000 ||
         std::abs((p.y - grid_.info.origin.position.y) / grid_.info.resolution) > 1000000)
       {
-        path_pub_->publish(path);
+        publish_route(path);
         return;
       }
     }
@@ -261,6 +237,22 @@ private:
       pose.pose.position = cell_center(cell);
       pose.pose.orientation.w = 1.0;
       path.poses.push_back(pose);
+    }
+    if (!cells.empty()) {
+      geometry_msgs::msg::PoseStamped start_pose, goal_pose;
+      start_pose.header = goal_pose.header = path.header;
+      start_pose.pose = ugv_pose_;
+      goal_pose.pose = goal_.pose;
+      path.poses.insert(path.poses.begin(), start_pose);
+      path.poses.push_back(goal_pose);
+      for (std::size_t i = 1; i < path.poses.size(); ++i) {
+        const auto & a = path.poses[i - 1].pose.position;
+        const auto & b = path.poses[i].pose.position;
+        if (!uav_ugv_msgs::clear_segment(safety_grid_, a.x, a.y, b.x, b.y)) {
+          path.poses.clear();
+          break;
+        }
+      }
     }
     if (cells.empty()) {
       const double min_x = grid_.info.origin.position.x;
@@ -279,21 +271,33 @@ private:
         goal_.pose.position.x, goal_.pose.position.y, goal.x, goal.y, goal_state,
         min_x, max_x, min_y, max_y);
     }
-    path_pub_->publish(path);
+    publish_route(path);
   }
 
-  int max_goal_adjust_cells_{5};
+  void publish_route(const nav_msgs::msg::Path & path)
+  {
+    uav_ugv_msgs::msg::PlannedRoute route;
+    route.header = path.header;
+    route.goal = goal_;
+    route.path = path;
+    route.clearance_grid = safety_grid_;
+    path_pub_->publish(path);
+    route_pub_->publish(route);
+  }
+
+  double robot_radius_{0.5}, clearance_{0.05};
   bool have_grid_{false};
   bool have_goal_{false};
   uav_ugv_msgs::PoseGuard pose_guard_;
   double max_grid_age_{2.0};
   int64_t grid_receipt_{0};
-  nav_msgs::msg::OccupancyGrid grid_;
+  nav_msgs::msg::OccupancyGrid grid_, safety_grid_;
   geometry_msgs::msg::PoseStamped goal_;
   rclcpp::Subscription<nav_msgs::msg::OccupancyGrid>::SharedPtr grid_sub_;
   rclcpp::Subscription<geometry_msgs::msg::PoseStamped>::SharedPtr goal_sub_;
   rclcpp::Subscription<geometry_msgs::msg::PoseWithCovarianceStamped>::SharedPtr ugv_pose_sub_;
   rclcpp::Publisher<nav_msgs::msg::Path>::SharedPtr path_pub_;
+  rclcpp::Publisher<uav_ugv_msgs::msg::PlannedRoute>::SharedPtr route_pub_;
   rclcpp::TimerBase::SharedPtr timer_;
 };
 
