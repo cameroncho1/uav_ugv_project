@@ -1,0 +1,619 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A simple technical explanation of the implemented UAV-assisted UGV localization subsystem. Work in progress.">
+  <title>How cooperative localization works</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #ffffff;
+      --ink: #000000;
+      --font: "Aptos", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      width: 100%;
+      min-height: 100%;
+      margin: 0;
+      overflow: hidden;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--font);
+    }
+
+    button { color: inherit; font: inherit; }
+    a { color: inherit; text-decoration: underline; }
+
+    .topbar, .bottombar {
+      position: fixed;
+      z-index: 4;
+      left: 0;
+      right: 0;
+      height: 58px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      padding: 0 clamp(22px, 4vw, 64px);
+      background: var(--bg);
+    }
+
+    .topbar { top: 0; border-bottom: 1px solid var(--ink); }
+    .bottombar { bottom: 0; border-top: 1px solid var(--ink); }
+    .topbar-title { font-size: 0.85rem; font-weight: 700; }
+    .topbar-context {
+      overflow: hidden;
+      font-size: 0.85rem;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .slides { position: fixed; inset: 58px 0; }
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: clamp(24px, 3.5vw, 56px) clamp(22px, 4vw, 64px);
+      visibility: hidden;
+      opacity: 0;
+      pointer-events: none;
+      overflow-y: auto;
+    }
+
+    .slide.active { visibility: visible; opacity: 1; pointer-events: auto; }
+    .slide-inner { width: min(100%, 1300px); min-width: 0; display: grid; }
+    h1, h2, h3, p { margin-top: 0; }
+
+    h1 {
+      max-width: 18ch;
+      margin-bottom: 28px;
+      font-size: clamp(2.6rem, 5.4vw, 4.6rem);
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      line-height: 1.02;
+    }
+
+    h2 {
+      max-width: 30ch;
+      margin-bottom: 12px;
+      font-size: clamp(1.7rem, 3vw, 2.6rem);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.08;
+    }
+
+    h3 { margin-bottom: 14px; font-size: clamp(1.05rem, 1.5vw, 1.3rem); }
+    p, li { font-size: clamp(0.95rem, 1.3vw, 1.18rem); line-height: 1.45; }
+    .lead { max-width: 48ch; font-size: clamp(1.15rem, 2vw, 1.6rem); line-height: 1.4; }
+    .cite, .note { font-size: clamp(0.85rem, 1.1vw, 1rem); line-height: 1.45; }
+    .cite { margin-bottom: clamp(20px, 3vw, 36px); }
+    .note { margin: 24px 0 0; }
+    .mono { font-family: Consolas, "Liberation Mono", monospace; font-size: 0.88em; overflow-wrap: anywhere; }
+    ul, ol { margin: 0; padding-left: 1.15em; }
+    li + li { margin-top: 0.55em; }
+
+    .paper-layout {
+      --pad: clamp(24px, 4vw, 64px);
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      padding-top: clamp(20px, 2.6vw, 32px);
+      border-top: 1px solid var(--ink);
+    }
+
+    .paper-layout > section:first-child { padding-right: var(--pad); }
+    .paper-layout > section + section { padding-left: var(--pad); border-left: 1px solid var(--ink); }
+    .diagram { display: block; width: 100%; height: auto; margin: 12px 0 0; }
+    .diagram text { font-family: var(--font); fill: var(--ink); font-size: 17px; }
+    .equation { padding: 20px 0; margin: 20px 0 0; border-top: 1px solid; border-bottom: 1px solid; }
+
+    table { width: 100%; border-collapse: collapse; }
+    th, td {
+      padding: 14px 16px 14px 0;
+      border-bottom: 1px solid var(--ink);
+      font-size: clamp(0.95rem, 1.3vw, 1.15rem);
+      line-height: 1.4;
+      text-align: left;
+      vertical-align: top;
+    }
+    th { font-weight: 700; border-bottom-width: 2px; }
+
+    .nav-button {
+      min-width: 108px;
+      min-height: 38px;
+      padding: 0 18px;
+      border: 1px solid var(--ink);
+      border-radius: 0;
+      background: var(--bg);
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+    .nav-button:hover:not(:disabled) { background: var(--ink); color: var(--bg); }
+    .nav-button:disabled { opacity: 0.35; cursor: default; }
+    button:focus-visible, a:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+    .segments { flex: 1; display: flex; gap: 6px; max-width: 520px; }
+    .segment { flex: 1; height: 24px; padding: 0; border: 0; background: transparent; cursor: pointer; position: relative; }
+    .segment::after { content: ""; position: absolute; left: 0; right: 0; top: 11px; height: 2px; background: var(--ink); opacity: 0.25; }
+    .segment.current::after { opacity: 1; }
+    .counter { min-width: 64px; font-size: 0.85rem; text-align: right; font-variant-numeric: tabular-nums; }
+
+    @media (prefers-reduced-motion: no-preference) {
+      .slide { transition: opacity 150ms ease, visibility 150ms; }
+    }
+
+    @media (max-width: 860px) {
+      .topbar-context, .segments { display: none; }
+      .paper-layout { grid-template-columns: minmax(0, 1fr); }
+      .paper-layout > section:first-child { padding-right: 0; }
+      .paper-layout > section + section { padding-left: 0; margin-top: 20px; padding-top: 20px; border-left: 0; border-top: 1px solid var(--ink); }
+      .slide { place-items: start; }
+      th, td { padding-right: 10px; }
+    }
+
+    @media print {
+      @page { size: A4 landscape; margin: 10mm; }
+      html, body { overflow: visible; }
+      .topbar, .bottombar { display: none; }
+      .slides { position: static; }
+      .slide {
+        position: relative;
+        inset: auto;
+        height: 185mm;
+        padding: 10mm;
+        break-after: page;
+        visibility: visible;
+        opacity: 1;
+        overflow: visible;
+      }
+      .slide:last-child { break-after: auto; }
+      .paper-layout { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+      .paper-layout > section:first-child { padding-right: 24px; }
+      .paper-layout > section + section { padding: 0 0 0 24px; margin: 0; border-top: 0; border-left: 1px solid; }
+      h1 { font-size: 44px; }
+      h2 { font-size: 30px; }
+      h3 { font-size: 20px; }
+      p, li, th, td { font-size: 16px; }
+      .cite, .note { font-size: 14px; }
+    }
+  </style>
+  <noscript>
+    <style>
+      html, body { overflow: auto; }
+      .topbar, .bottombar { display: none; }
+      .slides { position: static; }
+      .slide { position: relative; min-height: 100vh; visibility: visible; opacity: 1; pointer-events: auto; }
+    </style>
+  </noscript>
+</head>
+<body>
+  <main aria-label="How cooperative localization works">
+    <header class="topbar">
+      <div class="topbar-title">Cooperative localization &middot; Work in progress</div>
+      <div class="topbar-context" id="currentTitle">Subsystem purpose</div>
+    </header>
+
+    <div class="slides">
+      <section class="slide active" data-title="Subsystem purpose">
+        <div class="slide-inner">
+          <h1>How cooperative localization works</h1>
+          <p class="lead">The ground robot combines its sensors with drone camera measurements to estimate its position.</p>
+          <p>UGV means ground robot. UAV means drone.</p>
+          <p class="note">Work in progress. This presentation is intended to be updated as more work is done.<br>Rylan Wade &middot; CS513 &middot; Updated October 11, 2026</p>
+        </div>
+      </section>
+
+      <section class="slide" data-title="The localization output">
+        <div class="slide-inner">
+          <h2>The localization output</h2>
+          <p class="cite">A pose describes position and orientation.</p>
+          <div class="paper-layout">
+            <section>
+              <h3>The estimate contains</h3>
+              <ul>
+                <li>The robot's position in the map.</li>
+                <li>Its heading, or the direction it faces.</li>
+                <li>The time of the estimate.</li>
+                <li>Uncertainty in its position and heading.</li>
+              </ul>
+            </section>
+            <section>
+              <h3>Other packages use it</h3>
+              <ul>
+                <li>The planner uses the pose, a map, and a goal to choose a route.</li>
+                <li>The controller uses the pose to follow that route.</li>
+                <li>ROS 2 carries the estimate on <span class="mono">/ugv/localization/pose</span>, about 30 times per second.</li>
+              </ul>
+            </section>
+          </div>
+          <p class="note">ROS 2 connects software nodes through messages. <a href="subsystem.md">Subsystem documentation</a></p>
+        </div>
+      </section>
+
+      <section class="slide" data-title="Sensor inputs">
+        <div class="slide-inner">
+          <h2>Sensor inputs</h2>
+          <p class="cite">Each sensor provides a different part of the position estimate.</p>
+          <table>
+            <thead><tr><th>Input</th><th>What the estimator uses</th></tr></thead>
+            <tbody>
+              <tr><td>Wheel measurements</td><td>Forward speed to predict movement.</td></tr>
+              <tr><td>IMU, an inertial sensor</td><td>Heading and turn rate.</td></tr>
+              <tr><td>Robot GPS</td><td>A position in the map when GPS is available.</td></tr>
+              <tr><td>Drone camera</td><td>The robot's position relative to the drone.</td></tr>
+              <tr><td>PX4, the drone's flight software</td><td>The drone's estimated position and orientation.</td></tr>
+            </tbody>
+          </table>
+          <p class="note">The estimator uses wheel velocity. It does not use the configured wheel-pose spawn offset as a global position fix. <a href="interfaces.md">Sensor interfaces</a></p>
+        </div>
+      </section>
+
+      <section class="slide" data-title="Camera measurements">
+        <div class="slide-inner">
+          <h2>Camera measurements</h2>
+          <p class="cite">The robot carries a square AprilTag with a known pattern and a 0.4 m edge.</p>
+          <div class="paper-layout">
+            <section>
+              <h3>From pixels to position</h3>
+              <ol>
+                <li>Find the tag and its four corners in the image.</li>
+                <li>Use the tag size and camera calibration to calculate its position.</li>
+                <li>Apply the camera mount and tag mount offsets to locate the robot's chassis.</li>
+              </ol>
+            </section>
+            <section>
+              <h3>Camera calibration</h3>
+              <ul>
+                <li>Calibration relates pixels to viewing directions.</li>
+                <li>Mount settings describe the camera's position and angle on the drone.</li>
+                <li>The detector receives images and calibration. It has no simulator-position input.</li>
+                <li>A missing or invalid tag produces no position measurement.</li>
+              </ul>
+            </section>
+          </div>
+          <p class="note">The demo uses rendered images at 5 Hz. Calibration comes from known simulation geometry. <a href="perception.md">Perception documentation</a></p>
+        </div>
+      </section>
+
+      <section class="slide" data-title="Relative position to map position">
+        <div class="slide-inner">
+          <h2>Relative position to map position</h2>
+          <p class="cite">The correction adapter combines the camera measurement with the drone's pose.</p>
+          <div class="paper-layout">
+            <section>
+              <h3>Position calculation</h3>
+              <ul>
+                <li>The camera gives an offset from the drone to the robot.</li>
+                <li>The adapter rotates that offset into map directions using the drone's orientation.</li>
+                <li>It adds the offset to the drone's map position.</li>
+              </ul>
+              <p class="equation">Robot position = drone position + rotated offset</p>
+            </section>
+            <section>
+              <h3>Example in map coordinates</h3>
+              <svg class="diagram" viewBox="0 0 480 260" role="img" aria-labelledby="exampleTitle exampleDesc">
+                <title id="exampleTitle">Adding a relative offset to the drone position</title>
+                <desc id="exampleDesc">The drone is at east 10, north 5 meters. The robot is two meters east and one meter south, at east 12, north 4 meters.</desc>
+                <path d="M110 80H320V175" fill="none" stroke="black" stroke-width="2" stroke-dasharray="5 5"/>
+                <circle cx="110" cy="80" r="6" fill="black"/>
+                <circle cx="320" cy="175" r="6" fill="black"/>
+                <text x="26" y="48">Drone: (10, 5) m</text>
+                <text x="163" y="68">2 m east</text>
+                <text x="334" y="132">1 m south</text>
+                <text x="246" y="212">Robot: (12, 4) m</text>
+              </svg>
+              <p>The example offset is already rotated into map coordinates.</p>
+            </section>
+          </div>
+          <p class="note">Drone position and orientation uncertainty also enter the correction. <a href="uav_measurement_design.md">Measurement design</a></p>
+        </div>
+      </section>
+
+      <section class="slide" data-title="Coordinates and time">
+        <div class="slide-inner">
+          <h2>Coordinates and time</h2>
+          <div class="paper-layout">
+            <section>
+              <h3>Use the same map</h3>
+              <ul>
+                <li>The map uses east, north, and up, in meters.</li>
+                <li>GPS latitude and longitude are converted into local map coordinates.</li>
+                <li>PX4 north/east/down coordinates are converted into east/north/up.</li>
+                <li>A configured offset aligns PX4's local origin with the map.</li>
+              </ul>
+            </section>
+            <section>
+              <h3>Use the capture time</h3>
+              <ul>
+                <li>The image keeps the time when the camera captured it.</li>
+                <li>The adapter finds or interpolates the drone pose at that time.</li>
+                <li>A missing time match waits briefly, then expires.</li>
+                <li>Simulation measurements use the same clock.</li>
+              </ul>
+            </section>
+          </div>
+          <p class="note">The correction allows a 0.25 s gap between drone poses and a 0.5 s measurement age. <a href="interfaces.md">Frames and timestamps</a></p>
+        </div>
+      </section>
+
+      <section class="slide" data-title="The EKF">
+        <div class="slide-inner">
+          <h2>The EKF combines the measurements</h2>
+          <p class="cite">An Extended Kalman Filter (EKF) keeps a running estimate. The project uses the ROS package <span class="mono">robot_localization</span>.</p>
+          <div class="paper-layout">
+            <section>
+              <h3>Predict movement</h3>
+              <ul>
+                <li>Wheel speed tells the filter how fast the robot moves.</li>
+                <li>IMU heading tells it which direction the robot faces.</li>
+                <li>The filter predicts the next position between position readings.</li>
+              </ul>
+            </section>
+            <section>
+              <h3>Correct position</h3>
+              <ul>
+                <li>GPS or a drone-derived robot position adjusts the prediction.</li>
+                <li>The reported uncertainty controls the weight of a measurement.</li>
+                <li>Checks reject invalid readings and large inconsistent jumps.</li>
+                <li>The filter publishes the combined pose and uncertainty.</li>
+              </ul>
+            </section>
+          </div>
+          <p class="note">Drone corrections update map x/y. The IMU supplies heading and turn rate. <a href="interfaces.md">Filter inputs</a></p>
+        </div>
+      </section>
+
+      <section class="slide" data-title="Uncertainty">
+        <div class="slide-inner">
+          <h2>Uncertainty is part of the output</h2>
+          <p class="cite">Covariance describes the size and direction of the estimate's uncertainty.</p>
+          <div class="paper-layout">
+            <section>
+              <h3>Measurement errors</h3>
+              <ul>
+                <li>GPS readings vary around the robot's position.</li>
+                <li>Pixel and mounting errors affect the camera measurement.</li>
+                <li>Drone position and heading errors affect the robot's map position.</li>
+                <li>The system reports these errors through its uncertainty model.</li>
+              </ul>
+            </section>
+            <section>
+              <h3>Shared position error</h3>
+              <ul>
+                <li>Robot GPS and drone position can share the same global offset.</li>
+                <li>They can agree while both are wrong.</li>
+                <li>Relative vision cannot identify that shared map offset.</li>
+                <li>A configured uncertainty term stays in the output. It does not detect or remove unknown bias.</li>
+              </ul>
+            </section>
+          </div>
+          <p class="note">Simulation noise and uncertainty settings are test assumptions. Hardware needs measured settings. <a href="perception.md#shared-global-position-errors">Shared-error model</a></p>
+        </div>
+      </section>
+
+      <section class="slide" data-title="Missing measurements">
+        <div class="slide-inner">
+          <h2>Missing measurements</h2>
+          <table>
+            <thead><tr><th>Condition</th><th>Implemented behavior</th></tr></thead>
+            <tbody>
+              <tr><td>Robot GPS stops</td><td>Wheel and IMU readings continue. Camera corrections can still provide map position.</td></tr>
+              <tr><td>The camera loses the tag</td><td>The detector stops sending observations. The EKF continues with remaining inputs.</td></tr>
+              <tr><td>No global position at startup</td><td>The estimate starts with large position uncertainty. Navigation waits for an acceptable pose.</td></tr>
+              <tr><td>PX4 resets its local reference</td><td>The anchor adapter stops output until its map alignment is reset and the adapter restarts.</td></tr>
+            </tbody>
+          </table>
+          <p class="note">Camera loss does not immediately stop the robot. Navigation continues only while pose, map, and route checks pass. <a href="subsystem.md">Outage behavior</a></p>
+        </div>
+      </section>
+
+      <section class="slide" data-title="Navigation checks">
+        <div class="slide-inner">
+          <h2>Navigation checks the fused pose</h2>
+          <div class="paper-layout">
+            <section>
+              <h3>Before motion</h3>
+              <ul>
+                <li>The pose must use the map frame and contain valid values.</li>
+                <li>The pose must be at most 0.5 s old and received within the last 0.5 s.</li>
+                <li>Position standard deviation must be at most 0.5 m.</li>
+                <li>Heading standard deviation must be at most 0.2 radians, about 11 degrees.</li>
+              </ul>
+            </section>
+            <section>
+              <h3>Hold and recovery</h3>
+              <ul>
+                <li>The planner also needs a valid, fresh map. The controller needs a valid, fresh route.</li>
+                <li>Failed checks cause zero velocity commands every 0.1 s.</li>
+                <li>A steady clock catches missing updates even if simulation time freezes.</li>
+                <li>Valid inputs allow navigation to resume.</li>
+              </ul>
+            </section>
+          </div>
+          <p class="note">Standard deviation describes uncertainty; it is not a maximum error guarantee. Controller or transport failure still needs an actuator command timeout. <a href="../navigation.md">Navigation rules</a></p>
+        </div>
+      </section>
+
+      <section class="slide" data-title="How the system is tested">
+        <div class="slide-inner">
+          <h2>How the system is tested</h2>
+          <div class="paper-layout">
+            <section>
+              <h3>Localization accuracy</h3>
+              <ul>
+                <li>Compare estimates with simulator truth at matching times.</li>
+                <li>Run baseline and assisted filters on the same robot sensor messages.</li>
+                <li>Test GPS on, lost during motion, and off from startup.</li>
+                <li>Inject drift, bad observations, outages, and shared position errors.</li>
+              </ul>
+            </section>
+            <section>
+              <h3>Perception and navigation</h3>
+              <ul>
+                <li>Check camera geometry against known target positions.</li>
+                <li>Move an opaque panel in front of the camera, then remove it.</li>
+                <li>Send stale or uncertain poses to the ROS planner and controller.</li>
+                <li>Measure physical goal distance separately from estimated distance.</li>
+              </ul>
+            </section>
+          </div>
+          <p class="note">Simulator truth is used for sensor simulation and scoring. The estimator and navigation do not receive it as their pose. <a href="evaluation_results.md">Test methods and results</a></p>
+        </div>
+      </section>
+
+      <section class="slide" data-title="Recorded simulation results">
+        <div class="slide-inner">
+          <h2>Recorded simulation results</h2>
+          <p class="cite">These results apply to the documented simulation conditions.</p>
+          <table>
+            <thead><tr><th>Check</th><th>Recorded result</th></tr></thead>
+            <tbody>
+              <tr><td>Nine live-camera trials</td><td>Position RMSE: 0.096 to 0.157 m. RMSE is a measure of error across the scored samples.</td></tr>
+              <tr><td>Rendered camera visibility</td><td>Centered and off-center tags are detected. Tested occlusions produce no observations; detection resumes when the panel is removed.</td></tr>
+              <tr><td>Navigation without robot GPS</td><td>Physical goal distance: 0.607 m, within the declared 0.85 m test tolerance.</td></tr>
+              <tr><td>Known shared uncertainty</td><td>A configured 0.8 m uncertainty term causes a hold. All 1,217 commands remain zero.</td></tr>
+              <tr><td>Builds and checks</td><td>PX4 and nine ROS packages build. 140 registered checks report zero failures; six are skipped.</td></tr>
+            </tbody>
+          </table>
+          <p class="note">The controller's 0.5 m tolerance uses estimated position. It does not guarantee 0.5 m physical accuracy. <a href="evaluation_results.md">Results</a> &middot; <a href="results/camera/verification.json">Verification record</a></p>
+        </div>
+      </section>
+
+      <section class="slide" data-title="Work still needed">
+        <div class="slide-inner">
+          <h2>Work still needed</h2>
+          <div class="paper-layout">
+            <section>
+              <h3>Further implementation</h3>
+              <ul>
+                <li>Add an actuator timeout for lost velocity commands.</li>
+                <li>Add an independent global reference to address shared GPS/drone position bias.</li>
+                <li>Measure physical camera calibration and mounting uncertainty.</li>
+              </ul>
+            </section>
+            <section>
+              <h3>Further evaluation</h3>
+              <ul>
+                <li>Test moving occlusion, motion blur, and damaged tags.</li>
+                <li>Test physical wheel slip and uneven terrain.</li>
+                <li>Test representative obstacles with the mapping subsystem.</li>
+                <li>The existing mapper uses image brightness to classify cells.</li>
+              </ul>
+            </section>
+          </div>
+          <p class="note">Work in progress. Update this presentation as more work is done, including implementation, test conditions, results, and remaining limits.</p>
+        </div>
+      </section>
+
+      <section class="slide" data-title="Documentation and updates">
+        <div class="slide-inner">
+          <h2>Documentation and updates</h2>
+          <div class="paper-layout">
+            <section>
+              <h3>Implementation details</h3>
+              <ul>
+                <li><a href="subsystem.md">Subsystem</a>: purpose and ownership.</li>
+                <li><a href="interfaces.md">Interfaces</a>: messages, frames, and timestamps.</li>
+                <li><a href="perception.md">Perception</a>: camera geometry and uncertainty.</li>
+                <li><a href="../navigation.md">Navigation</a>: motion, hold, and recovery rules.</li>
+              </ul>
+            </section>
+            <section>
+              <h3>Update with project work</h3>
+              <ul>
+                <li>Describe the behavior implemented in code.</li>
+                <li>Link each measured result to its test conditions.</li>
+                <li>Keep failed runs and untested conditions visible.</li>
+                <li>Update the title date when revising the presentation.</li>
+              </ul>
+            </section>
+          </div>
+          <p class="note"><a href="evaluation_results.md">Evaluation results</a> &middot; <a href="../project/implementation_report_2026-10-11.md">Implementation report</a><br>Work in progress. This presentation is intended to be updated as more work is done.</p>
+        </div>
+      </section>
+    </div>
+
+    <nav class="bottombar" aria-label="Slide navigation">
+      <button class="nav-button" id="previousButton" type="button">Previous</button>
+      <div class="segments" id="segments"></div>
+      <div class="counter" id="counter" aria-live="polite" aria-atomic="true">01 / 14</div>
+      <button class="nav-button" id="nextButton" type="button">Next</button>
+    </nav>
+  </main>
+
+  <script>
+    (() => {
+      const slides = Array.from(document.querySelectorAll('.slide'));
+      const previousButton = document.getElementById('previousButton');
+      const nextButton = document.getElementById('nextButton');
+      const counter = document.getElementById('counter');
+      const currentTitle = document.getElementById('currentTitle');
+      const segments = document.getElementById('segments');
+      let current = 0;
+
+      const segmentButtons = slides.map((slide, index) => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'segment';
+        button.setAttribute('aria-label', `Go to slide ${index + 1}: ${slide.dataset.title}`);
+        button.addEventListener('click', () => show(index));
+        segments.appendChild(button);
+        return button;
+      });
+
+      function indexFromHash() {
+        const match = window.location.hash.match(/^#slide-(\d+)$/);
+        return match ? Math.min(slides.length - 1, Math.max(0, Number(match[1]) - 1)) : 0;
+      }
+
+      function show(index, updateHash = true) {
+        current = Math.min(slides.length - 1, Math.max(0, index));
+        slides.forEach((slide, slideIndex) => {
+          const active = slideIndex === current;
+          slide.classList.toggle('active', active);
+          slide.setAttribute('aria-hidden', String(!active));
+          slide.inert = !active;
+          if (active) slide.scrollTop = 0;
+        });
+        segmentButtons.forEach((button, buttonIndex) => {
+          const active = buttonIndex === current;
+          button.classList.toggle('current', active);
+          button.setAttribute('aria-current', active ? 'step' : 'false');
+        });
+        previousButton.disabled = current === 0;
+        nextButton.disabled = current === slides.length - 1;
+        counter.textContent = `${String(current + 1).padStart(2, '0')} / ${String(slides.length).padStart(2, '0')}`;
+        currentTitle.textContent = slides[current].dataset.title;
+        document.title = `${slides[current].dataset.title} | Cooperative localization`;
+        if (updateHash) window.history.replaceState(null, '', `#slide-${current + 1}`);
+      }
+
+      previousButton.addEventListener('click', () => show(current - 1));
+      nextButton.addEventListener('click', () => show(current + 1));
+      document.addEventListener('keydown', (event) => {
+        if (event.altKey || event.ctrlKey || event.metaKey ||
+            event.target.closest('input, textarea, select, [contenteditable]')) return;
+        if (event.key === ' ' && event.target.closest('button, a')) return;
+        if (['ArrowRight', 'PageDown', ' '].includes(event.key)) {
+          event.preventDefault();
+          show(current + 1);
+        } else if (['ArrowLeft', 'PageUp'].includes(event.key)) {
+          event.preventDefault();
+          show(current - 1);
+        } else if (event.key === 'Home') {
+          event.preventDefault();
+          show(0);
+        } else if (event.key === 'End') {
+          event.preventDefault();
+          show(slides.length - 1);
+        }
+      });
+      window.addEventListener('hashchange', () => show(indexFromHash(), false));
+      show(indexFromHash(), false);
+    })();
+  </script>
+</body>
+</html>

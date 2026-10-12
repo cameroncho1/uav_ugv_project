@@ -16,6 +16,8 @@ The [goal demo](README_simple_goal_demo.md) adds a stationary UAV camera grid, l
 
 See [simulation setup](docs/simulation_setup.md) for the pinned firmware, ROS messages, UAV models, and magnetometer settings.
 
+The [how localization works presentation](docs/cooperative_localization/how_it_works_presentation.html) explains the sensor inputs, camera corrections, estimator, and navigation checks in simple technical English. It is a work in progress and is intended to be updated as more work is done.
+
 ## Tested Environment
 
 | Component | Tested Version / Setting |
