@@ -5,3 +5,6 @@ ros2_ws/log/
 *.pyc
 __pycache__/
 .DS_Store
+
+# Local-only agent context notes
+docs/cooperative_localization/sim_setup_context.md
