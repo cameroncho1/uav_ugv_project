@@ -20,7 +20,7 @@ The [localization presentation](docs/cooperative_localization/how_it_works_prese
 
 ## Runtime and recorded environments
 
-Run ROS, PX4 and Gazebo inside Ubuntu 22.04. macOS and Windows are host systems for editing and Git. The original basic simulation runs on Apple Silicon with UTM; the October 12 audit validation runs on x86-64 Ubuntu 22.04 under Windows WSL2. A fresh audit-branch build on ARM64 is not recorded.
+Run ROS, PX4 and Gazebo inside Ubuntu 22.04. macOS and Windows are host systems for editing and Git. The original basic simulation runs on Apple Silicon with UTM; the audit-branch runtime uses x86-64 Ubuntu 22.04 under Windows WSL2. A fresh audit-branch build on ARM64 is not recorded.
 
 | Component | Tested Version / Setting |
 |---|---|

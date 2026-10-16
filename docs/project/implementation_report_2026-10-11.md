@@ -1,6 +1,6 @@
 # Implementation report: October 11, 2026
 
-Historical report: behavior and numerical results below describe October 11. Current code links follow the October 12 ownership moves; [remediation](remediation_2026-10-12.md) records the fixes and replacement validation.
+Historical report: behavior and numerical results below describe October 11. Source links follow the current package locations; the reported results do not validate later code changes.
 
 ## Summary and scope
 

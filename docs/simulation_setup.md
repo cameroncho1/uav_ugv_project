@@ -128,7 +128,7 @@ MAKEFLAGS=-j1 colcon build --packages-up-to ros_gz_bridge \
 source install/setup.bash
 ```
 
-Keep this install sourced when building the project. The project workspace records the sourced underlay in its setup chain. This source recipe is checked against upstream build metadata; an ARM64 build is not recorded in the audit results.
+Keep this install sourced when building the project. The project workspace records the sourced underlay in its setup chain. This source recipe is checked against upstream build metadata; an ARM64 build has not been verified.
 
 ### Install project dependencies
 

@@ -90,6 +90,33 @@ cd ..
 scripts/run_cooperative_trials.sh "$HOME/uav_ugv_results/paired_nominal"
 ```
 
-[Interfaces](interfaces.md#evaluation-and-reproducibility) lists drift, outlier, outage, camera, tracking, and command-loss checks. [Audit results](../project/remediation_2026-10-12.md) records 155 registered checks with zero errors/failures and seven cppcheck skips. It also records the GPS-denied camera goal trial: 0.549 m physical goal error and 0.064 m cross-track RMSE. These are recorded simulation results.
+[Interfaces](interfaces.md#evaluation-and-reproducibility) lists drift, outlier, outage, camera, tracking, and command-loss checks.
 
-[All project documentation](../README.md) includes design, research, presentations, historical reports, and evidence.
+## Design and interfaces
+
+| Document | Contents |
+| --- | --- |
+| [Subsystem](subsystem.md) | Estimator behavior and ownership. |
+| [Interfaces](interfaces.md) | Topics, frames, clocks, controls, launch modes, and evaluation commands. |
+| [UAV measurement design](uav_measurement_design.md) | Coordinate conversion, acquisition-time matching, propagated covariance, and rejection rules. |
+| [Camera observations](perception.md) | Tag geometry, calibration assumptions, visibility, and shared-error tests. |
+| [Navigation integration](../navigation.md) | Pose consumers, goal revisions, clearance, command expiry, and tracking metrics. |
+| [Research references](references.md) | Source summaries and limits on their application to this simulation. |
+
+## Results and implementation history
+
+| Document | Revision or scope |
+| --- | --- |
+| [October 11 results](evaluation_results.md) | Historical GPS-branch trials, before the audit fixes. |
+| [October 11 implementation report](../project/implementation_report_2026-10-11.md) | Changes, attribution, decisions, and result links. |
+| [GPS-branch evidence](results/) | Retained summaries, comparisons, charts, and diagnostics. |
+
+## Presentations
+
+| Presentation | Contents |
+| --- | --- |
+| [How localization works](how_it_works_presentation.html) | Current pipeline, navigation guards, and dated results. |
+| [Localization overview](initial_presentation.html) | Scope, inputs, output, and integration. |
+| [Research papers](research_papers_presentation.html) | Literature summaries and source links. |
+
+[Project documentation](../README.md) covers shared setup and project-wide design.

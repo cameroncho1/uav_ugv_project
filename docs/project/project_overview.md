@@ -25,4 +25,4 @@ The proposed evaluation covers route length, terrain, obstacle density, localiza
 
 The camera goal-demo world has no physical obstacles. Multi-UAV scouting, semantic terrain classification, energy-aware global planning, dynamic-hazard evaluation, and production fault diagnosis remain proposed work.
 
-[Audit results](remediation_2026-10-12.md) records the implemented fixes and validation. [Localization](../cooperative_localization/README.md) describes the estimator and extension interfaces.
+[Localization](../cooperative_localization/README.md) describes the estimator, extension interfaces, test commands, and retained historical results.

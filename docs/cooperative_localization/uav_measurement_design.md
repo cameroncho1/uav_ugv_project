@@ -12,7 +12,7 @@ The correction computes `p_ugv = p_uav + R_uav * relative`. With independent anc
 
 ## Design choices checked by evaluation
 
-Numerical results in this section are retained October 11 runs. [October 12 remediation](../project/remediation_2026-10-12.md) records the current reruns; they are not promises of general accuracy.
+Numerical results in this section are retained October 11 runs. They do not describe validation of later code changes.
 
 | Choice | Evidence and implemented behavior |
 | --- | --- |

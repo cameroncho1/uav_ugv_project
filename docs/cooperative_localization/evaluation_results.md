@@ -1,6 +1,6 @@
 # UGV Localization Evaluation
 
-The results below are retained October 11 evidence. [October 12 remediation and validation](../project/remediation_2026-10-12.md) records the current ownership, fixes, paired reruns, and physical tracking results. Earlier numbers are not reclassified as tests of the repaired code.
+The results below are retained October 11 evidence for the GPS branch. They do not describe validation of later code changes.
 
 ## Baseline-only short route
 

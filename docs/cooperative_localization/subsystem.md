@@ -59,7 +59,7 @@ Paired trials compare baseline and assisted filters on identical UGV messages. C
 
 Rendered trials test tag visibility, occlusion, recovery, and off-axis geometry. Closed-loop trials measure physical route cross-track error and goal arrival. Command-loss trials measure stopping after controller or bridge loss.
 
-[Interfaces](interfaces.md#evaluation-and-reproducibility) lists commands. [Audit results](../project/remediation_2026-10-12.md) records conditions and output files. [October 11 results](evaluation_results.md) remains historical evidence for the GPS branch.
+[Interfaces](interfaces.md#evaluation-and-reproducibility) lists commands and output files. [October 11 results](evaluation_results.md) remains historical evidence for the GPS branch.
 
 ## Limits
 

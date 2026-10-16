@@ -44,4 +44,4 @@ The ROS guard harness includes blocked starts and delayed obsolete-goal routes i
 
 Closed-loop baseline/assisted tracking uses separate fresh worlds with identical configured seeds, map and goal. Trajectories and sensor sequences differ under feedback. The fixture supplies a declared free grid, fixed-observer synthetic observations, and the drift profile. GPS outage begins no earlier than 2 s after first motion and after at least 11 received fixes, preserving the GPS evidence threshold. This isolates tracking from camera-grid accuracy. Baseline holds/failures remain recorded.
 
-[Results](cooperative_localization/evaluation_results.md) and the [remediation record](project/remediation_2026-10-12.md) identify measured conditions. Uneven terrain, hardware camera calibration, unknown shared global bias and reliable semantic mapping remain outside these simulation claims.
+[Historical results](cooperative_localization/evaluation_results.md) identify the tested GPS-branch conditions. Uneven terrain, hardware camera calibration, unknown shared global bias and reliable semantic mapping remain outside these simulation claims.
