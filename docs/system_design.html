@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>UAV-UGV project system design</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:white;color:black;font:16px/1.5 Arial,sans-serif}main{max-width:1280px;margin:auto;padding:28px 24px}h1{font-size:28px;margin:0 0 8px}p{margin:8px 0 16px;max-width:95ch}a{color:black;text-underline-offset:3px}.legend{display:flex;gap:20px;flex-wrap:wrap;font-size:14px;margin:18px 0}.key{display:inline-block;width:16px;height:16px;border:1px solid black;margin-right:6px;vertical-align:-3px}.changed{background:#d9eddf}.existing{background:#dfeaf5}.proposed{background:#faeacb}.diagram{overflow:auto;border:1px solid #aaa}svg{display:block;width:100%;min-width:940px}svg text{fill:black;font-family:Arial,sans-serif}.title{font-size:18px;font-weight:bold}.body{font-size:15px}.small{font-size:13px}.box{stroke:black;stroke-width:1;rx:3}.edge{fill:none;stroke:black;stroke-width:1.5;marker-end:url(#arrow)}.future{stroke-dasharray:5 4}h2{font-size:20px;margin:24px 0 8px}ul{padding-left:22px}li{margin:5px 0}.note{font-size:14px}footer{margin-top:24px;border-top:1px solid #aaa;padding-top:12px;font-size:14px}@media print{@page{size:A4 landscape;margin:10mm}main{padding:0}svg{min-width:0}body{font-size:12px;print-color-adjust:exact;-webkit-print-color-adjust:exact}.diagram{overflow:visible}h1{font-size:23px}footer{break-inside:avoid}}
+</style>
+</head>
+<body><main>
+<h1>UAV-UGV project system design</h1>
+<p>A UAV observes the route and helps locate a ground robot. The ground robot uses a terrain map, its estimated pose, and a goal to plan and drive.</p>
+<p class="note">Branch comparison: <code>main</code> to <code>fix/subsystem-audit</code>, including the GPS-branch work. Green means added or changed, including changes to inherited code. It does not mean the whole subsystem is finished.</p>
+<div class="legend" aria-label="Implementation status">
+<span><i class="key changed"></i>Added or changed on this branch</span>
+<span><i class="key existing"></i>Existing foundation on main</span>
+<span><i class="key proposed"></i>Proposed; not implemented here</span>
+</div>
+<div class="diagram" tabindex="0" role="region" aria-label="Scrollable project system design">
+<svg viewBox="0 0 1200 815" role="img" aria-labelledby="diagram-title diagram-desc">
+<title id="diagram-title">Proposed project and implemented prototype</title>
+<desc id="diagram-desc">Camera sensing feeds terrain mapping and cooperative localization. Mission goals, the map and the estimated UGV pose feed A-star planning and path following. Fault injection and scoring evaluate these components in Gazebo. Multi-UAV scouting, semantic terrain mapping, energy-aware global routing and production fault diagnosis remain proposed.</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 Z" fill="black"/></marker></defs>
+<rect class="box" x="640" y="20" width="250" height="65" fill="#d9eddf"/>
+<text class="title" x="655" y="47">Mission goal</text><text class="body" x="655" y="70">Fixed goal + goal revision</text>
+<path class="edge" d="M765 85 V145"/>
+<rect class="box" x="20" y="145" width="250" height="165" fill="#d9eddf"/>
+<text class="title" x="35" y="175">UAV flight + sensing</text>
+<text class="body" x="35" y="205">Takeoff and hover</text><text class="body" x="35" y="229">Independent PX4 map pose</text><text class="body" x="35" y="253">Camera tag observations</text><text class="small" x="35" y="290">uav_control / uav_sensing</text>
+<rect class="box" x="330" y="145" width="250" height="165" fill="#d9eddf"/>
+<text class="title" x="345" y="175">Terrain mapping</text><text class="body" x="345" y="205">Calibrated ground projection</text><text class="body" x="345" y="229">Brightness-based grid</text><text class="body" x="345" y="253">Image-time UAV pose</text><text class="small" x="345" y="290">traversability_mapping</text>
+<rect class="box" x="640" y="145" width="250" height="165" fill="#d9eddf"/>
+<text class="title" x="655" y="175">Route planning</text><text class="body" x="655" y="205">Local A* search</text><text class="body" x="655" y="229">Robot footprint clearance</text><text class="body" x="655" y="253">Route matched to goal</text><text class="small" x="655" y="290">route_planning</text>
+<rect class="box" x="950" y="145" width="230" height="165" fill="#d9eddf"/>
+<text class="title" x="965" y="175">UGV driving</text><text class="body" x="965" y="205">Guarded path following</text><text class="body" x="965" y="229">Stop on invalid inputs</text><text class="body" x="965" y="253">Actuator command expiry</text><text class="small" x="965" y="290">ugv_control</text>
+<path class="edge" d="M270 210 H330"/><text class="small" x="282" y="198">Images</text>
+<path class="edge" d="M580 210 H640"/><text class="small" x="594" y="198">Grid</text>
+<path class="edge" d="M890 210 H950"/><text class="small" x="902" y="198">Route</text>
+<rect class="box" x="20" y="400" width="250" height="160" fill="#d9eddf"/>
+<text class="title" x="35" y="430">Measured UGV inputs</text><text class="body" x="35" y="460">GPS position</text><text class="body" x="35" y="484">Wheel speed</text><text class="body" x="35" y="508">IMU heading and turn rate</text><text class="small" x="35" y="540">/ugv/sensors/*</text>
+<rect class="box" x="330" y="400" width="560" height="160" fill="#d9eddf"/>
+<text class="title" x="345" y="430">Cooperative UGV localization</text><text class="body" x="345" y="460">Validate sensors + match UAV observations by acquisition time</text><text class="body" x="345" y="484">Fuse wheel, IMU, GPS and UAV position measurements</text><text class="body" x="345" y="508">Publish UGV pose + covariance in map</text><text class="small" x="345" y="540">cooperative_localization + localization_common</text>
+<path class="edge" d="M270 480 H330"/>
+<path class="edge" d="M145 310 V355 H455 V400"/><text class="small" x="155" y="346">UAV map pose + relative observation</text>
+<path class="edge" d="M765 400 V310"/><text class="small" x="775" y="358">UGV pose</text>
+<path class="edge" d="M890 480 H920 V335 H1065 V310"/><text class="small" x="970" y="330">UGV pose</text>
+<rect class="box" x="20" y="620" width="355" height="150" fill="#dfeaf5"/>
+<text class="title" x="35" y="650">Simulation foundation</text><text class="body" x="35" y="680">Gazebo world + UAV / UGV models</text><text class="body" x="35" y="704">PX4 SITL + ROS 2 + DDS</text><text class="small" x="35" y="744">Existing main code, extended by this branch</text>
+<rect class="box" x="395" y="620" width="380" height="150" fill="#d9eddf"/>
+<text class="title" x="410" y="650">Simulation integration + evaluation</text><text class="body" x="410" y="680">Raw sensor / clock bridges + test noise</text><text class="body" x="410" y="704">GPS outages, drift, outliers + truth scoring</text><text class="small" x="410" y="744">simulation_support / fault_management</text>
+<path class="edge" d="M195 620 V590 H145 V560"/>
+<path class="edge" d="M585 620 V590 H290 V520 H270"/>
+<rect class="box future" x="950" y="400" width="230" height="160" fill="#faeacb"/>
+<text class="title" x="965" y="430">Future fault response</text><text class="body" x="965" y="460">Fault classification</text><text class="body" x="965" y="484">Mechanical fault diagnosis</text><text class="body" x="965" y="508">Mission recovery policy</text><text class="small" x="965" y="540">Guards and test faults exist</text>
+<rect class="box future" x="795" y="620" width="385" height="150" fill="#faeacb"/>
+<text class="title" x="810" y="650">Other proposed project work</text><text class="body" x="810" y="680">Multi-UAV scouting + semantic terrain mapping</text><text class="body" x="810" y="704">Energy-aware global routes + dynamic hazards</text><text class="body" x="810" y="728">Varied terrain and obstacle evaluation</text>
+<text class="small" x="20" y="802">Arrows show the main data flow. Simulator truth is used for synthetic inputs and scoring, not as the navigation pose.</text>
+</svg></div>
+<h2>Prototype limits</h2>
+<ul><li>One hovering UAV, one UGV, a roof tag, and known camera geometry.</li><li>Flat simulated ground. The camera goal-demo world has no physical obstacles.</li><li>Brightness classification supplies the current terrain grid. Semantic hazard recognition remains proposed.</li><li>The UAV retains an independent global reference during UGV GPS loss.</li></ul>
+<footer><a href="README.md">Documentation index</a> · <a href="cooperative_localization/README.md">Localization guide</a> · <a href="project/remediation_2026-10-12.md">Audit results</a></footer>
+</main></body></html>

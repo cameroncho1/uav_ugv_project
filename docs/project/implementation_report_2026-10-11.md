@@ -187,7 +187,7 @@ Historical report: behavior and numerical results below describe October 11. Cur
 - **Check complete integration:** the GPS-denied goal trial uses the camera, actual PX4 anchor, wheel/IMU fusion, planner, controller, and command bridge together. Physical distance is scored separately from estimated distance.
 - **Check failures as well as successes:** legacy-heading, wheel-frame, rendering, startup, and scoring failures remain labeled with their conditions. They are not counted as successful intended-system comparisons.
 - **Check the limits on uncertainty claims:** 100% ellipse coverage in the nine camera trials indicates conservative uncertainty under those conditions. Temporally correlated samples and three seeds do not prove calibrated 95% confidence or hardware reliability.
-- **Reproduce in Linux:** [simulation setup](../simulation_setup.md), [interfaces](../cooperative_localization/interfaces.md#evaluation-and-reproducibility), [perception commands](../cooperative_localization/perception.md#research-and-verification), and [navigation commands](../navigation.md#verification-and-commands) document builds and runners. Retain new results in a separate output directory with their conditions.
+- **Reproduce in Linux:** [simulation setup](../simulation_setup.md), [interfaces](../cooperative_localization/interfaces.md#evaluation-and-reproducibility), [perception commands](../cooperative_localization/perception.md#research-and-verification), and [navigation commands](../navigation.md#scoring-and-verification) document builds and runners. Retain new results in a separate output directory with their conditions.
 
 ## Remaining limits
 

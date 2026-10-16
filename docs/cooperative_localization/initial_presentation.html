@@ -736,7 +736,7 @@
 <rect class="heavy" x="470" y="568" width="30" height="24"/><text x="512" y="585">main pipeline</text>
 <rect class="box" x="700" y="568" width="30" height="24" stroke-dasharray="4 3"/><text x="742" y="585">test and scoring only</text>
 </svg>
-          <p class="note">Package: <span class="mono">cooperative_localization</span>. The fused pose includes optional UAV corrections; the planner connection remains open.</p>
+          <p class="note">Package: <span class="mono">cooperative_localization</span>. The planner and controller consume the fused pose. <a href="README.md">Current implementation guide</a></p>
         </div>
       </section>
 
@@ -760,7 +760,7 @@
             <section>
               <h3>Consumers</h3>
               <ul>
-                <li><strong>Planner:</strong> connects to this pose after accuracy and GPS-loss tests.</li>
+                <li><strong>Planner:</strong> consumes this pose with freshness and uncertainty checks.</li>
                 <li><strong>Mapping:</strong> publishes traversability data in the same ENU map frame.</li>
                 <li><strong>Coordinates:</strong> pose, obstacles, routes, and goals share one frame.</li>
                 <li><strong>Covariance:</strong> the estimator's uncertainty in the pose.</li>
@@ -836,8 +836,8 @@
         <div class="slide-inner">
           <h2>Next steps</h2>
           <ol class="steps">
-            <li>Connect the fused pose to navigation with freshness and uncertainty checks.
-              <span>The planner consumes the fused UGV pose and rejects stale or uncertain samples.</span></li>
+            <li>Evaluate representative obstacle courses and terrain.
+              <span>The current planner already consumes the fused pose with freshness, uncertainty, clearance, and goal-revision checks.</span></li>
             <li>Validate the calibrated detector under motion blur, damaged targets, and physical camera calibration.</li>
             <li>Evaluate correlated anchor errors and controller behavior during loss of both position sources.</li>
           </ol>
@@ -853,14 +853,14 @@
               <ul>
                 <li>Who owns the coordinate transform tree.</li>
                 <li>How to validate and tune the simulated sensor error settings.</li>
-                <li>How fault management will inject GPS loss and read localization health.</li>
+                <li>Production fault-classification and mission-recovery policy. Evaluation already supplies GPS outage controls.</li>
               </ul>
             </section>
             <section>
               <h3>Inside localization</h3>
               <ul>
-                <li>How correlated drone errors and occlusion are modeled.</li>
-                <li>Which calibrated detector supplies the full 3D vector.</li>
+                <li>Unknown global errors beyond the configured shared-bias test model.</li>
+                <li>Hardware calibration and alternatives to the implemented AprilTag producer.</li>
               </ul>
             </section>
           </div>

@@ -1,18 +1,28 @@
-# Drone-Led Navigation for Unmanned Ground Vehicle for Search and Rescue Operations
+# Drone-led UGV navigation
 
-## Project Information
+Team: Sophie Siemsgluess, Rylan Wade, Ethan Palosh, Jeremy Yin, Cameron Cho.
 
-- **Team members:** Sophie Siemsgluess, Rylan Wade, Ethan Palosh, Jeremy Yin, Cameron Cho
-- **Project cluster:** C1 - Multi-Agent Systems
+Project cluster: C1, Multi-Agent Systems.
 
-## Abstract
+[Documentation index](../README.md) | [System diagram](../system_design.html) | [Technical plan](technical_plan.md)
 
-This project proposes a collaborative UAV-UGV navigation system in which a small swarm of aerial vehicles serves as the "eyes" for a ground vehicle operating in challenging scenarios that may affect the reliability and availability of sensor data.
+## Proposed project
 
-The UAVs perform real-time aerial surveys to construct a traversability map and identify obstacles and hazardous surfaces, such as mud or water. The system uses this information to provide an optimized path for autonomous UGV navigation. The UAVs operate as forward scouts that continuously monitor the route ahead. When a new obstacle is detected, the system triggers real-time replanning so the UGV can reroute before encountering the hazard.
+UAVs survey the route ahead of a UGV. A terrain map identifies obstacles and hazardous surfaces. A planner selects a route, and the UGV follows it. New hazards trigger replanning. UAV observations also help estimate the UGV's position when its GPS is degraded or unavailable.
 
-In GPS-denied environments, a UAV with superior line of sight to satellites or fixed beacons assists the UGV by relaying position corrections and navigation instructions. A key challenge is fault detection across sensor failures, mechanical issues, and image occlusion caused by obstacles.
+The proposed evaluation covers route length, terrain, obstacle density, localization error, fault response, energy use, and navigation completion.
 
-The project will develop algorithms for fault detection, route planning, and localization under constraints that include route duration, vehicle fuel, UAV battery capacity, and GPS availability. Together, these capabilities form an integrated aerial-ground framework for robust, adaptive autonomous navigation in complex environments.
+## Implemented prototype
 
-The proposed system will be evaluated in simulation across varied route lengths, terrain, and obstacles. Evaluation metrics will include safety, energy efficiency, fault tolerance, localization accuracy, and obstacle-detection and avoidance accuracy.
+- One UAV takes off and hovers above a flat simulated route.
+- A calibrated camera detector observes a roof marker on the UGV.
+- Independent UAV map anchors and relative observations provide UGV position measurements.
+- A planar filter combines wheel speed, IMU heading/rate, GPS, and optional UAV measurements.
+- Camera brightness supplies a local terrain grid.
+- Local A* plans with footprint clearance and goal-associated routes.
+- The UGV controller follows valid routes and stops on invalid inputs. A Gazebo actuator watchdog expires missing commands.
+- Fault injection and scoring cover GPS loss, drift, outliers, occlusion, shared-reference error, route tracking, and command loss under recorded conditions.
+
+The camera goal-demo world has no physical obstacles. Multi-UAV scouting, semantic terrain classification, energy-aware global planning, dynamic-hazard evaluation, and production fault diagnosis remain proposed work.
+
+[Audit results](remediation_2026-10-12.md) records the implemented fixes and validation. [Localization](../cooperative_localization/README.md) describes the estimator and extension interfaces.

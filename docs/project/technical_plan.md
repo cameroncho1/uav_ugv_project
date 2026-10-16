@@ -1,11 +1,15 @@
 # Technical Plan
 
+[Documentation index](../README.md) · [System diagram](../system_design.html)
+
+The current implementation is a single-UAV, single-UGV simulation. The roles and course schedule below also include proposed work.
+
 ## Technology Stack
 
-- **Simulator:** Gazebo provides ROS 2-native UAV and UGV multi-agent support and is the safer option for the project timeline. AirSim or Isaac Sim may provide better visuals and terrain variety but would add integration risk.
-- **Middleware:** ROS 2 provides UAV-UGV communication through topics, services, and actions. Simulated bandwidth and latency constraints can be added to represent communication limits.
-- **Planning baseline:** Use A*, D* Lite, or RRT* for global planning, with D* Lite or a local replanner such as TEB or DWA for dynamic obstacle avoidance. Adapt existing ROS 2 Nav2 implementations where practical.
-- **Localization baseline:** Use EKF or UKF sensor fusion, preferably through established ROS 2 tooling such as `robot_localization`, with UAV-assisted relative-position corrections incorporated as measurement updates.
+- Simulator: Gazebo Harmonic and PX4 SITL on Ubuntu 22.04.
+- Middleware: ROS 2 Humble, Micro XRCE-DDS, and the Harmonic ROS-Gazebo bridge.
+- Planning: local eight-neighbor A* with footprint clearance and goal-associated routes. Global energy-aware planning and dynamic-hazard avoidance remain proposed.
+- Localization: the planar `robot_localization` EKF with wheel, IMU, GPS, and optional UAV position measurements.
 
 ## Roles
 
@@ -29,9 +33,9 @@ Owns resilient UGV pose estimation when UGV GNSS is degraded or unavailable. Fus
 
 Builds fault-injection and detection logic for sensor dropout, occlusion, and mechanical or actuator faults. Designs the evaluation harness, metrics, logging, and test matrix across route lengths, terrain types, and obstacle densities.
 
-> **Project decision:** Decide early whether fault detection covers sensor, mechanical, and occlusion faults or a selected subset.
+Current fault work implements synthetic sensor corruption, outage controls, occlusion trials, scoring, and command-loss checks. Mechanical diagnosis and production fault-classification/recovery policy remain proposed.
 
-## 11-Week Timeline
+## Original 11-week course schedule (planned)
 
 | Week | Milestone or deliverable | Ownership |
 |---:|---|---|

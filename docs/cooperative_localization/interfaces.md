@@ -1,5 +1,7 @@
 # Cooperative localization interfaces
 
+[Documentation index](../README.md) · [Localization guide](README.md)
+
 ## Stable contract and ownership
 
 - The requirements baseline is `65ba304`. Localization owns measured-input validation/fusion and one authoritative UGV pose. Relative sensing remains independent of sensing technology.
@@ -113,6 +115,6 @@ The localization scorer interpolates truth at acquisition times and rejects trut
 
 Closed-loop scoring records route snapshots and truth matched to the most recent planned route at or before acquisition time (maximum reference age 1 s). CSVs preserve physical point-to-polyline cross-track error; summaries include RMSE, mean, maximum, p95, traveled distance and reduction in physical distance to the fixed goal. Separate baseline/assisted closed-loop worlds use the same configured seeds/map/goal, but their trajectories and sensor sequences differ. The free-grid fixture isolates tracking from camera-map accuracy.
 
-Arrival requires a full fresh one-second stopped interval, estimated distance at most 0.5 m, and the declared physical tolerance (0.85 m for the camera demo). A deadline during dwell cannot pass. Hold checks require fresh sensors and sufficient evidence. Every runner bounds process-group cleanup and stops only its owned processes. Use persistent directories for retained results; `/tmp` may clear when WSL restarts.
+Arrival requires a full fresh one-second stopped interval, estimated distance at most 0.5 m, and the declared physical tolerance (0.85 m for the camera demo). A deadline during dwell cannot pass. Hold checks require fresh sensors and sufficient evidence. Localization and camera evaluation runners bound process-group cleanup and stop their owned processes. Use persistent directories for retained results; `/tmp` may clear when WSL restarts.
 
 [Results](evaluation_results.md), [navigation](../navigation.md), [perception](perception.md) and [simulation setup](../simulation_setup.md) distinguish recorded conditions and remaining limits.

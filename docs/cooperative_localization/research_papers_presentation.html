@@ -380,7 +380,7 @@
       <section class="slide active" data-title="Research papers" aria-hidden="false">
         <div class="slide-inner">
           <h1>Cooperative Localization: Research Papers</h1>
-          <p class="lead">UAV-assisted UGV localization papers and the EKF used by our GPS, wheel, and IMU baseline.</p>
+          <p class="lead">UAV-assisted UGV localization papers and the EKF used by the project's GPS, wheel, and IMU baseline.</p>
         </div>
       </section>
 
@@ -392,7 +392,7 @@
             <li><a href="https://navi.ion.org/content/71/4/navi.677" target="_blank" rel="noopener">Akhihiero et al.</a>: fusing several noisy measurements in one filter.</li>
             <li><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC11280856/" target="_blank" rel="noopener">De Silva and Katupitiya</a>: GPS-equipped drones locating a ground vehicle that has no GPS.</li>
             <li><a href="https://arxiv.org/pdf/2603.08926" target="_blank" rel="noopener">Brunacci et al.</a>: UAV-UGV relative position as a filter input.</li>
-            <li><a href="https://docs.ros.org/en/api/robot_localization/html/index.html" target="_blank" rel="noopener">Moore and Stouch</a>: robot_localization, the ROS filter package used by our baseline.</li>
+            <li><a href="https://docs.ros.org/en/api/robot_localization/html/index.html" target="_blank" rel="noopener">Moore and Stouch</a>: robot_localization, the ROS filter package used by the project's baseline.</li>
           </ol>
         </div>
       </section>
@@ -417,9 +417,9 @@
               <div class="relevance-group">
                 <h3>To localization</h3>
                 <ul>
-                  <li>Supports our main claim: a UAV with a reliable position cuts UGV drift during GPS loss.</li>
+                  <li>Supports the project's main claim: a UAV with a reliable position cuts UGV drift during GPS loss.</li>
                   <li>Supports one central estimator and one pose output.</li>
-                  <li>Results by measurement type model our three test cases.</li>
+                  <li>Results by measurement type model the project's three test cases.</li>
                 </ul>
               </div>
               <div class="relevance-group">
@@ -455,15 +455,15 @@
                 <h3>To localization</h3>
                 <ul>
                   <li>Same pattern as ours: several measurements, different rates, one EKF.</li>
-                  <li>Gives example noise values for our simulated sensors.</li>
-                  <li>UAV pose error will spread into our UGV estimate, so we should model it.</li>
+                  <li>Gives example noise values for the project's simulated sensors.</li>
+                  <li>UAV pose error will spread into the project's UGV estimate, and enters the propagated correction covariance.</li>
                 </ul>
               </div>
               <div class="relevance-group">
                 <h3>To the project</h3>
                 <ul>
-                  <li>Ground robot tracks drone, the reverse of our case. Cite for method only.</li>
-                  <li>The authors list UAV-helps-UGV as future work, which is our subsystem.</li>
+                  <li>Ground robot tracks drone, the reverse of the project's case. Cite for method only.</li>
+                  <li>The authors list UAV-helps-UGV as future work, which is the project's subsystem.</li>
                 </ul>
               </div>
             </section>
@@ -490,16 +490,16 @@
               <div class="relevance-group">
                 <h3>To localization</h3>
                 <ul>
-                  <li>Closest match to our problem statement.</li>
+                  <li>Closest match to the project's problem statement.</li>
                   <li>Supports rejecting measurements that conflict with how the vehicle can move.</li>
-                  <li>Shows why measurement geometry matters if we switch to range-only sensing.</li>
+                  <li>Shows why measurement geometry matters if the interface changes to range-only sensing.</li>
                 </ul>
               </div>
               <div class="relevance-group">
                 <h3>To the project</h3>
                 <ul>
-                  <li>Names search and rescue and disaster use, which matches our goal.</li>
-                  <li>Fewer drones means less battery use, which ties to our battery limit.</li>
+                  <li>Names search and rescue and disaster use, which matches the project's goal.</li>
+                  <li>Fewer drones means less battery use, which ties to the project's battery limit.</li>
                 </ul>
               </div>
             </section>
@@ -528,8 +528,8 @@
                 <ul>
                   <li>Model for treating a UAV-UGV relative position as a timestamped measurement with its own noise.</li>
                   <li>Simple outlier check before fusing.</li>
-                  <li>Gives accuracy ranges for our sim noise: GNSS 1 to 3 m, UWB 10 to 30 cm.</li>
-                  <li>Frame and attitude mistakes show up as position error. Watch our frame contract.</li>
+                  <li>Gives accuracy ranges for the project's sim noise: GNSS 1 to 3 m, UWB 10 to 30 cm.</li>
+                  <li>Frame and attitude mistakes show up as position error. Watch the project's frame contract.</li>
                 </ul>
               </div>
               <div class="relevance-group">
@@ -564,16 +564,16 @@
               <div class="relevance-group">
                 <h3>To localization</h3>
                 <ul>
-                  <li>The EKF package used by our GPS, wheel, and IMU baseline.</li>
-                  <li>Continuous estimation matches our rule that the pose never stops publishing.</li>
-                  <li>Our contract is PoseWithCovarianceStamped, so we need a small relay node.</li>
+                  <li>The EKF package used by the project's GPS, wheel, and IMU baseline.</li>
+                  <li>Continuous estimation matches the project's rule that the pose never stops publishing.</li>
+                  <li>The output contract is PoseWithCovarianceStamped, and the implemented adapter converts the filter output.</li>
                 </ul>
               </div>
               <div class="relevance-group">
                 <h3>To the project</h3>
                 <ul>
                   <li>A standard ROS tool lowers integration risk.</li>
-                  <li>We read the package documentation, not the paper. Read the paper before citing it.</li>
+                  <li>Source review covers the package documentation. Review the paper separately before citation.</li>
                 </ul>
               </div>
             </section>

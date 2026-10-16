@@ -202,7 +202,7 @@
           <h1>How cooperative localization works</h1>
           <p class="lead">The ground robot combines its sensors with drone camera measurements to estimate its position.</p>
           <p>UGV means ground robot. UAV means drone.</p>
-          <p class="note">Work in progress. This presentation is intended to be updated as more work is done.<br>Rylan Wade &middot; CS513 &middot; Updated October 11, 2026</p>
+          <p class="note">Audit-branch behavior and dated simulation results.<br>Rylan Wade &middot; CS513 &middot; Documentation checked October 15, 2026<br><a href="../README.md">Documentation index</a></p>
         </div>
       </section>
 
@@ -433,7 +433,7 @@
               </ul>
             </section>
           </div>
-          <p class="note">Standard deviation describes uncertainty; it is not a maximum error guarantee. Controller or transport failure still needs an actuator command timeout. <a href="../navigation.md">Navigation rules</a></p>
+          <p class="note">Standard deviation is not a maximum error guarantee. Goal-associated routes include footprint clearance. A Gazebo actuator watchdog expires missing commands after 0.35 s. <a href="../navigation.md">Navigation rules</a></p>
         </div>
       </section>
 
@@ -467,18 +467,18 @@
       <section class="slide" data-title="Recorded simulation results">
         <div class="slide-inner">
           <h2>Recorded simulation results</h2>
-          <p class="cite">These results apply to the documented simulation conditions.</p>
+          <p class="cite">Dates identify the tested implementation. Results apply to the recorded simulation conditions.</p>
           <table>
             <thead><tr><th>Check</th><th>Recorded result</th></tr></thead>
             <tbody>
-              <tr><td>Nine live-camera trials</td><td>Position RMSE: 0.096 to 0.157 m. RMSE is a measure of error across the scored samples.</td></tr>
+              <tr><td>Nine live-camera trials, October 11</td><td>Position RMSE: 0.096 to 0.157 m. Historical GPS-branch evidence.</td></tr>
               <tr><td>Rendered camera visibility</td><td>Centered and off-center tags are detected. Tested occlusions produce no observations; detection resumes when the panel is removed.</td></tr>
-              <tr><td>Navigation without robot GPS</td><td>Physical goal distance: 0.607 m, within the declared 0.85 m test tolerance.</td></tr>
-              <tr><td>Known shared uncertainty</td><td>A configured 0.8 m uncertainty term causes a hold. All 1,217 commands remain zero.</td></tr>
-              <tr><td>Builds and checks</td><td>PX4 and nine ROS packages build. 140 registered checks report zero failures; six are skipped.</td></tr>
+              <tr><td>GPS-denied navigation, October 12</td><td>Physical goal distance: 0.549 m. Cross-track RMSE: 0.064 m. Physical arrival tolerance: 0.85 m.</td></tr>
+              <tr><td>Known shared uncertainty, October 11</td><td>A configured 0.8 m uncertainty term causes a hold. All 1,217 commands remain zero.</td></tr>
+              <tr><td>Builds and checks, October 12</td><td>PX4 and 11 first-party ROS packages build. 155 registered checks: zero errors/failures, seven cppcheck skips.</td></tr>
             </tbody>
           </table>
-          <p class="note">The controller's 0.5 m tolerance uses estimated position. It does not guarantee 0.5 m physical accuracy. <a href="evaluation_results.md">Results</a> &middot; <a href="results/camera/verification.json">Verification record</a></p>
+          <p class="note">Estimated tolerance is 0.5 m; physical scoring uses 0.85 m. <a href="evaluation_results.md">October 11 results</a> &middot; <a href="../project/remediation_2026-10-12.md">October 12 results and validation conditions</a></p>
         </div>
       </section>
 
@@ -489,7 +489,7 @@
             <section>
               <h3>Further implementation</h3>
               <ul>
-                <li>Add an actuator timeout for lost velocity commands.</li>
+                <li>Implement actuator command expiry in a hardware driver; the Gazebo plugin already provides it in simulation.</li>
                 <li>Add an independent global reference to address shared GPS/drone position bias.</li>
                 <li>Measure physical camera calibration and mounting uncertainty.</li>
               </ul>
@@ -504,7 +504,7 @@
               </ul>
             </section>
           </div>
-          <p class="note">Work in progress. Update this presentation as more work is done, including implementation, test conditions, results, and remaining limits.</p>
+          <p class="note">Hardware operation, uneven terrain, semantic obstacle detection, and unknown shared global bias remain outside the recorded validation.</p>
         </div>
       </section>
 
@@ -515,7 +515,7 @@
             <section>
               <h3>Implementation details</h3>
               <ul>
-                <li><a href="subsystem.md">Subsystem</a>: purpose and ownership.</li>
+                <li><a href="README.md">Localization guide</a>: startup, code locations, and extension interfaces.</li>
                 <li><a href="interfaces.md">Interfaces</a>: messages, frames, and timestamps.</li>
                 <li><a href="perception.md">Perception</a>: camera geometry and uncertainty.</li>
                 <li><a href="../navigation.md">Navigation</a>: motion, hold, and recovery rules.</li>

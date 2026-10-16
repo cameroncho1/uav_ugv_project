@@ -40,12 +40,12 @@ Master's thesis, Auburn University. [Link](https://etd.auburn.edu/handle/10415/7
 
 ### Relevance to cooperative localization
 
-- Directly supports our core claim: a UAV with a reliable position can reduce UGV drift during GPS loss.
-- Supports a single centralized estimator, which matches our one authoritative pose output.
-- Its results are grouped by which measurements are available. This is a model for our three test cases (nominal GPS, GPS loss without UAV, GPS loss with UAV).
-- Its point that reported uncertainty must match real error supports our metric "uncertainty consistency with observed error."
-- Tuning notes apply to our EKF setup.
-- Our UAV reading is a relative position, which carries the same information as range plus bearing. This is the best case in the thesis. This is our interpretation, not a claim made by the thesis.
+- Studies this operating case: a UAV with a reliable position can reduce UGV drift during GPS loss.
+- Compares centralized and decentralized team estimators. This implementation estimates the UGV only and consumes an independent UAV anchor.
+- Its results are grouped by which measurements are available. This is a model for the project's three test cases (nominal GPS, GPS loss without UAV, GPS loss with UAV).
+- Its point that reported uncertainty must match real error supports the project's metric "uncertainty consistency with observed error."
+- Tuning notes apply to the project's EKF setup.
+- The implemented UAV reading is a relative position, which carries the same information as range plus bearing. This is the best case in the thesis. This is the project's interpretation, not a claim made by the thesis.
 
 ### Relevance to the project
 
@@ -56,7 +56,7 @@ Master's thesis, Auburn University. [Link](https://etd.auburn.edu/handle/10415/7
 ### Cautions
 
 - Simulated in MATLAB. The field test was processed after the run, not in real time.
-- Its UGV was a car with a high-grade inertial sensor. Our simulated UGV will have cheaper sensors, so expect larger drift.
+- Its UGV was a car with a high-grade inertial sensor. The simulated sensor errors are configured assumptions; they do not reproduce that vehicle hardware.
 - Bearing measurements in the field test were simulated from GPS data.
 
 ---
@@ -79,11 +79,11 @@ NAVIGATION (Institute of Navigation), West Virginia University. [Link](https://n
 
 ### Relevance to cooperative localization
 
-- Same pattern as our estimator: several measurement types, different rates, each with stated noise, fused in one EKF.
-- Gives example noise values we can use when setting simulated sensor noise (explicit simulation assumptions in `interfaces.md`).
+- Same pattern as the project's estimator: several measurement types, different rates, each with stated noise, fused in one EKF.
+- Gives example noise values used as references for simulated sensor noise (explicit simulation assumptions in `interfaces.md`).
 - Shows the EKF versus factor graph tradeoff. It supports starting with an EKF and names the factor graph as a future option.
-- Shows that errors in one vehicle's pose spread into the other vehicle's estimate. In our case, UAV pose errors will spread into the UGV correction. We should model UAV pose error, not assume it is perfect.
-- The authors name the reverse direction (UAV helping UGV pose) as future work. That is our subsystem.
+- Shows that errors in one vehicle's pose spread into the other vehicle's estimate. In the project's case, UAV pose errors will spread into the UGV correction. The correction propagates UAV pose uncertainty.
+- The authors name the reverse direction (UAV helping UGV pose) as future work. That is the project's subsystem.
 
 ### Relevance to the project
 
@@ -93,8 +93,8 @@ NAVIGATION (Institute of Navigation), West Virginia University. [Link](https://n
 
 ### Cautions
 
-- The direction is reversed. Here the UGV localizes the UAV. In our project the UAV helps localize the UGV.
-- GPS is fully denied in this paper. Ours is degraded or lost on the UGV only, and the UAV keeps a reliable position.
+- The direction is reversed. Here the UGV localizes the UAV. In the project's project the UAV helps localize the UGV.
+- GPS is fully denied in this paper. UGV GPS is degraded or lost in this project, and the UAV keeps an independent global reference.
 
 ---
 
@@ -115,21 +115,21 @@ Sensors (MDPI), University of New South Wales. [Link](https://pmc.ncbi.nlm.nih.g
 
 ### Relevance to cooperative localization
 
-- Closest match to our problem statement: GPS-equipped UAVs help a UGV that has no usable GPS.
-- Shows a practical safeguard for our estimator: reject measurements that conflict with what the UGV can physically do. This ties to our requirement that the estimator handles rejected measurements.
-- Shows why measurement geometry matters. Our relative-position reading avoids this ambiguity, but if the team later switches to range-only sensing, this paper explains the risk.
+- Closest match to the project's problem statement: GPS-equipped UAVs help a UGV that has no usable GPS.
+- Shows a practical safeguard for the project's estimator: reject measurements that conflict with what the UGV can physically do. This ties to the project's requirement that the estimator handles rejected measurements.
+- Shows why measurement geometry matters. The relative-position reading avoids this ambiguity, but if the team later switches to range-only sensing, this paper explains the risk.
 - Gives an example of scoring position and heading error against a reference.
 
 ### Relevance to the project
 
-- Names search and rescue, disaster, and battlefield use, which match our project goal.
+- Names search and rescue, disaster, and battlefield use, which match the project's project goal.
 - Supports the case for using few UAVs, which also limits battery use and cost. This links to the project's battery constraint.
 - Its list of sensing options (camera, lidar, radar, UWB) and their weaknesses in smoke and darkness supports the project's focus on degraded conditions.
 
 ### Cautions
 
 - Flat ground only. Hilly terrain and blocked range readings are listed as future work.
-- Range-only sensing. Our design uses a relative-position reading.
+- Range-only sensing. The implemented design uses a relative-position reading.
 
 ---
 
@@ -152,8 +152,8 @@ arXiv preprint 2603.08926 (v2, July 2026). Universities of Perugia, ETH Zurich, 
 
 - Shows a clean way to treat a UAV-UGV relative-position reading: as a timestamped measurement with its own noise, fused by an EKF. This matches the implemented timestamped measurement interface.
 - Shows a simple outlier check before fusing.
-- The accuracy figures give reasonable ranges for our simulated sensor noise.
-- The frame and attitude bias problem is a warning for our frame contract. A frame or heading mistake shows up as position error.
+- The accuracy figures give reasonable ranges for the project's simulated sensor noise.
+- The frame and attitude bias problem is a warning for the project's frame contract. A frame or heading mistake shows up as position error.
 
 ### Relevance to the project
 
@@ -164,8 +164,8 @@ arXiv preprint 2603.08926 (v2, July 2026). Universities of Perugia, ETH Zurich, 
 ### Cautions
 
 - Preprint, not yet peer reviewed. Cite as a preprint.
-- Its goal is close-range docking, not route following. Use it for the filter design and not for accuracy claims about our system.
-- Hardware is a nano drone and a quadruped robot. It does not match our simulation.
+- Its goal is close-range docking, not route following. Use it for the filter design and not for accuracy claims about the project's system.
+- Hardware is a nano drone and a quadruped robot. It does not match the project's simulation.
 
 ---
 
@@ -187,10 +187,10 @@ Proceedings of the 13th International Conference on Intelligent Autonomous Syste
 ### Relevance to cooperative localization
 
 - The subsystem runs this package's 2D EKF for the GPS, wheel, and IMU baseline.
-- Its continuous estimation and sensor timeout match our requirement that the pose keeps publishing when GPS is lost.
-- Its pose-with-covariance input suits our UAV-derived UGV position.
-- Its rejection thresholds cover our requirement for handling rejected measurements.
-- Its output type is `Odometry`, and our contract is `PoseWithCovarianceStamped`. A small relay node is needed.
+- Its continuous estimation and sensor timeout match the project's requirement that the pose keeps publishing when GPS is lost.
+- Its pose-with-covariance input suits the project's UAV-derived UGV position.
+- Its rejection thresholds cover the project's requirement for handling rejected measurements.
+- Its output type is `Odometry`, and the project's contract is `PoseWithCovarianceStamped`. The implemented output adapter converts the message type.
 - The frame settings need care. Global data such as GPS belongs in the `map` frame, and another source must supply the local frame.
 
 ### Relevance to the project
@@ -220,7 +220,7 @@ Proceedings of the 13th International Conference on Intelligent Autonomous Syste
 
 - No reference here covers Gazebo or PX4 simulation of localization. Find one if the report needs a simulation-validity argument.
 - No reference covers traversability mapping or path planning. Other team members should add their own.
-- All four research papers use real sensors or MATLAB. Our results are simulation only, so the report should limit its claims to the simulated conditions, as `subsystem.md` already requires.
+- All four research papers use real sensors or MATLAB. The project results are simulation only, so the report should limit its claims to the simulated conditions, as `subsystem.md` already requires.
 
 ## Implementation sources
 
