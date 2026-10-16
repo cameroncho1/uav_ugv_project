@@ -1,6 +1,6 @@
 # Scripts
 
-Run these scripts inside Ubuntu. Most launch tests or score results.
+Run these scripts inside Ubuntu.
 
 For the complete camera-assisted navigation demo, run from the repository root:
 
