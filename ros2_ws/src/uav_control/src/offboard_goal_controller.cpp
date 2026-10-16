@@ -1,5 +1,6 @@
 #include <cstdint>
 #include <memory>
+#include <string>
 
 #include <px4_msgs/msg/offboard_control_mode.hpp>
 #include <px4_msgs/msg/trajectory_setpoint.hpp>
@@ -10,9 +11,12 @@
 
 using namespace std::chrono_literals;
 
-class OffboardGoalController : public rclcpp::Node {
+class OffboardGoalController : public rclcpp::Node
+{
 public:
-  OffboardGoalController() : Node("uav_goal_controller") {
+  OffboardGoalController()
+  : Node("uav_goal_controller")
+  {
     uav_altitude_ = declare_parameter("uav_altitude", 4.0);
 
     auto px4_qos = rclcpp::QoS(rclcpp::KeepLast(10)).best_effort();
@@ -31,9 +35,13 @@ public:
 
 
     //receives the state of the preflight checks, offboard mode, and armed state  from px4 msg
+    const auto status_version = px4_msgs::msg::VehicleStatus::MESSAGE_VERSION;
+    const auto status_topic = std::string("/fmu/out/vehicle_status") +
+      (status_version ? "_v" + std::to_string(status_version) : "");
     vehicle_status_sub_ = create_subscription<px4_msgs::msg::VehicleStatus>(
-      "/fmu/out/vehicle_status_v1", px4_qos,
-      [this](px4_msgs::msg::VehicleStatus::SharedPtr msg) {
+      status_topic, px4_qos,
+      [this](
+        px4_msgs::msg::VehicleStatus::SharedPtr msg) {
         preflight_passed_ = msg->pre_flight_checks_pass;
         offboard_active_ = msg->nav_state == px4_msgs::msg::VehicleStatus::NAVIGATION_STATE_OFFBOARD;
         armed_ = msg->arming_state == px4_msgs::msg::VehicleStatus::ARMING_STATE_ARMED;
@@ -48,17 +56,19 @@ public:
           hold_north_ = msg->position[0];
           hold_east_ = msg->position[1];
           have_position_ = true;
-          RCLCPP_INFO(get_logger(), "Holding initial horizontal position (N=%.2f, E=%.2f)",
+          RCLCPP_INFO(
+            get_logger(), "Holding initial horizontal position (N=%.2f, E=%.2f)",
             hold_north_, hold_east_);
         }
       });
 
-    timer_ = create_wall_timer(100ms, [this]() { control_tick(); });
+    timer_ = create_wall_timer(100ms, [this]() {control_tick();});
     RCLCPP_INFO(get_logger(), "Waiting for PX4 odometry and vehicle status; UAV will hold XY");
   }
 
 private:
-  void publish_vehicle_command(uint16_t command, float param1, float param2) {
+  void publish_vehicle_command(uint16_t command, float param1, float param2)
+  {
     px4_msgs::msg::VehicleCommand msg;
     msg.timestamp = static_cast<uint64_t>(now().nanoseconds() / 1000);
     msg.command = command;
@@ -72,7 +82,8 @@ private:
     vehicle_command_pub_->publish(msg);
   }
 
-  void control_tick() {
+  void control_tick()
+  {
     if (!have_position_) {
       return;
     }
@@ -143,7 +154,8 @@ private:
   rclcpp::TimerBase::SharedPtr timer_;
 };
 
-int main(int argc, char **argv) {
+int main(int argc, char ** argv)
+{
   rclcpp::init(argc, argv);
   rclcpp::spin(std::make_shared<OffboardGoalController>());
   rclcpp::shutdown();

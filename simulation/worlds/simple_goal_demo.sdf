@@ -22,7 +22,10 @@
     <plugin filename="gz-sim-air-pressure-system" name="gz::sim::systems::AirPressure"/>
     <plugin filename="gz-sim-air-speed-system" name="gz::sim::systems::AirSpeed"/>
     <plugin filename="gz-sim-navsat-system" name="gz::sim::systems::NavSat"/>
-    <plugin filename="gz-sim-magnetometer-system" name="gz::sim::systems::Magnetometer"/>
+    <plugin filename="gz-sim-magnetometer-system" name="gz::sim::systems::Magnetometer">
+      <use_units_gauss>false</use_units_gauss>
+      <use_earth_frame_ned>false</use_earth_frame_ned>
+    </plugin>
     <plugin filename="gz-sim-sensors-system" name="gz::sim::systems::Sensors">
       <render_engine>ogre2</render_engine>
     </plugin>
@@ -62,7 +65,8 @@
         <visual name="inner_ring">
           <pose>0 0 0.025 0 0 0</pose>
           <geometry><cylinder><radius>0.52</radius><length>0.012</length></cylinder></geometry>
-          <material><ambient>0.12 0.16 0.12 1</ambient><diffuse>0.12 0.16 0.12 1</diffuse></material>
+          <!-- Visual-only goal annotation stays above the dark-obstacle threshold. -->
+          <material><ambient>0.30 0.34 0.30 1</ambient><diffuse>0.30 0.34 0.30 1</diffuse></material>
         </visual>
         <visual name="goal_center">
           <pose>0 0 0.034 0 0 0</pose>
@@ -82,8 +86,16 @@
       <attenuation><range>200</range><constant>1</constant></attenuation>
     </light>
 
-    <model name="simple_ugv">
+    <model name="simple_ugv" canonical_link="chassis">
       <pose>-4 0 0 0 0 0</pose>
+      <!-- Known metric roof target; visual-only, fixed to the chassis. -->
+      <include merge="true">
+        <uri>model://ugv_fiducial</uri>
+        <pose relative_to="chassis">0 0 0.12 0 0 0</pose>
+      </include>
+      <joint name="FiducialJoint" type="fixed">
+        <parent>chassis</parent><child>fiducial_link</child>
+      </joint>
       <link name="chassis">
         <pose>0 0 0.25 0 0 0</pose>
         <inertial>
@@ -100,6 +112,18 @@
             <diffuse>0.12 0.38 0.72 1</diffuse>
           </material>
         </visual>
+        <sensor name="imu" type="imu">
+          <gz_frame_id>simple_ugv/chassis/imu</gz_frame_id>
+          <always_on>true</always_on>
+          <update_rate>50</update_rate>
+          <topic>/simple_ugv/imu</topic>
+        </sensor>
+        <sensor name="gps" type="navsat">
+          <gz_frame_id>simple_ugv/chassis/gps</gz_frame_id>
+          <always_on>true</always_on>
+          <update_rate>5</update_rate>
+          <topic>/simple_ugv/gps</topic>
+        </sensor>
       </link>
       <link name="left_wheel">
         <pose>0 0.30 0.15 -1.5708 0 0</pose>
@@ -141,6 +165,11 @@
         <parent>chassis</parent><child>right_wheel</child>
         <axis><xyz expressed_in="__model__">0 1 0</xyz><limit><lower>-1e16</lower><upper>1e16</upper></limit></axis>
       </joint>
+      <plugin filename="libugv_command_watchdog.so" name="ugv_control::CommandWatchdog">
+        <input_topic>/simple_ugv/drive_cmd_vel</input_topic>
+        <output_topic>/simple_ugv/cmd_vel</output_topic>
+        <timeout>0.35</timeout>
+      </plugin>
       <plugin filename="gz-sim-diff-drive-system" name="gz::sim::systems::DiffDrive">
         <left_joint>left_wheel_joint</left_joint>
         <right_joint>right_wheel_joint</right_joint>
@@ -149,6 +178,8 @@
         <odom_publish_frequency>20</odom_publish_frequency>
         <topic>/simple_ugv/cmd_vel</topic>
         <odom_topic>/simple_ugv/odom</odom_topic>
+        <frame_id>simple_ugv/odom</frame_id>
+        <child_frame_id>simple_ugv/chassis</child_frame_id>
       </plugin>
     </model>
   </world>

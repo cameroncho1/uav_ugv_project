@@ -1,0 +1,28 @@
+{
+  "seed": 513,
+  "expected_hold": true,
+  "initial_gps_enabled": true,
+  "shared_position_stddev_m": 0.8,
+  "systematic_position_stddev_m": 0.8,
+  "uav_altitude_setpoint_m": 4.5,
+  "relative_source": "camera",
+  "pose_count": 711,
+  "uav_correction_count": 21,
+  "relative_observation_count": 33,
+  "wheel_measurement_count": 463,
+  "gps_measurement_count": 120,
+  "min_position_stddev_m": 0.8512668976578249,
+  "final_receipt_ages_wall_s": {
+    "truth": 0.000547138999991148,
+    "pose": 0.01902460799999517,
+    "command": 0.08108280700000137
+  },
+  "first_motion_wall_s": null,
+  "duration_wall_s": 125.64073146499999,
+  "true_goal_distance_m": 7.995002757375126,
+  "estimated_goal_distance_m": 6.26185275862977,
+  "true_goal_tolerance_m": 0.85,
+  "max_linear_speed_m_s": 0.0,
+  "command_count": 1217,
+  "passed": true
+}

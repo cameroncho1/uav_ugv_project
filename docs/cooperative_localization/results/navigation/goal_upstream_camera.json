@@ -1,0 +1,9 @@
+{
+  "first_motion_wall_s": 30.03232147900053,
+  "duration_wall_s": 300.0120043860006,
+  "true_goal_distance_m": 7.762296049910681,
+  "estimated_goal_distance_m": 7.631196655253081,
+  "max_linear_speed_m_s": 0.42225432070153457,
+  "command_count": 2841,
+  "passed": false
+}

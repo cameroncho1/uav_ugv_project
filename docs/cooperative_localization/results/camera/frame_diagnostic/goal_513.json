@@ -1,0 +1,19 @@
+{
+  "seed": 513,
+  "relative_source": "camera",
+  "gps_enabled_from_startup": false,
+  "camera_rate_hz": 5,
+  "first_motion_wall_s": 80.70602193800005,
+  "duration_wall_s": 152.27937080799893,
+  "true_goal_distance_m": 0.6184679573191456,
+  "estimated_goal_distance_m": 0.4130904334745468,
+  "max_linear_speed_m_s": 0.424001610168733,
+  "command_count": 1437,
+  "passed": true,
+  "record_source": "Captured scorer console summary; temporary workspace cleared by WSL restart",
+  "uav_altitude_setpoint_m": 4.0,
+  "detector_threshold_constants": [
+    7
+  ],
+  "true_goal_tolerance_m": 0.85
+}

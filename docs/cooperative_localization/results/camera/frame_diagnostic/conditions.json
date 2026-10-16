@@ -1,0 +1,8 @@
+{
+  "wheel_odometry_child_frame": "simple_ugv/fiducial_link",
+  "ekf_body_frame": "simple_ugv/chassis",
+  "wheel_transform_available": false,
+  "valid_full_sensor_comparison": false,
+  "finding": "Merged roof model becomes default canonical link; wheel messages cannot be transformed into EKF body frame.",
+  "implemented_contract": "Explicit canonical_link=chassis and DiffDrive frame_id/child_frame_id; scorer requires frame agreement and wheel measurements after GPS loss."
+}

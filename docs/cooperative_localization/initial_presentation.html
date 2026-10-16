@@ -1,0 +1,958 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Design overview and first steps for the UGV cooperative localization subsystem.">
+  <title>UGV Localization</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #ffffff;
+      --ink: #000000;
+      --font: "Aptos", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+      --mono: "Cascadia Code", "SFMono-Regular", Consolas, monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      width: 100%;
+      min-height: 100%;
+      margin: 0;
+      overflow: hidden;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--font);
+    }
+
+    button {
+      color: inherit;
+      font: inherit;
+    }
+
+    .topbar,
+    .bottombar {
+      position: fixed;
+      z-index: 4;
+      left: 0;
+      right: 0;
+      height: 58px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      padding: 0 clamp(22px, 4vw, 64px);
+      background: var(--bg);
+    }
+
+    .topbar {
+      top: 0;
+      border-bottom: 1px solid var(--ink);
+    }
+
+    .bottombar {
+      bottom: 0;
+      border-top: 1px solid var(--ink);
+    }
+
+    .topbar-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .topbar-context {
+      overflow: hidden;
+      font-size: 0.85rem;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .slides {
+      position: fixed;
+      inset: 58px 0;
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: clamp(24px, 3.5vw, 56px) clamp(22px, 4vw, 64px);
+      visibility: hidden;
+      opacity: 0;
+      pointer-events: none;
+      overflow-y: auto;
+    }
+
+    .slide.active {
+      visibility: visible;
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      .slide {
+        transition: opacity 150ms ease, visibility 150ms;
+      }
+    }
+
+    .slide-inner {
+      width: min(100%, 1300px);
+      display: grid;
+      align-content: center;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin-top: 0;
+    }
+
+    h1 {
+      max-width: 18ch;
+      margin-bottom: 28px;
+      font-size: clamp(2.6rem, 5.4vw, 4.6rem);
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      line-height: 1.02;
+    }
+
+    h2 {
+      max-width: 30ch;
+      margin-bottom: 12px;
+      font-size: clamp(1.7rem, 3vw, 2.6rem);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.08;
+    }
+
+    h3 {
+      margin-bottom: 10px;
+      font-size: clamp(1.05rem, 1.5vw, 1.3rem);
+      font-weight: 700;
+    }
+
+    p,
+    li {
+      font-size: clamp(0.95rem, 1.3vw, 1.18rem);
+      line-height: 1.45;
+    }
+
+    .lead {
+      max-width: 42ch;
+      margin-bottom: 0;
+      font-size: clamp(1.15rem, 2vw, 1.6rem);
+      line-height: 1.4;
+    }
+
+    .cite {
+      max-width: 66ch;
+      margin-bottom: clamp(18px, 2.6vw, 32px);
+      font-size: clamp(0.95rem, 1.3vw, 1.15rem);
+    }
+
+    .note {
+      max-width: 80ch;
+      margin: clamp(16px, 2.2vw, 26px) 0 0;
+      font-size: clamp(0.85rem, 1.1vw, 1rem);
+    }
+
+    .mono {
+      font-family: var(--mono);
+      font-size: 0.92em;
+    }
+
+    ul,
+    ol {
+      margin: 0;
+      padding-left: 1.15em;
+    }
+
+    li + li {
+      margin-top: 0.55em;
+    }
+
+    li span.sub {
+      display: block;
+      margin-top: 2px;
+      font-size: 0.85em;
+    }
+
+    .columns {
+      --pad: clamp(24px, 4vw, 64px);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      padding-top: clamp(20px, 2.6vw, 32px);
+      border-top: 1px solid var(--ink);
+    }
+
+    .columns > section:first-child {
+      padding-right: var(--pad);
+    }
+
+    .columns > section + section {
+      padding-left: var(--pad);
+      border-left: 1px solid var(--ink);
+    }
+
+    .split {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+      gap: clamp(28px, 5vw, 72px);
+      align-items: center;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+      gap: clamp(28px, 5vw, 72px);
+      align-items: center;
+    }
+
+    svg {
+      display: block;
+      width: 100%;
+      height: auto;
+      max-height: 54vh;
+    }
+
+    svg text {
+      fill: #000;
+      font-family: var(--font);
+      font-size: 15px;
+    }
+
+    svg .b {
+      font-weight: 700;
+      font-size: 17px;
+    }
+
+    svg .m {
+      font-family: var(--mono);
+      font-size: 14px;
+    }
+
+    svg .ln {
+      fill: none;
+      stroke: #000;
+      stroke-width: 2;
+    }
+
+    svg .thin {
+      fill: none;
+      stroke: #000;
+      stroke-width: 1.5;
+    }
+
+    svg .fill {
+      fill: #000;
+      stroke: none;
+    }
+
+    svg .heavy {
+      fill: #fff;
+      stroke: #000;
+      stroke-width: 3;
+    }
+
+    svg .box {
+      fill: #fff;
+      stroke: #000;
+      stroke-width: 1.5;
+    }
+
+    .flow {
+      display: grid;
+      grid-template-columns: 1fr 40px 1fr 40px 1fr;
+      gap: 0;
+      align-items: stretch;
+      margin-top: 8px;
+    }
+
+    .flow.three {
+      grid-template-columns: 1fr 40px 1fr;
+      margin-top: 0;
+    }
+
+    .box {
+      padding: 16px 18px;
+      border: 1px solid var(--ink);
+    }
+
+    .box + .box {
+      margin-top: 10px;
+    }
+
+    .box strong {
+      display: block;
+      font-size: clamp(0.95rem, 1.3vw, 1.15rem);
+    }
+
+    .box span {
+      display: block;
+      margin-top: 4px;
+      font-size: clamp(0.8rem, 1.05vw, 0.95rem);
+      line-height: 1.35;
+    }
+
+    .box.heavy {
+      border-width: 3px;
+    }
+
+    .stack {
+      display: grid;
+      align-content: start;
+    }
+
+    .arrow + .stack,
+    .stack + .arrow + .stack {
+      align-content: center;
+    }
+
+    .arrow {
+      display: grid;
+      place-items: center;
+      font-size: 1.6rem;
+    }
+
+    table {
+      width: 100%;
+      max-width: 940px;
+      border-collapse: collapse;
+    }
+
+    th,
+    td {
+      padding: 13px 16px 13px 0;
+      border-bottom: 1px solid var(--ink);
+      font-size: clamp(0.95rem, 1.3vw, 1.15rem);
+      line-height: 1.4;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      font-weight: 700;
+      border-bottom-width: 2px;
+    }
+
+    .kv th {
+      width: 8.5em;
+      border-bottom-width: 1px;
+    }
+
+    .steps {
+      display: grid;
+      gap: 14px;
+      max-width: 86ch;
+      padding-left: 1.6em;
+    }
+
+    .steps li {
+      margin: 0;
+      font-size: clamp(0.98rem, 1.45vw, 1.28rem);
+    }
+
+    .steps li span {
+      display: block;
+      margin-top: 2px;
+      font-size: clamp(0.85rem, 1.1vw, 1rem);
+    }
+
+    .nav-button {
+      min-width: 108px;
+      min-height: 38px;
+      padding: 0 18px;
+      border: 1px solid var(--ink);
+      border-radius: 0;
+      background: var(--bg);
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+
+    .nav-button:hover:not(:disabled) {
+      background: var(--ink);
+      color: var(--bg);
+    }
+
+    .nav-button:active:not(:disabled) {
+      transform: translateY(1px);
+    }
+
+    .nav-button:focus-visible,
+    .segment:focus-visible {
+      outline: 2px solid var(--ink);
+      outline-offset: 3px;
+    }
+
+    .nav-button:disabled {
+      opacity: 0.35;
+      cursor: default;
+    }
+
+    .segments {
+      flex: 1;
+      display: flex;
+      gap: 6px;
+      max-width: 520px;
+    }
+
+    .segment {
+      flex: 1;
+      height: 18px;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .segment::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 8px;
+      height: 2px;
+      background: var(--ink);
+      opacity: 0.25;
+    }
+
+    .segment.current::after {
+      opacity: 1;
+    }
+
+    .counter {
+      min-width: 64px;
+      font-size: 0.85rem;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    @media (max-width: 860px) {
+      html,
+      body {
+        overflow: auto;
+      }
+
+      .topbar-context,
+      .segments {
+        display: none;
+      }
+
+      .columns,
+      .flow,
+      .flow.three,
+      .split,
+      .hero {
+        grid-template-columns: 1fr;
+      }
+
+      .columns > section:first-child {
+        padding-right: 0;
+      }
+
+      .columns > section + section {
+        padding-left: 0;
+        margin-top: 20px;
+        padding-top: 20px;
+        border-left: 0;
+        border-top: 1px solid var(--ink);
+      }
+
+      .arrow {
+        transform: rotate(90deg);
+        min-height: 36px;
+      }
+
+      .slide {
+        place-items: start;
+      }
+    }
+
+    @media print {
+      html,
+      body {
+        overflow: visible;
+      }
+
+      .topbar,
+      .bottombar {
+        display: none;
+      }
+
+      .slides {
+        position: static;
+      }
+
+      .slide {
+        position: relative;
+        inset: auto;
+        min-height: 100vh;
+        page-break-after: always;
+        visibility: visible;
+        opacity: 1;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main aria-label="UGV localization presentation">
+    <header class="topbar">
+      <div class="topbar-title">Cooperative localization</div>
+      <div class="topbar-context" id="currentTitle">UGV Localization</div>
+    </header>
+
+    <div class="slides">
+      <section class="slide active" data-title="UGV Localization" aria-hidden="false">
+        <div class="slide-inner hero">
+          <div>
+            <h1>UGV Localization</h1>
+            <p class="lead">Estimates the ground robot's position, including when its GPS is weak or lost. The drone provides corrections.</p>
+            <p class="note">Planar EKF, simulated drone corrections, and repeatable accuracy trials.</p>
+          </div>
+          <svg viewBox="0 0 520 430" role="img" aria-label="Robot pose and uncertainty on a map with east and north axes">
+            <line class="ln" x1="70" y1="350" x2="454" y2="350"/>
+            <line class="ln" x1="70" y1="350" x2="70" y2="52"/>
+            <path class="fill" d="M454 350 l-12 -7 v14 z"/>
+            <path class="fill" d="M70 52 l-7 12 h14 z"/>
+            <text x="462" y="356">E</text>
+            <text x="62" y="38">N</text>
+            <text x="70" y="383">map / ENU</text>
+            <path class="thin" d="M105 316 C178 300 203 253 265 245 C331 237 342 177 411 148" stroke-dasharray="7 9"/>
+            <ellipse class="thin" cx="329" cy="202" rx="92" ry="54" transform="rotate(-28 329 202)" stroke-dasharray="6 7"/>
+            <circle class="fill" cx="329" cy="202" r="10"/>
+            <line x1="329" y1="202" x2="382" y2="166" stroke="#000" stroke-width="5" stroke-linecap="round"/>
+            <path class="fill" d="M382 166 l-16 2 l8 12 z"/>
+            <text class="b" x="274" y="112">Pose estimate</text>
+            <text x="275" y="133">position + orientation</text>
+            <line class="thin" x1="320" y1="139" x2="325" y2="174"/>
+            <text class="b" x="360" y="275">Covariance</text>
+            <text x="360" y="296">uncertainty in the pose</text>
+            <line class="thin" x1="361" y1="260" x2="383" y2="237"/>
+          </svg>
+        </div>
+      </section>
+
+      <section class="slide" data-title="Localization and planning" aria-hidden="true">
+        <div class="slide-inner">
+          <h2>Localization and route planning</h2>
+          <p class="cite">Route planning takes the robot pose, the terrain map, and the goal, all in the same coordinate frame.</p>
+          <div class="split">
+            <table>
+              <thead>
+                <tr><th>Subsystem</th><th>What it does</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Localization</td><td>Estimates the current robot pose.</td></tr>
+                <tr><td>Traversability</td><td>Marks the terrain the robot can cross.</td></tr>
+                <tr><td>Planning</td><td>Uses the pose, terrain, and goal to generate a route.</td></tr>
+              </tbody>
+            </table>
+            <div class="flow three">
+              <div class="stack">
+                <div class="box"><strong>Authoritative pose</strong><span>From localization</span></div>
+                <div class="box"><strong>Traversability map</strong><span>From traversability mapping</span></div>
+              </div>
+              <div class="arrow" aria-hidden="true">&rarr;</div>
+              <div class="stack">
+                <div class="box heavy"><strong>Route planning</strong><span>pose + terrain + goal</span></div>
+              </div>
+            </div>
+          </div>
+          <p class="note">Pose: position and heading.</p>
+        </div>
+      </section>
+
+      <section class="slide" data-title="GPS loss" aria-hidden="true">
+        <div class="slide-inner">
+          <h2>GPS loss</h2>
+          <p class="cite">The subsystem keeps publishing a pose during GPS loss.</p>
+          <div class="split">
+            <ul>
+              <li>GPS gives a global position while it is available.</li>
+              <li>Without GPS, wheel odometry and the IMU track movement. Their errors accumulate and the estimate drifts.</li>
+              <li>Covariance (the uncertainty value) grows as the estimate drifts.</li>
+              <li>Drone corrections reduce the drift.</li>
+            </ul>
+            <svg viewBox="0 0 640 390" role="img" aria-label="Estimated robot path drifting away from the true path after GPS is lost, with growing uncertainty">
+              <line class="ln" x1="60" y1="320" x2="600" y2="320"/>
+              <line class="ln" x1="60" y1="320" x2="60" y2="40"/>
+              <text x="600" y="342" text-anchor="end">time</text>
+              <line class="thin" x1="260" y1="60" x2="260" y2="320" stroke-dasharray="6 6"/>
+              <text class="b" x="268" y="56">GPS unavailable</text>
+              <path d="M260 204 L600 101 L600 291 Z" fill="none" stroke="#000" stroke-width="1.5" stroke-dasharray="2 5"/>
+              <path d="M60 260 L600 109" fill="none" stroke="#000" stroke-width="3"/>
+              <path d="M260 204 Q420 225 600 196" fill="none" stroke="#000" stroke-width="3" stroke-dasharray="10 7"/>
+              <line x1="60" y1="368" x2="92" y2="368" stroke="#000" stroke-width="3"/>
+              <text x="100" y="373">True position</text>
+              <line x1="230" y1="368" x2="262" y2="368" stroke="#000" stroke-width="3" stroke-dasharray="10 7"/>
+              <text x="270" y="373">Estimated</text>
+              <line x1="380" y1="368" x2="412" y2="368" stroke="#000" stroke-width="1.5" stroke-dasharray="2 5"/>
+              <text x="420" y="373">uncertainty grows with drift</text>
+            </svg>
+          </div>
+        </div>
+      </section>
+
+      <section class="slide" data-title="Inputs and output" aria-hidden="true">
+        <div class="slide-inner">
+          <h2>Inputs and output</h2>
+          <p class="cite">A 2D EKF combines UGV GPS, wheel speed, IMU heading, and optional UAV position corrections.</p>
+          <div class="flow">
+            <div class="stack">
+              <div class="box"><strong>UGV GPS</strong><span>Global position when available</span></div>
+              <div class="box"><strong>UGV odometry</strong><span>Motion from the wheels</span></div>
+              <div class="box"><strong>UGV IMU</strong><span>Rotation and acceleration</span></div>
+              <div class="box"><strong>UAV relative position</strong><span>Noisy observation of the robot, seen from the drone</span></div>
+            </div>
+            <div class="arrow" aria-hidden="true">&rarr;</div>
+            <div class="stack">
+              <div class="box heavy">
+                <strong>Localization estimator</strong>
+                <span>2D EKF using robot_localization.</span>
+                <span>Timestamp-matched drone corrections supply map position during GPS loss.</span>
+              </div>
+            </div>
+            <div class="arrow" aria-hidden="true">&rarr;</div>
+            <div class="stack">
+              <div class="box heavy">
+                <strong>Authoritative UGV pose</strong>
+                <span class="mono">/ugv/localization/pose</span>
+                <span>Position, orientation, timestamp, and covariance</span>
+              </div>
+            </div>
+          </div>
+          <p class="note">Baseline and UAV-assisted filters publish poses with covariance and share identical UGV measurements in paired trials.</p>
+        </div>
+      </section>
+
+      <section class="slide" data-title="Drone corrections" aria-hidden="true">
+        <div class="slide-inner">
+          <h2>Drone corrections</h2>
+          <p class="cite">The drone is a second position source when the robot's GPS is unusable.</p>
+          <div class="split">
+            <table class="kv">
+              <tbody>
+                <tr><th>Assumption</th><td>Drone localization stays reliable during robot GPS loss.</td></tr>
+                <tr><th>Measurement</th><td>Noisy robot position relative to the drone.</td></tr>
+                <tr><th>Effect</th><td>Reduces drift and uncertainty.</td></tr>
+                <tr><th>Hardware</th><td>A calibrated roof-tag detector supplies the full 3D vector from rendered pixels; range alone is insufficient.</td></tr>
+              </tbody>
+            </table>
+            <svg viewBox="0 0 640 400" role="img" aria-label="A localized drone observes the true robot position, and the correction moves the drifted estimate toward it">
+              <defs>
+                <marker id="head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+                  <path d="M0 0 L10 5 L0 10 z" fill="#000"/>
+                </marker>
+              </defs>
+              <rect class="box" x="70" y="30" width="170" height="46"/>
+              <text class="b" x="155" y="59" text-anchor="middle">Localized UAV</text>
+              <line x1="155" y1="76" x2="462" y2="288" stroke="#000" stroke-width="2" stroke-dasharray="8 6" marker-end="url(#head)"/>
+              <text x="384" y="196">noisy relative-position</text>
+              <text x="384" y="216">observation</text>
+              <circle class="fill" cx="476" cy="300" r="14"/>
+              <text class="b" x="476" y="340" text-anchor="middle">True UGV</text>
+              <circle cx="300" cy="320" r="14" fill="#fff" stroke="#000" stroke-width="2" stroke-dasharray="4 4"/>
+              <text class="b" x="300" y="360" text-anchor="middle">Drifted estimate</text>
+              <line x1="318" y1="312" x2="452" y2="300" stroke="#000" stroke-width="3" marker-end="url(#head)"/>
+              <text x="332" y="286">correction</text>
+            </svg>
+          </div>
+        </div>
+      </section>
+
+      <section class="slide" data-title="Subsystem connections" aria-hidden="true">
+        <div class="slide-inner">
+          <h2>Subsystem connections</h2>
+          <p class="cite">Implemented connection: the fused UGV pose and traversability map share the <span class="mono">map</span> frame. The planner consumes the fused pose with freshness and uncertainty checks.</p>
+          <svg viewBox="0 0 1200 615" style="max-height:58vh" role="img" aria-label="Data sources (UGV sensors, drone, fault management) feed cooperative localization. Localization publishes one pose. Route planning combines that pose with the traversability map and the mission goal and sends a route to UGV control. Gazebo ground truth is used only for test data and scoring.">
+<defs><marker id="head2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#000"/></marker></defs>
+<text class="b" x="0" y="20">Data sources</text>
+<text class="b" x="350" y="20">Localization</text>
+<text class="b" x="700" y="20">Route planning</text>
+<text class="b" x="1012" y="20">Robot</text>
+<rect class="box" x="0" y="50" width="250" height="80" />
+<text class="b" x="14" y="78">UGV sensors</text>
+<text x="14" y="102">GPS, wheel odometry, IMU</text>
+<text x="14" y="123">Available in ROS 2</text>
+<rect class="box" x="0" y="150" width="250" height="90" />
+<text class="b" x="14" y="178">Drone (UAV)</text>
+<text x="14" y="202">Independent noisy anchor</text>
+<text x="14" y="223">Noisy relative vector in FLU</text>
+<rect class="box" x="0" y="260" width="250" height="80" />
+<text class="b" x="14" y="288">Fault management</text>
+<text x="14" y="312">GPS and UAV SetBool gates</text>
+<text x="14" y="333">Standard ROS services</text>
+<rect class="box" x="0" y="380" width="250" height="110" stroke-dasharray="6 5"/>
+<text class="b" x="14" y="408">Gazebo ground truth</text>
+<text x="14" y="432">Makes test sensor data and</text>
+<text x="14" y="453">scores results. Never sent</text>
+<text x="14" y="474">to the planner.</text>
+<polyline points="250,90 348,90" fill="none" stroke="#000" stroke-width="2" marker-end="url(#head2)"/>
+<polyline points="250,195 348,195" fill="none" stroke="#000" stroke-width="2" stroke-dasharray="6 5" marker-end="url(#head2)"/>
+<polyline points="250,300 348,300" fill="none" stroke="#000" stroke-width="2" stroke-dasharray="6 5" marker-start="url(#head2)" marker-end="url(#head2)"/>
+<rect class="heavy" x="350" y="40" width="270" height="310"/>
+<text class="b" x="364" y="68">UGV planar EKF</text>
+<text x="364" y="94">Fuses wheel speed, IMU</text>
+<text x="364" y="115">heading, GPS, and UAV x/y.</text>
+<text x="364" y="136">Publishes pose + covariance.</text>
+<text x="364" y="157">Paired GPS-loss trials</text>
+<text x="364" y="178">score both estimates.</text>
+<line class="thin" x1="350" y1="235" x2="620" y2="235"/>
+<text class="b" x="364" y="258">Output</text>
+<text class="m" x="364" y="280">/ugv/localization/pose</text>
+<text x="364" y="302">position, heading, uncertainty</text>
+<text x="364" y="323">in map frame (ENU)</text>
+<text x="350" y="384">Other route planning inputs</text>
+<rect class="box" x="350" y="394" width="270" height="64" />
+<text class="b" x="364" y="422">Traversability mapping</text>
+<text x="364" y="446">Terrain, in map frame</text>
+<rect class="box" x="350" y="474" width="270" height="64" />
+<text class="b" x="364" y="502">Mission</text>
+<text x="364" y="526">Goal, in map frame</text>
+<rect class="heavy" x="700" y="150" width="250" height="230"/>
+<text class="b" x="714" y="180">Route planning</text>
+<text x="714" y="210">Reads fused UGV pose.</text>
+<text x="714" y="234">Never reads raw sensors.</text>
+<text x="714" y="258">Outputs a route.</text>
+<polyline points="620,280 698,280" fill="none" stroke="#000" stroke-width="2" stroke-dasharray="6 5" marker-end="url(#head2)"/>
+<polyline points="620,427 660,427 660,318 698,318" fill="none" stroke="#000" stroke-width="2" marker-end="url(#head2)"/>
+<polyline points="620,506 680,506 680,352 698,352" fill="none" stroke="#000" stroke-width="2" marker-end="url(#head2)"/>
+<text x="659" y="270" text-anchor="middle">fused pose</text>
+<polyline points="950,260 1010,260" fill="none" stroke="#000" stroke-width="2" marker-end="url(#head2)"/>
+<text x="980" y="250" text-anchor="middle">route</text>
+<rect class="box" x="1012" y="215" width="188" height="90"/>
+<text class="b" x="1106" y="255" text-anchor="middle">UGV control</text>
+<text x="1106" y="278" text-anchor="middle">drives the route</text>
+<line x1="0" y1="580" x2="40" y2="580" stroke="#000" stroke-width="2" marker-end="url(#head2)"/><text x="52" y="585">data flow</text>
+<line x1="170" y1="580" x2="210" y2="580" stroke="#000" stroke-width="2" stroke-dasharray="6 5" marker-start="url(#head2)" marker-end="url(#head2)"/><text x="222" y="585">control and health interface</text>
+<rect class="heavy" x="470" y="568" width="30" height="24"/><text x="512" y="585">main pipeline</text>
+<rect class="box" x="700" y="568" width="30" height="24" stroke-dasharray="4 3"/><text x="742" y="585">test and scoring only</text>
+</svg>
+          <p class="note">Package: <span class="mono">cooperative_localization</span>. The planner and controller consume the fused pose. <a href="README.md">Current implementation guide</a></p>
+        </div>
+      </section>
+
+      <section class="slide" data-title="Pose interface" aria-hidden="true">
+        <div class="slide-inner">
+          <h2>Pose interface</h2>
+          <p class="cite">The EKF publishes this fused pose topic. The planner uses this pose with freshness and uncertainty gates.</p>
+          <div class="columns">
+            <section>
+              <h3>Topic definition</h3>
+              <table class="kv">
+                <tbody>
+                  <tr><th>Topic</th><td class="mono">/ugv/localization/pose</td></tr>
+                  <tr><th>Message</th><td class="mono">geometry_msgs/msg/PoseWithCovarianceStamped</td></tr>
+                  <tr><th>Frame</th><td class="mono">map</td></tr>
+                  <tr><th>Convention</th><td>ENU: east, north, up</td></tr>
+                </tbody>
+              </table>
+              <p class="note">Publishes from the baseline or UAV-assisted EKF.</p>
+            </section>
+            <section>
+              <h3>Consumers</h3>
+              <ul>
+                <li><strong>Planner:</strong> consumes this pose with freshness and uncertainty checks.</li>
+                <li><strong>Mapping:</strong> publishes traversability data in the same ENU map frame.</li>
+                <li><strong>Coordinates:</strong> pose, obstacles, routes, and goals share one frame.</li>
+                <li><strong>Covariance:</strong> the estimator's uncertainty in the pose.</li>
+                <li><strong>Frames:</strong> the PX4-format anchor is converted from NED/FRD to map ENU/FLU.</li>
+              </ul>
+            </section>
+          </div>
+        </div>
+      </section>
+
+      <section class="slide" data-title="Evaluation" aria-hidden="true">
+        <div class="slide-inner">
+          <h2>Evaluation</h2>
+          <p class="cite">Same route under three GPS conditions. Measures estimator error and path-following error.</p>
+          <div class="columns">
+            <section>
+              <h3>Test cases</h3>
+              <ol>
+                <li>Nominal GPS
+                  <span class="sub">Regular global position updates.</span></li>
+                <li>GPS loss without drone assistance
+                  <span class="sub">Odometry and IMU only. The estimate drifts.</span></li>
+                <li>GPS loss with drone assistance
+                  <span class="sub">Drone observations correct the estimate.</span></li>
+              </ol>
+            </section>
+            <section>
+              <h3>Metrics</h3>
+              <ul>
+                <li>Position RMSE: overall position error.</li>
+                <li>Mean and max position error.</li>
+                <li>Heading error.</li>
+                <li>Covariance: reported uncertainty versus actual error.</li>
+                <li>Path-following error.</li>
+              </ul>
+            </section>
+          </div>
+        </div>
+      </section>
+
+      <section class="slide" data-title="Scope" aria-hidden="true">
+        <div class="slide-inner">
+          <h2>Scope</h2>
+          <div class="columns">
+            <section>
+              <h3>In scope</h3>
+              <ul>
+                <li>UGV pose estimation</li>
+                <li>GPS degradation behavior</li>
+                <li>Odometry and IMU fusion</li>
+                <li>Drone relative-position corrections</li>
+                <li>Pose covariance</li>
+                <li>Planner-facing pose output</li>
+              </ul>
+            </section>
+            <section>
+              <h3>Not in scope</h3>
+              <ul>
+                <li>Terrain classification</li>
+                <li>Path generation</li>
+                <li>Drone path planning</li>
+                <li>Full SLAM (mapping and localizing at once)</li>
+                <li>Loss of localization for both vehicles</li>
+                <li>Commitment to UWB or camera hardware</li>
+              </ul>
+            </section>
+          </div>
+          <p class="note">Assumes the drone has reliable localization while the robot's GPS is degraded. Localization when both vehicles lose their global reference is out of scope.</p>
+        </div>
+      </section>
+
+      <section class="slide" data-title="Next steps" aria-hidden="true">
+        <div class="slide-inner">
+          <h2>Next steps</h2>
+          <ol class="steps">
+            <li>Evaluate representative obstacle courses and terrain.
+              <span>The current planner already consumes the fused pose with freshness, uncertainty, clearance, and goal-revision checks.</span></li>
+            <li>Validate the calibrated detector under motion blur, damaged targets, and physical camera calibration.</li>
+            <li>Evaluate correlated anchor errors and controller behavior during loss of both position sources.</li>
+          </ol>
+        </div>
+      </section>
+
+      <section class="slide" data-title="Open decisions" aria-hidden="true">
+        <div class="slide-inner">
+          <h2>Open decisions</h2>
+          <div class="columns">
+            <section>
+              <h3>With other subsystems</h3>
+              <ul>
+                <li>Who owns the coordinate transform tree.</li>
+                <li>How to validate and tune the simulated sensor error settings.</li>
+                <li>Production fault-classification and mission-recovery policy. Evaluation already supplies GPS outage controls.</li>
+              </ul>
+            </section>
+            <section>
+              <h3>Inside localization</h3>
+              <ul>
+                <li>Unknown global errors beyond the configured shared-bias test model.</li>
+                <li>Hardware calibration and alternatives to the implemented AprilTag producer.</li>
+              </ul>
+            </section>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <nav class="bottombar" aria-label="Slide navigation">
+      <button class="nav-button" id="previousButton" type="button">Previous</button>
+      <div class="segments" id="segments"></div>
+      <div class="counter" id="counter">01 / 11</div>
+      <button class="nav-button" id="nextButton" type="button">Next</button>
+    </nav>
+  </main>
+
+  <script>
+    (() => {
+      const slides = Array.from(document.querySelectorAll('.slide'));
+      const previousButton = document.getElementById('previousButton');
+      const nextButton = document.getElementById('nextButton');
+      const counter = document.getElementById('counter');
+      const currentTitle = document.getElementById('currentTitle');
+      const segments = document.getElementById('segments');
+      let current = 0;
+
+      const segmentButtons = slides.map((slide, index) => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'segment';
+        button.setAttribute('aria-label', `Go to slide ${index + 1}: ${slide.dataset.title}`);
+        button.addEventListener('click', () => show(index));
+        segments.appendChild(button);
+        return button;
+      });
+
+      function indexFromHash() {
+        const match = window.location.hash.match(/^#slide-(\d+)$/);
+        if (!match) return 0;
+        return Math.min(slides.length - 1, Math.max(0, Number(match[1]) - 1));
+      }
+
+      function show(index, updateHash = true) {
+        current = Math.min(slides.length - 1, Math.max(0, index));
+
+        slides.forEach((slide, slideIndex) => {
+          const active = slideIndex === current;
+          slide.classList.toggle('active', active);
+          slide.setAttribute('aria-hidden', String(!active));
+          if (active) slide.scrollTop = 0;
+        });
+
+        segmentButtons.forEach((button, buttonIndex) => {
+          const active = buttonIndex === current;
+          button.classList.toggle('current', active);
+          button.setAttribute('aria-current', active ? 'step' : 'false');
+        });
+
+        previousButton.disabled = current === 0;
+        nextButton.disabled = current === slides.length - 1;
+        counter.textContent = `${String(current + 1).padStart(2, '0')} / ${String(slides.length).padStart(2, '0')}`;
+        currentTitle.textContent = slides[current].dataset.title;
+        document.title = `${slides[current].dataset.title} | UGV Localization`;
+
+        if (updateHash) {
+          window.history.replaceState(null, '', `#slide-${current + 1}`);
+        }
+      }
+
+      previousButton.addEventListener('click', () => show(current - 1));
+      nextButton.addEventListener('click', () => show(current + 1));
+
+      document.addEventListener('keydown', (event) => {
+        if (event.altKey || event.ctrlKey || event.metaKey) return;
+
+        if (['ArrowRight', 'PageDown', ' '].includes(event.key)) {
+          event.preventDefault();
+          show(current + 1);
+        } else if (['ArrowLeft', 'PageUp'].includes(event.key)) {
+          event.preventDefault();
+          show(current - 1);
+        } else if (event.key === 'Home') {
+          event.preventDefault();
+          show(0);
+        } else if (event.key === 'End') {
+          event.preventDefault();
+          show(slides.length - 1);
+        }
+      });
+
+      window.addEventListener('hashchange', () => show(indexFromHash(), false));
+      show(indexFromHash(), false);
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,70 @@
+{
+  "cases": [
+    {
+      "case": "visible",
+      "observations": 10,
+      "visible": true,
+      "diagnostics": {
+        "processed": "9",
+        "accepted": "9",
+        "reprojection_error_pixels": "1.0984061717994356e-06"
+      },
+      "rmse_3d_m": 0.022955706687327992,
+      "max_error_3d_m": 0.022955706687327992,
+      "passed": true
+    },
+    {
+      "case": "partial_occlusion",
+      "observations": 0,
+      "visible": false,
+      "diagnostics": {
+        "processed": "21",
+        "accepted": "11",
+        "not_visible": "10",
+        "reprojection_error_pixels": "1.0984061717994356e-06"
+      },
+      "passed": true
+    },
+    {
+      "case": "full_occlusion",
+      "observations": 0,
+      "visible": false,
+      "diagnostics": {
+        "processed": "40",
+        "accepted": "11",
+        "not_visible": "29",
+        "reprojection_error_pixels": "1.0984061717994356e-06"
+      },
+      "passed": true
+    },
+    {
+      "case": "recovery",
+      "observations": 14,
+      "visible": true,
+      "diagnostics": {
+        "processed": "54",
+        "accepted": "25",
+        "not_visible": "29",
+        "reprojection_error_pixels": "1.0984061717994356e-06"
+      },
+      "rmse_3d_m": 0.022955706687327992,
+      "max_error_3d_m": 0.022955706687327992,
+      "passed": true
+    },
+    {
+      "case": "off_axis",
+      "observations": 15,
+      "visible": true,
+      "diagnostics": {
+        "processed": "73",
+        "accepted": "44",
+        "not_visible": "29",
+        "reprojection_error_pixels": "0.030712925774519114"
+      },
+      "rmse_3d_m": 0.011293569503732106,
+      "max_error_3d_m": 0.011293569503732106,
+      "passed": true
+    }
+  ],
+  "passed": true
+}

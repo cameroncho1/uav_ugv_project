@@ -1,0 +1,74 @@
+
+[0/1] cd /home/rylanwwade/uav_validation/px4/build/px4_sitl_default/src/modules/simulation/gz_bridge && /usr/bin/cmake -E env PX4_SIM_MODEL=gz_x500_mono_cam_down GZ_IP=127.0.0.1 /home/rylanwwade/uav_validation/px4/build/px4_sitl_default/bin/px4
+
+______  __   __    ___
+| ___ \ \ \ / /   /   |
+| |_/ /  \ V /   / /| |
+|  __/   /   \  / /_| |
+| |     / /^\ \ \___  |
+\_|     \/   \/     |_/
+
+px4 starting.
+
+INFO  [px4] startup script: /bin/sh etc/init.d-posix/rcS 0
+INFO  [init] found model autostart file as SYS_AUTOSTART=4014
+INFO  [param] selected parameter default file fs/parameters.bson
+INFO  [param] importing from 'fs/parameters.bson'
+INFO  [parameters] BSON document size 168 bytes, decoded 168 bytes (INT32:6, FLOAT:2)
+INFO  [param] selected parameter backup file fs/parameters_backup.bson
+INFO  [dataman] data manager file './fs/dataman' size is 1208528 bytes
+INFO  [init] Gazebo simulator 8.15.0
+INFO  [init] Standalone PX4 launch, waiting for Gazebo
+INFO  [init] Gazebo world is ready
+INFO  [init] PX4_GZ_MODEL_NAME set, PX4 will attach to existing model
+INFO  [gz_bridge] world: simple_goal_demo, model: cooperative_camera_uav_0
+INFO  [lockstep_scheduler] setting initial absolute time to 3888000 us
+INFO  [commander] LED: open /dev/led0 failed (22)
+WARN  [health_and_arming_checks] Preflight Fail: system power unavailable
+INFO  [tone_alarm] home set
+INFO  [vision_target_estimator] VTE for static target init
+INFO  [uxrce_dds_client] init UDP agent IP:127.0.0.1, port:8888
+INFO  [uxrce_dds_client] successfully created rt/fmu/out/register_ext_component_reply_v1 data writer, topic iINFO  [uxrce_dds_client] successfully created rt/fmu/out/arming_check_request_v1 data writer, topic id: 16
+INFO  [uxrce_dds_client] successfully created rt/fmu/out/setpoint_config_reply data writer, topic id: 270
+INFO  [uxrce_dds_client] successfully created rt/fmu/out/mode_completed data writer, topic id: 170
+INFO  [uxrce_dds_client] successfully created rt/fmu/out/battery_status_v1 data writer, topic id: 20
+INFO  [uxrce_dds_client] successfully created rt/fmu/out/collision_constraints data writer, topic id: 27
+INFO  [uxrce_dds_client] successfully created rt/fmu/out/estimator_status_flags data writer, topic id: 91
+INFO  [uxrce_dds_client] successfully created rt/fmu/out/failsafe_flags data writer, topic id: 98
+INFO  [uxrce_dds_client] successfully created rt/fmu/out/manual_control_setpoint_v1 data writer, topic id: 16INFO  [uxrce_dds_client] successfully created rt/fmu/out/message_format_response data writer, topic id: 167
+INFO  [uxrce_dds_client] successfully created rt/fmu/out/position_setpoint_triplet data writer, topic id: 207INFO  [uxrce_dds_client] successfully created rt/fmu/out/sensor_combined data writer, topic id: 247
+INFO  [uxrce_dds_client] successfully created rt/fmu/out/timesync_status data writer, topic id: 279
+INFO  [uxrce_dds_client] successfully created rt/fmu/out/transponder_report data writer, topic id: 282
+INFO  [uxrce_dds_client] successfully created rt/fmu/out/vehicle_land_detected data writer, topic id: 308
+INFO  [uxrce_dds_client] successfully created rt/fmu/out/vehicle_attitude data writer, topic id: 294
+INFO  [uxrce_dds_client] successfully created rt/fmu/out/vehicle_control_mode data writer, topic id: 301
+INFO  [uxrce_dds_client] successfully created rt/fmu/out/vehicle_command_ack_v1 data writer, topic id: 298
+INFO  [uxrce_dds_client] successfully created rt/fmu/out/vehicle_global_position data writer, topic id: 302
+INFO  [uxrce_dds_client] successfully created rt/fmu/out/vehicle_gnss data writer, topic id: 304
+INFO  [uxrce_dds_client] successfully created rt/fmu/out/vehicle_local_position_v1 data writer, topic id: 309INFO  [uxrce_dds_client] successfully created rt/fmu/out/vehicle_odometry data writer, topic id: 314
+INFO  [uxrce_dds_client] successfully created rt/fmu/out/vehicle_status_v4 data writer, topic id: 319
+INFO  [uxrce_dds_client] successfully created rt/fmu/out/airspeed_validated_v1 data writer, topic id: 13
+INFO  [uxrce_dds_client] successfully created rt/fmu/out/vtol_vehicle_status data writer, topic id: 338
+INFO  [uxrce_dds_client] successfully created rt/fmu/out/home_position_v2 data writer, topic id: 140
+INFO  [uxrce_dds_client] successfully created rt/fmu/out/wind data writer, topic id: 341
+INFO  [uxrce_dds_client] successfully created rt/fmu/out/gimbal_device_attitude_status data writer, topic id:INFO  [uxrce_dds_client] successfully created rt/fmu/out/config_overrides_confirm_v1 data writer, topic id: 2INFO  [uxrce_dds_client] successfully created rt/fmu/out/vtx data writer, topic id: 339
+INFO  [uxrce_dds_client] successfully created rt/fmu/out/input_rc data writer, topic id: 142
+INFO  [mavlink] mode: Normal, data rate: 4000000 B/s on udp port 18570 remote port 14550
+INFO  [mavlink] mode: Onboard, data rate: 4000000 B/s on udp port 14580 remote port 14540
+INFO  [mavlink] mode: Onboard, data rate: 4000 B/s on udp port 14280 remote port 14030
+INFO  [mavlink] mode: Gimbal, data rate: 400000 B/s on udp port 13030 remote port 13280
+INFO  [logger] logger started (mode=all)
+INFO  [logger] Max log file size: 1024 MiB
+INFO  [logger] Start file log (type: full)
+INFO  [logger] [logger] ./fs/log/2026-10-12/01_17_27.ulg
+INFO  [logger] Opened full log file: ./fs/log/2026-10-12/01_17_27.ulg
+INFO  [mavlink] MAVLink only on localhost (set param MAV_{i}_BROADCAST = 1 to enable network)
+INFO  [mavlink] MAVLink only on localhost (set param MAV_{i}_BROADCAST = 1 to enable network)
+INFO  [px4] Startup script returned successfully
+pxh> WARN  [health_and_arming_checks] Preflight Fail: no heading reference
+INFO  [commander] Ready for takeoff!
+INFO  [commander] Armed by external command
+INFO  [tone_alarm] arming warning
+INFO  [commander] Takeoff detected
+
+Session terminated, killing shell... ...killed.

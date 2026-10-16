@@ -1,0 +1,20 @@
+sim_uav_sensor:
+  ros__parameters:
+    use_sim_time: true
+    frequency: 5.0
+    relative_stddev:
+    - 0.25
+    - 0.15
+    - 0.25
+    anchor_stddev:
+    - 0.3
+    - 0.3
+    - 0.5
+    attitude_stddev:
+    - 0.01
+    - 0.01
+    - 0.02
+    ugv_chassis_offset:
+    - 0.0
+    - 0.0
+    - 0.25

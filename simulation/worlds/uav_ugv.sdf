@@ -15,6 +15,21 @@
       <background>0.7 0.7 0.7 1</background>
       <shadows>true</shadows>
     </scene>
+    <plugin filename="gz-sim-physics-system" name="gz::sim::systems::Physics"/>
+    <plugin filename="gz-sim-user-commands-system" name="gz::sim::systems::UserCommands"/>
+    <plugin filename="gz-sim-scene-broadcaster-system" name="gz::sim::systems::SceneBroadcaster"/>
+    <plugin filename="gz-sim-contact-system" name="gz::sim::systems::Contact"/>
+    <plugin filename="gz-sim-imu-system" name="gz::sim::systems::Imu"/>
+    <plugin filename="gz-sim-air-pressure-system" name="gz::sim::systems::AirPressure"/>
+    <plugin filename="gz-sim-air-speed-system" name="gz::sim::systems::AirSpeed"/>
+    <plugin filename="gz-sim-navsat-system" name="gz::sim::systems::NavSat"/>
+    <plugin filename="gz-sim-magnetometer-system" name="gz::sim::systems::Magnetometer">
+      <use_units_gauss>false</use_units_gauss>
+      <use_earth_frame_ned>false</use_earth_frame_ned>
+    </plugin>
+    <plugin filename="gz-sim-sensors-system" name="gz::sim::systems::Sensors">
+      <render_engine>ogre2</render_engine>
+    </plugin>
     <model name="ground_plane">
       <static>true</static>
       <link name="link">
@@ -90,11 +105,19 @@
       <longitude_deg> 8.546163739800146</longitude_deg>
       <elevation>0</elevation>
     </spherical_coordinates>
-    <model name="simple_ugv">
+    <model name="simple_ugv" canonical_link="chassis">
 
       <pose>1 0 0 0 0 0</pose>
 
       <!-- Main body -->
+      <!-- Known metric roof target; visual-only, fixed to the chassis. -->
+      <include merge="true">
+        <uri>model://ugv_fiducial</uri>
+        <pose relative_to="chassis">0 0 0.12 0 0 0</pose>
+      </include>
+      <joint name="FiducialJoint" type="fixed">
+        <parent>chassis</parent><child>fiducial_link</child>
+      </joint>
       <link name="chassis">
         <pose>0 0 0.25 0 0 0</pose>
 
@@ -127,6 +150,18 @@
             <diffuse>0.2 0.3 0.8 1</diffuse>
           </material>
         </visual>
+        <sensor name="imu" type="imu">
+          <gz_frame_id>simple_ugv/chassis/imu</gz_frame_id>
+          <always_on>true</always_on>
+          <update_rate>50</update_rate>
+          <topic>/simple_ugv/imu</topic>
+        </sensor>
+        <sensor name="gps" type="navsat">
+          <gz_frame_id>simple_ugv/chassis/gps</gz_frame_id>
+          <always_on>true</always_on>
+          <update_rate>5</update_rate>
+          <topic>/simple_ugv/gps</topic>
+        </sensor>
       </link>
 
 
@@ -281,6 +316,11 @@
 
 
       <!-- Differential drive controller -->
+      <plugin filename="libugv_command_watchdog.so" name="ugv_control::CommandWatchdog">
+        <input_topic>/simple_ugv/drive_cmd_vel</input_topic>
+        <output_topic>/simple_ugv/cmd_vel</output_topic>
+        <timeout>0.35</timeout>
+      </plugin>
       <plugin
         filename="gz-sim-diff-drive-system"
         name="gz::sim::systems::DiffDrive">
@@ -294,6 +334,9 @@
         <odom_publish_frequency>20</odom_publish_frequency>
 
         <topic>/simple_ugv/cmd_vel</topic>
+        <odom_topic>/simple_ugv/odom</odom_topic>
+        <frame_id>simple_ugv/odom</frame_id>
+        <child_frame_id>simple_ugv/chassis</child_frame_id>
       </plugin>
 
     </model>

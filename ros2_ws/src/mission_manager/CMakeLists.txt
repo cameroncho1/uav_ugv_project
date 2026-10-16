@@ -15,7 +15,7 @@ add_executable(goal_manager src/goal_manager.cpp)
 ament_target_dependencies(goal_manager rclcpp geometry_msgs visualization_msgs)
 install(TARGETS goal_manager DESTINATION lib/${PROJECT_NAME})
 
-install(DIRECTORY launch DESTINATION share/${PROJECT_NAME})
+install(DIRECTORY launch config DESTINATION share/${PROJECT_NAME})
 get_filename_component(PROJECT_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../../.." ABSOLUTE)
 install(FILES "${PROJECT_ROOT}/config/simple_goal_demo.rviz" DESTINATION share/${PROJECT_NAME}/config)
 

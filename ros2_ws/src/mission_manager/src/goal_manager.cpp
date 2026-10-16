@@ -7,9 +7,12 @@
 
 using namespace std::chrono_literals;
 
-class GoalManager : public rclcpp::Node {
+class GoalManager : public rclcpp::Node
+{
 public:
-  GoalManager() : Node("goal_manager") {
+  GoalManager()
+  : Node("goal_manager")
+  {
     //Takes in a goal_x and goal_y but defaults to (4,0)
     goal_x_ = declare_parameter("goal_x", 4.0);
     goal_y_ = declare_parameter("goal_y", 0.0);
@@ -20,16 +23,21 @@ public:
 
     //publishes marker visualization in the global grid for Rviz2
     marker_pub_ = create_publisher<visualization_msgs::msg::Marker>("/global_goal", 1);
-    timer_ = create_wall_timer(1s, [this]() { publish_goal(); });
+    timer_ = create_wall_timer(1s, [this]() {publish_goal();});
 
     RCLCPP_INFO(get_logger(), "Global goal in map frame: (%.1f, %.1f)", goal_x_, goal_y_);
   }
 
 private:
-  void publish_goal() {
+  void publish_goal()
+  {
     geometry_msgs::msg::PoseStamped goal;
     goal.header.frame_id = "map";
-    goal.header.stamp = now();
+    const auto current = now();
+    if (current.nanoseconds() <= 0) {return;}
+    if (revision_.nanoseconds() == 0 || current < last_clock_) {revision_ = current;}
+    last_clock_ = current;
+    goal.header.stamp = revision_;
     goal.pose.position.x = goal_x_;
     goal.pose.position.y = goal_y_;
     goal.pose.orientation.w = 1.0;
@@ -60,9 +68,11 @@ private:
   rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr goal_pub_;
   rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr marker_pub_;
   rclcpp::TimerBase::SharedPtr timer_;
+  rclcpp::Time revision_{0, 0, RCL_ROS_TIME}, last_clock_{0, 0, RCL_ROS_TIME};
 };
 
-int main(int argc, char **argv) {
+int main(int argc, char ** argv)
+{
   rclcpp::init(argc, argv);
   rclcpp::spin(std::make_shared<GoalManager>());
   rclcpp::shutdown();

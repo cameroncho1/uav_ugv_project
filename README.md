@@ -2,17 +2,25 @@
 
 This repository contains a UAV–UGV simulation using PX4 SITL, Gazebo Sim, ROS 2, and Micro XRCE-DDS.
 
-Current milestone:
+Implemented prototype:
 - Custom Gazebo world with a simple UGV
 - PX4 X500 UAV in the same world
 - PX4 takeoff without requiring QGroundControl
 - PX4 ↔ ROS 2 communication through Micro XRCE-DDS
-- Live PX4 odometry received by a custom C++ ROS 2 node
-- ROS 2 package structure for future autonomy development
+- PX4 state received by UAV control and map-anchor nodes
+- Cooperative UGV localization, camera observations, and guarded navigation
+
+Start with the [documentation index](docs/README.md), [system diagram](docs/system_design.html), or [goal demo](README_simple_goal_demo.md). The [localization guide](docs/cooperative_localization/README.md) covers the sensor-to-estimate pipeline, package boundaries, extension points, and tests.
 
 ---
 
-## Tested Environment
+See [simulation setup](docs/simulation_setup.md) for the pinned firmware, ROS messages, UAV models, and magnetometer settings.
+
+The [localization presentation](docs/cooperative_localization/how_it_works_presentation.html) covers sensor inputs, camera corrections, estimation, navigation checks, and dated results.
+
+## Runtime and recorded environments
+
+Run ROS, PX4 and Gazebo inside Ubuntu 22.04. macOS and Windows are host systems for editing and Git. The original basic simulation runs on Apple Silicon with UTM; the audit-branch runtime uses x86-64 Ubuntu 22.04 under Windows WSL2. A fresh audit-branch build on ARM64 is not recorded.
 
 | Component | Tested Version / Setting |
 |---|---|
@@ -22,8 +30,8 @@ Current milestone:
 | Architecture | ARM64 / aarch64 |
 | ROS 2 | Humble |
 | Gazebo Sim | Harmonic / gz-sim8 (tested with 8.14.0) |
-| PX4-Autopilot | `d6f12ad1c4f70ad3230afd7d86e971421e02fef4` |
-| px4_msgs | `86d8239e962f6939e05c3737784f60c02fa884db` |
+| PX4-Autopilot | `0462e3a31e7f0a6f6f05a5e094bee8a52e8759ec` |
+| px4_msgs | `109e8c8e151938f03fee2e62e3e93dc5ff5e2281` |
 | UAV model | PX4 `gz_x500` |
 | Micro XRCE-DDS Agent | 2.4.2 recommended for ROS 2 Humble |
 | DDS transport | UDP |
@@ -52,6 +60,9 @@ uav_ugv_project/
 │       ├── ugv_control/
 │       ├── traversability_mapping/
 │       ├── route_planning/
+│       ├── localization_common/
+│       ├── uav_sensing/
+│       ├── simulation_support/
 │       ├── cooperative_localization/
 │       ├── fault_management/
 │       ├── mission_manager/
@@ -65,14 +76,17 @@ uav_ugv_project/
 └── README.md
 ```
 
-## ROS 2 Package Responsibilities (Just an outline for now, subject to change)
+## ROS 2 Package Responsibilities
 
-- `uav_control`: PX4/UAV interface, including the Offboard goal controller.
-- `ugv_control`: UGV state and motion control.
+- `uav_control`: PX4/UAV interface, Offboard control, and independent ENU map anchors.
+- `uav_sensing`: Calibrated camera-relative observations; a replaceable producer.
+- `localization_common`: ROS-independent frame, geodesy, and covariance math.
+- `simulation_support`: Gazebo truth/raw sensor bridges, geometry, and shared `/clock`.
+- `ugv_control`: Goal-associated path following and the simulated actuator command watchdog.
 - `traversability_mapping`: UAV perception data to terrain/hazard/traversability map.
 - `route_planning`: UGV path planning and dynamic replanning.
 - `cooperative_localization`: UAV-assisted UGV localization for GPS-denied scenarios.
-- `fault_management`: Sensor, communication, and vehicle-health monitoring.
+- `fault_management`: Explicit simulated sensor corruption, fault controls, and evaluation assemblies. Production fault/health policy remains an open integration decision.
 - `mission_manager`: High-level UAV/UGV mission coordination.
 - `uav_ugv_msgs`: Custom ROS 2 messages shared between project packages.
 
@@ -111,7 +125,7 @@ A practical starting point for this project is:
 ```text
 CPU: 4+ virtual cores
 RAM: 8 GB or more if available
-Disk: 30–40 GB or more (I got it done with like 25)
+Disk: 40 GB or more; allow additional space for PX4 builds and trial output
 ```
 
 ## 3. Install the Ubuntu Desktop
@@ -135,14 +149,39 @@ hostname -I
 From the Mac:
 
 ```bash
-ssh <ubuntu-user>@<VM-IP>
+ssh ubuntu_user@VM_IP
 ```
+
+Replace `ubuntu_user` and `VM_IP` with the guest's username and address.
 
 You can then use VS Code Remote - SSH to edit on the Mac while compiling and running everything inside Ubuntu.
 
 ---
 
+# Fresh Setup: Windows + Ubuntu 22.04
+
+Use an Ubuntu 22.04 x86-64 desktop VM, or WSL2 with WSLg. For a desktop VM, install the Ubuntu 22.04 amd64 ISO in the chosen hypervisor, enable its graphics support, and open a terminal inside Ubuntu. Then follow [Software Setup Inside Ubuntu](#software-setup-inside-ubuntu).
+
+For WSL2, run in administrator PowerShell:
+
+```powershell
+wsl --install -d Ubuntu-22.04
+```
+
+Restart Windows when requested. Open Ubuntu and create the Linux user. Check the distribution from PowerShell:
+
+```powershell
+wsl --list --verbose
+wsl -d Ubuntu-22.04
+```
+
+The version column must show `2`. Build in the Linux home directory, such as `~/uav_ugv_project`. Camera trials need a working Linux display; WSLg supplies this on the recorded Windows setup. Check `echo "$DISPLAY"` inside Ubuntu before starting the camera demo.
+
+Run the remaining Bash commands inside Ubuntu. [Microsoft's WSL instructions](https://learn.microsoft.com/en-us/windows/wsl/install) cover installation and distribution selection.
+
 # Software Setup Inside Ubuntu
+
+These steps apply to the Ubuntu guest on either host. Existing Ubuntu installations can keep their working ROS and simulator setup, then install the audit branch's additional package dependencies below.
 
 ## 1. Update Ubuntu and Install Basic Tools
 
@@ -221,7 +260,7 @@ echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc
 Install PX4/ROS Python dependencies:
 
 ```bash
-pip install --user -U empy==3.3.4 pyros-genmsg setuptools
+python3 -m pip install --user 'empy==3.3.4' pyros-genmsg 'setuptools==65.7.0' 'numpy<2'
 ```
 
 Verify:
@@ -268,19 +307,22 @@ git submodule status
 Expected PX4 commit:
 
 ```text
-d6f12ad1c4f70ad3230afd7d86e971421e02fef4
+0462e3a31e7f0a6f6f05a5e094bee8a52e8759ec
 ```
 
 Expected `px4_msgs` commit:
 
 ```text
-86d8239e962f6939e05c3737784f60c02fa884db
+109e8c8e151938f03fee2e62e3e93dc5ff5e2281
 ```
 
-## Testing the Feature Branch Before Merge
+## Testing the Audit Branch Before Merge
+
+The audit branch must be available from a remote before another clone can select it. After publication:
 
 ```bash
-git switch cameron/simple-uav-ugv-sim
+git fetch origin
+git switch fix/subsystem-audit
 git submodule update --init --recursive
 ```
 
@@ -333,7 +375,8 @@ cd Micro-XRCE-DDS-Agent
 mkdir -p build
 cd build
 
-cmake ..
+source /opt/ros/humble/setup.bash
+cmake .. -DUAGENT_USE_SYSTEM_FASTDDS=ON -DUAGENT_USE_SYSTEM_FASTCDR=ON
 make -j$(nproc)
 
 sudo make install
@@ -346,7 +389,7 @@ Verify:
 MicroXRCEAgent --help
 ```
 
-The simulation uses UDP port `8888`.
+The simulation uses UDP port `8888`. This build uses the Fast DDS libraries installed with ROS Humble. Source ROS before starting the agent in each terminal. The [agent build options](https://github.com/eProsima/Micro-XRCE-DDS-Agent/blob/v2.4.2/CMakeLists.txt) define the system-library flags.
 
 ---
 
@@ -357,11 +400,19 @@ cd ~/uav_ugv_project/external/PX4-Autopilot
 make px4_sitl
 ```
 
+Generate the Gazebo target and its `gz_env.sh` before starting the separate world scripts. This command builds without starting a simulation:
+
+```bash
+DONT_RUN=1 make px4_sitl gz_x500
+```
+
 ---
 
 # Build the ROS 2 Workspace
 
 ## First Full Build
+
+Install the [Harmonic bridge and project dependencies](docs/simulation_setup.md#dependency-metadata-and-harmonic-overlay) from the repository root first. This includes the actuator watchdog plugin dependencies, `robot_localization`, and OpenCV.
 
 ```bash
 cd ~/uav_ugv_project/ros2_ws
@@ -467,7 +518,7 @@ Leave it running.
 
 ## Terminal 4 — ROS 2 Development Shell
 
-There is intentionally no `ros.sh` wrapper so this terminal can be used for any ROS 2 command or node.
+Source ROS and the current workspace in each development terminal:
 
 ```bash
 source /opt/ros/humble/setup.bash
@@ -513,7 +564,7 @@ Typical output includes:
 /fmu/out/vehicle_odometry
 /fmu/out/vehicle_global_position
 /fmu/out/vehicle_local_position_v1
-/fmu/out/vehicle_status_v1
+/fmu/out/vehicle_status_v4
 
 /fmu/in/offboard_control_mode
 /fmu/in/trajectory_setpoint
@@ -587,10 +638,12 @@ pxh> commander takeoff
 
 ```bash
 gz topic \
-  -t /simple_ugv/cmd_vel \
+  -t /simple_ugv/drive_cmd_vel \
   -m gz.msgs.Twist \
   -p 'linear: {x: 0.5}'
 ```
+
+The actuator watchdog stops a single command after 0.35 seconds. The normal ROS controller publishes commands every 100 ms. `/simple_ugv/cmd_vel` is the watchdog output to DiffDrive.
 
 ---
 
@@ -681,10 +734,10 @@ Expected:
 
 ```text
 PX4:
-d6f12ad1c4f70ad3230afd7d86e971421e02fef4
+0462e3a31e7f0a6f6f05a5e094bee8a52e8759ec
 
 px4_msgs:
-86d8239e962f6939e05c3737784f60c02fa884db
+109e8c8e151938f03fee2e62e3e93dc5ff5e2281
 ```
 
 ---

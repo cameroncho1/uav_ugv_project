@@ -9,6 +9,9 @@
 #
 # Run this from a terminal on the Ubuntu desktop (not over SSH), because it
 # opens graphical terminal tabs and the Gazebo window.
+#
+# If gnome-terminal is not installed (for example on WSL2), this script hands
+# off to start_sim_tmux.sh, which does the same thing inside tmux.
 
 set -u
 
@@ -32,6 +35,8 @@ stop_all() {
   pkill -KILL -x px4 2>/dev/null
   pkill -KILL -f MicroXRCEAgent 2>/dev/null
   pkill -KILL -f "gz sim" 2>/dev/null
+  # Also close the tmux session if the tmux fallback started the simulation.
+  command -v tmux >/dev/null && tmux kill-session -t "${SESSION:-uavugv}" 2>/dev/null
   echo "Done. The terminal tabs stay open so you can read their output; close them by hand."
 }
 
@@ -45,7 +50,12 @@ WITH_GUI=1
 
 # ---------------------------------------------------------------- sanity checks
 if ! command -v gnome-terminal >/dev/null; then
-  echo "Error: gnome-terminal not found. Run this on the Ubuntu desktop." >&2
+  if command -v tmux >/dev/null; then
+    echo "gnome-terminal not found, using tmux instead."
+    exec bash "$(dirname "$0")/start_sim_tmux.sh" "$@"
+  fi
+  echo "Error: neither gnome-terminal nor tmux found." >&2
+  echo "Run this on the Ubuntu desktop, or install tmux: sudo apt install tmux" >&2
   exit 1
 fi
 if [[ -z "${DISPLAY:-}" && -z "${WAYLAND_DISPLAY:-}" ]]; then
@@ -71,6 +81,8 @@ open_tab() {
   local title="$1" cmd="$2"
   gnome-terminal --tab --title="$title" -- bash -c "
     export GZ_PARTITION='$GZ_PARTITION' GZ_IP='$GZ_IP'
+    [ -f '$ROS_SETUP' ] && source '$ROS_SETUP'
+    [ -f '$WS_SETUP' ] && source '$WS_SETUP'
     cd '$PROJECT'
     $cmd
     echo

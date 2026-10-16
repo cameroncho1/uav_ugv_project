@@ -1,0 +1,11 @@
+{
+  "samples": 1048,
+  "window_s": [
+    51.32,
+    71.82
+  ],
+  "source_ulog": "22_36_04.ulg",
+  "signed_heading_bias_deg": 0.8939695870845594,
+  "rmse_heading_deg": 0.8942910730985287,
+  "max_abs_heading_error_deg": 0.9476092634307168
+}

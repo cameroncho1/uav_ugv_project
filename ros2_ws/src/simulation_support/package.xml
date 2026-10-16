@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>simulation_support</name>
+  <version>0.0.0</version>
+  <description>Gazebo sensor bridges, clock integration and evaluation truth readers.</description>
+  <maintainer email="rylanwwade@gmail.com">Rylan Wade</maintainer>
+  <license>TODO: License declaration</license>
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <buildtool_depend>pkg-config</buildtool_depend>
+  <depend>rclcpp</depend>
+  <depend>geometry_msgs</depend>
+  <depend>gz-transport13</depend>
+  <depend>gz-msgs10</depend>
+  <exec_depend>ros_gz_bridge</exec_depend>
+  <exec_depend>launch</exec_depend>
+  <exec_depend>launch_ros</exec_depend>
+  <exec_depend>ament_index_python</exec_depend>
+  <exec_depend>python3-yaml</exec_depend>
+  <test_depend>ament_cmake_pytest</test_depend>
+  <export><build_type>ament_cmake</build_type></export>
+</package>

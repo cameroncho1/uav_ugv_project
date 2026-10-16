@@ -1,0 +1,32 @@
+header {
+  stamp {
+    sec: 2
+    nsec: 652000000
+  }
+  data {
+    key: "frame_id"
+    value: "simple_ugv/odom"
+  }
+  data {
+    key: "child_frame_id"
+    value: "simple_ugv/chassis"
+  }
+}
+pose {
+  position {
+    x: 7.0251545327641229e-19
+    y: 8.0200382307178772e-36
+  }
+  orientation {
+    z: 6.5571123191504393e-18
+    w: 1
+  }
+}
+twist {
+  linear {
+    x: -1.396908323472295e-18
+  }
+  angular {
+    z: 5.63186694697447e-19
+  }
+}

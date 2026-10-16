@@ -1,0 +1,12 @@
+{
+  "source_ulog": "21_43_37.ulg",
+  "comparison": "PX4 vehicle_attitude vs vehicle_attitude_groundtruth at truth sample timestamps",
+  "window_s": [
+    55,
+    75
+  ],
+  "samples": 1111,
+  "signed_heading_bias_deg": 17.9353628691979,
+  "max_abs_heading_error_deg": 18.283602836669516,
+  "px4_revision": "d6f12ad1c4f70ad3230afd7d86e971421e02fef4"
+}

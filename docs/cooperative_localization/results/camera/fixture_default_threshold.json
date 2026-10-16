@@ -1,0 +1,68 @@
+{
+  "cases": [
+    {
+      "case": "visible",
+      "observations": 14,
+      "visible": true,
+      "diagnostics": {
+        "processed": "16",
+        "accepted": "16",
+        "reprojection_error_pixels": "1.0984061717994356e-06"
+      },
+      "rmse_3d_m": 0.022955706687327992,
+      "max_error_3d_m": 0.022955706687327992,
+      "passed": true
+    },
+    {
+      "case": "partial_occlusion",
+      "observations": 0,
+      "visible": false,
+      "diagnostics": {
+        "processed": "35",
+        "accepted": "19",
+        "not_visible": "16",
+        "reprojection_error_pixels": "1.0984061717994356e-06"
+      },
+      "passed": true
+    },
+    {
+      "case": "full_occlusion",
+      "observations": 0,
+      "visible": false,
+      "diagnostics": {
+        "processed": "46",
+        "accepted": "19",
+        "not_visible": "27",
+        "reprojection_error_pixels": "1.0984061717994356e-06"
+      },
+      "passed": true
+    },
+    {
+      "case": "recovery",
+      "observations": 14,
+      "visible": true,
+      "diagnostics": {
+        "processed": "61",
+        "accepted": "32",
+        "not_visible": "29",
+        "reprojection_error_pixels": "1.0984061717994356e-06"
+      },
+      "rmse_3d_m": 0.022955706687327992,
+      "max_error_3d_m": 0.022955706687327992,
+      "passed": true
+    },
+    {
+      "case": "off_axis",
+      "observations": 0,
+      "visible": true,
+      "diagnostics": {
+        "processed": "76",
+        "accepted": "33",
+        "not_visible": "43",
+        "reprojection_error_pixels": "1.0984061717994356e-06"
+      }
+    }
+  ],
+  "passed": false,
+  "error": "off_axis: missing detections"
+}

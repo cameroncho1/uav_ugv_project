@@ -1,0 +1,11 @@
+ugv_ekf:
+  ros__parameters:
+    # Absolute UGV map position inferred from an independent UAV observation.
+    pose1: /ugv/measurements/uav_pose
+    pose1_config: [true, true, false,
+                   false, false, false,
+                   false, false, false,
+                   false, false, false,
+                   false, false, false]
+    pose1_queue_size: 10
+    pose1_rejection_threshold: 5.0

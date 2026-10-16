@@ -1,0 +1,14 @@
+sim_ugv_sensors:
+  ros__parameters:
+    origin_latitude: 47.397971057728974
+    origin_longitude: 8.546163739800146
+    origin_altitude: 0.0
+    spawn_x: -4.0
+    spawn_y: 0.0
+    spawn_yaw: 0.0
+uav_pose:
+  ros__parameters:
+    map_origin: [0.0, 0.0, 0.3]
+sim_uav_sensor:
+  ros__parameters:
+    map_origin: [0.0, 0.0, 0.3]
