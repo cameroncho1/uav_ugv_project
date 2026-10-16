@@ -9,6 +9,7 @@ The project uses UAV observations to map terrain, estimate a ground robot's pose
 | [Host and Ubuntu setup](../README.md) | macOS with UTM, Windows with an Ubuntu VM or WSL2, ROS Humble, PX4, DDS, and basic simulation. |
 | [Simulation dependencies](simulation_setup.md) | Pinned revisions, Harmonic bridge, rosdep rules, build checks, and display requirements. |
 | [Goal demo](../README_simple_goal_demo.md) | Full camera-assisted navigation launch and separate-terminal commands. |
+| [Sensor dataset collection](sensor_dataset.md) | Per-run noise controls, complete simulation startup, ROS bag recording, truth labels, and dataset checks. |
 
 ## Project design
 

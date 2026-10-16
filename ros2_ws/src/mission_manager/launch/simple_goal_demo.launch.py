@@ -56,6 +56,11 @@ def generate_launch_description():
         DeclareLaunchArgument("initial_gps_enabled", default_value="true",
                               description="Enable prepared UGV GPS at startup."),
         DeclareLaunchArgument("seed", default_value="513"),
+        DeclareLaunchArgument("measurement_config",
+                              default_value=str(fault_share / "config/measurement_model.yaml"),
+                              description="UGV noise YAML path relative to the launch directory."),
+        DeclareLaunchArgument("measurement_profile", default_value="nominal",
+                              choices=["nominal", "drift"]),
         DeclareLaunchArgument("shared_position_stddev", default_value="0.0",
                               description="Simulation-only shared GPS/UAV position fault (m)."),
         DeclareLaunchArgument("systematic_position_stddev",
@@ -86,6 +91,8 @@ def generate_launch_description():
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(str(fault_share / "launch/sim_ugv_sensors.launch.py")),
             launch_arguments={"world": "simple_goal_demo", "seed": LaunchConfiguration("seed"),
+                              "measurement_config": LaunchConfiguration("measurement_config"),
+                              "measurement_profile": LaunchConfiguration("measurement_profile"),
                               "shared_position_stddev":
                                   LaunchConfiguration("shared_position_stddev"),
                               "initial_gps_enabled":

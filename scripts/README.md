@@ -24,3 +24,5 @@ ros2 launch mission_manager simple_goal_demo.launch.py
 | Helpers | `check_sim_dependencies.py`, `process_cleanup.sh`, `evaluation_math.py`, `generate_fiducial_model.py` | Check dependencies, stop trial processes, calculate metrics, and generate the roof tag. |
 
 [Setup and demo instructions](../README_simple_goal_demo.md) · [Evaluation commands](../docs/cooperative_localization/interfaces.md#evaluation-and-reproducibility)
+
+[Sensor dataset collection](../docs/sensor_dataset.md) gives the exact simulation and recording commands, with adjustable noise files for each run.
