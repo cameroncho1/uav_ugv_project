@@ -5,6 +5,17 @@ ros2_ws/log/
 *.pyc
 __pycache__/
 .DS_Store
+.vscode/
+
+# Python virtualenv (recreatable via `python -m venv` + `pip install -r requirements.txt`)
+uav_ugv_project_fault_detection/lib/
+uav_ugv_project_fault_detection/bin/
+uav_ugv_project_fault_detection/share/
+uav_ugv_project_fault_detection/include/
+uav_ugv_project_fault_detection/pyvenv.cfg
+
+# Training data (raw flight recordings; not source)
+uav_ugv_project_fault_detection/datasets/
 
 # Local-only agent context notes
 docs/cooperative_localization/sim_setup_context.md

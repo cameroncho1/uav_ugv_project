@@ -1,0 +1,26 @@
+{
+    "shared": {
+        "input_dim": 100,
+        "output_dim": 1,
+        "batch_size": 32,
+        "dropout_rate": 0.2,
+        "activation_function": "relu"
+    },
+    "autoencoder": {
+        "hidden_dim": 50
+    },
+    "bilstm": {
+        "hidden_dim": 50,
+        "num_layers": 2
+    },
+    "rnn": {
+        "hidden_dim": 50,
+        "num_layers": 2
+    },
+    "Trainer": {
+        "batch_size": 32,
+        "num_epochs": 100,
+        "learning_rate": 0.001,
+        "optimizer": "Adam"
+    }
+}
