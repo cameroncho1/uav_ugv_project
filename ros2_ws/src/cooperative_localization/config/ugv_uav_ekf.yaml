@@ -9,3 +9,14 @@ ugv_ekf:
                    false, false, false]
     pose1_queue_size: 10
     pose1_rejection_threshold: 5.0
+
+    # Each observation is published on exactly one of pose1/pose2. Joint updates
+    # preserve measured x/y/yaw correlations and do not reuse camera position.
+    pose2: /ugv/measurements/uav_pose_with_heading
+    pose2_config: [true, true, false,
+                   false, false, true,
+                   false, false, false,
+                   false, false, false,
+                   false, false, false]
+    pose2_queue_size: 10
+    pose2_rejection_threshold: 5.0

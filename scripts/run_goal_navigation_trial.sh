@@ -32,12 +32,14 @@ setsid ros2 launch mission_manager simple_goal_demo.launch.py \
   start_simulation:=false start_rviz:=false \
   initial_gps_enabled:="${INITIAL_GPS_ENABLED:-false}" \
   uav_altitude:="${UAV_ALTITUDE:-4.5}" \
+  uav_heading:="${UAV_HEADING:-true}" \
   seed:="${SEED:-513}" shared_position_stddev:="${SHARED_POSITION_STDDEV:-0.0}" \
   systematic_position_stddev:="${SYSTEMATIC_POSITION_STDDEV:-${SHARED_POSITION_STDDEV:-0.0}}" \
   >"$OUTPUT/launch.log" 2>&1 & pids+=("$!")
 setsid ros2 run simulation_support ugv_truth --ros-args \
   -p world:=simple_goal_demo -p use_sim_time:=true >"$OUTPUT/truth.log" 2>&1 & pids+=("$!")
 score_args=(--timeout "${TRIAL_TIMEOUT:-600}" --seed "${SEED:-513}"
+  --uav-heading "${UAV_HEADING:-true}"
   --uav-altitude "${UAV_ALTITUDE:-4.5}"
   --shared-position-stddev "${SHARED_POSITION_STDDEV:-0.0}"
   --systematic-position-stddev "${SYSTEMATIC_POSITION_STDDEV:-${SHARED_POSITION_STDDEV:-0.0}}")

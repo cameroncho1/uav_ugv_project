@@ -4,7 +4,7 @@
 
 ## Stable contract and ownership
 
-- The requirements baseline is `65ba304`. Localization owns measured-input validation/fusion and one authoritative UGV pose. Relative sensing remains independent of sensing technology.
+- Localization owns measured-input validation/fusion and one authoritative UGV pose. Relative sensing is independent of sensing technology.
 - Shared global positions use ENU `map`; ROS body axes use FLU. PX4 NED/FRD conversion, covariance, and local-origin alignment are explicit in the UAV interface owner.
 - Acquisition stamps are preserved. Simulation assembly uses `/clock`; actual PX4 anchors use `UXRCE_DDS_SYNCT=0` and the matching ROS DDS domain.
 - Simulator truth is used only for synthesis and scoring. Estimation and navigation consume the stated measurement interfaces. The fused UGV pose is never fed into its UAV correction producer.
@@ -20,7 +20,7 @@
 | `route_planning` / `ugv_control` | Clearance routes associated with goal revisions / path following and actuator command expiry. |
 | `localization_common` | Frame, covariance and geodesy math without ROS or simulator imports. |
 
-UGV bridging and clock ownership were open in the baseline and are now assigned to integration. Global map-to-body TF publication and hardware sensor calibration remain open; they are not silently assigned to the estimator.
+Integration owns UGV bridging and the shared clock. Global map-to-body TF publication and hardware sensor calibration remain open ownership decisions.
 
 ## Topics and frames
 
@@ -36,11 +36,13 @@ Raw simulated data uses sensor QoS. Prepared inputs and fused poses use reliable
 | `/ugv/measurements/imu` | `sensor_msgs/Imu` | Validated components; `-1` availability markers remain attached to missing components. |
 | `/ugv/measurements/gps_pose` | `geometry_msgs/PoseWithCovarianceStamped` | WGS84 projected into map ENU with known covariance rotated from the fix's tangent basis. Orientation is unused. |
 | `/uav/localization/pose` | `geometry_msgs/PoseWithCovarianceStamped` | Independent UAV position/FLU attitude and covariance in map. |
-| `/ugv/sensors/uav_relative_pose` | `geometry_msgs/PoseWithCovarianceStamped` | Chassis origin relative to UAV body origin in `uav/base_link` FLU. Orientation is unused. |
+| `/ugv/sensors/uav_relative_pose` | `geometry_msgs/PoseWithCovarianceStamped` | Chassis pose relative to UAV body in `uav/base_link` FLU. Camera inputs include measured orientation and joint fixed-axis covariance; position-only inputs use large angular uncertainty. |
 | `/ugv/measurements/uav_pose` | `geometry_msgs/PoseWithCovarianceStamped` | UGV map position from a timestamp-matched independent anchor plus relative observation. |
+| `/ugv/measurements/uav_pose_with_heading` | `geometry_msgs/PoseWithCovarianceStamped` | Joint UGV map x/y/yaw correction, including cross-covariance. An observation uses this topic or the position-only topic, never both. |
 | `/ugv/localization/odometry` | `nav_msgs/Odometry` | Internal planar EKF output. |
 | `/ugv/localization/pose` | `geometry_msgs/PoseWithCovarianceStamped` | Authoritative map pose/covariance, including the configured unreduced systematic x/y prior. |
 | `/uav/camera/image`, `/uav/camera/camera_info` | `sensor_msgs/Image`, `sensor_msgs/CameraInfo` | Rendered/measured optical data; `uav/camera_optical_frame`. |
+| `/uav/camera/heading_image` | `sensor_msgs/Image` | Best-effort bgr8 image with measured chassis-forward arrow; original acquisition stamp and optical frame. Visualization only. |
 | `/local_grid` | `nav_msgs/OccupancyGrid` | Acquisition-stamped map projection with matched camera anchor and calibrated mount. |
 | `/ugv/navigation/route` | `uav_ugv_msgs/PlannedRoute` | Goal revision, path and the conservative footprint-clearance grid used to plan it. |
 | `/local_path` | `nav_msgs/Path` | Visualization and evaluation reference; does not authorize motion. |
@@ -56,6 +58,8 @@ IMU orientation requires a valid unit quaternion. Missing/invalid orientation is
 The independent UAV adapter accepts NED/FRD PX4 samples with finite variances and a matching clock. `map_origin` is a stated alignment. Optional takeoff initialization requires airborne status and a reset-free interval. A later PX4 reference reset stops anchors pending realignment/restart. A ROS-clock rewind resets temporal initialization state. Origin guesses from UGV truth or fused pose are prohibited.
 
 Corrections use exact anchors or interpolation with at most 0.25 s anchor gaps, 0.5 s acquisition age, and 30 m range. UAV position/attitude and relative uncertainty are propagated. No extrapolation is performed. Pending batches are detached before processing so clock resets cannot invalidate queue iteration.
+
+`uav_heading:=true` enables joint camera x/y/yaw corrections. The standalone estimator defaults to false; the camera demo and camera evaluation default to true. Heading selection requires a valid relative quaternion, positive angular uncertainty, a horizontal forward-axis projection of at least 0.5, and map heading standard deviation at most 0.35 rad. Otherwise the position-only correction remains available. Joint covariance includes source position/orientation correlations and UAV attitude error. Both filter inputs use five-sigma innovation rejection. [Camera heading](camera_heading.md) defines geometry, controls, and validation.
 
 ## Launch modes and controls
 
@@ -117,4 +121,4 @@ Closed-loop scoring records route snapshots and truth matched to the most recent
 
 Arrival requires a full fresh one-second stopped interval, estimated distance at most 0.5 m, and the declared physical tolerance (0.85 m for the camera demo). A deadline during dwell cannot pass. Hold checks require fresh sensors and sufficient evidence. Localization and camera evaluation runners bound process-group cleanup and stop their owned processes. Use persistent directories for retained results; `/tmp` may clear when WSL restarts.
 
-[Results](evaluation_results.md), [navigation](../navigation.md), [perception](perception.md) and [simulation setup](../simulation_setup.md) distinguish recorded conditions and remaining limits.
+[Heading validation](heading_validation.md), [navigation](../navigation.md), [perception](perception.md) and [simulation setup](../simulation_setup.md) state measured conditions and remaining limits.

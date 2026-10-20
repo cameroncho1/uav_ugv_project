@@ -12,7 +12,8 @@ from rclpy.node import Node
 from rclpy.qos import qos_profile_sensor_data
 from std_srvs.srv import SetBool
 
-from localization_common.frames import covariance, interpolate, rotation, ugv_position
+from localization_common.frames import (covariance, interpolate, planar_heading_pose,
+                                         rotation, ugv_pose, ugv_position)
 
 
 def stamp_ns(message):
@@ -37,8 +38,11 @@ class UavCorrection(Node):
         self.max_range = self.declare_parameter("max_range", 30.).value
         self.max_speed = self.declare_parameter("max_ugv_speed", 2.).value
         self.enabled = self.declare_parameter("enabled", True).value
+        self.heading_enabled = self.declare_parameter("heading_enabled", False).value
+        self.max_heading_stddev = self.declare_parameter("max_heading_stddev", .35).value
         if not all(np.isfinite(value) and value > 0 for value in
-                   (self.max_age, self.max_gap, self.max_range, self.max_speed)):
+                   (self.max_age, self.max_gap, self.max_range, self.max_speed,
+                    self.max_heading_stddev)):
             raise ValueError("Correction limits must be finite and positive")
         self.anchors = deque(maxlen=200)
         self.pending = deque(maxlen=100)
@@ -47,6 +51,8 @@ class UavCorrection(Node):
         self.last_clock = None
         self.publisher = self.create_publisher(PoseWithCovarianceStamped,
                                                "/ugv/measurements/uav_pose", 20)
+        self.heading_publisher = self.create_publisher(
+            PoseWithCovarianceStamped, "/ugv/measurements/uav_pose_with_heading", 20)
         self.diagnostics = self.create_publisher(DiagnosticArray, "/diagnostics", 10)
         self.create_subscription(PoseWithCovarianceStamped, "/uav/localization/pose",
                                  self.on_anchor, qos_profile_sensor_data)
@@ -94,7 +100,8 @@ class UavCorrection(Node):
                 raise ValueError("Wrong frame or stale relative reading")
             p = message.pose.pose.position
             relative = np.array([p.x, p.y, p.z])
-            c = covariance(message.pose.covariance, 6)[:3, :3]
+            full_covariance = covariance(message.pose.covariance, 6)
+            c = full_covariance[:3, :3]
             if (not np.all(np.isfinite(relative)) or np.linalg.norm(relative) > self.max_range
                     or np.linalg.eigvalsh(c).min() <= 0):
                 raise ValueError("Invalid relative measurement")
@@ -102,7 +109,18 @@ class UavCorrection(Node):
             self.counters["invalid_relative"] += 1
             return
         if self.enabled:
-            self.pending.append((stamp, relative, c, message.header.stamp))
+            attitude = None
+            if self.heading_enabled:
+                q = message.pose.pose.orientation
+                candidate = np.array([q.w, q.x, q.y, q.z])
+                try:
+                    rotation(candidate)
+                    if np.linalg.eigvalsh(full_covariance[3:, 3:]).min() <= 0:
+                        raise ValueError("Missing relative orientation uncertainty")
+                    attitude = candidate / np.linalg.norm(candidate)
+                except ValueError:
+                    self.counters["heading_unavailable"] += 1
+            self.pending.append((stamp, relative, full_covariance, attitude, message.header.stamp))
             self.process()
 
     def anchor_at(self, stamp):
@@ -123,15 +141,15 @@ class UavCorrection(Node):
         self.valid_time(0)
         batch = list(self.pending)
         self.pending.clear()
-        for stamp, relative, c, ros_stamp in batch:
+        for stamp, relative, c, attitude, ros_stamp in batch:
             if not self.valid_time(stamp):
                 self.counters["expired"] += 1
                 continue
             anchor = self.anchor_at(stamp)
             if anchor is None:
-                self.pending.append((stamp, relative, c, ros_stamp))
+                self.pending.append((stamp, relative, c, attitude, ros_stamp))
                 continue
-            position, result_cov = ugv_position(anchor, relative, c)
+            position, result_cov = ugv_position(anchor, relative, c[:3, :3])
             if self.previous is not None:
                 previous_stamp, previous_position, previous_cov = self.previous
                 if stamp <= previous_stamp:
@@ -153,9 +171,25 @@ class UavCorrection(Node):
             output_cov[:3, :3] = result_cov
             output_cov[3:, 3:] = np.eye(3)*1e6
             output.pose.covariance = output_cov.flatten().tolist()
+            publisher = self.publisher
+            if attitude is not None:
+                try:
+                    _, map_attitude, joint_covariance = ugv_pose(anchor, relative, attitude, c)
+                    map_attitude, joint_covariance = planar_heading_pose(
+                        map_attitude, joint_covariance)
+                    if joint_covariance[5, 5] > self.max_heading_stddev**2:
+                        raise ValueError("Heading uncertainty exceeds the configured limit")
+                    q = output.pose.pose.orientation
+                    q.w, q.x, q.y, q.z = (float(value) for value in map_attitude)
+                    output.pose.covariance = joint_covariance.ravel().tolist()
+                    publisher = self.heading_publisher
+                    self.counters["heading_accepted"] += 1
+                except ValueError:
+                    # A weak orientation must not discard a usable position.
+                    self.counters["heading_unavailable"] += 1
             self.previous = (stamp, position, result_cov)
             self.counters["accepted"] += 1
-            self.publisher.publish(output)
+            publisher.publish(output)
 
     def report(self):
         status = DiagnosticStatus(name="cooperative_localization/uav_correction",

@@ -43,6 +43,8 @@ If the matching `simple_goal_demo` world, camera UAV, PX4, and DDS agent are alr
 
 In the Gazebo window, add its **Image Display** plugin and select `/world/simple_goal_demo/model/cooperative_camera_uav_0/link/camera_link/sensor/camera/image`. To list camera topics, run `gz topic -l | grep -Ei 'camera|image'`.
 
+RViz's **Camera heading** display shows `/uav/camera/heading_image`, with a green arrow pointing toward the UGV front as measured from its roof tag. Heading fusion is enabled in the demo; `uav_heading:=false` keeps camera position assistance while omitting camera heading from the filter. Planning and control read the fused pose from `/ugv/localization/pose` in both modes. [Camera heading](docs/cooperative_localization/camera_heading.md) documents the measurement, mounting calibration, uncertainty, and validation commands.
+
 ## Grid Scope
 
 RViz displays `/local_grid`, `/local_path`, and the `/global_goal` marker. Each ground cell uses five projected pixel samples; any sample below the threshold marks it occupied. Cells outside the complete footprint remain unknown. Grids retain image acquisition time and require a matched independent map anchor. A matched bounded-uncertainty UGV pose masks its own visible body. This is only a prototype visual heuristic: shadows and dark texture may become false obstacles, while obstacles similar in brightness to grass can be missed. The grid is not a semantic or safety-rated obstacle map. The camera feed and image-derived grid are real simulation outputs; A* runs only within the current camera footprint.

@@ -13,6 +13,15 @@ Panels:
 Visualization Manager:
   Class: ""
   Displays:
+    - Class: rviz_default_plugins/Image
+      Enabled: true
+      Name: Camera heading
+      Topic:
+        Depth: 1
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Best Effort
+        Value: /uav/camera/heading_image
     - Alpha: 0.9
       Class: rviz_default_plugins/Map
       Color Scheme: map

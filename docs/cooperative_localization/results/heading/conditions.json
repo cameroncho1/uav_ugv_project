@@ -1,0 +1,90 @@
+{
+  "runtime": {
+    "os": "Ubuntu 22.04 / WSL2",
+    "architecture": "x86_64",
+    "ros": "Humble",
+    "gazebo": "8.15.0",
+    "python": "3.10.12",
+    "opencv": "4.5.4",
+    "numpy": "1.26.4",
+    "robot_localization": "3.5.4-1jammy.20260908.012128",
+    "renderer": "Ogre with WSLg display; no Gazebo GUI"
+  },
+  "dependencies": {
+    "minimum_gazebo_version": "8.6.0",
+    "revisions": {
+      "external/PX4-Autopilot": "0462e3a31e7f0a6f6f05a5e094bee8a52e8759ec",
+      "ros2_ws/src/px4_msgs": "109e8c8e151938f03fee2e62e3e93dc5ff5e2281",
+      "external/PX4-Autopilot/Tools/simulation/gz": "a15af9628536914ff7201c992fce5e3cb5d70db9"
+    }
+  },
+  "build": "All 11 first-party packages; pinned consumed-message underlay supplies px4_msgs.",
+  "source_sha256_lf": {
+    "ros2_ws/src/localization_common/localization_common/frames.py": "cec2025f638f20d4a11f47d0a3714c7ead009632ace980763218e8ff7018b1b5",
+    "ros2_ws/src/uav_sensing/scripts/fiducial_math.py": "b1ce8190cdbd057714e03cc092afc1d20145f1a599ec35bf5c6914d38595a92a",
+    "ros2_ws/src/uav_sensing/scripts/uav_fiducial_sensor.py": "0bb237e48a5e47ca1bc9c77f5eef175246ddc50f25b5ceb2fa365eb70eea0147",
+    "ros2_ws/src/uav_sensing/config/camera_calibration.yaml": "c532700ee0eb9dcb841f5ffc10a48d7d7096ed8d3c092ef363aa362e03d73d21",
+    "ros2_ws/src/cooperative_localization/scripts/uav_correction.py": "ae50a002f335293ed14360b76cf727e26519413a7fccfbc45f8d75092df1b3a0",
+    "ros2_ws/src/cooperative_localization/config/uav_correction.yaml": "4a692546b794d950845ab8677944e46a12f45b8c7f8da48c6a6f81a0bfdc70ac",
+    "ros2_ws/src/cooperative_localization/config/ugv_ekf.yaml": "10f207a3e8b827a511383db21bd0d624de56a59c5f11d7569b4b20c2fbfa5e02",
+    "ros2_ws/src/cooperative_localization/config/ugv_uav_ekf.yaml": "e552f9a36648938dcdd32f7a105c6a990301847edad1cb756ee1a7f27091f4d8",
+    "ros2_ws/src/cooperative_localization/launch/ugv_localization.launch.py": "97fd494fd08b3320f5b09bfd03f8bf7c5f58fd644066c1b18bd42d5393e2019c",
+    "ros2_ws/src/mission_manager/launch/simple_goal_demo.launch.py": "122eecc6bc05796495fc8a9bb4bf0364f6b322ffa64a92b90ae738c28a49f83f",
+    "ros2_ws/src/fault_management/launch/evaluation_launch.py": "50784d4b790671070ca582f0597cdf20d35babc840faab703d8d48573eeb2d53",
+    "ros2_ws/src/fault_management/scripts/localization_trial.py": "12c93f205e833b4791f32b3ca20b0083743698628d98dc6d9293c24ab505d066",
+    "scripts/test_camera_heading_fusion.py": "0b751537ea1a5067b0d86fd53c93aa7ac020616b24e8a09e3a2714aa55e06d19",
+    "scripts/test_camera_perception.py": "6f93b62b6b9b330bc0ec22c4bfe170ac6791a38e6fd659714add913a809574c6",
+    "scripts/score_goal_navigation.py": "0dd140f3d89e78929b45176f1b93bfbe467bb336417aad4641dbe3e9a9a53e19",
+    "scripts/run_live_cooperative_trial.sh": "3b115a0e150913fafb15ba54a1351e781e473fedbebff807b52d461e08e96a13",
+    "scripts/run_goal_navigation_trial.sh": "1572ebfaea64a9de863ecb390f1b7b81e3c0b1816231ae638483d61821b8a190",
+    "simulation/worlds/fiducial_camera_test.sdf": "a405e71c254275d9a786d8efbc876a65c9dae30c477d7d2e85c2466fc6260890",
+    "simulation/worlds/simple_goal_demo.sdf": "1789ec7caa80f584a7896f0114c3699c14e213e7482bdd9f66b12fcafab3c6ea",
+    "simulation/models/cooperative_camera_uav/model.sdf": "3edd99c966a270aaa4621cc0787be466f018c285a85e4e6c812d0525eed2a697",
+    "simulation/models/ugv_fiducial/model.sdf": "f8e38fd6d605362511a3edbd7d4d9905122eefba5946401a709dc2643da2272d",
+    "ros2_ws/src/fault_management/config/measurement_model.yaml": "61c444ee42e690bfa3e8fd3e7292e6966a910cd7a6fc2285dcf3c4e97294a111",
+    "ros2_ws/src/fault_management/config/measurement_nominal.yaml": "892cff336ec66f07417e1782341baf544aa2e74adabf1dbdd126b3ccbd123dd6",
+    "ros2_ws/src/fault_management/config/measurement_drift.yaml": "caa81a80a51eb9949da29f7a99bd77abd1520e03ebf54a34e231c6ad5c40f5e3",
+    "config/simple_goal_demo.rviz": "41581697747d17c46052570f478670c619ceba8730065cf077da47dacf87fc80"
+  },
+  "schema_cache": {
+    "package_format3.xsd": {
+      "url": "https://raw.githubusercontent.com/ros-infrastructure/rep/master/xsd/package_format3.xsd",
+      "sha256": "f096a197ed6d7878984bb2501a55f7f1bd4895d254399fb7857e154bfb644f41"
+    },
+    "package_common.xsd": {
+      "url": "https://raw.githubusercontent.com/ros-infrastructure/rep/master/xsd/package_common.xsd",
+      "sha256": "941ea8645344f3c4b7b9d7e68799898309d65a18225fa9cbef4169d95d1a3211"
+    }
+  },
+  "fixtures": {
+    "rendered": "static observer at (0,0,4), 0.4 m tag at z=0.37 m, four cardinal yaw angles; 5 Hz",
+    "heading_fusion": "stationary chassis yaw 0, UAV yaw 0.7; IMU bias 0.18 rad; IMU sigma 0.1 rad; anchor and relative angle sigma 0.02 rad each; 2 s observation outage; 170 degree outliers; independent anchors continue during camera outage",
+    "heading_stress_gate": "same fixture with IMU bias 0.36 rad; recovery criteria fail",
+    "paired_nominal": "seeds 513,514,515; GPS on/off/startup_off; 31 s; fixed-observer synthetic position only",
+    "paired_drift": "same seed/GPS matrix; 91 s; wheel scale +15%; IMU heading drift 0.002 rad/s; position only",
+    "paired_robust": "seeds 513,514,515; GPS off; 91 s drift; every tenth relative sample +8 m body x; relative outage 35-55 s",
+    "live_camera": "seed 513; GPS on/off/startup_off; live PX4 anchor; owned 5 Hz camera; joint x/y/yaw; 4.5 m altitude",
+    "camera_goal": "seed 514; GPS denied from startup; live PX4/camera; joint x/y/yaw; physical goal tolerance 0.85 m"
+  },
+  "commands": [
+    "colcon build --symlink-install --packages-ignore px4_msgs",
+    "XML_CATALOG_FILES=<local ROS schema catalog> colcon test --executor sequential --packages-ignore px4_msgs",
+    "ROS_DOMAIN_ID=72 python3 scripts/test_camera_heading_fusion.py evaluation/heading_fusion.json",
+    "ROS_DOMAIN_ID=73 GZ_PARTITION=uav_heading_validation scripts/run_camera_perception_trial.sh evaluation/rendered_heading",
+    "ROS_DOMAIN_ID=74 GZ_PARTITION=uav_heading_paired scripts/run_cooperative_trials.sh evaluation/paired_nominal",
+    "ROS_DOMAIN_ID=74 GZ_PARTITION=uav_heading_paired ROUTE=long DURATION=91 MEASUREMENT_PROFILE=drift scripts/run_cooperative_trials.sh evaluation/paired_drift",
+    "ROS_DOMAIN_ID=74 GZ_PARTITION=uav_heading_paired GPS_CASES=off ROUTE=long DURATION=91 MEASUREMENT_PROFILE=drift OUTLIER_EVERY=10 DROPOUT_START=35.0 DROPOUT_END=55.0 scripts/run_cooperative_trials.sh evaluation/paired_robust",
+    "ROS_DOMAIN_ID=75 GZ_PARTITION=uav_heading_camera SEEDS=513 scripts/run_camera_anchor_trials.sh evaluation/camera_anchors",
+    "ROS_DOMAIN_ID=75 GZ_PARTITION=uav_heading_camera SEED=514 scripts/run_goal_navigation_trial.sh evaluation/camera_goal"
+  ],
+  "registered_test_environment": {
+    "ROS_DOMAIN_ID": "76 for numerical ROS checks",
+    "OPENBLAS_NUM_THREADS": "1",
+    "OMP_NUM_THREADS": "1"
+  },
+  "test_source_sha256_lf": {
+    "ros2_ws/src/cooperative_localization/test/test_uav_correction.py": "354ba245d3f7910bbec6e0c956dca049d2ef8f5957ee03fbdba0fdbea068e9aa",
+    "ros2_ws/src/uav_sensing/test/test_fiducial_math.py": "d5538f9157c57119d893b35053abddc899d87e7c3e49c646a6de102925eb1e59",
+    "ros2_ws/src/localization_common/test/test_numerical.py": "1abbc09514b326200c7321c1e17ad135ec0b9beebae18170c633a3c46fd8d0d2"
+  }
+}

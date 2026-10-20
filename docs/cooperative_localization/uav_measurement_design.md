@@ -1,27 +1,27 @@
-# UAV-assisted position measurements
+# UAV-assisted pose measurements
 
 ## Implemented model
 
-The sensor boundary uses a full 3D UGV position relative to the UAV in `uav/base_link` (forward, left, up). `PoseWithCovarianceStamped` carries the relative vector, its position covariance, and its acquisition time. Its orientation is unused. The implemented camera detector supplies this vector using known marker geometry, CameraInfo intrinsics, and body-camera extrinsics; [perception](perception.md) describes the calibration assumptions. A range-only UWB reading does not supply this vector; it needs a different observation model or additional geometry.
+The sensor boundary uses a full 3D UGV position relative to the UAV in `uav/base_link` (forward, left, up). `PoseWithCovarianceStamped` carries the relative vector, covariance, and acquisition time. The camera detector also supplies measured chassis orientation and joint fixed-axis covariance using known marker geometry, CameraInfo intrinsics, and body-camera extrinsics. Position-only producers leave orientation unused with large angular covariance. [Camera heading](camera_heading.md) defines orientation composition, joint x/y/yaw covariance, and heading-quality fallback; [perception](perception.md) describes camera calibration assumptions. A range-only UWB reading does not supply the relative vector; it needs a different observation model or additional geometry.
 
 The UAV anchor is independently localized in ENU `map`. `uav_control/scripts/uav_pose.py` converts PX4 NED position, FRD attitude, and their variances. The configured `map_origin` translates PX4's local origin into the shared map. This origin is an external alignment assumption, not an estimate obtained from UGV truth. The goal demo and live trial runner require airborne status and a reset-free ten-second initialization interval before accepting the reference. The standalone anchor launch defaults to no airborne requirement and zero settling delay. Later PX4 resets stop output and require realignment and restart. Independent noisy simulated anchors remain available for controlled observation tests.
 
-The correction computes `p_ugv = p_uav + R_uav * relative`. With independent anchor and relative errors, its covariance is `J * C_uav * J.T + R * C_relative * R.T`, where `J = [I, -skew(R * relative)]`. Anchor attitude errors are about fixed map axes. Full 3D rotation and covariance are retained; the planar EKF selects only map x/y. The Jacobian is a small-angle approximation.
+The position correction computes `p_ugv = p_uav + R_uav * relative`. With independent anchor and relative errors, its covariance is `J * C_uav * J.T + R * C_relative * R.T`, where `J = [I, -skew(R * relative)]`. Anchor attitude errors are about fixed map axes. The planar EKF selects map x/y, with optional camera-derived yaw fused jointly when enabled and usable. Full position/orientation composition retains source cross-covariance. The Jacobians are small-angle approximations.
 
 `simulation_support` owns the Gazebo pose reader; `fault_management` owns the synthetic relative-observation producer. Evaluation assemblies select these explicitly. At 5 Hz the synthetic producer generates independent Gaussian relative position, UAV position, and UAV attitude errors. The fixed-observer evaluation places the UAV at map `(2, -2, 4)`; it models an independently localized hovering observer without running flight dynamics. The same relative sensor can read a named PX4 UAV model in a live world. True poses supply synthetic sensor data and scoring; the estimator receives only the noisy measurements. The camera demo selects rendered observations and an actual PX4 anchor instead of this synthetic relative sensor.
 
 ## Design choices checked by evaluation
 
-Numerical results in this section are retained October 11 runs. They do not describe validation of later code changes.
-
 | Choice | Evidence and implemented behavior |
 | --- | --- |
-| Full relative vector and 3D rotation | Range alone cannot determine one UGV position from one UAV. Rotation round trips and lever-arm covariance tests cover nonzero roll, pitch, and yaw. Only x/y is fused by the existing planar EKF. |
-| UAV uncertainty in every correction | A 10,000-sample Monte Carlo check agrees with the propagated covariance diagonals within 5%. Attitude error grows into position error with distance. |
+| Full relative vector and 3D rotation | Range alone cannot determine one UGV position from one UAV. Rotation round trips and lever-arm covariance tests cover nonzero roll, pitch, and yaw. The planar EKF selects x/y or joint x/y/yaw. |
+| UAV uncertainty in every correction | Monte Carlo checks exercise position propagation and joint position/orientation covariance, including correlated errors. Attitude error grows into position error with distance. |
 | Acquisition-time matching | Delayed readings wait for a bracketed anchor, expire without extrapolation, and retain their original timestamp. Clock-mismatch and reset tests reject invalid anchors. |
-| Independent streaming EKFs | The existing robot_localization filter accepts absolute pose x/y. A second baseline filter receives identical UGV messages for each paired comparison; neither estimate feeds the observation producer. |
-| Jump gate plus EKF innovation gate | Synthetic 8 m outliers generate 31-38 adapter jump rejections per fault trial. Observations resume after the 20-second outage and assisted RMSE stays below 0.389 m. |
-| Aligned PX4 anchor as the live default | Nine live trials have 0.124-0.151 m assisted RMSE and 0.79-0.91 degree UAV heading RMSE. The legacy magnetic configuration has a measured 17.94 degree bias. [Recorded conditions](evaluation_results.md) distinguish these dependency configurations. |
+| Independent streaming EKFs | Paired filters receive identical UGV messages; neither estimate feeds the observation producer. Heading checks isolate the effect of selecting camera yaw. |
+| Jump gate plus EKF innovation gate | Synthetic trials inject 8 m position outliers and a 20-second outage. The heading fixture injects 170-degree orientation outliers and a two-second observation outage. |
+| Aligned PX4 anchor as the live default | The dependency checker verifies pinned wire definitions, firmware, and ENU/tesla magnetic settings before live evaluation. |
+
+[Heading validation](heading_validation.md) gives the executed conditions and measured results.
 
 ## Timing and rejection
 
@@ -39,8 +39,8 @@ The correction buffers UAV anchors and interpolates position and quaternion at t
 
 Noise values are controlled simulation assumptions, not sensor calibration. UAV uncertainty is included so a precise relative reading cannot create an unrealistically perfect global anchor. The filters do not exchange their estimates, avoiding estimator feedback. The independent Gaussian fixture omits persistent shared errors. Separate [perception and shared-bias tests](perception.md) exercise actual pixels, occlusion, and a configured common global offset. Covariance propagation assumes independent anchor and relative errors; the public fused-pose interface retains a configured systematic position prior for shared absolute-reference uncertainty.
 
-The paired evaluation uses two EKFs on the same sensor messages and trajectory. It measures position error and reported planar uncertainty under nominal noise, injected wheel-scale and IMU-heading drift, relative-measurement outliers, and correction dropout. Results and conditions are recorded in `evaluation_results.md`.
+The paired evaluation uses two EKFs on the same sensor messages and trajectory. It measures position error and reported planar uncertainty under nominal noise, injected wheel-scale and IMU-heading drift, relative-measurement outliers, and correction dropout. [Heading validation](heading_validation.md) records results and conditions.
 
 ## Live PX4 compatibility
 
-The dependency manifest pins PX4, matching ROS messages, and Gazebo models to the [upstream magnetometer fix](https://github.com/PX4/PX4-Autopilot/pull/28877). Both standalone worlds select ENU magnetic components in tesla, and the aligned model uses tesla noise. [Simulation setup](../simulation_setup.md) gives exact revisions and a fail-fast compatibility check. The nine live trials measure 0.79-0.91 degree heading RMSE; the residual is consistent with the upstream discussion of earth-field model differences. This is a measured simulation result, not a guarantee of hardware heading accuracy. Gaussian covariance propagation cannot compensate for an unmodeled systematic bias. `ANCHOR_MODE=simulated` selects the independent synthetic anchor fixture.
+The dependency manifest pins PX4, matching ROS messages, and Gazebo models to the [upstream magnetometer fix](https://github.com/PX4/PX4-Autopilot/pull/28877). Both standalone worlds select ENU magnetic components in tesla, and the aligned model uses tesla noise. [Simulation setup](../simulation_setup.md) gives exact revisions and a fail-fast compatibility check. Gaussian covariance propagation cannot compensate for an unmodeled systematic bias. `ANCHOR_MODE=simulated` selects the independent synthetic anchor fixture.

@@ -15,8 +15,8 @@ The proposed evaluation covers route length, terrain, obstacle density, localiza
 ## Implemented prototype
 
 - One UAV takes off and hovers above a flat simulated route.
-- A calibrated camera detector observes a roof marker on the UGV.
-- Independent UAV map anchors and relative observations provide UGV position measurements.
+- A calibrated camera detector observes a roof marker on the UGV and annotates its forward direction.
+- Independent UAV map anchors and relative observations provide UGV position and optional heading measurements with joint uncertainty.
 - A planar filter combines wheel speed, IMU heading/rate, GPS, and optional UAV measurements.
 - Camera brightness supplies a local terrain grid.
 - Local A* plans with footprint clearance and goal-associated routes.

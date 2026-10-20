@@ -25,5 +25,7 @@ The project uses UAV observations to map terrain, estimate a ground robot's pose
 | --- | --- |
 | [Cooperative localization](cooperative_localization/README.md) | Sensor fusion, UAV assistance, interfaces, extension points, results, research, presentations, and implementation history. |
 | [Navigation](navigation.md) | Goal-associated routes, footprint clearance, path following, actuator expiry, and scoring. |
+| [Camera heading](cooperative_localization/camera_heading.md) | Measured UGV direction overlay, relative orientation, joint heading fusion, and calibration. |
+| [Heading validation](cooperative_localization/heading_validation.md) | Executed checks, measured simulation results, and operating limits. |
 
 The [technical plan](project/technical_plan.md) lists responsibilities for simulation integration, perception and mapping, route planning, localization, and fault management.

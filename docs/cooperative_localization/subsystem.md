@@ -17,9 +17,9 @@ A planar `robot_localization` extended Kalman filter combines:
 - Wheel forward velocity and a zero lateral-velocity constraint for the differential-drive model.
 - IMU yaw and turn rate.
 - GPS map x/y when valid and available.
-- UAV-derived map x/y when assistance is enabled.
+- UAV-derived map x/y when assistance is enabled; optional camera-derived yaw is fused jointly with x/y.
 
-Integrated wheel pose and placeholder GPS/UAV orientation are excluded from fusion. The filter starts with large x/y uncertainty until an absolute position anchors it.
+Integrated wheel pose and placeholder GPS or position-only UAV orientation are excluded from fusion. The filter starts with large x/y uncertainty until an absolute position anchors it. Camera observations provide measured orientation with joint covariance when heading is enabled.
 
 The measurement adapter validates frames, component availability, timestamps, and covariance. Known GPS covariance is preserved and rotated into map coordinates. Unknown covariance uses configured fallback values. Missing IMU orientation remains unavailable. GPS and UAV position updates have five-sigma innovation gates.
 
@@ -27,7 +27,7 @@ The measurement adapter validates frames, component availability, timestamps, an
 
 The correction combines an independently localized UAV pose with a measured 3D vector from UAV body origin to UGV chassis origin. Anchors are matched at observation acquisition time. UAV position, UAV attitude, and relative-measurement uncertainty enter the correction covariance.
 
-The current producer detects a roof AprilTag in rendered camera pixels. The estimator consumes the relative-position interface. A different producer can publish the same vector, frame, timestamp, and covariance. A scalar range alone requires a different observation model or additional geometry.
+The camera producer detects a roof AprilTag in rendered pixels and publishes relative chassis position/orientation with joint covariance. The estimator consumes the relative-position interface with optional orientation. A different producer can supply position only with large unused orientation covariance. A scalar range alone requires a different observation model or additional geometry. [Camera heading](camera_heading.md) defines the image direction indicator, joint x/y/yaw updates, uncertainty, and fallback behavior.
 
 ## GPS loss and uncertainty
 
@@ -59,7 +59,7 @@ Paired trials compare baseline and assisted filters on identical UGV messages. C
 
 Rendered trials test tag visibility, occlusion, recovery, and off-axis geometry. Closed-loop trials measure physical route cross-track error and goal arrival. Command-loss trials measure stopping after controller or bridge loss.
 
-[Interfaces](interfaces.md#evaluation-and-reproducibility) lists commands and output files. [October 11 results](evaluation_results.md) remains historical evidence for the GPS branch.
+[Interfaces](interfaces.md#evaluation-and-reproducibility) lists commands and output files. [Heading validation](heading_validation.md) records executed checks, measured conditions, and limits.
 
 ## Limits
 

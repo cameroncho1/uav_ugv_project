@@ -63,6 +63,7 @@ class LocalizationTrial(Node):
         self.baseline_pending = deque()
         self.baseline_rows = []
         self.uav_count = 0
+        self.uav_heading_count = 0
         self.uav_diagnostics = {}
         self.estimate_count = 0
         self.truth_count = 0
@@ -90,6 +91,8 @@ class LocalizationTrial(Node):
                                      self.on_baseline, 10)
         self.create_subscription(PoseWithCovarianceStamped, "/ugv/measurements/uav_pose",
                                  self.on_uav, 10)
+        self.create_subscription(PoseWithCovarianceStamped,
+                                 "/ugv/measurements/uav_pose_with_heading", self.on_uav_heading, 10)
         self.create_subscription(DiagnosticArray, "/diagnostics", self.on_diagnostics, 10)
         self.create_subscription(PoseWithCovarianceStamped, "/ugv/measurements/gps_pose",
                                  self.on_gps, 10)
@@ -136,6 +139,10 @@ class LocalizationTrial(Node):
 
     def on_uav(self, message):
         self.uav_count += 1
+
+    def on_uav_heading(self, message):
+        self.uav_heading_count += 1
+        self.on_uav(message)
 
     def on_diagnostics(self, message):
         for status in message.status:
@@ -253,6 +260,7 @@ class LocalizationTrial(Node):
             "measurement_profile": self.args.measurement_profile,
             "anchor_source": self.args.anchor_source,
             "relative_source": getattr(self.args, "relative_source", "simulated"),
+            "uav_heading_enabled": self.args.uav_heading == "true",
             "uav_altitude_setpoint_m": getattr(self.args, "uav_altitude", None),
             "shared_position_stddev_m": getattr(self.args, "shared_position_stddev", 0.0),
             "systematic_position_stddev_m": getattr(self.args, "systematic_position_stddev", 0.0),
@@ -260,6 +268,7 @@ class LocalizationTrial(Node):
             "relative_outlier_every": self.args.outlier_every,
             "relative_dropout_interval_s": [self.args.dropout_start, self.args.dropout_end],
             "uav_messages": self.uav_count,
+            "uav_heading_messages": self.uav_heading_count,
             "uav_diagnostics": self.uav_diagnostics,
             "gps_messages_after_disable": self.gps_after_outage,
             "gps_messages_total": self.gps_count,
@@ -295,6 +304,7 @@ def main():
     parser.add_argument("--measurement-profile", choices=["nominal", "drift"], default="nominal")
     parser.add_argument("--anchor-source", default="unspecified")
     parser.add_argument("--relative-source", choices=["simulated", "camera"], default="simulated")
+    parser.add_argument("--uav-heading", choices=["true", "false"], default="false")
     parser.add_argument("--uav-altitude", type=float, default=None)
     parser.add_argument("--shared-position-stddev", type=float, default=0.0)
     parser.add_argument("--systematic-position-stddev", type=float, default=0.0)

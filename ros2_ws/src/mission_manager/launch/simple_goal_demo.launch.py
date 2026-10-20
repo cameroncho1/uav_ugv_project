@@ -53,6 +53,8 @@ def generate_launch_description():
         ),
         DeclareLaunchArgument("uav_assistance", default_value="true",
                               description="Fuse UAV-assisted position measurements."),
+        DeclareLaunchArgument("uav_heading", default_value="true",
+                              description="Fuse camera-derived UGV heading with position."),
         DeclareLaunchArgument("initial_gps_enabled", default_value="true",
                               description="Enable prepared UGV GPS at startup."),
         DeclareLaunchArgument("seed", default_value="513"),
@@ -103,7 +105,8 @@ def generate_launch_description():
             launch_arguments={"use_sim_time": "true",
                               "systematic_position_stddev":
                                   LaunchConfiguration("systematic_position_stddev"),
-                              "uav_assistance": LaunchConfiguration("uav_assistance")}.items()),
+                              "uav_assistance": LaunchConfiguration("uav_assistance"),
+                              "uav_heading": LaunchConfiguration("uav_heading")}.items()),
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(str(uav_share / "launch/uav_pose.launch.py")),
             launch_arguments={"use_sim_time": "true", "map_origin": "[0.0, 0.0, 0.3]",

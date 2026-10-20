@@ -97,3 +97,43 @@ def ugv_position(anchor, relative, relative_covariance):
     result_cov = (jacobian @ covariance(anchor_covariance, 6) @ jacobian.T
                   + r @ covariance(relative_covariance) @ r.T)
     return position + offset, (result_cov + result_cov.T) / 2
+
+
+def ugv_pose(anchor, relative_position, relative_attitude, relative_covariance):
+    """Compose independent poses with fixed-axis rotation errors in their parent frames.
+
+    The full covariance retains position/rotation correlations from both sources.
+    Relative attitude rotates chassis axes into the UAV body frame.
+    """
+    position, attitude, anchor_covariance = anchor
+    r = rotation(attitude)
+    offset = r @ np.asarray(relative_position)
+    anchor_jacobian = np.eye(6)
+    anchor_jacobian[:3, 3:] = -skew(offset)
+    relative_jacobian = np.zeros((6, 6))
+    relative_jacobian[:3, :3] = relative_jacobian[3:, 3:] = r
+    result_cov = (anchor_jacobian @ covariance(anchor_covariance, 6) @ anchor_jacobian.T
+                  + relative_jacobian @ covariance(relative_covariance, 6)
+                  @ relative_jacobian.T)
+    return (position + offset, quaternion(r @ rotation(relative_attitude)),
+            (result_cov + result_cov.T) / 2)
+
+
+def planar_heading_pose(attitude, pose_covariance, min_horizontal=0.5):
+    """Return yaw-only attitude and covariance retaining position/yaw correlations.
+
+    Heading is the map-plane direction of chassis +X, not direction of travel.
+    Reject near-vertical forward axes where this direction is poorly defined.
+    """
+    forward = rotation(attitude)[:, 0]
+    horizontal_squared = float(forward[:2] @ forward[:2])
+    if horizontal_squared < min_horizontal**2:
+        raise ValueError("Chassis forward axis has no reliable planar heading")
+    yaw = math.atan2(forward[1], forward[0])
+    jacobian = np.zeros((6, 6))
+    jacobian[:3, :3] = np.eye(3)
+    jacobian[5, 3:] = [-forward[0]*forward[2]/horizontal_squared,
+                       -forward[1]*forward[2]/horizontal_squared, 1.]
+    result = jacobian @ covariance(pose_covariance, 6) @ jacobian.T
+    result[3, 3] = result[4, 4] = 1e6
+    return np.array([math.cos(yaw/2), 0., 0., math.sin(yaw/2)]), (result + result.T)/2
