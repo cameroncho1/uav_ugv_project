@@ -18,6 +18,7 @@ ros2 launch mission_manager simple_goal_demo.launch.py
 | Localization experiments | `run_localization_trials.sh`, `run_cooperative_trials.sh` | Test baseline localization or compare baseline and UAV-assisted filters. |
 | Flying-UAV experiments | `run_live_cooperative_trial.sh`, `run_aligned_anchor_trials.sh`, `run_camera_anchor_trials.sh` | Run PX4 trials; matrix wrappers repeat seeds and GPS cases. |
 | Camera checks | `run_camera_perception_trial.sh`, `test_camera_perception.py` | Launch and score visibility, occlusion, and recovery tests. |
+| Camera heading | `test_camera_heading_fusion.py` | Compare real filters with/without camera yaw under declared IMU bias, observation loss, recovery, and outliers. |
 | Navigation experiments | `run_goal_navigation_trial.sh`, `run_path_tracking_trials.py` | Measure goal arrival and baseline/assisted route tracking. |
 | Scoring | `score_goal_navigation.py`, `score_px4_heading.py` | Calculate navigation and UAV heading errors. |
 | Behavior checks | `test_navigation_guards.py`, `test_actuator_watchdog.py`, `test_gnss_innovation.py` | Check invalid-input stops, command expiry, and GPS rejection. |

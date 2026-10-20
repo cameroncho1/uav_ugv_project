@@ -60,12 +60,15 @@ def test_covariance_matches_monte_carlo_independent_position_and_attitude_errors
     relative_cov = np.diag([.0625, .0225, .0625])
     _, predicted = ugv_position((np.zeros(3), q, anchor_cov), relative, relative_cov)
     errors = []
-    for _ in range(10000):
-        anchor_error = rng.multivariate_normal(np.zeros(6), anchor_cov)
+    # Factor each covariance once; repeated single draws spend most of the
+    # test doing identical decompositions on constrained simulation hosts.
+    anchor_errors = rng.multivariate_normal(np.zeros(6), anchor_cov, 10000)
+    relative_errors = rng.multivariate_normal(np.zeros(3), relative_cov, 10000)
+    for anchor_error, relative_error in zip(anchor_errors, relative_errors):
         theta = anchor_error[3:]
         a = np.linalg.norm(theta)
         error_q = [math.cos(a/2), *(theta/a*math.sin(a/2))]
-        noisy_relative = relative + rng.multivariate_normal(np.zeros(3), relative_cov)
+        noisy_relative = relative + relative_error
         errors.append(anchor_error[:3] + rotation(error_q) @ r @ noisy_relative - r @ relative)
     np.testing.assert_allclose(np.diag(np.cov(np.array(errors).T)), np.diag(predicted), rtol=.05)
 
@@ -160,3 +163,54 @@ def test_multiple_pending_readings_rewind_without_crash_and_recover(correction):
     node.on_anchor(reading(node, now.nanoseconds, [0., 0., 4.], "map"))
     node.on_relative(reading(node, now.nanoseconds, [1., 0., -4.], "uav/base_link"))
     assert len(output) == 1
+
+
+def test_heading_update_preserves_joint_covariance_without_duplicate_position(correction):
+    node, position_only = correction
+    node.heading_enabled = True
+    joint = []
+    node.heading_publisher = SimpleNamespace(publish=joint.append)
+    stamp = node.get_clock().now().nanoseconds - 100000000
+    anchor = reading(node, stamp, [3., 1., 4.], 'map')
+    anchor.pose.pose.orientation.w = math.cos(math.pi/4)
+    anchor.pose.pose.orientation.z = math.sin(math.pi/4)
+    relative = reading(node, stamp, [2., 0., -4.], 'uav/base_link')
+    c = np.array(relative.pose.covariance).reshape(6, 6)
+    c[1, 5] = c[5, 1] = .001
+    relative.pose.covariance = c.ravel().tolist()
+    node.on_relative(relative)
+    node.on_anchor(anchor)
+    assert not position_only
+    assert len(joint) == 1
+    measured = joint[0]
+    assert measured.header.stamp == relative.header.stamp
+    q = measured.pose.pose.orientation
+    assert math.atan2(2*q.w*q.z, 1-2*q.z*q.z) == pytest.approx(math.pi/2)
+    out = np.array(measured.pose.covariance).reshape(6, 6)
+    assert abs(out[0, 5]) > .0001
+    assert np.linalg.eigvalsh(out[np.ix_([0, 1, 5], [0, 1, 5])]).min() > 0
+    node.on_relative(relative)
+    assert len(joint) == 1
+
+
+@pytest.mark.parametrize('fault', ['missing_orientation', 'unknown_uncertainty', 'vertical'])
+def test_unusable_heading_keeps_position_only_correction(correction, fault):
+    node, position_only = correction
+    node.heading_enabled = True
+    joint = []
+    node.heading_publisher = SimpleNamespace(publish=joint.append)
+    stamp = node.get_clock().now().nanoseconds - 100000000
+    relative = reading(node, stamp, [1., 0., -4.], 'uav/base_link')
+    if fault == 'missing_orientation':
+        relative.pose.pose.orientation.w = 0.
+    elif fault == 'unknown_uncertainty':
+        relative.pose.covariance[35] = 1e6
+    else:
+        relative.pose.pose.orientation.w = math.cos(math.pi/4)
+        relative.pose.pose.orientation.y = math.sin(math.pi/4)
+    node.on_anchor(reading(node, stamp, [0., 0., 4.], 'map'))
+    node.on_relative(relative)
+    assert len(position_only) == 1
+    assert not joint
+    assert position_only[0].pose.covariance[35] == 1e6
+    assert node.counters['heading_unavailable'] == 1

@@ -52,6 +52,7 @@ def description(assisted):
         nodes = [include("fault_management", "sim_ugv_sensors.launch.py", fault_args),
                  include("cooperative_localization", "ugv_localization.launch.py", {
                      "use_sim_time": "true", "uav_assistance": str(assisted).lower(),
+                     "uav_heading": value("uav_heading") or str(source == "camera").lower(),
                      "systematic_position_stddev": value("systematic_position_stddev"),
                      **{key: str(datum[key]) for key in
                         ("origin_latitude", "origin_longitude", "origin_altitude")}})]
@@ -92,6 +93,8 @@ def description(assisted):
     return LaunchDescription([
         DeclareLaunchArgument("relative_source", default_value="simulated",
                               choices=["simulated", "camera"]),
+        DeclareLaunchArgument("uav_heading", default_value="",
+                              description="Camera heading fusion; defaults on for camera inputs."),
         DeclareLaunchArgument("world", default_value=""),
         DeclareLaunchArgument("seed", default_value="513"),
         DeclareLaunchArgument("initial_gps_enabled", default_value="true"),

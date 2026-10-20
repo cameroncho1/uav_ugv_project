@@ -34,6 +34,7 @@ class GoalScore(Node):
         self.gps_client = self.create_client(SetBool, "/evaluation/set_gps_enabled")
         self.pose_count = 0
         self.correction_count = 0
+        self.heading_correction_count = 0
         self.relative_count = 0
         self.wheel_count = 0
         self.gps_count = 0
@@ -48,6 +49,9 @@ class GoalScore(Node):
         self.create_subscription(Twist, '/ugv/cmd_vel', self.on_command, 10)
         self.create_subscription(PoseWithCovarianceStamped, '/ugv/measurements/uav_pose',
                                  self.on_correction, 10)
+        self.create_subscription(PoseWithCovarianceStamped,
+                                 '/ugv/measurements/uav_pose_with_heading',
+                                 self.on_heading_correction, 10)
         self.create_subscription(PoseWithCovarianceStamped, '/ugv/sensors/uav_relative_pose',
                                  self.on_relative, 10)
         self.create_subscription(Odometry, '/ugv/measurements/wheel_odom', self.on_wheel, 10)
@@ -99,6 +103,10 @@ class GoalScore(Node):
     def on_correction(self, _):
         self.correction_count += 1
 
+    def on_heading_correction(self, message):
+        self.heading_correction_count += 1
+        self.on_correction(message)
+
     def on_relative(self, _):
         self.relative_count += 1
 
@@ -117,6 +125,7 @@ def main():
     parser.add_argument('output', type=Path)
     parser.add_argument('--estimate-topic', default='/ugv/localization/pose')
     parser.add_argument('--relative-source', choices=['camera', 'simulated'], default='camera')
+    parser.add_argument('--uav-heading', choices=['true', 'false'], default=None)
     parser.add_argument('--gps-outage-after-motion', type=float, default=-1.0)
     parser.add_argument('--goal-x', type=float, default=4.0)
     parser.add_argument('--goal-y', type=float, default=0.0)
@@ -211,8 +220,11 @@ def main():
                   'systematic_position_stddev_m': args.systematic_position_stddev,
                   'uav_altitude_setpoint_m': args.uav_altitude,
                   'relative_source': args.relative_source,
+                  'uav_heading_enabled': (args.uav_heading == 'true' if args.uav_heading is not None
+                                          else args.relative_source == 'camera'),
                   'navigation_pose_topic': args.estimate_topic, 'pose_count': node.pose_count,
                   'uav_correction_count': node.correction_count,
+                  'uav_heading_correction_count': node.heading_correction_count,
                   'relative_observation_count': node.relative_count,
                   'wheel_measurement_count': node.wheel_count,
                   'gps_measurement_count': node.gps_count,

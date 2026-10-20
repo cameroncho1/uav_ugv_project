@@ -1,0 +1,28 @@
+{
+  "first_party_packages_built": 11,
+  "dependency_compatibility": "passed",
+  "registered": {
+    "tests": 170,
+    "errors": 0,
+    "failures": 0,
+    "skipped": 7
+  },
+  "skips": "Seven existing cppcheck skips with installed cppcheck 2.7",
+  "static_python_F_E9_and_bash_syntax": "passed",
+  "rendered_cases": 8,
+  "rendered_heading": "passed",
+  "heading_fusion_0_18_rad_bias": "passed",
+  "heading_stress_0_36_rad_bias": "does not meet recovery criteria; operating limit",
+  "live_camera_gps_cases": 3,
+  "live_camera": "passed",
+  "camera_goal": "passed",
+  "paired_position_only_regression": {
+    "nominal": 9,
+    "drift": 9,
+    "outlier_outage": 3,
+    "qualified_trials": 21,
+    "gps_gate_evidence": "passed",
+    "position_only_compatibility": "passed"
+  },
+  "owned_simulations_stopped": true
+}

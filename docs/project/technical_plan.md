@@ -9,7 +9,7 @@ The current implementation is a single-UAV, single-UGV simulation. The roles and
 - Simulator: Gazebo Harmonic and PX4 SITL on Ubuntu 22.04.
 - Middleware: ROS 2 Humble, Micro XRCE-DDS, and the Harmonic ROS-Gazebo bridge.
 - Planning: local eight-neighbor A* with footprint clearance and goal-associated routes. Global energy-aware planning and dynamic-hazard avoidance remain proposed.
-- Localization: the planar `robot_localization` EKF with wheel, IMU, GPS, and optional UAV position measurements.
+- Localization: the planar `robot_localization` EKF with wheel, IMU, GPS, and optional UAV position/heading measurements.
 
 ## Roles
 

@@ -5,3 +5,5 @@ uav_correction:
     max_anchor_gap: 0.25
     max_range: 30.0
     max_ugv_speed: 2.0
+    # Heading is selected by the launch's uav_heading argument.
+    max_heading_stddev: 0.35

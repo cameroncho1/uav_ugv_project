@@ -88,8 +88,10 @@ ros2 bag record --storage sqlite3 --use-sim-time \
   /ugv/sensors/gps /ugv/sensors/imu /ugv/sensors/wheel_odom \
   /ugv/sensors/uav_relative_pose /uav/localization/pose \
   /ugv/measurements/gps_pose /ugv/measurements/uav_pose \
+  /ugv/measurements/uav_pose_with_heading \
   /ugv/localization/pose /ugv/localization/odometry \
   /uav/camera/image /uav/camera/camera_info \
+  /uav/camera/heading_image \
   /evaluation/ugv_truth \
   /global_goal_pose /ugv/navigation/route /ugv/cmd_vel \
   /diagnostics /tf /tf_static
@@ -97,7 +99,7 @@ ros2 bag record --storage sqlite3 --use-sim-time \
 
 - Leave recording running. It waits for `/clock` and discovers topics as they appear.
 - Use a new bag directory for each run.
-- Omit `/uav/camera/image` for numerical-only datasets.
+- Omit `/uav/camera/image` and `/uav/camera/heading_image` for numerical-only datasets.
 
 ## 4. Terminal B: publish truth labels
 

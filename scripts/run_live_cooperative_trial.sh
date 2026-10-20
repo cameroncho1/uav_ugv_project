@@ -18,6 +18,8 @@ case "$relative_mode" in
   camera) world=simple_goal_demo; uav_model=cooperative_camera_uav_0; px4_script=px4_goal_demo.sh ;;
   *) echo "RELATIVE_MODE must be simulated or camera" >&2; exit 1 ;;
 esac
+uav_heading="${UAV_HEADING:-false}"
+if [[ "$relative_mode" == camera ]]; then uav_heading="${UAV_HEADING:-true}"; fi
 uav_altitude="${UAV_ALTITUDE:-4.0}"
 if [[ "$relative_mode" == camera ]]; then uav_altitude="${UAV_ALTITUDE:-4.5}"; fi
 if [[ "$relative_mode" == camera && "${ANCHOR_MODE:-px4}" != px4 ]]; then
@@ -68,6 +70,7 @@ sleep 20
 setsid ros2 launch fault_management ugv_cooperative_evaluation.launch.py \
   seed:="${SEED:-513}" initial_gps_enabled:="$initial_gps_enabled" \
   world:="$world" relative_source:="$relative_mode" \
+  uav_heading:="$uav_heading" \
   uav_model:="$uav_model" publish_anchor:="$publish_anchor" \
   uav_odometry_topic:="$odometry_topic" \
   uav_require_airborne:="$airborne" uav_initial_settle_time:="$settle" \
@@ -87,6 +90,7 @@ setsid timeout "${TRIAL_TIMEOUT:-300}" ros2 run fault_management localization_tr
   --gps "$gps_case" --seed "${SEED:-513}" \
   --anchor-source "${ANCHOR_MODE:-px4}" --observer-model "$uav_model" \
   --relative-source "$relative_mode" \
+  --uav-heading "$uav_heading" \
   --uav-altitude "$uav_altitude" \
   --comparison-topic /evaluation/baseline_pose --output "$OUTPUT/trial_live" &
 score_pid=$!

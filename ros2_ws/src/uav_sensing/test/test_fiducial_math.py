@@ -3,6 +3,7 @@
 import sys
 import math
 import copy
+from array import array
 from types import SimpleNamespace
 import xml.etree.ElementTree as ET
 from pathlib import Path
@@ -15,13 +16,16 @@ import yaml
 from sensor_msgs.msg import CameraInfo, Image
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'scripts'))
-from fiducial_math import Calibration, detect_marker, marker_points, solve_marker  # noqa: E402
+from fiducial_math import (Calibration, annotate_heading, detect_marker, marker_points,
+                           solve_marker, solve_marker_pose)  # noqa: E402
+from localization_common.frames import planar_heading_pose, rotation  # noqa: E402
 from uav_fiducial_sensor import FiducialSensor  # noqa: E402
 
 K = np.array([[540., 0., 640.], [0., 540., 480.], [0., 0., 1.]])
 BODY_ROTATION = np.array([[0., -1., 0.], [-1., 0., 0.], [0., 0., -1.]])
 MOUNT = np.array([0., 0., -0.18])
 OFFSET = np.array([0., 0., -0.12])
+cv2.setNumThreads(1)
 
 
 def project(rvec, tvec):
@@ -113,16 +117,22 @@ def test_shared_principal_error_does_not_average_away():
     config = Calibration(pixel_stddev=0.2, principal_point_stddev=2.0,
                          focal_length_stddev=1e-8,
                          mount_position_stddev=1e-8, mount_angle_stddev=1e-8,
-                         marker_size_stddev=1e-8)
-    center, covariance, _ = solve_marker(corners, K, [], BODY_ROTATION, MOUNT, OFFSET, config)
+                         marker_size_stddev=1e-8, marker_mount_angle_stddev=1e-8)
+    center = solve_marker_pose(corners, K, [], BODY_ROTATION, MOUNT, OFFSET,
+                                calibration=config)
+    nominal_yaw = math.atan2(rotation(center.attitude)[1, 0], rotation(center.attitude)[0, 0])
     random = np.random.default_rng(513)
     errors = []
     for _ in range(600):
         noisy = corners + random.normal(0, 0.2, (4, 2)) + random.normal(0, 2.0, (1, 2))
-        point, _, _ = solve_marker(noisy, K, [], BODY_ROTATION, MOUNT, OFFSET, config)
-        errors.append(point - center)
+        pose = solve_marker_pose(noisy, K, [], BODY_ROTATION, MOUNT, OFFSET, calibration=config)
+        r = rotation(pose.attitude)
+        angle = math.atan2(r[1, 0], r[0, 0])-nominal_yaw
+        errors.append(np.r_[pose.position-center.position, math.atan2(math.sin(angle), math.cos(angle))])
     empirical = np.cov(np.array(errors).T)
-    np.testing.assert_allclose(np.diag(empirical), np.diag(covariance), rtol=0.35, atol=1e-5)
+    _, projected = planar_heading_pose(center.attitude, center.covariance)
+    expected = projected[np.ix_([0, 1, 2, 5], [0, 1, 2, 5])]
+    np.testing.assert_allclose(np.diag(empirical), np.diag(expected), rtol=0.35, atol=1e-5)
 
 
 class Capture:
@@ -162,7 +172,7 @@ def camera_message(sensor):
     image.encoding = 'mono8'
     image.step = 1280
     pixels = marker_image(project(np.array([2.9, 0.2, 0.1]), np.array([0.2, -0.4, 3.5])))
-    image.data = pixels.ravel().tolist()
+    image.data = array('B', pixels.tobytes())
     return image
 
 
@@ -173,7 +183,8 @@ def test_camera_callback_preserves_acquisition_and_body_contract(sensor):
     output = sensor.publisher.messages[0]
     assert output.header.frame_id == 'uav/base_link'
     assert output.header.stamp == message.header.stamp
-    assert output.pose.covariance[35] == 1e6
+    assert 0 < output.pose.covariance[35] < 0.1
+    assert np.linalg.eigvalsh(np.array(output.pose.covariance).reshape(6, 6)).min() > 0
     assert output.pose.covariance[0] > 0
     sensor.on_image(message)
     assert len(sensor.publisher.messages) == 1
@@ -211,7 +222,7 @@ def test_camera_callback_rejects_invalid_inputs(sensor, fault):
         message.step = 0
         message.data = []
     else:
-        message.data = [255] * (1280 * 960)
+        message.data = array('B', [255]) * (1280 * 960)
     sensor.on_image(message)
     assert not sensor.publisher.messages
 
@@ -242,7 +253,14 @@ def test_calibration_matches_owned_camera_and_roof_mount():
         tag = next(item for item in includes if item.findtext('uri') == 'model://ugv_fiducial')
         assert tag.find('pose').attrib['relative_to'] == 'chassis'
         tag_pose = list(map(float, tag.findtext('pose').split()))
-        np.testing.assert_allclose(-np.array(tag_pose[:3]), values['marker_to_chassis'])
+        roll, pitch, yaw = tag_pose[3:]
+        chassis_from_marker = (cv2.Rodrigues(np.array([0., 0., yaw]))[0]
+                               @ cv2.Rodrigues(np.array([0., pitch, 0.]))[0]
+                               @ cv2.Rodrigues(np.array([roll, 0., 0.]))[0])
+        np.testing.assert_allclose(chassis_from_marker.T.ravel(),
+                                   values['marker_from_chassis_rotation'], atol=1e-12)
+        np.testing.assert_allclose(-chassis_from_marker.T @ np.array(tag_pose[:3]),
+                                   values['marker_to_chassis'])
 
 
 
@@ -275,3 +293,50 @@ def test_rejected_future_image_does_not_poison_monotonic_state(sensor):
     sensor.on_image(future)
     sensor.on_image(valid)
     assert len(sensor.publisher.messages) == 1
+
+
+@pytest.mark.parametrize('yaw', [0., math.pi/2, math.pi, -math.pi/2, 3.13, -3.13])
+def test_measured_heading_and_arrow_follow_chassis_front(yaw):
+    c, s = math.cos(yaw), math.sin(yaw)
+    chassis = np.array([[c, -s, 0], [s, c, 0], [0, 0, 1.]])
+    camera_rotation = BODY_ROTATION.T @ chassis
+    rvec = cv2.Rodrigues(camera_rotation)[0]
+    tvec = np.array([0.2, -0.3, 3.5])
+    observation = solve_marker_pose(project(rvec, tvec), K, [], BODY_ROTATION, MOUNT, OFFSET)
+    np.testing.assert_allclose(rotation(observation.attitude), chassis, atol=1e-5)
+    expected_axis = cv2.projectPoints(
+        np.array([tvec, tvec + camera_rotation[:, 0]*0.3]),
+        np.zeros(3), np.zeros(3), K, np.zeros(5))[0].reshape(2, 2)
+    np.testing.assert_allclose(observation.image_axis, expected_axis, atol=1e-4)
+    annotated = annotate_heading(np.full((960, 1280), 255, np.uint8), observation)
+    assert annotated.shape == (960, 1280, 3)
+    assert np.any(annotated[:, :, 1] > annotated[:, :, 0])
+
+
+def test_marker_mount_rotation_is_applied_to_heading():
+    marker_from_chassis = np.array([[0., -1., 0.], [1., 0., 0.], [0., 0., 1.]])
+    rvec = cv2.Rodrigues(BODY_ROTATION.T)[0]
+    observation = solve_marker_pose(project(rvec, np.array([0., 0., 3.5])), K, [],
+                                    BODY_ROTATION, MOUNT, OFFSET, marker_from_chassis)
+    np.testing.assert_allclose(rotation(observation.attitude), marker_from_chassis, atol=1e-5)
+
+
+def test_annotation_publishes_acquisition_frame_and_removes_arrow_on_occlusion(sensor):
+    annotated = []
+    sensor.annotated_publisher = SimpleNamespace(
+        get_subscription_count=lambda: 1, publish=annotated.append)
+    message = camera_message(sensor)
+    sensor.on_image(message)
+    assert len(annotated) == 1
+    assert annotated[0].header == message.header
+    assert annotated[0].encoding == 'bgr8'
+    assert len(annotated[0].data) == message.width * message.height * 3
+    from rclpy.time import Time
+    sensor.get_clock = lambda: SimpleNamespace(now=lambda: Time(nanoseconds=10_200_000_000))
+    message.header.stamp.nanosec = 200_000_000
+    message.data = array('B', [255]) * (1280 * 960)
+    sensor.on_image(message)
+    assert len(sensor.publisher.messages) == 1
+    assert len(annotated) == 2
+    unavailable = np.frombuffer(annotated[1].data, np.uint8).reshape(960, 1280, 3)
+    assert np.all(unavailable[100:, :, :] == 255)

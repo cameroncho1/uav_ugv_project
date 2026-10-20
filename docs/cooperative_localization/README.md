@@ -1,6 +1,6 @@
 # Cooperative UGV localization
 
-The system estimates the ground robot's position and heading, with pose uncertainty. Wheel speed and IMU heading track motion. GPS and UAV-derived position measurements provide absolute map position.
+The system estimates the ground robot's position and heading, with pose uncertainty. Wheel speed and IMU heading track motion. GPS and UAV-derived measurements provide absolute map position. Calibrated camera observations also supply optional heading corrections and an image direction indicator.
 
 The output is `/ugv/localization/pose`, a `geometry_msgs/msg/PoseWithCovarianceStamped` in ENU `map`. Covariance describes the modeled uncertainty. An unknown error shared by GPS and the UAV's global reference cannot be recovered from relative measurements alone.
 
@@ -19,7 +19,7 @@ ros2 launch mission_manager simple_goal_demo.launch.py initial_gps_enabled:=fals
 
 This starts the simulated world, PX4, DDS, raw sensors, simulated measurement noise, camera detector, UAV anchor, estimator, mapper, planner, controller, and RViz. The UAV hovers while the UGV navigates to `(4, 0)`. The world has flat ground and no physical obstacles. Use Ctrl+C in the launch terminal to stop the demo.
 
-Use `uav_assistance:=false` for baseline-only fusion. Use `start_rviz:=false` to omit RViz. Camera rendering still needs a valid display. [Goal-demo instructions](../../README_simple_goal_demo.md) list the separate-terminal commands.
+Use `uav_assistance:=false` for baseline-only fusion. Use `uav_heading:=false` for camera position without camera heading. RViz's **Camera heading** display shows `/uav/camera/heading_image`. Use `start_rviz:=false` to omit RViz. Camera rendering still needs a valid display. [Goal-demo instructions](../../README_simple_goal_demo.md) list the separate-terminal commands.
 
 ## Data flow
 
@@ -27,9 +27,9 @@ Use `uav_assistance:=false` for baseline-only fusion. Use `start_rviz:=false` to
 2. `fault_management` adds the selected simulation error model and publishes `/ugv/sensors/*`.
 3. `cooperative_localization` validates those measurements and converts GPS into map coordinates.
 4. `uav_control` publishes the UAV's independent map position and attitude.
-5. `uav_sensing` detects the roof tag and publishes the UGV position relative to the UAV.
+5. `uav_sensing` detects the roof tag and publishes the UGV pose relative to the UAV, joint covariance, and a measured forward-direction image overlay.
 6. `cooperative_localization` matches the relative reading to the UAV anchor at acquisition time and propagates both sources' uncertainty.
-7. The `robot_localization` extended Kalman filter combines wheel velocity, IMU yaw/rate, GPS x/y, and optional UAV-derived x/y.
+7. The `robot_localization` extended Kalman filter combines wheel velocity, IMU yaw/rate, GPS x/y, and optional UAV-derived x/y or joint x/y/yaw. Each camera observation supplies one update.
 8. The output adapter publishes pose, acquisition time, and covariance. Planning and control consume that output.
 
 Simulator truth feeds synthetic sensors and scoring. The estimator does not use truth as its operational pose.
@@ -38,16 +38,16 @@ Simulator truth feeds synthetic sensors and scoring. The estimator does not use 
 
 All paths below are under `ros2_ws/src/`.
 
-| Responsibility | GPS branch | Audit branch |
-| --- | --- | --- |
-| Measured-input validation, correction matching, filter configuration, fused output | `cooperative_localization` | `cooperative_localization` |
-| PX4 map anchor | `cooperative_localization` | `uav_control` |
-| Camera detector and calibration | `cooperative_localization` | `uav_sensing` |
-| Raw bridges, shared clock, truth readers | `cooperative_localization` | `simulation_support` |
-| Sensor noise, faults, outages, trial assembly, scoring | `cooperative_localization` | `fault_management` |
-| Shared frame, covariance, and geodesy math | `cooperative_localization` | `localization_common` |
-| Terrain mapping | `traversability_mapping` | Same package; calibrated acquisition-time projection replaces the old mapper. |
-| Planning and driving | `route_planning`, `ugv_control` | Same packages; goal-associated routes, clearance, and actuator expiry are added. |
+| Responsibility | Package |
+| --- | --- |
+| Measured-input validation, correction matching, filter configuration, fused output | `cooperative_localization` |
+| PX4 map anchor | `uav_control` |
+| Camera detector, calibration, relative orientation and image overlay | `uav_sensing` |
+| Raw bridges, shared clock, truth readers | `simulation_support` |
+| Sensor noise, faults, outages, trial assembly, scoring | `fault_management` |
+| Shared frame, covariance, and geodesy math | `localization_common` |
+| Terrain mapping | `traversability_mapping` |
+| Planning and driving | `route_planning`, `ugv_control` |
 
 `localization_common` contains numerical functions without ROS or Gazebo imports. `cooperative_localization` contains ROS nodes and estimator configuration. The nodes call the numerical functions.
 
@@ -100,22 +100,22 @@ scripts/run_cooperative_trials.sh "$HOME/uav_ugv_results/paired_nominal"
 | [Interfaces](interfaces.md) | Topics, frames, clocks, controls, launch modes, and evaluation commands. |
 | [UAV measurement design](uav_measurement_design.md) | Coordinate conversion, acquisition-time matching, propagated covariance, and rejection rules. |
 | [Camera observations](perception.md) | Tag geometry, calibration assumptions, visibility, and shared-error tests. |
+| [Camera heading](camera_heading.md) | Direction overlay, relative orientation, joint heading fusion, controls, and uncertainty. |
 | [Navigation integration](../navigation.md) | Pose consumers, goal revisions, clearance, command expiry, and tracking metrics. |
 | [Research references](references.md) | Source summaries and limits on their application to this simulation. |
 
-## Results and implementation history
+## Validation
 
-| Document | Revision or scope |
+| Document | Scope |
 | --- | --- |
-| [October 11 results](evaluation_results.md) | Historical GPS-branch trials, before the audit fixes. |
-| [October 11 implementation report](../project/implementation_report_2026-10-11.md) | Changes, attribution, decisions, and result links. |
-| [GPS-branch evidence](results/) | Retained summaries, comparisons, charts, and diagnostics. |
+| [Heading validation](heading_validation.md) | Executed checks, camera/filter measurements, paired regressions, and limits. |
+| [Heading artifacts](results/heading/) | Machine-readable summaries and an annotated camera frame. |
 
 ## Presentations
 
 | Presentation | Contents |
 | --- | --- |
-| [How localization works](how_it_works_presentation.html) | Current pipeline, navigation guards, and dated results. |
+| [How localization works](how_it_works_presentation.html) | Localization pipeline and navigation guards. |
 | [Localization overview](initial_presentation.html) | Scope, inputs, output, and integration. |
 | [Research papers](research_papers_presentation.html) | Literature summaries and source links. |
 

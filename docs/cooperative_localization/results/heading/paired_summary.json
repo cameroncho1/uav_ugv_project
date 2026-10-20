@@ -1,0 +1,62 @@
+{
+  "paired_nominal": {
+    "trials": 9,
+    "baseline_rmse_m": [
+      0.28013048834056115,
+      1.0105129698282418
+    ],
+    "assisted_rmse_m": [
+      0.1798990264421717,
+      0.23313512286224014
+    ],
+    "assisted_max_error_m": [
+      0.4139283867947963,
+      0.5349198390033676
+    ],
+    "matched_samples_per_estimate": [
+      582,
+      614
+    ],
+    "all_assisted_rmse_lower": true
+  },
+  "paired_drift": {
+    "trials": 9,
+    "baseline_rmse_m": [
+      0.37368219301698646,
+      1.7358618968796702
+    ],
+    "assisted_rmse_m": [
+      0.20790628241508988,
+      0.22060151343462608
+    ],
+    "assisted_max_error_m": [
+      0.49406615503900897,
+      0.5568527572145654
+    ],
+    "matched_samples_per_estimate": [
+      1901,
+      2407
+    ],
+    "all_assisted_rmse_lower": true
+  },
+  "paired_robust": {
+    "trials": 3,
+    "baseline_rmse_m": [
+      0.9353166905301947,
+      1.4886312564604642
+    ],
+    "assisted_rmse_m": [
+      0.36000877981024343,
+      0.4644424675821744
+    ],
+    "assisted_max_error_m": [
+      0.6739249140785003,
+      1.0176100813696214
+    ],
+    "matched_samples_per_estimate": [
+      2397,
+      2403
+    ],
+    "all_assisted_rmse_lower": true
+  }
+}

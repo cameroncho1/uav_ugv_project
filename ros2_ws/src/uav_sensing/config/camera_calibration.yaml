@@ -7,6 +7,8 @@ uav_fiducial_sensor:
     body_from_optical_rotation: [0.0, -1.0, 0.0, -1.0, 0.0, 0.0, 0.0, 0.0, -1.0]
     body_from_optical_translation: [0.0, 0.0, -0.18]
     marker_to_chassis: [0.0, 0.0, -0.12]
+    # Maps chassis axes into marker axes. Marker +X points toward the UGV front.
+    marker_from_chassis_rotation: [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]
     input_frame: uav/camera_optical_frame
     pixel_stddev: 0.5
     principal_point_stddev: 0.25
@@ -14,6 +16,7 @@ uav_fiducial_sensor:
     marker_size_stddev: 0.001
     mount_position_stddev: 0.01
     mount_angle_stddev: 0.005
+    marker_mount_angle_stddev: 0.01
     max_reprojection_error: 1.5
     min_edge_pixels: 12.0
     max_image_age: 0.5
