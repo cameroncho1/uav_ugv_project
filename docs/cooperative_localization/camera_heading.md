@@ -154,6 +154,12 @@ correct tag, camera calibration, and mounting geometry. Planar pose ambiguity,
 small or blurred targets, and calibration bias can exceed this model. The map
 heading inherits UAV heading error; a shared heading bias is not an independent
 reference. Persistent disagreement can cause the joint innovation gate to reject
-an entire camera update, including its position. Hardware calibration, uneven
+an entire camera update, including its position. The filter has no IMU bias
+state. Camera heading helps only when the declared IMU heading uncertainty is
+well above the camera's and the IMU bias stays near or below 0.18 rad. With the
+simulated UGV IMU (0.02 rad), the IMU dominates, and a 0.15-0.18 rad bias blocks
+camera updates. Use `uav_heading:=false` when IMU heading bias is expected.
+[IMU heading bias limits](heading_validation.md#imu-heading-bias-limits) give the
+measured range. Hardware calibration, uneven
 terrain, motion blur, and simultaneous loss of both global references require
 separate evaluation.

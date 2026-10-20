@@ -26,8 +26,9 @@ def yaw(q):
 
 
 class HeadingFixture(Node):
-    def __init__(self):
+    def __init__(self, imu_stddev):
         super().__init__('camera_heading_fixture')
+        self.imu_variance = imu_stddev**2
         self.wheel = self.create_publisher(Odometry, '/ugv/sensors/wheel_odom', 10)
         self.imu = self.create_publisher(Imu, '/ugv/sensors/imu', 10)
         self.anchor = self.create_publisher(
@@ -61,7 +62,7 @@ class HeadingFixture(Node):
         imu = Imu()
         imu.header.stamp, imu.header.frame_id = stamp, 'simple_ugv/chassis/imu'
         imu.orientation.w, imu.orientation.z = math.cos(imu_yaw/2), math.sin(imu_yaw/2)
-        imu.orientation_covariance = np.diag([.01]*3).ravel().tolist()
+        imu.orientation_covariance = np.diag([self.imu_variance]*3).ravel().tolist()
         imu.angular_velocity_covariance = np.diag([.0001]*3).ravel().tolist()
         imu.linear_acceleration_covariance[0] = -1.
         self.imu.publish(imu)
@@ -113,6 +114,8 @@ def main():
     parser.add_argument('output', type=Path)
     parser.add_argument('--imu-bias', type=float, default=.18,
                         help='Final IMU heading bias in radians (default: 0.18).')
+    parser.add_argument('--imu-stddev', type=float, default=.1,
+                        help='Declared IMU orientation standard deviation in radians (default: 0.1).')
     args = parser.parse_args()
     args.output.parent.mkdir(parents=True, exist_ok=True)
     share = Path(get_package_share_directory('cooperative_localization'))
@@ -124,9 +127,11 @@ def main():
     processes = []
     if not math.isfinite(args.imu_bias) or not 0 < args.imu_bias < math.pi:
         parser.error('--imu-bias must be finite and between zero and pi')
+    if not math.isfinite(args.imu_stddev) or args.imu_stddev <= 0:
+        parser.error('--imu-stddev must be finite and positive')
     result = {'passed': False, 'clock': 'wall', 'expected_map_heading_rad': 0.,
               'imu_bias_rad': args.imu_bias,
-              'uav_map_heading_rad': .7, 'imu_orientation_stddev_rad': .1,
+              'uav_map_heading_rad': .7, 'imu_orientation_stddev_rad': args.imu_stddev,
               'relative_orientation_stddev_rad': .02, 'phases': {}}
     with tempfile.TemporaryDirectory() as temporary, args.output.with_suffix('.log').open('w') as log:
         config = Path(temporary)/'baseline.yaml'
@@ -138,7 +143,7 @@ def main():
              '-r', '__node:=ugv_ekf_position_only', '--params-file', str(config),
              '-r', 'odometry/filtered:=/heading_fixture/position_only']]
         rclpy.init()
-        node = HeadingFixture()
+        node = HeadingFixture(args.imu_stddev)
         try:
             for command in commands:
                 processes.append(subprocess.Popen(command, stdout=log, stderr=subprocess.STDOUT,

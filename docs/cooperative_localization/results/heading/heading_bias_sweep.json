@@ -1,0 +1,256 @@
+{
+  "fixture": "scripts/test_camera_heading_fusion.py",
+  "clock": "wall",
+  "command": "test_camera_heading_fusion.py OUT --imu-stddev S --imu-bias B",
+  "acceptance": {
+    "recovery_and_final_mean_below_rad": 0.12,
+    "recovery_below_fraction_of_position_only": 0.7,
+    "outlier_phase_max_below_rad": 0.2,
+    "min_joint_updates": 50,
+    "duplicate_position_updates": 0
+  },
+  "trials": [
+    {
+      "imu_orientation_stddev_rad": 0.02,
+      "imu_bias_rad": 0.02,
+      "passed": false,
+      "recovery_assisted_deg": 1.05,
+      "recovery_position_only_deg": 1.15,
+      "final_assisted_deg": 1.02,
+      "outlier_assisted_max_deg": 1.15,
+      "joint_updates": 115,
+      "duplicate_position_updates": 0
+    },
+    {
+      "imu_orientation_stddev_rad": 0.02,
+      "imu_bias_rad": 0.02,
+      "passed": false,
+      "recovery_assisted_deg": 1.07,
+      "recovery_position_only_deg": 1.15,
+      "final_assisted_deg": 1.04,
+      "outlier_assisted_max_deg": 1.15,
+      "joint_updates": 115,
+      "duplicate_position_updates": 0
+    },
+    {
+      "imu_orientation_stddev_rad": 0.02,
+      "imu_bias_rad": 0.04,
+      "passed": false,
+      "recovery_assisted_deg": 2.1,
+      "recovery_position_only_deg": 2.29,
+      "final_assisted_deg": 2.1,
+      "outlier_assisted_max_deg": 2.29,
+      "joint_updates": 114,
+      "duplicate_position_updates": 0
+    },
+    {
+      "imu_orientation_stddev_rad": 0.02,
+      "imu_bias_rad": 0.04,
+      "passed": false,
+      "recovery_assisted_deg": 2.08,
+      "recovery_position_only_deg": 2.29,
+      "final_assisted_deg": 2.08,
+      "outlier_assisted_max_deg": 2.29,
+      "joint_updates": 138,
+      "duplicate_position_updates": 0
+    },
+    {
+      "imu_orientation_stddev_rad": 0.02,
+      "imu_bias_rad": 0.06,
+      "passed": false,
+      "recovery_assisted_deg": 3.2,
+      "recovery_position_only_deg": 3.44,
+      "final_assisted_deg": 3.15,
+      "outlier_assisted_max_deg": 3.44,
+      "joint_updates": 111,
+      "duplicate_position_updates": 0
+    },
+    {
+      "imu_orientation_stddev_rad": 0.02,
+      "imu_bias_rad": 0.06,
+      "passed": false,
+      "recovery_assisted_deg": 3.12,
+      "recovery_position_only_deg": 3.44,
+      "final_assisted_deg": 3.19,
+      "outlier_assisted_max_deg": 3.44,
+      "joint_updates": 112,
+      "duplicate_position_updates": 0
+    },
+    {
+      "imu_orientation_stddev_rad": 0.02,
+      "imu_bias_rad": 0.1,
+      "passed": false,
+      "recovery_assisted_deg": 5.14,
+      "recovery_position_only_deg": 5.73,
+      "final_assisted_deg": 5.27,
+      "outlier_assisted_max_deg": 5.73,
+      "joint_updates": 114,
+      "duplicate_position_updates": 0
+    },
+    {
+      "imu_orientation_stddev_rad": 0.02,
+      "imu_bias_rad": 0.1,
+      "passed": false,
+      "recovery_assisted_deg": 5.26,
+      "recovery_position_only_deg": 5.73,
+      "final_assisted_deg": 5.27,
+      "outlier_assisted_max_deg": 5.73,
+      "joint_updates": 139,
+      "duplicate_position_updates": 0
+    },
+    {
+      "imu_orientation_stddev_rad": 0.02,
+      "imu_bias_rad": 0.18,
+      "passed": false,
+      "recovery_assisted_deg": 10.31,
+      "recovery_position_only_deg": 10.31,
+      "final_assisted_deg": 10.31,
+      "outlier_assisted_max_deg": 10.31,
+      "joint_updates": 118,
+      "duplicate_position_updates": 0
+    },
+    {
+      "imu_orientation_stddev_rad": 0.02,
+      "imu_bias_rad": 0.18,
+      "passed": false,
+      "recovery_assisted_deg": 10.31,
+      "recovery_position_only_deg": 10.31,
+      "final_assisted_deg": 10.31,
+      "outlier_assisted_max_deg": 10.31,
+      "joint_updates": 111,
+      "duplicate_position_updates": 0
+    },
+    {
+      "imu_orientation_stddev_rad": 0.1,
+      "imu_bias_rad": 0.18,
+      "passed": true,
+      "recovery_assisted_deg": 5.27,
+      "recovery_position_only_deg": 10.31,
+      "final_assisted_deg": 4.74,
+      "outlier_assisted_max_deg": 10.31,
+      "joint_updates": 110,
+      "duplicate_position_updates": 0
+    },
+    {
+      "imu_orientation_stddev_rad": 0.1,
+      "imu_bias_rad": 0.18,
+      "passed": true,
+      "recovery_assisted_deg": 4.88,
+      "recovery_position_only_deg": 10.31,
+      "final_assisted_deg": 4.85,
+      "outlier_assisted_max_deg": 10.31,
+      "joint_updates": 125,
+      "duplicate_position_updates": 0
+    },
+    {
+      "imu_orientation_stddev_rad": 0.1,
+      "imu_bias_rad": 0.18,
+      "passed": true,
+      "recovery_assisted_deg": 4.81,
+      "recovery_position_only_deg": 10.31,
+      "final_assisted_deg": 4.86,
+      "outlier_assisted_max_deg": 10.31,
+      "joint_updates": 112,
+      "duplicate_position_updates": 0
+    },
+    {
+      "imu_orientation_stddev_rad": 0.1,
+      "imu_bias_rad": 0.24,
+      "passed": false,
+      "recovery_assisted_deg": 6.7,
+      "recovery_position_only_deg": 13.75,
+      "final_assisted_deg": 6.82,
+      "outlier_assisted_max_deg": 13.75,
+      "joint_updates": 111,
+      "duplicate_position_updates": 0
+    },
+    {
+      "imu_orientation_stddev_rad": 0.1,
+      "imu_bias_rad": 0.24,
+      "passed": false,
+      "recovery_assisted_deg": 6.4,
+      "recovery_position_only_deg": 13.75,
+      "final_assisted_deg": 6.35,
+      "outlier_assisted_max_deg": 13.75,
+      "joint_updates": 111,
+      "duplicate_position_updates": 0
+    },
+    {
+      "imu_orientation_stddev_rad": 0.1,
+      "imu_bias_rad": 0.24,
+      "passed": false,
+      "recovery_assisted_deg": 6.52,
+      "recovery_position_only_deg": 13.75,
+      "final_assisted_deg": 6.56,
+      "outlier_assisted_max_deg": 13.75,
+      "joint_updates": 111,
+      "duplicate_position_updates": 0
+    },
+    {
+      "imu_orientation_stddev_rad": 0.1,
+      "imu_bias_rad": 0.3,
+      "passed": false,
+      "recovery_assisted_deg": 8.1,
+      "recovery_position_only_deg": 17.19,
+      "final_assisted_deg": 7.71,
+      "outlier_assisted_max_deg": 17.19,
+      "joint_updates": 114,
+      "duplicate_position_updates": 0
+    },
+    {
+      "imu_orientation_stddev_rad": 0.1,
+      "imu_bias_rad": 0.3,
+      "passed": false,
+      "recovery_assisted_deg": 8.01,
+      "recovery_position_only_deg": 17.19,
+      "final_assisted_deg": 8.33,
+      "outlier_assisted_max_deg": 17.19,
+      "joint_updates": 114,
+      "duplicate_position_updates": 0
+    },
+    {
+      "imu_orientation_stddev_rad": 0.1,
+      "imu_bias_rad": 0.3,
+      "passed": false,
+      "recovery_assisted_deg": 7.76,
+      "recovery_position_only_deg": 17.19,
+      "final_assisted_deg": 8.44,
+      "outlier_assisted_max_deg": 17.19,
+      "joint_updates": 112,
+      "duplicate_position_updates": 0
+    },
+    {
+      "imu_orientation_stddev_rad": 0.1,
+      "imu_bias_rad": 0.36,
+      "passed": false,
+      "recovery_assisted_deg": 20.63,
+      "recovery_position_only_deg": 20.63,
+      "final_assisted_deg": 17.75,
+      "outlier_assisted_max_deg": 20.63,
+      "joint_updates": 114,
+      "duplicate_position_updates": 0
+    },
+    {
+      "imu_orientation_stddev_rad": 0.1,
+      "imu_bias_rad": 0.36,
+      "passed": false,
+      "recovery_assisted_deg": 10.23,
+      "recovery_position_only_deg": 20.63,
+      "final_assisted_deg": 20.63,
+      "outlier_assisted_max_deg": 20.63,
+      "joint_updates": 111,
+      "duplicate_position_updates": 0
+    },
+    {
+      "imu_orientation_stddev_rad": 0.1,
+      "imu_bias_rad": 0.36,
+      "passed": false,
+      "recovery_assisted_deg": 20.63,
+      "recovery_position_only_deg": 20.63,
+      "final_assisted_deg": 10.47,
+      "outlier_assisted_max_deg": 20.63,
+      "joint_updates": 112,
+      "duplicate_position_updates": 0
+    }
+  ]
+}

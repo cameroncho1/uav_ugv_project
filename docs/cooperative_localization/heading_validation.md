@@ -146,37 +146,61 @@ not measure the benefit of camera heading.
 counts, error metrics, and the baseline/assisted comparisons. Sample counts report
 the matched evidence; scoring does not extrapolate missing truth coverage.
 
-## Persistent-bias operating limit
+## IMU heading bias limits
 
-A fixture with final IMU bias 0.36 rad improves heading partly but does not meet
-the acceptance criteria. After the two-second camera outage, recovery mean error
-is 12.04 degrees assisted versus 20.63 degrees position-only; the final assisted
-phase reaches 10.68 degrees. The fixture requires recovery/final mean error below
-0.12 rad (6.88 degrees) and outlier-phase maximum error below 0.2 rad (11.46
-degrees). [Stress diagnostic](results/heading/heading_stress_gate.json) retains
-the failed acceptance result and measured phases.
+The filter treats each IMU heading sample as independent noise with its declared
+standard deviation. It has no IMU bias state. A slow bias therefore pulls the
+estimate toward the IMU, and the filter reports less heading uncertainty than the
+bias error. The camera heading corrects part of the bias. When the gap between
+the camera heading and the estimate exceeds the five-sigma gate, the filter
+rejects the whole camera update, including its position.
 
-The stress result varies between wall-clock runs. In a repeat run, recovery
-reaches 12.56 degrees assisted, but after the outlier phase the filter rejects
-every camera update and the final assisted error matches position-only at 20.63
-degrees. Under this bias the camera can stop correcting heading and position for
-the rest of the run.
+The bias sweep repeats the filter fixture at several final biases and two
+declared IMU standard deviations. The acceptance criteria stay fixed. The
+outlier phase rejects every camera update for one second, so its maximum error
+reaches the IMU bias. That criterion (0.2 rad) can only pass when the bias is
+below 0.2 rad.
 
-The filter does not explicitly estimate IMU yaw bias. The five-sigma gate can
-reject a valid returning camera pose when the IMU-driven
-state and its covariance disagree too strongly with that pose. A joint rejection
-also rejects that observation's position. The adapter's `heading_accepted`
-counter reports publication, not the filter's innovation decision. Automatic
-sensor-fault diagnosis, adaptive IMU weighting, and recovery from arbitrary
-persistent heading disagreement are outside this implementation. Launching with
-`uav_heading:=false` retains position assistance without the joint heading gate.
+| IMU std | Final bias | Runs passed | Assisted recovery error | Position-only error | Result |
+| ---: | ---: | ---: | ---: | ---: | --- |
+| 0.1 rad | 0.18 rad | 3 of 3 | 4.8-5.3 degrees | 10.31 degrees | Camera heading accepted; criteria met. |
+| 0.1 rad | 0.24 rad | 0 of 3 | 6.4-6.7 degrees | 13.75 degrees | Recovery and final criteria met; outlier maximum equals the bias. |
+| 0.1 rad | 0.30 rad | 0 of 3 | 7.8-8.1 degrees | 17.19 degrees | Camera heading accepted; error above 6.88 degrees. |
+| 0.1 rad | 0.36 rad | 0 of 3 | 10.2-20.6 degrees | 20.63 degrees | Gate rejects camera updates in some phases of every run. |
+| 0.02 rad | 0.02-0.10 rad | 0 of 8 | 90-93% of position-only | 1.15-5.73 degrees | IMU outweighs the camera; improvement below the 30% criterion. |
+| 0.02 rad | 0.18 rad | 0 of 2 | 10.31 degrees | 10.31 degrees | Gate rejects every camera update after the outage. |
+
+[Bias sweep](results/heading/heading_bias_sweep.json) stores every run.
+[Stress diagnostic](results/heading/heading_stress_gate.json) stores the
+original 0.36 rad run. Each run has zero duplicate position updates.
+
+The failures come from the filter model and the test conditions, not from the
+heading measurement. The camera heading, its covariance, and the topic selection
+behave as specified in every run. The supported operating limits are:
+
+- Camera heading improves the estimate when the declared IMU heading standard
+  deviation is several times the camera heading standard deviation (0.1 rad
+  against about 0.03 rad here) and the IMU bias stays near or below 0.18 rad.
+- With the 0.02 rad IMU heading standard deviation that the simulated UGV
+  sensors declare, the IMU dominates. Camera heading reduces heading error by
+  7-10%, and a bias near 0.15-0.18 rad locks out camera updates. The
+  drift profile's 0.002 rad/s bias reaches that range after about 75-90 seconds.
+- A gate lockout also drops camera position. Without GPS, the estimate then
+  relies on wheel odometry and IMU until the IMU and camera agree again.
+- `uav_heading:=false` keeps camera position assistance under any IMU bias. Use it
+  for runs with a known or growing IMU heading bias.
+
+The adapter's `heading_accepted` counter reports publication, not the filter's
+gate decision. Bias estimation, adaptive IMU weighting, and gating heading
+separately from position are not implemented.
 
 ## Reproduce
 
 [Camera heading](camera_heading.md#validation) lists build, registered, rendered,
 filter, paired-localization, and goal-navigation commands. The filter fixture's
-`--imu-bias` option selects the final bias; `--imu-bias 0.36` exercises the stated
-stress condition. Outputs include strict pass/fail results and phase samples.
+`--imu-bias` option selects the final bias and `--imu-stddev` the declared IMU
+heading standard deviation (default 0.1 rad). `--imu-bias 0.36` runs the stress
+condition; `--imu-stddev 0.02` matches the simulated UGV IMU. Outputs include strict pass/fail results and phase samples.
 
 For a runtime that cannot reach the XML schema host, cache the official schemas
 and rerun registered checks with a local catalog:
