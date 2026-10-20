@@ -108,7 +108,7 @@ scripts/run_cooperative_trials.sh "$HOME/uav_ugv_results/paired_nominal"
 
 | Document | Scope |
 | --- | --- |
-| [Heading validation](heading_validation.md) | Executed checks, camera/filter measurements, paired regressions, and limits. |
+| [Heading validation](heading_validation.md) | Executed checks, camera/filter measurements, paired position-only trials, and limits. |
 | [Heading artifacts](results/heading/) | Machine-readable summaries and an annotated camera frame. |
 
 ## Presentations

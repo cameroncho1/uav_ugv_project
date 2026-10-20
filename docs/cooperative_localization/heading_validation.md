@@ -11,11 +11,11 @@ uncertainties are declared simulation assumptions.
 
 All eleven first-party packages build in Linux against the pinned consumed-message
 underlay. Registered checks report 170 tests, zero errors/failures, and seven
-existing cppcheck skips with installed cppcheck 2.7.
+cppcheck skips with installed cppcheck 2.7.
 [Verification](results/heading/verification.json) records the check result.
 Checks cover joint covariance, heading projection, angle wrap,
 mount alignment, acquisition time, duplicate suppression, position-only fallback,
-image annotation, and the existing package contracts.
+image annotation, and the other package contracts.
 
 The joint-pose numerical check uses 6,000 correlated Monte Carlo samples. The
 camera check uses 600 samples with independent corner noise and a shared
@@ -117,7 +117,7 @@ This establishes goal arrival under the stated tolerance in the flat, obstacle-f
 world. It does not isolate the effect of heading fusion or establish a 0.5 m
 physical arrival guarantee.
 
-## Position-only compatibility regression
+## Position-only assistance
 
 Fixed-observer synthetic inputs supply position only, with heading fusion disabled.
 Seeds 513-515 each exercise GPS available, lost at ten seconds, and denied from
@@ -136,8 +136,8 @@ All 21 comparisons have lower assisted RMSE in these runs. Each trial has at lea
 500 acquisition-matched poses per estimate and at least fifty corrections. GPS
 gates produce zero messages after declared loss and throughout startup denial.
 The largest assisted position error in the outlier/outage group is 1.018 m.
-These trials validate position-only compatibility and its existing assistance
-behavior; they do not measure the benefit of camera heading.
+These trials check position-only assistance with heading fusion disabled; they do
+not measure the benefit of camera heading.
 
 [Aggregate metrics](results/heading/paired_summary.json),
 [nominal summaries](results/heading/paired_nominal/),
@@ -155,6 +155,12 @@ phase reaches 10.68 degrees. The fixture requires recovery/final mean error belo
 0.12 rad (6.88 degrees) and outlier-phase maximum error below 0.2 rad (11.46
 degrees). [Stress diagnostic](results/heading/heading_stress_gate.json) retains
 the failed acceptance result and measured phases.
+
+The stress result varies between wall-clock runs. In a repeat run, recovery
+reaches 12.56 degrees assisted, but after the outlier phase the filter rejects
+every camera update and the final assisted error matches position-only at 20.63
+degrees. Under this bias the camera can stop correcting heading and position for
+the rest of the run.
 
 The filter does not explicitly estimate IMU yaw bias. The five-sigma gate can
 reject a valid returning camera pose when the IMU-driven
@@ -195,9 +201,9 @@ colcon test-result --verbose
 ```
 
 The numerical checks use one BLAS thread and one OpenCV thread to avoid CPU
-oversubscription. Monte Carlo sample counts and test time limits stay intact.
+oversubscription. Monte Carlo sample counts and test time limits are not reduced.
 
-All runtime assemblies stop their owned processes. The public pose topic, type,
-ENU map frame, and acquisition-time contract remain unchanged. Hardware mounting
+All runtime assemblies stop their owned processes. In both heading modes, the
+fused pose is `/ugv/localization/pose` in ENU `map` with acquisition time. Hardware mounting
 calibration, motion blur, uneven terrain, shared UAV heading bias, and simultaneous
 loss of both global references require separate validation.

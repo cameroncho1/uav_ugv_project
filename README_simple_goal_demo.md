@@ -43,7 +43,7 @@ If the matching `simple_goal_demo` world, camera UAV, PX4, and DDS agent are alr
 
 In the Gazebo window, add its **Image Display** plugin and select `/world/simple_goal_demo/model/cooperative_camera_uav_0/link/camera_link/sensor/camera/image`. To list camera topics, run `gz topic -l | grep -Ei 'camera|image'`.
 
-RViz's **Camera heading** display shows `/uav/camera/heading_image`, with a green arrow pointing toward the UGV front as measured from its roof tag. Heading fusion is enabled in the demo; `uav_heading:=false` keeps camera position assistance while omitting camera heading from the filter. The authoritative `/ugv/localization/pose` interface stays the same. [Camera heading](docs/cooperative_localization/camera_heading.md) documents the measurement, mounting calibration, uncertainty, and validation commands.
+RViz's **Camera heading** display shows `/uav/camera/heading_image`, with a green arrow pointing toward the UGV front as measured from its roof tag. Heading fusion is enabled in the demo; `uav_heading:=false` keeps camera position assistance while omitting camera heading from the filter. Planning and control read the fused pose from `/ugv/localization/pose` in both modes. [Camera heading](docs/cooperative_localization/camera_heading.md) documents the measurement, mounting calibration, uncertainty, and validation commands.
 
 ## Grid Scope
 

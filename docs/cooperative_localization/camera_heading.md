@@ -2,8 +2,8 @@
 
 The UAV camera measures the UGV's forward direction from its roof AprilTag. The
 annotated camera image draws a green arrow along chassis +X. This direction is
-independent of the fused UGV estimate and remains meaningful while the UGV is
-stationary or reversing. It represents facing direction, not velocity.
+independent of the fused UGV estimate and is valid while the UGV is stationary
+or reversing. It represents facing direction, not velocity.
 
 ## Run and view
 
@@ -19,7 +19,7 @@ RViz includes a **Camera heading** image display. The topic is
 `/uav/camera/heading_image`, a best-effort `sensor_msgs/Image` in `bgr8`. It keeps
 the source image's acquisition timestamp and optical frame. The background is
 grayscale; the annotation is colored. The detector generates annotated pixels
-only while this topic has subscribers. The raw image and mapping input remain
+only while this topic has subscribers. The raw image and mapping input is
 `/uav/camera/image`.
 
 An absent or rejected target produces a processed image labeled **Target
@@ -56,7 +56,7 @@ defaults disable assistance and heading. Simulation also requires
 | `cooperative_localization` | Match acquisition times, validate corrections, select position-only or joint updates, and fuse them. |
 | `fault_management` | Assemble evaluation inputs and score filter behavior. |
 
-`/ugv/localization/pose` remains `PoseWithCovarianceStamped` in ENU `map`, with
+`/ugv/localization/pose` is a `PoseWithCovarianceStamped` in ENU `map`, with
 position, orientation, acquisition time, and covariance. Planning and control
 consume this authoritative output.
 
@@ -132,7 +132,7 @@ source install/setup.bash
 cd ..
 ROS_DOMAIN_ID=72 python3 scripts/test_camera_heading_fusion.py /tmp/heading_fusion.json
 scripts/run_camera_perception_trial.sh /tmp/heading_pixels
-scripts/run_cooperative_trials.sh /tmp/heading_position_regression
+scripts/run_cooperative_trials.sh /tmp/heading_position_only
 scripts/run_camera_anchor_trials.sh /tmp/heading_camera_anchors
 scripts/run_goal_navigation_trial.sh /tmp/heading_goal
 ```
