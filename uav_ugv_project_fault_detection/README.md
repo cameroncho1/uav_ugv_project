@@ -107,6 +107,9 @@ Weights are written under `models/<name>Weights/` (and
 
 # Simulated UGV sensor faults
 
+See [MODELS.md](MODELS.md) for each UGV model's inputs, outputs,
+architecture, training data, evaluation metrics, and results.
+
 `datasets/ugv_clean/` holds clean simulated UGV runs from
 [`scripts/collect_ugv_dataset.sh`](../scripts/collect_ugv_dataset.sh) (see
 [sensor dataset collection](../docs/sensor_dataset.md#batch-clean-ugv-runs)).
