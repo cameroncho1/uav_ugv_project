@@ -202,10 +202,12 @@ def _predict(name, model, windows):
     return np.asarray(out, dtype=np.float64)
 
 
-def _anomaly_labels(scores, labels):
-     # Turn autoencoder error scores into binary labels via a threshold. The
-     # threshold is the max mean-error of the *normal* windows, flagging anything
-     # that reconstructs worse than the worst normal case as faulty.
+def _anomaly_labels(scores, labels, threshold=None):
+     # Turn autoencoder error scores into binary labels via a threshold. When no
+     # threshold is given it is the max mean-error of the *normal* windows,
+     # flagging anything that reconstructs worse than the worst normal case.
+    if threshold is not None:   # scalar or one value per window
+        return (scores > threshold).astype(int), threshold
     if not np.any(labels == 0):
         threshold = float(np.median(scores))
     else:
@@ -213,14 +215,44 @@ def _anomaly_labels(scores, labels):
     return (scores > threshold).astype(int), threshold
 
 
-def print_summary(name, model, windows, labels, positive="fault", info=None):
+def _channel_keys(info):
+    return (info["sensor"] + "/" + info["column"]).to_numpy()
+
+
+def _clean_error_thresholds(model, clean_windows, clean_info, percentile, weight_dir):
+     # Per-channel fault thresholds for the autoencoder: the given percentile of
+     # the reconstruction error over clean *training* windows of each channel
+     # (noisy IMU axes and smooth wheel speeds have very different error floors).
+     # Saved beside the weights so ``--mode run`` reuses them.
+    errors = _predict("Autoencoder", model, clean_windows)
+    keys = _channel_keys(clean_info)
+    thresholds = {k: float(np.percentile(errors[keys == k], percentile))
+                  for k in sorted(set(keys))}
+    with open(os.path.join(weight_dir, "threshold.json"), "w", encoding="utf-8") as f:
+        json.dump({"percentile": percentile, "per_channel": thresholds,
+                   "clean_train_windows": len(errors)}, f, indent=2)
+    print(f"   Clean-train reconstruction error p{percentile:g} per channel "
+          f"({len(errors)} windows):")
+    for key, value in thresholds.items():
+        print(f"      {key:22s} {value:.4e}")
+    return thresholds
+
+
+def _window_thresholds(thresholds, info):
+     # Map per-channel thresholds onto each window of ``info``.
+    return np.array([thresholds[k] for k in _channel_keys(info)])
+
+
+def print_summary(name, model, windows, labels, positive="fault", info=None,
+                  threshold=None):
      # Evaluate ``model`` on ``windows`` and print a P/R/F1 summary. Classifiers
      # are scored on their fault predictions; the autoencoder is scored by
-     # thresholding its reconstruction error against the normal data.
+     # thresholding its reconstruction error (``threshold`` when given).
     scores = _predict(name, model, windows)
     if name == "Autoencoder":
-        preds, threshold = _anomaly_labels(scores, labels)
-        print(f"   Autoencoder anomaly threshold = {threshold:.4e}")
+        preds, threshold = _anomaly_labels(scores, labels, threshold)
+        if np.ndim(threshold) == 0:
+            print(f"   Autoencoder anomaly threshold = {threshold:.4e}")
         positive = "anomaly"
     else:
         preds = scores.astype(int)
@@ -292,6 +324,7 @@ def train_model(name, train_windows, train_labels, val_windows, val_labels,
         val_windows = val_labels = None
     if flatten and args.dataset == "ugv":
         # Reconstruction models learn normal behaviour only.
+        clean_info = args.train_info[train_labels == 0].reset_index(drop=True)
         train_windows = train_windows[train_labels == 0]
         train_labels = train_labels[train_labels == 0]
         if val_windows is not None:
@@ -359,9 +392,16 @@ def train_model(name, train_windows, train_labels, val_windows, val_labels,
         # Score on every validation window, including faulty ones.
         model.load_state_dict(torch.load(os.path.join(weight_dir, "best_model.pt"),
                                          map_location="cpu"))
+        threshold = None
+        if flatten:   # train_windows are clean-only here
+            thresholds = _clean_error_thresholds(
+                 model, train_windows, clean_info, args.ae_percentile, weight_dir)
         (_, _), (val_windows, val_labels) = build_ugv_train_val(args)
+        if flatten:
+            threshold = _window_thresholds(thresholds, args.val_info)
         print("--- Validation summary (best_model.pt) ---")
-        result = print_summary(name, model, val_windows, val_labels, info=args.val_info)
+        result = print_summary(name, model, val_windows, val_labels, info=args.val_info,
+                               threshold=threshold)
     elif val_windows is not None:
         print("--- Validation summary ---")
         result = print_summary(name, model, val_windows, val_labels)
@@ -393,9 +433,16 @@ def run_model(name, args, feat_dim):
     model.eval()
 
     if args.dataset == "ugv":
-        (_, _), (windows, labels) = build_ugv_train_val(args)
+        (train_windows, train_labels), (windows, labels) = build_ugv_train_val(args)
+        threshold = None
+        if name == "Autoencoder":
+            clean = train_labels == 0
+            thresholds = _clean_error_thresholds(
+                 model, train_windows[clean], args.train_info[clean].reset_index(drop=True),
+                 args.ae_percentile, os.path.dirname(weight_path))
+            threshold = _window_thresholds(thresholds, args.val_info)
         print(f"--- Validation inference on {len(labels)} windows (domain={args.domain}) ---")
-        print_summary(name, model, windows, labels, info=args.val_info)
+        print_summary(name, model, windows, labels, info=args.val_info, threshold=threshold)
         return model
     windows, labels, _ = D.build_dataset(
          DATA_DIR,
@@ -431,6 +478,9 @@ def main():
     parser.add_argument("--no-tensorboard", action="store_true")
     parser.add_argument("--device", default="cpu",
                         help="Training device: cpu, mps (Apple GPU), or cuda.")
+    parser.add_argument("--ae-percentile", type=float, default=99.0,
+                        help="UGV autoencoder: flag windows whose reconstruction error exceeds "
+                             "this percentile of their channel's clean training errors.")
     parser.add_argument("--batch-size", type=int, default=None,
                         help="Override batch_size from the config.")
     parser.add_argument("--topic", default=D.DEFAULT_TOPIC)

@@ -152,7 +152,10 @@ it carries that channel's fault label. Windows are standardized with
 per-channel statistics from the training fault-free variants, because a
 per-window z-score would erase constant offsets. Train/validation splits are by
 `source_run` (24 / 6 drives). The autoencoder trains on fault-free windows
-only. Summaries add recall per fault type and the clean-window false-positive
+only. A window is faulty when its reconstruction error exceeds the
+`--ae-percentile` (default 99) of the clean training errors for the same
+channel; the per-channel thresholds are saved to `threshold.json` beside the
+weights and recomputed by `--mode run`. Summaries add recall per fault type and the clean-window false-positive
 rate. UGV weights are written to `models/<name>Weights_ugv/`, separate from
 the ALFA weights. `--device mps` uses the Apple GPU for the BiLSTM and
 autoencoder; `nn.RNN` trains faster on `--device cpu`.
