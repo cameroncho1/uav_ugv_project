@@ -119,7 +119,7 @@ class WindowDataset(Dataset):
 
 
 # --- Model factory -----------------------------------------------------------
-def build_model(name, input_dim, num_classes=2):
+def build_model(name, input_dim, num_classes=2, readout="full"):
      # Instantiate a model by name for the given per-step input dimension.
      # The RNN/BiLSTM are binary fault classifiers and therefore always use
      # ``num_classes`` output units (fault vs normal), independent of the
@@ -142,6 +142,7 @@ def build_model(name, input_dim, num_classes=2):
              hidden_dim=config["bilstm"]["hidden_dim"],
              output_dim=num_classes,
              num_layers=config["bilstm"]["num_layers"],
+             readout=readout,
         )
     raise ValueError(f"Unknown model: {name}")
 
@@ -333,7 +334,7 @@ def train_model(name, train_windows, train_labels, val_windows, val_labels,
                 args, feat_dim):
      # Train one model type and checkpoint its weights to its subfolder.
     print(f"\n=== Training {name} ===")
-    input_dim = _model_input_dim(name, feat_dim, args.seq_len)
+    input_dim = _model_input_dim(name, feat_dim, args.window_len)
     flatten = name == "Autoencoder"
 
     if val_windows is None:
@@ -368,6 +369,9 @@ def train_model(name, train_windows, train_labels, val_windows, val_labels,
 
     weight_dir = weight_folder(name, args.domain, args.dataset, args.paired)
     os.makedirs(weight_dir, exist_ok=True)
+    # Record the readout so --mode run rebuilds the same network.
+    with open(os.path.join(weight_dir, "model_config.json"), "w", encoding="utf-8") as f:
+        json.dump({"readout": "full", "window_len": args.window_len}, f, indent=2)
 
     epochs = (
         args.epochs if args.epochs is not None
@@ -431,6 +435,16 @@ def train_model(name, train_windows, train_labels, val_windows, val_labels,
 
 
 # --- Inference / running a trained model -------------------------------------
+def _saved_readout(weight_dir):
+     # BiLSTM readout used when ``weight_dir`` was trained; folders without
+     # model_config.json predate the 'full' readout and use 'last'.
+    path = os.path.join(weight_dir, "model_config.json")
+    if not os.path.exists(path):
+        return "last"
+    with open(path, "r", encoding="utf-8") as f:
+        return json.load(f).get("readout", "last")
+
+
 def _ugv_ae_thresholds(model, args, weight_dir):
      # Recompute the autoencoder's per-channel thresholds from clean train windows.
     train_windows, train_labels, train_info = args.splits["train"]
@@ -443,7 +457,8 @@ def _ugv_ae_thresholds(model, args, weight_dir):
 def _load_trained(name, args, feat_dim):
     path = os.path.join(weight_folder(name, args.domain, args.dataset, args.paired),
                         "best_model.pt")
-    model = build_model(name, _model_input_dim(name, feat_dim, args.seq_len))
+    model = build_model(name, _model_input_dim(name, feat_dim, args.window_len),
+                        readout=_saved_readout(os.path.dirname(path)))
     model.load_state_dict(torch.load(path, map_location="cpu"))
     model.eval()
     return model, os.path.dirname(path)
@@ -486,8 +501,9 @@ def run_model(name, args, feat_dim):
         return None
 
     print(f"\n=== Running {name} (loading {weight_path}) ===")
-    input_dim = _model_input_dim(name, feat_dim, args.seq_len)
-    model = build_model(name, input_dim)
+    input_dim = _model_input_dim(name, feat_dim, args.window_len)
+    model = build_model(name, input_dim,
+                        readout=_saved_readout(os.path.dirname(weight_path)))
     model.load_state_dict(torch.load(weight_path, map_location="cpu"))
     model.eval()
 
@@ -568,6 +584,7 @@ def main():
         return
 
     feat_dim = train_windows.shape[2]
+    args.window_len = train_windows.shape[1]   # time steps (or FFT bins) per window
     print(
          f"Train: {len(train_windows)} windows, "
          f"Val: {0 if val_windows is None else len(val_windows)} windows, "

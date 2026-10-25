@@ -15,7 +15,8 @@
 #
 # Windows are standardized with per-channel statistics from the training
 # fault-free windows, not per window: a per-window z-score would remove a
-# constant offset entirely. The reference uses its channel's statistics.
+# constant offset entirely. The reference uses its channel's statistics. The
+# frequency domain keeps the seq_len // 2 + 1 non-redundant FFT bins.
 
 import json
 import math
@@ -24,7 +25,6 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-import dataset as D
 from fault_injection import EARTH_RADIUS, NOMINAL_SIGMA
 
 CHANNELS = [(sensor, column) for sensor, columns in NOMINAL_SIGMA.items() for column in columns]
@@ -108,12 +108,10 @@ def standardize(windows, info, stats, seq_len, domain):
     std = np.array([stats[key][1] for key in keys])[:, None, None]
     scaled = np.nan_to_num((windows - mean) / std)   # missing reference -> 0
     if domain == "frequency":
-        # Orthonormal FFT magnitude (divide by sqrt(seq_len)): unit white noise stays
-        # near 1 per bin instead of growing with the window length.
-        scaled = np.stack([
-            np.concatenate([D._to_window(w[:, f], seq_len, "frequency")
-                            for f in range(w.shape[1])], axis=1)
-            for w in scaled]) / math.sqrt(seq_len)
+        # One-sided orthonormal FFT magnitude: bins 0..seq_len//2 (the rest mirror
+        # them for real input), divided by sqrt(seq_len) so unit white noise stays
+        # near 1 per bin. Windows become (seq_len // 2 + 1, F).
+        scaled = np.abs(np.fft.rfft(scaled, axis=1)) / math.sqrt(seq_len)
     return scaled.astype(np.float32)
 
 
