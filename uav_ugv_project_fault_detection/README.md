@@ -143,27 +143,43 @@ slip; faults are injected into the per-sample channels only.
 
 ```
 ./bin/python main.py --dataset ugv --model bilstm --epochs 2500 --batch-size 256 --device mps --save-every 250
-./bin/python main.py --dataset ugv --mode run --model bilstm   # score best_model.pt on validation
+./bin/python main.py --dataset ugv --mode run --model bilstm     # val + test summaries
+./bin/python main.py --dataset ugv --mode run --model ensemble   # BiLSTM OR autoencoder
 ```
 
-`ugv_dataset.py` cuts every faultable channel into 100-sample single-channel
-windows (2 s IMU, 5 s wheel, 20 s GPS); a window is faulty when any sample in
-it carries that channel's fault label. Windows are standardized with
-per-channel statistics from the training fault-free variants, because a
-per-window z-score would erase constant offsets. Train/validation splits are by
-`source_run` (24 / 6 drives). The autoencoder trains on fault-free windows
-only. A window is faulty when its reconstruction error exceeds the
-`--ae-percentile` (default 99) of the clean training errors for the same
-channel; the per-channel thresholds are saved to `threshold.json` beside the
-weights and recomputed by `--mode run`. Summaries add recall per fault type and the clean-window false-positive
-rate. UGV weights are written to `models/<name>Weights_ugv/`, separate from
-the ALFA weights. `--device mps` uses the Apple GPU for the BiLSTM and
-autoencoder; `nn.RNN` trains faster on `--device cpu`.
+`ugv_dataset.py` cuts every faultable channel into 100-sample windows (2 s IMU,
+5 s wheel, 20 s GPS); a window is faulty when any sample in it carries that
+channel's fault label. Source runs are split 20 train / 5 validation / 5 test
+(`--val-runs`, `--test-runs`); checkpoints and thresholds use train and
+validation only, and summaries report the held-out test runs.
+
+Each window has two features: the channel and a reference for the same
+quantity from another sensor or the drive command (IMU yaw rate vs wheel yaw
+rate, wheel speed vs commanded speed, IMU ax/ay vs commanded acceleration,
+GPS vs wheel-odometry position; zeros for wx, wy, az, and altitude). On clean
+training windows the yaw-rate, speed, and GPS references correlate 0.89–0.99
+with their channels. `--single-channel` drops the reference. Windows are
+standardized with per-channel statistics from clean training windows, because
+a per-window z-score would erase constant offsets; the frequency domain uses
+orthonormal FFT magnitudes.
+
+- RNN / BiLSTM save `best_model.pt` at the highest validation F1 (faults are
+  about 1% of windows, so validation loss tracks confidence, not detection).
+- The autoencoder trains on fault-free windows and flags a window when its
+  reconstruction error exceeds the `--ae-percentile` (default 99) of clean
+  training errors for that channel; thresholds go to `threshold.json`.
+- `--model ensemble` (with `--mode run`) flags a window when the BiLSTM or the
+  autoencoder flags it.
+
+Weights go to `models/<name>Weights_ugv_paired[_freq]/`
+(`<name>Weights_ugv` holds the earlier single-channel run on a 24/6 split).
+`--device mps` uses the Apple GPU for the BiLSTM and autoencoder; `nn.RNN`
+trains faster on `--device cpu`.
 
 ## Live training curves (TensorBoard)
 
 Every training run writes TensorBoard logs to `runs/<dataset>_<model>_<domain>_<time>/`:
-per-epoch `loss/train`, `loss/val`, `learning_rate`, `epoch_seconds`, the run
+per-epoch `loss/train`, `loss/val`, `f1/val` (classifiers), `learning_rate`, `epoch_seconds`, the run
 arguments, and the final validation precision / recall / F1 / accuracy.
 
 ```

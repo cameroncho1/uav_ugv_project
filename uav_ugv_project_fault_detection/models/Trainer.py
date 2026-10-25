@@ -25,6 +25,7 @@ class Trainer:
         save_every=10,
         device="cpu",
         writer=None,
+        select_by="loss",
     ):
         # Device for training (e.g. 'cpu', 'mps', 'cuda'); batches move with it.
         self.device = torch.device(device)
@@ -48,6 +49,13 @@ class Trainer:
         self.history = {"train": [], "val": []}
         # Optional torch.utils.tensorboard SummaryWriter for live loss curves.
         self.writer = writer
+        # 'loss': keep the lowest validation loss as best_model.pt. 'f1': keep the
+        # highest validation F1 of the fault class (argmax of classifier logits),
+        # which suits rare-fault data where the loss tracks confidence, not detection.
+        if select_by not in ("loss", "f1"):
+            raise ValueError(f"select_by must be 'loss' or 'f1', not {select_by!r}")
+        self.select_by = select_by
+        self.best_val_f1 = -1.0
 
     def _save(self, path) -> None:
         # Persist the model so it can be loaded later with model.load_state_dict
@@ -85,17 +93,28 @@ class Trainer:
             if val_loader is not None:
                 self.model.eval()
                 val_loss = 0.0
+                counts = torch.zeros(3)   # tp, fp, fn of the fault class
                 with torch.no_grad():
                     for inputs, targets in val_loader:
                         inputs, targets = inputs.to(self.device), targets.to(self.device)
                         outputs = self.model(inputs)
                         loss = self.criterion(outputs, targets)
                         val_loss += loss.item()
+                        if self.select_by == "f1":
+                            pred = outputs.argmax(dim=1)
+                            counts += torch.stack([
+                                ((pred == 1) & (targets == 1)).sum(),
+                                ((pred == 1) & (targets == 0)).sum(),
+                                ((pred == 0) & (targets == 1)).sum()]).cpu()
                 val_loss = val_loss / max(len(val_loader), 1)
+                tp, fp, fn = counts.tolist()
+                val_f1 = 2 * tp / (2 * tp + fp + fn) if tp else 0.0
 
             print(
                 f"Epoch [{epoch + 1}/{self.num_epochs}], "
                 f"Train Loss: {train_loss:.4f}, Validation Loss: {val_loss:.4f}"
+                + (f", Validation F1: {val_f1:.4f}"
+                   if self.select_by == "f1" and val_loader is not None else "")
             )
 
             # Record the epoch losses so a loss curve can be plotted later.
@@ -105,6 +124,8 @@ class Trainer:
                 self.writer.add_scalar("loss/train", train_loss, epoch + 1)
                 if val_loader is not None:
                     self.writer.add_scalar("loss/val", val_loss, epoch + 1)
+                    if self.select_by == "f1":
+                        self.writer.add_scalar("f1/val", val_f1, epoch + 1)
                 self.writer.add_scalar(
                     "learning_rate", self.optimizer.param_groups[0]["lr"], epoch + 1)
                 self.writer.add_scalar("epoch_seconds", time.time() - epoch_start, epoch + 1)
@@ -116,9 +137,13 @@ class Trainer:
                     self._save(
                         os.path.join(self.save_dir, f"model_epoch_{epoch + 1:04d}.pt")
                     )
-                # Keep the model that achieved the lowest validation loss.
-                if val_loss < self.best_val_loss:
+                # Keep the model with the best validation score.
+                improved = (val_loader is not None and val_f1 > self.best_val_f1
+                            if self.select_by == "f1" else val_loss < self.best_val_loss)
+                if improved:
                     self.best_val_loss = val_loss
+                    if self.select_by == "f1":
+                        self.best_val_f1 = val_f1
                     self.best_epoch = epoch + 1
                     self._save(os.path.join(self.save_dir, "best_model.pt"))
 
@@ -127,8 +152,10 @@ class Trainer:
                 self._save(os.path.join(self.save_dir, "final_model.pt"))
 
         if self.save_dir is not None:
+            score = (f"F1: {self.best_val_f1:.4f}" if self.select_by == "f1"
+                     else f"loss: {self.best_val_loss:.4f}")
             print(
-                f"Best validation loss: {self.best_val_loss:.4f} at epoch "
+                f"Best validation {score} at epoch "
                 f'{self.best_epoch if self.best_epoch >= 0 else "?"}.'
             )
             # Persist the per-epoch loss history for plotting (plot_losses.py).
