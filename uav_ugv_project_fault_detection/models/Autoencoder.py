@@ -21,14 +21,15 @@ class Autoencoder(nn.Module):
 
     def forward(self, x):
         encoded = torch.relu(self.encoder(x))
-        decoded = torch.sigmoid(self.decoder(encoded))
+        # Linear output: inputs are standardized and can be negative.
+        decoded = self.decoder(encoded)
         return decoded
 
     def encode(self, x):
         return torch.relu(self.encoder(x))
 
     def decode(self, encoded):
-        return torch.sigmoid(self.decoder(encoded))
+        return self.decoder(encoded)
 
     def reconstruct(self, x):
         encoded = self.encode(x)

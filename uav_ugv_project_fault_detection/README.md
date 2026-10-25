@@ -104,3 +104,69 @@ Weights are written under `models/<name>Weights/` (and
 `models/<name>Weights_freq/` for the frequency domain), each containing
 `best_model.pt`, `final_model.pt`, `model_epoch_NNNN.pt` checkpoints, and a
 `loss_history.json`.
+
+# Simulated UGV sensor faults
+
+`datasets/ugv_clean/` holds clean simulated UGV runs from
+[`scripts/collect_ugv_dataset.sh`](../scripts/collect_ugv_dataset.sh) (see
+[sensor dataset collection](../docs/sensor_dataset.md#batch-clean-ugv-runs)).
+`fault_injection.py` turns each clean run into labelled variants:
+
+```
+./bin/python fault_injection.py --input datasets/ugv_clean --output datasets/ugv_faulty
+./bin/python test_fault_injection.py
+```
+
+Every variant first receives nominal Gaussian noise (the
+`sim_ugv_sensors.py` defaults: IMU 0.01 rad/s and 0.1 m/s², wheel speed
+0.05 m/s and 0.02 rad/s, GPS 1.5 m horizontal and 3 m vertical). One fault is
+then injected into one randomly chosen channel (IMU `wx..az`, wheel `vx`/`wz`,
+GPS latitude/longitude/altitude). Magnitudes are multiples of that channel's
+nominal sigma:
+
+| Fault | Effect | Default parameters |
+| --- | --- | --- |
+| `short` | 3–8 spikes of 1–3 samples inside a 5–20 s window; only spike samples are labelled | 6–15 sigma, random sign |
+| `noise` | Extra Gaussian noise over a 5–30 s window | 3–8 sigma std |
+| `constant` | Fixed offset from onset to the end of the run | 3–10 sigma, random sign |
+
+Defaults write one fault-free (`normal`) and one variant per fault type for
+each run (`run_<seed>_<type>_<index>/`); change counts with `--per-type`,
+`--normal-variants`, and `--types`. Each sensor CSV gains `fault` (0/1),
+`fault_type`, and `fault_column` per sample; `faults.json` stores the exact
+injection, its seed, and `source_run`. Split train/validation/test by
+`source_run` so variants of one drive never appear in two splits. Wheel
+odometry pose columns are left as recorded and drift with simulated wheel
+slip; faults are injected into the per-sample channels only.
+
+## Training on the UGV variants
+
+```
+./bin/python main.py --dataset ugv --model bilstm --epochs 2500 --batch-size 256 --device mps --save-every 250
+./bin/python main.py --dataset ugv --mode run --model bilstm   # score best_model.pt on validation
+```
+
+`ugv_dataset.py` cuts every faultable channel into 100-sample single-channel
+windows (2 s IMU, 5 s wheel, 20 s GPS); a window is faulty when any sample in
+it carries that channel's fault label. Windows are standardized with
+per-channel statistics from the training fault-free variants, because a
+per-window z-score would erase constant offsets. Train/validation splits are by
+`source_run` (24 / 6 drives). The autoencoder trains on fault-free windows
+only. Summaries add recall per fault type and the clean-window false-positive
+rate. UGV weights are written to `models/<name>Weights_ugv/`, separate from
+the ALFA weights. `--device mps` uses the Apple GPU for the BiLSTM and
+autoencoder; `nn.RNN` trains faster on `--device cpu`.
+
+## Live training curves (TensorBoard)
+
+Every training run writes TensorBoard logs to `runs/<dataset>_<model>_<domain>_<time>/`:
+per-epoch `loss/train`, `loss/val`, `learning_rate`, `epoch_seconds`, the run
+arguments, and the final validation precision / recall / F1 / accuracy.
+
+```
+./bin/tensorboard --logdir runs     # then open http://localhost:6006
+```
+
+Use `--tensorboard-dir` to log elsewhere or `--no-tensorboard` to skip it.
+`runs/` is gitignored; per-epoch histories are also saved as
+`loss_history.json` in each weight folder.

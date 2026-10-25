@@ -18,5 +18,13 @@ uav_ugv_project_fault_detection/pyvenv.cfg
 # Training data (raw flight recordings; not source)
 uav_ugv_project_fault_detection/datasets/
 
+# TensorBoard event files (view live with: tensorboard --logdir runs)
+uav_ugv_project_fault_detection/runs/
+
 # Local-only agent context notes
 docs/cooperative_localization/sim_setup_context.md
+
+# Personal Claude Code files (memories live outside the repo in ~/.claude/projects/)
+CLAUDE.local.md
+.claude/settings.local.json
+.claude/memory/

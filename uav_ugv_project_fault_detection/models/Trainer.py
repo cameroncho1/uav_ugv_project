@@ -23,11 +23,15 @@ class Trainer:
         num_epochs,
         save_dir=None,
         save_every=10,
+        device="cpu",
+        writer=None,
     ):
-        self.model = model
+        # Device for training (e.g. 'cpu', 'mps', 'cuda'); batches move with it.
+        self.device = torch.device(device)
+        self.model = model.to(self.device)
         self.train_data = train_data
         self.val_data = val_data
-        self.criterion = criterion
+        self.criterion = criterion.to(self.device)   # moves class weights too
         self.optimizer = optimizer
         self.batch_size = batch_size
         self.num_epochs = num_epochs
@@ -42,6 +46,8 @@ class Trainer:
         # Per-epoch loss history, written to disk after training so a plot can
         # be generated independently of the training run.
         self.history = {"train": [], "val": []}
+        # Optional torch.utils.tensorboard SummaryWriter for live loss curves.
+        self.writer = writer
 
     def _save(self, path) -> None:
         # Persist the model so it can be loaded later with model.load_state_dict
@@ -60,9 +66,11 @@ class Trainer:
         )
 
         for epoch in range(self.num_epochs):
+            epoch_start = time.time()
             self.model.train()
             running_loss = 0.0
             for inputs, targets in train_loader:
+                inputs, targets = inputs.to(self.device), targets.to(self.device)
                 self.optimizer.zero_grad()
                 outputs = self.model(inputs)
                 loss = self.criterion(outputs, targets)
@@ -79,6 +87,7 @@ class Trainer:
                 val_loss = 0.0
                 with torch.no_grad():
                     for inputs, targets in val_loader:
+                        inputs, targets = inputs.to(self.device), targets.to(self.device)
                         outputs = self.model(inputs)
                         loss = self.criterion(outputs, targets)
                         val_loss += loss.item()
@@ -92,6 +101,13 @@ class Trainer:
             # Record the epoch losses so a loss curve can be plotted later.
             self.history["train"].append(train_loss)
             self.history["val"].append(val_loss)
+            if self.writer is not None:
+                self.writer.add_scalar("loss/train", train_loss, epoch + 1)
+                if val_loader is not None:
+                    self.writer.add_scalar("loss/val", val_loss, epoch + 1)
+                self.writer.add_scalar(
+                    "learning_rate", self.optimizer.param_groups[0]["lr"], epoch + 1)
+                self.writer.add_scalar("epoch_seconds", time.time() - epoch_start, epoch + 1)
 
             # Periodically checkpoint so a long run is not lost and so the latest
             # model is always available under the model's weight folder.

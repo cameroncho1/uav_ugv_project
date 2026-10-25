@@ -23,8 +23,8 @@ class BiLSTM(nn.Module):
 
     def forward(self, x):
          # x shape: (batch, seq_len, input_dim)
-        h0 = torch.zeros(self.num_layers * 2, x.size(0), self.hidden_dim)   # Multiply by 2 for bidirectional
-        c0 = torch.zeros(self.num_layers * 2, x.size(0), self.hidden_dim)   # Multiply by 2 for bidirectional
+        h0 = torch.zeros(self.num_layers * 2, x.size(0), self.hidden_dim, device=x.device)   # Multiply by 2 for bidirectional
+        c0 = torch.zeros(self.num_layers * 2, x.size(0), self.hidden_dim, device=x.device)   # Multiply by 2 for bidirectional
         out, _ = self.lstm(x, (h0, c0))
         out = self.fc(out[:, -1, :])
         return out
