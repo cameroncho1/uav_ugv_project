@@ -1,0 +1,122 @@
+[
+  {
+    "checkpoint": "best_model.pt",
+    "f1": 0.1242,
+    "precision": 0.069,
+    "recall": 0.6233,
+    "false_positive_rate": 0.1224,
+    "short_recall": 0.263,
+    "noise_recall": 0.276,
+    "constant_recall": 0.796
+  },
+  {
+    "checkpoint": "final_model.pt",
+    "f1": 0.0992,
+    "precision": 0.0551,
+    "recall": 0.4932,
+    "false_positive_rate": 0.123,
+    "short_recall": 0.158,
+    "noise_recall": 0.138,
+    "constant_recall": 0.663
+  },
+  {
+    "checkpoint": "model_epoch_0250.pt",
+    "f1": 0.1066,
+    "precision": 0.058,
+    "recall": 0.6507,
+    "false_positive_rate": 0.1537,
+    "short_recall": 0.158,
+    "noise_recall": 0.276,
+    "constant_recall": 0.857
+  },
+  {
+    "checkpoint": "model_epoch_0500.pt",
+    "f1": 0.0997,
+    "precision": 0.0541,
+    "recall": 0.637,
+    "false_positive_rate": 0.1622,
+    "short_recall": 0.263,
+    "noise_recall": 0.276,
+    "constant_recall": 0.816
+  },
+  {
+    "checkpoint": "model_epoch_0750.pt",
+    "f1": 0.079,
+    "precision": 0.0419,
+    "recall": 0.6918,
+    "false_positive_rate": 0.2304,
+    "short_recall": 0.421,
+    "noise_recall": 0.414,
+    "constant_recall": 0.827
+  },
+  {
+    "checkpoint": "model_epoch_1000.pt",
+    "f1": 0.0406,
+    "precision": 0.0222,
+    "recall": 0.2397,
+    "false_positive_rate": 0.1539,
+    "short_recall": 0.053,
+    "noise_recall": 0.207,
+    "constant_recall": 0.286
+  },
+  {
+    "checkpoint": "model_epoch_1250.pt",
+    "f1": 0.1943,
+    "precision": 0.1286,
+    "recall": 0.3973,
+    "false_positive_rate": 0.0392,
+    "short_recall": 0.0,
+    "noise_recall": 0.138,
+    "constant_recall": 0.551
+  },
+  {
+    "checkpoint": "model_epoch_1500.pt",
+    "f1": 0.1024,
+    "precision": 0.0556,
+    "recall": 0.6507,
+    "false_positive_rate": 0.1609,
+    "short_recall": 0.211,
+    "noise_recall": 0.345,
+    "constant_recall": 0.827
+  },
+  {
+    "checkpoint": "model_epoch_1750.pt",
+    "f1": 0.0923,
+    "precision": 0.0498,
+    "recall": 0.637,
+    "false_positive_rate": 0.1771,
+    "short_recall": 0.316,
+    "noise_recall": 0.31,
+    "constant_recall": 0.796
+  },
+  {
+    "checkpoint": "model_epoch_2000.pt",
+    "f1": 0.099,
+    "precision": 0.0541,
+    "recall": 0.5822,
+    "false_positive_rate": 0.1482,
+    "short_recall": 0.158,
+    "noise_recall": 0.241,
+    "constant_recall": 0.765
+  },
+  {
+    "checkpoint": "model_epoch_2250.pt",
+    "f1": 0.0255,
+    "precision": 0.0142,
+    "recall": 0.1233,
+    "false_positive_rate": 0.1242,
+    "short_recall": 0.105,
+    "noise_recall": 0.103,
+    "constant_recall": 0.133
+  },
+  {
+    "checkpoint": "model_epoch_2500.pt",
+    "f1": 0.0992,
+    "precision": 0.0551,
+    "recall": 0.4932,
+    "false_positive_rate": 0.123,
+    "short_recall": 0.158,
+    "noise_recall": 0.138,
+    "constant_recall": 0.663
+  }
+]
