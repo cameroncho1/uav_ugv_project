@@ -1,5 +1,35 @@
 # Collect sensor data
 
+## Batch clean UGV runs
+
+`scripts/collect_ugv_dataset.sh` records noise-free UGV sensors for fault-detection training. Each seed starts a headless [`ugv_dataset`](../simulation/worlds/ugv_dataset.sdf) world, drives a seeded open-loop maneuver schedule, and writes CSVs. Faults and noise are added offline from these runs.
+
+```bash
+source /opt/ros/humble/setup.bash
+source ros2_ws/install/setup.bash   # ARM64: built over ~/ros_gz_harmonic_ws (see simulation_setup.md)
+SEEDS="$(seq 1000 1029)" DURATION=120 scripts/collect_ugv_dataset.sh datasets/ugv_clean
+```
+
+- The `ugv_dataset` world uses the `simple_goal_demo` UGV, sensors, and geodetic datum with two frictionless chassis casters. Without casters the two-wheel chassis pitches about 21-24° while driving and drags its edge, which tilts gravity in the IMU. With casters, a 30 s run on the UTM ARM64 VM held pitch within 0.21° and mean IMU `az` at 9.811 m/s².
+- [`ugv_dataset_recorder.py`](../ros2_ws/src/fault_management/scripts/ugv_dataset_recorder.py) waits for IMU, wheel odometry, GPS, and truth, then records a 3 s stationary prefix and random stop, straight, arc, spin, weave, and speed-ramp segments. Commands stay within 0.8 m/s and 1.2 rad/s with 0.8 m/s² and 2 rad/s² rate limits. No truth enters the command.
+- Completed runs (`metadata.json` present) are skipped, so an interrupted batch resumes with the same command.
+- `UPDATE_RATE=1000` runs Gazebo about 3x faster. Sensor and command rates are unchanged, but truth drops to about 15 Hz because Gazebo pose broadcasts are throttled by wall-clock time.
+
+Each `run_<seed>/` contains:
+
+| File | Rate | Columns |
+| --- | ---: | --- |
+| `imu.csv` | 50 Hz | `stamp`, orientation `qx..qw` (ENU), angular velocity `wx..wz` (FLU), linear acceleration `ax..az` (FLU, includes gravity) |
+| `wheel_odom.csv` | ~19 Hz | `stamp`, DiffDrive pose `x,y,z,qx..qw` in an odom frame at the spawn pose, twist `vx..vz,wx..wz` (FLU) |
+| `gps.csv` | 5 Hz | `stamp`, `status`, `latitude`, `longitude`, `altitude` |
+| `truth.csv` | 50 Hz | `stamp`, UGV model origin `x,y,z,qx..qw` in ENU `map` |
+| `cmd.csv` | 20 Hz | sim time, commanded `linear`, `angular`, `segment` index |
+| `metadata.json` | | seed, duration, start sim time, sample counts, frames, and the maneuver segments |
+
+Stamps are Gazebo acquisition times in seconds. The spawn is `(-4, 0)` with zero yaw, so map position is wheel-odometry position plus `(-4, 0)`. Raw readings have no added noise; wheel odometry still drifts from wheel slip (0.30 m over 10 m in the 30 s check) and IMU acceleration shows contact vibration (`az` standard deviation 0.23 m/s² while driving). Split train, validation, and test sets by run.
+
+## Full camera-assisted recording
+
 Run in Ubuntu 22.04 with ROS 2 Humble and Gazebo Harmonic. Open every terminal at the repo root. Complete [setup](../README.md) and [dependencies](simulation_setup.md) first.
 
 ## 1. Build
