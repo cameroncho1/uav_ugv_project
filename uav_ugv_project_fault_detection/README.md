@@ -135,7 +135,23 @@ nominal sigma:
 
 Defaults write one fault-free (`normal`) and one variant per fault type for
 each run (`run_<seed>_<type>_<index>/`); change counts with `--per-type`,
-`--normal-variants`, and `--types`. Each sensor CSV gains `fault` (0/1),
+`--normal-variants`, and `--types`. `--count TYPE=N` overrides the count for one
+type, and `--noise-window MIN MAX` sets the noise-fault length in seconds.
+
+`datasets/ugv_clean_long/` holds 30 further 300 s drives (seeds 1030–1059,
+recorded at `UPDATE_RATE=1000`, so truth is about 15 Hz; sensor rates are
+unchanged). Their training variants add three longer noise faults per drive:
+
+```
+./bin/python fault_injection.py --input datasets/ugv_clean_long --output datasets/ugv_faulty_long \
+  --count noise=3 --noise-window 30 120 --seed 1
+./bin/python main.py --dataset ugv --extra-train-dir datasets/ugv_faulty_long ...
+```
+
+`--extra-train-dir` adds variants to the training split only; validation and
+test remain the five held-out drives each from `datasets/ugv_faulty`. With the
+long drives the training split grows from 33,920 to 224,540 windows and its
+noise-fault windows from 97 to 2,095. Each sensor CSV gains `fault` (0/1),
 `fault_type`, and `fault_column` per sample; `faults.json` stores the exact
 injection, its seed, and `source_run`. Split train/validation/test by
 `source_run` so variants of one drive never appear in two splits. Wheel

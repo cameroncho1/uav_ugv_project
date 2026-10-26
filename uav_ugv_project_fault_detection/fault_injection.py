@@ -86,15 +86,19 @@ def add_nominal_noise(frames, rng):
                 0.0, channel_scale(sensor, column, latitude), len(frame))
 
 
-def random_fault(kind, duration, rng, settle=3.0):
-    """Draw a random FaultSpec of ``kind`` for a run lasting ``duration`` seconds."""
+def random_fault(kind, duration, rng, settle=3.0, noise_window=NOISE_WINDOW):
+    """Draw a random FaultSpec of ``kind`` for a run lasting ``duration`` seconds.
+
+    ``noise_window`` is the (min, max) length in seconds of a ``noise`` fault.
+    """
     sensor = str(rng.choice(list(NOMINAL_SIGMA)))
     column = str(rng.choice(list(NOMINAL_SIGMA[sensor])))
     if kind == "constant":
         start = rng.uniform(settle, duration - MIN_CONSTANT_LENGTH)
         return FaultSpec(sensor, column, kind, start, duration,
                          rng.uniform(*OFFSET_SIGMA), int(rng.choice([-1, 1])))
-    length = rng.uniform(*(SHORT_WINDOW if kind == "short" else NOISE_WINDOW))
+    length = min(rng.uniform(*(SHORT_WINDOW if kind == "short" else noise_window)),
+                 duration - settle - 1.0)
     start = rng.uniform(settle, duration - length)
     if kind == "noise":
         return FaultSpec(sensor, column, kind, start, start + length,
@@ -152,7 +156,8 @@ def label_frames(frames, faults):
         frame.loc[mask, "fault_column"] = spec.column
 
 
-def make_variant(run_folder, output_folder, kind, seed, nominal_noise=True):
+def make_variant(run_folder, output_folder, kind, seed, nominal_noise=True,
+                 noise_window=NOISE_WINDOW):
     """Write one variant of a clean run with fault ``kind`` (or ``None``)."""
     run_folder, output_folder = Path(run_folder), Path(output_folder)
     rng = np.random.default_rng(seed)
@@ -162,7 +167,7 @@ def make_variant(run_folder, output_folder, kind, seed, nominal_noise=True):
     duration = max(f["stamp"].iloc[-1] for f in frames.values()) - first_stamp(frames)
     faults = []
     if kind is not None:
-        spec = random_fault(kind, duration, rng)
+        spec = random_fault(kind, duration, rng, noise_window=noise_window)
         faults.append((spec, apply_fault(frames, spec, rng)))
     label_frames(frames, faults)
     output_folder.mkdir(parents=True, exist_ok=True)
@@ -174,6 +179,7 @@ def make_variant(run_folder, output_folder, kind, seed, nominal_noise=True):
         "source_run": run_folder.name,
         "seed": seed,
         "nominal_noise": nominal_noise,
+        "noise_window_s": list(noise_window),
         "nominal_sigma": NOMINAL_SIGMA,
         "faults": [{**asdict(spec), "labelled_samples": int(mask.sum())}
                    for spec, mask in faults],
@@ -190,6 +196,11 @@ def main():
                         help="Faulty variants per fault type per clean run.")
     parser.add_argument("--normal-variants", type=int, default=1,
                         help="Fault-free variants (nominal noise only) per clean run.")
+    parser.add_argument("--count", action="append", default=[], metavar="TYPE=N",
+                        help="Variants of one fault type per clean run, overriding "
+                             "--per-type (repeatable), e.g. --count noise=3.")
+    parser.add_argument("--noise-window", type=float, nargs=2, default=list(NOISE_WINDOW),
+                        metavar=("MIN", "MAX"), help="Noise-fault length range in seconds.")
     parser.add_argument("--no-nominal-noise", action="store_true")
     parser.add_argument("--seed", type=int, default=0)
     args = parser.parse_args()
@@ -198,12 +209,19 @@ def main():
     if not runs:
         raise SystemExit(f"No completed runs under {args.input}")
     plan = [("normal", None, i) for i in range(args.normal_variants)]
-    plan += [(kind, kind, i) for kind in args.types for i in range(args.per_type)]
+    counts = dict.fromkeys(args.types, args.per_type)
+    for item in args.count:
+        kind, _, number = item.partition("=")
+        if kind not in FAULT_TYPES or not number.isdigit():
+            raise SystemExit(f"--count expects TYPE=N with TYPE in {FAULT_TYPES}, got {item!r}")
+        counts[kind] = int(number)
+    plan += [(kind, kind, i) for kind, count in counts.items() for i in range(count)]
     for run_index, run in enumerate(runs):
         for slot, (name, kind, index) in enumerate(plan):
             seed = args.seed * 1_000_003 + run_index * 1009 + slot
             make_variant(run, Path(args.output) / f"{run.name}_{name}_{index}", kind, seed,
-                         nominal_noise=not args.no_nominal_noise)
+                         nominal_noise=not args.no_nominal_noise,
+                         noise_window=tuple(args.noise_window))
     print(f"Wrote {len(runs) * len(plan)} variants from {len(runs)} runs to {args.output}")
 
 

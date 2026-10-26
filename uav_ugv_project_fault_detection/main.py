@@ -309,7 +309,7 @@ def build_ugv_train_val(args):
         args.splits = U.build_ugv_splits(
              args.ugv_dir, seq_len=args.seq_len, val_runs=args.val_runs,
              test_runs=args.test_runs, seed=args.seed, domain=args.domain,
-             paired=args.paired,
+             paired=args.paired, extra_train_dirs=args.extra_train_dir,
         )
         for split, (windows, labels, _) in args.splits.items():
             print(f"    {split}: {len(labels)} windows -> {int(labels.sum())} faulty")
@@ -542,6 +542,9 @@ def main():
                         help="ALFA flights (datasets/processed) or simulated UGV "
                              "fault variants (fault_injection.py output).")
     parser.add_argument("--ugv-dir", default=UGV_DIR)
+    parser.add_argument("--extra-train-dir", action="append", default=[],
+                        help="UGV: additional fault_injection.py output used for training "
+                             "only (repeatable); validation and test stay in --ugv-dir.")
     parser.add_argument("--val-runs", type=int, default=5,
                         help="UGV: source runs held out for validation.")
     parser.add_argument("--test-runs", type=int, default=5,

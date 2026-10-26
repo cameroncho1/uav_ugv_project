@@ -115,14 +115,30 @@ def standardize(windows, info, stats, seq_len, domain):
     return scaled.astype(np.float32)
 
 
-def build_ugv_splits(base_dir, seq_len=100, stride=None, val_runs=5, test_runs=5, seed=42,
-                     domain="time", paired=False):
-    """Return ``{"train"|"val"|"test": (windows, labels, info)}`` standardized windows."""
-    variants = sorted(p for p in Path(base_dir).iterdir() if (p / "faults.json").exists())
+def find_variants(folder):
+    variants = sorted(p for p in Path(folder).iterdir() if (p / "faults.json").exists())
     if not variants:
-        raise RuntimeError(f'No fault_injection.py variants under "{base_dir}"')
+        raise RuntimeError(f'No fault_injection.py variants under "{folder}"')
+    return variants
+
+
+def build_ugv_splits(base_dir, seq_len=100, stride=None, val_runs=5, test_runs=5, seed=42,
+                     domain="time", paired=False, extra_train_dirs=()):
+    """Return ``{"train"|"val"|"test": (windows, labels, info)}`` standardized windows.
+
+    Variants in ``extra_train_dirs`` join the training split only, so validation
+    and test stay the runs drawn from ``base_dir``.
+    """
+    splits = split_runs(find_variants(base_dir), val_runs, test_runs, seed)
+    held_out = {v.name.split("_")[1] for name in ("val", "test") for v in splits[name]}
+    for folder in extra_train_dirs:
+        extra = find_variants(folder)
+        overlap = held_out & {v.name.split("_")[1] for v in extra}
+        if overlap:
+            raise ValueError(f"{folder} reuses held-out source runs {sorted(overlap)}")
+        splits["train"] += extra
     raw = {name: channel_windows(group, seq_len, stride or seq_len, paired)
-           for name, group in split_runs(variants, val_runs, test_runs, seed).items()}
+           for name, group in splits.items()}
     stats = channel_stats(*raw["train"])
     return {name: (standardize(w, info, stats, seq_len, domain), y, info)
             for name, (w, y, info) in raw.items()}

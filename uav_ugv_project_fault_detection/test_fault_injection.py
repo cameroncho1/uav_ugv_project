@@ -67,6 +67,15 @@ def test_random_faults_fit_inside_run():
             assert all(spec.start <= s[0] <= spec.end for s in spec.spikes)
 
 
+def test_noise_window_is_configurable_and_clipped():
+    rng = np.random.default_rng(6)
+    for _ in range(200):
+        spec = random_fault("noise", 300.0, rng, noise_window=(30.0, 120.0))
+        assert 30.0 <= spec.end - spec.start <= 120.0 and spec.end <= 300.0
+        short_run = random_fault("noise", 20.0, rng, noise_window=(30.0, 120.0))
+        assert 3.0 <= short_run.start < short_run.end <= 20.0
+
+
 def test_labels_and_variant_files():
     frames = synthetic_frames()
     spec = FaultSpec("gps", "altitude", "constant", 30.0, 60.0, 3.0)
