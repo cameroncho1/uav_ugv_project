@@ -7,7 +7,8 @@ ugv` path of `main.py`. The ALFA flight-data path is described in
 [README.md](README.md).
 
 All numbers come from the committed runs in `models/*Weights_ugv_paired*/` and
-`models/train_logs/ugv_paired_*.log` (commit `0f81b62`, October 25, 2026). They
+`models/train_logs/ugv_paired_*.log` (October 25, 2026; the BiLSTMs and the
+frequency-domain models were retrained after commit `177bae8`). They
 describe one simulated dataset, one seeded split, and the injected fault
 ranges below; they are not measurements of real sensors.
 
@@ -167,7 +168,7 @@ remove a constant offset from every window after onset.
 | Domain | Feature per time step | Notes |
 | --- | --- | --- |
 | `time` (default) | standardized samples, shape `(100, F)` | |
-| `frequency` | FFT magnitude of each standardized feature over the window, divided by √100, shape `(100, F)` | Bin 0 is the window mean × 10, so offsets appear there. Bins 51–99 mirror bins 1–49 for real input. |
+| `frequency` | One-sided FFT magnitude of each standardized feature over the window (bins 0–50), divided by √100, shape `(51, F)` | Bin 0 is the window mean × 10, so offsets appear there. The other 49 bins of a 100-point FFT mirror bins 1–49 for real input and are dropped. |
 
 ### 3.5 Splits
 
@@ -194,16 +195,16 @@ hyperparameters in [`models/utils/ModelParameters.json`](models/utils/ModelParam
 
 | | |
 | --- | --- |
-| Input | Flattened window, `100 × F` values (200 for paired, 100 for single-channel) |
+| Input | Flattened window, `L × F` values, where L = 100 time steps or 51 frequency bins (paired: 200 time, 102 frequency) |
 | Architecture | `Linear(100F → 50)` → ReLU → `Linear(50 → 100F)`; linear output |
 | Output | Reconstruction of the input window |
-| Parameters | 20,250 (paired), 10,150 (single-channel) |
+| Parameters | 20,250 (paired time), 10,352 (paired frequency), 10,150 (single-channel time) |
 | Fault score | Mean squared reconstruction error of the window |
 | Decision | Faulty when the error exceeds the channel's threshold (Section 6.2) |
 
 The autoencoder trains on clean windows only, so it learns normal behaviour; a
 window it cannot reconstruct is anomalous. It treats the window as an unordered
-vector of 100F numbers and does not model time order. The decoder output is
+vector of L·F numbers and does not model time order. The decoder output is
 linear because standardized inputs are negative about half the time; an earlier
 sigmoid output could not reconstruct them.
 
@@ -211,7 +212,7 @@ sigmoid output could not reconstruct them.
 
 | | |
 | --- | --- |
-| Input | Window sequence, shape `(batch, 100, F)` |
+| Input | Window sequence, shape `(batch, L, F)` (L = 100 time steps or 51 frequency bins) |
 | Architecture | `nn.RNN(F, 50, num_layers=2, tanh)`, zero initial state → hidden state at the last time step → `Linear(50 → 2)` |
 | Output | Two logits (clean, faulty); prediction = argmax |
 | Parameters | 7,902 (paired), 7,852 (single-channel) |
@@ -220,14 +221,17 @@ sigmoid output could not reconstruct them.
 
 | | |
 | --- | --- |
-| Input | Window sequence, shape `(batch, 100, F)` |
-| Architecture | `nn.LSTM(F, 50, num_layers=2, bidirectional=True)`, zero initial states → concatenated forward/backward outputs at the last time step (100 values) → `Linear(100 → 2)` |
+| Input | Window sequence, shape `(batch, L, F)` (L = 100 time steps or 51 frequency bins) |
+| Architecture | `nn.LSTM(F, 50, num_layers=2, bidirectional=True)`, zero initial states → top-layer forward output at the last step concatenated with the backward output at the first step (100 values) → `Linear(100 → 2)` |
 | Output | Two logits (clean, faulty); prediction = argmax |
 | Parameters | 82,602 (paired), 82,202 (single-channel) |
 
-The classifier reads `out[:, -1, :]`. At the last time step the forward half
-has read the whole window, but the backward half has read only that final
-sample (see Section 9).
+Both halves of the readout have read the whole window: the forward LSTM ends
+at the last step and the backward LSTM ends at the first. Training writes
+`model_config.json` (`"readout": "full"`) beside the weights. Folders without
+it, such as `models/<name>Weights_ugv/`, were trained with the earlier `last`
+readout (both halves at the last step, where the backward half has read one
+sample), and `main.py` loads them with that readout.
 
 ### 4.4 Ensemble (`--mode run --model ensemble`)
 
@@ -299,18 +303,38 @@ Held-out test drives (5 drives, 8,480 windows, 91 faulty), paired features,
 
 | Model | Domain | Best epoch (val F1) | Test F1 | Precision | Recall | Clean FPR | Short | Noise | Constant |
 | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| BiLSTM | time | 1964 (0.752) | **0.714** | 0.779 | 0.659 | 0.20% | 0.20 | 0.28 | 0.96 |
-| BiLSTM | frequency | 1264 (0.718) | 0.558 | 0.535 | 0.582 | 0.55% | 0.30 | 0.24 | 0.83 |
-| RNN | frequency | 79 (0.552) | 0.373 | 0.275 | 0.582 | 1.67% | 0.40 | 0.24 | 0.81 |
+| BiLSTM | time | 2210 (0.799) | **0.716** | 0.817 | 0.637 | 0.15% | 0.10 | 0.24 | 0.96 |
+| BiLSTM | frequency | 2165 (0.713) | 0.592 | 0.602 | 0.582 | 0.42% | 0.30 | 0.17 | 0.87 |
+| RNN | frequency | 53 (0.636) | 0.423 | 0.812 | 0.286 | 0.07% | 0.10 | 0.10 | 0.42 |
 | RNN | time | 630 (0.534) | 0.356 | 0.263 | 0.549 | 1.67% | 0.00 | 0.17 | 0.87 |
 | Autoencoder | time | 2088 (loss) | 0.345 | 0.237 | 0.637 | 2.23% | 0.20 | 0.31 | 0.90 |
-| Autoencoder | frequency | 1638 (loss) | 0.292 | 0.222 | 0.429 | 1.63% | 0.50 | 0.31 | 0.48 |
-| Ensemble | time | — | 0.352 | 0.236 | 0.692 | 2.43% | 0.30 | 0.31 | 0.98 |
-| Ensemble | frequency | — | 0.355 | 0.246 | 0.637 | 2.12% | 0.50 | 0.31 | 0.85 |
+| Autoencoder | frequency | 1719 (loss) | 0.270 | 0.202 | 0.407 | 1.74% | 0.40 | 0.31 | 0.46 |
+| Ensemble | time | — | 0.356 | 0.240 | 0.692 | 2.38% | 0.30 | 0.31 | 0.98 |
+| Ensemble | frequency | — | 0.362 | 0.251 | 0.648 | 2.10% | 0.50 | 0.31 | 0.87 |
+
+The BiLSTMs use the full readout. The frequency-domain models use the 51
+one-sided bins. The time-domain RNN and autoencoder are unchanged by those
+fixes and were not retrained.
+
+Change from the previous version (last-step BiLSTM readout, 100 mirrored
+frequency bins; commit `0f81b62`), test F1:
+
+| Model | Previous | Current |
+| --- | ---: | ---: |
+| BiLSTM, time | 0.714 | 0.716 |
+| BiLSTM, frequency | 0.558 | 0.592 |
+| RNN, frequency | 0.373 | 0.423 |
+| Autoencoder, frequency | 0.292 | 0.270 |
+
+The time-domain BiLSTM's validation F1 rose from 0.752 to 0.799, but its test
+F1 is unchanged within one or two windows. On this test split, 0.01 of recall
+is one window.
 
 Observations on these runs:
 
-- The time-domain BiLSTM gives the best F1 and the lowest false-positive rate.
+- The time-domain BiLSTM gives the best F1 (0.716) with a 0.15% clean
+  false-positive rate. The frequency RNN flags fewer clean windows (0.07%) but
+  recalls only 29% of faulty ones.
 - Constant offsets are the most detectable fault type once the reference
   feature is present. Without it, the earlier single-channel autoencoder
   recalled 6% of constant-fault windows on its validation split; the paired one
@@ -363,16 +387,10 @@ Useful options: `--single-channel`, `--val-runs`, `--test-runs`,
   models do not locate the faulty samples within a window.
 - **No channel identity.** One model serves all 11 channels without being told
   which channel a window belongs to.
-- **BiLSTM readout.** The classifier uses the last time step only, where the
-  backward LSTM has seen one sample. Concatenating the forward state at the
-  last step with the backward state at the first step would use both full
-  passes.
-- **Redundant frequency bins.** The magnitude spectrum of a real window is
-  symmetric, so half of the frequency bins repeat the other half.
 - **Overfitting.** Training loss falls throughout, while validation loss rises
   after early epochs for the BiLSTM. F1-based checkpointing keeps the best
   validation epoch; dropout or early stopping would shorten training.
 - **RNN instability.** RNN validation F1 varies widely between epochs (for
-  example, the frequency RNN's best epoch is 79 of 2500).
+  example, the frequency RNN's best epoch is 53 of 2500).
 - **Reference quality.** The IMU `ax` reference correlates only 0.30 with
   measured `ax`, because commanded acceleration leads the vehicle's response.

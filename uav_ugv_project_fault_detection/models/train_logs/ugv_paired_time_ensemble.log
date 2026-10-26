@@ -16,16 +16,16 @@ Train: 33920 windows, Val: 8480 windows, feat_dim=2
       wheel_odom/vx          3.0923e-02
       wheel_odom/wz          4.7679e-01
 --- Ensemble (BiLSTM OR Autoencoder) val summary (8480 windows) ---
-   BiLSTM: Precision = 0.867   Recall = 0.665     F1 = 0.752   Accuracy = 0.991
-      recall short 0.10, noise 0.30, constant 0.76; clean FPR 0.0022
+   BiLSTM: Precision = 0.878   Recall = 0.733     F1 = 0.799   Accuracy = 0.992
+      recall short 0.00, noise 0.39, constant 0.84; clean FPR 0.0022
    Autoencoder: Precision = 0.164   Recall = 0.170     F1 = 0.167   Accuracy = 0.965
       recall short 0.10, noise 0.52, constant 0.12; clean FPR 0.0184
-   Ensemble: Precision = 0.423   Recall = 0.699     F1 = 0.527   Accuracy = 0.974
-      recall short 0.10, noise 0.52, constant 0.77; clean FPR 0.0202
+   Ensemble: Precision = 0.444   Recall = 0.767     F1 = 0.562   Accuracy = 0.975
+      recall short 0.10, noise 0.52, constant 0.85; clean FPR 0.0204
 --- Ensemble (BiLSTM OR Autoencoder) test summary (8480 windows) ---
-   BiLSTM: Precision = 0.779   Recall = 0.659     F1 = 0.714   Accuracy = 0.994
-      recall short 0.20, noise 0.28, constant 0.96; clean FPR 0.0020
+   BiLSTM: Precision = 0.817   Recall = 0.637     F1 = 0.716   Accuracy = 0.995
+      recall short 0.10, noise 0.24, constant 0.96; clean FPR 0.0015
    Autoencoder: Precision = 0.237   Recall = 0.637     F1 = 0.345   Accuracy = 0.974
       recall short 0.20, noise 0.31, constant 0.90; clean FPR 0.0223
-   Ensemble: Precision = 0.236   Recall = 0.692     F1 = 0.352   Accuracy = 0.973
-      recall short 0.30, noise 0.31, constant 0.98; clean FPR 0.0243
+   Ensemble: Precision = 0.240   Recall = 0.692     F1 = 0.356   Accuracy = 0.973
+      recall short 0.30, noise 0.31, constant 0.98; clean FPR 0.0238

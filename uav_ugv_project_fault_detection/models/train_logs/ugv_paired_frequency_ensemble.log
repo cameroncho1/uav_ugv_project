@@ -4,28 +4,28 @@ Loading UGV fault variants from "/Users/jeremyyin/Documents/GitHub/uav_ugv_proje
     test: 8480 windows -> 91 faulty
 Train: 33920 windows, Val: 8480 windows, feat_dim=2
    Clean-train reconstruction error p99 per channel (33547 windows):
-      gps/altitude           6.2376e-02
-      gps/latitude           6.2433e-03
-      gps/longitude          3.6866e-03
-      imu/ax                 5.3899e-02
-      imu/ay                 3.9986e-02
-      imu/az                 5.9118e-02
-      imu/wx                 6.2073e-02
-      imu/wy                 4.2752e-02
-      imu/wz                 8.5345e-03
-      wheel_odom/vx          7.9904e-03
-      wheel_odom/wz          6.9576e-02
+      gps/altitude           4.2597e-02
+      gps/latitude           3.7844e-03
+      gps/longitude          2.4662e-03
+      imu/ax                 2.8061e-02
+      imu/ay                 2.0539e-02
+      imu/az                 2.2563e-02
+      imu/wx                 4.0496e-02
+      imu/wy                 2.6597e-02
+      imu/wz                 8.1409e-03
+      wheel_odom/vx          7.5196e-03
+      wheel_odom/wz          6.8104e-02
 --- Ensemble (BiLSTM OR Autoencoder) val summary (8480 windows) ---
-   BiLSTM: Precision = 0.789   Recall = 0.659     F1 = 0.718   Accuracy = 0.989
-      recall short 0.10, noise 0.48, constant 0.73; clean FPR 0.0037
-   Autoencoder: Precision = 0.349   Recall = 0.250     F1 = 0.291   Accuracy = 0.975
-      recall short 0.10, noise 0.48, constant 0.22; clean FPR 0.0099
-   Ensemble: Precision = 0.520   Recall = 0.676     F1 = 0.588   Accuracy = 0.980
-      recall short 0.10, noise 0.57, constant 0.73; clean FPR 0.0132
+   BiLSTM: Precision = 0.792   Recall = 0.648     F1 = 0.712   Accuracy = 0.989
+      recall short 0.10, noise 0.43, constant 0.72; clean FPR 0.0036
+   Autoencoder: Precision = 0.345   Recall = 0.273     F1 = 0.305   Accuracy = 0.974
+      recall short 0.00, noise 0.43, constant 0.27; clean FPR 0.0110
+   Ensemble: Precision = 0.500   Recall = 0.665     F1 = 0.571   Accuracy = 0.979
+      recall short 0.10, noise 0.52, constant 0.73; clean FPR 0.0141
 --- Ensemble (BiLSTM OR Autoencoder) test summary (8480 windows) ---
-   BiLSTM: Precision = 0.535   Recall = 0.582     F1 = 0.558   Accuracy = 0.990
-      recall short 0.30, noise 0.24, constant 0.83; clean FPR 0.0055
-   Autoencoder: Precision = 0.222   Recall = 0.429     F1 = 0.292   Accuracy = 0.978
-      recall short 0.50, noise 0.31, constant 0.48; clean FPR 0.0163
-   Ensemble: Precision = 0.246   Recall = 0.637     F1 = 0.355   Accuracy = 0.975
-      recall short 0.50, noise 0.31, constant 0.85; clean FPR 0.0212
+   BiLSTM: Precision = 0.602   Recall = 0.582     F1 = 0.592   Accuracy = 0.991
+      recall short 0.30, noise 0.17, constant 0.87; clean FPR 0.0042
+   Autoencoder: Precision = 0.202   Recall = 0.407     F1 = 0.270   Accuracy = 0.976
+      recall short 0.40, noise 0.31, constant 0.46; clean FPR 0.0174
+   Ensemble: Precision = 0.251   Recall = 0.648     F1 = 0.362   Accuracy = 0.975
+      recall short 0.50, noise 0.31, constant 0.87; clean FPR 0.0210
