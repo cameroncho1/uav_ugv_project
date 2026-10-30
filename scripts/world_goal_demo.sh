@@ -3,7 +3,7 @@ set -e
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 PX4="$ROOT/external/PX4-Autopilot"
-WORLD="$ROOT/simulation/worlds/simple_goal_demo.sdf"
+WORLD="$ROOT/simulation/worlds/simple_goal_demo.sdf" #swap this for whichever variant to be tested (incl spare, dense, narrow, corridor)
 
 python3 "$ROOT/scripts/check_sim_dependencies.py"
 
