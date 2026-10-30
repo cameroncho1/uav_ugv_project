@@ -165,6 +165,42 @@
         <parent>chassis</parent><child>right_wheel</child>
         <axis><xyz expressed_in="__model__">0 1 0</xyz><limit><lower>-1e16</lower><upper>1e16</upper></limit></axis>
       </joint>
+      <!-- Front and rear ball casters keep the chassis level without adding drive.
+           Both spheres (r = 0.08 m) sit on the ground directly under the chassis floor. -->
+      <link name="front_caster">
+        <pose>0.30 0 0.08 0 0 0</pose>
+        <inertial>
+          <mass>0.2</mass>
+          <inertia><ixx>0.001</ixx><iyy>0.001</iyy><izz>0.001</izz></inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry><sphere><radius>0.08</radius></sphere></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><sphere><radius>0.08</radius></sphere></geometry>
+          <material><ambient>0.35 0.35 0.35 1</ambient><diffuse>0.35 0.35 0.35 1</diffuse></material>
+        </visual>
+      </link>
+      <link name="rear_caster">
+        <pose>-0.30 0 0.08 0 0 0</pose>
+        <inertial>
+          <mass>0.2</mass>
+          <inertia><ixx>0.001</ixx><iyy>0.001</iyy><izz>0.001</izz></inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry><sphere><radius>0.08</radius></sphere></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><sphere><radius>0.08</radius></sphere></geometry>
+          <material><ambient>0.35 0.35 0.35 1</ambient><diffuse>0.35 0.35 0.35 1</diffuse></material>
+        </visual>
+      </link>
+      <joint name="front_caster_joint" type="ball">
+        <parent>chassis</parent><child>front_caster</child>
+      </joint>
+      <joint name="rear_caster_joint" type="ball">
+        <parent>chassis</parent><child>rear_caster</child>
+      </joint>
       <plugin filename="libugv_command_watchdog.so" name="ugv_control::CommandWatchdog">
         <input_topic>/simple_ugv/drive_cmd_vel</input_topic>
         <output_topic>/simple_ugv/cmd_vel</output_topic>
