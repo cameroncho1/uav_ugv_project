@@ -5,6 +5,10 @@ Each variant is a copy of the base world with a set of static, dark obstacles
 inserted. The world name stays `simple_goal_demo`, so launch files, PX4 and the
 camera topics keep working; only the file name differs.
 
+The UGV is not copied: the base world includes model://simple_ugv, so the
+variants pick up vehicle changes automatically. Never hand-edit a variant;
+change the base world or this script and regenerate with --all.
+
 Obstacles are dark on purpose: the mapper marks a grid cell occupied only when
 projected camera pixels fall below `obstacle_luminance_threshold` (default 32).
 
