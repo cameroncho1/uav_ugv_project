@@ -75,7 +75,7 @@ def generate_launch_description():
         DeclareLaunchArgument("uav_altitude", default_value="4.5",
                               description="UAV target altitude in meters."),
         DeclareLaunchArgument(
-            "grid_resolution", default_value="0.25",
+            "grid_resolution", default_value="0.1",
             description="Camera occupancy-grid cell size in meters.",
         ),
         DeclareLaunchArgument(
@@ -85,6 +85,12 @@ def generate_launch_description():
         SetEnvironmentVariable("GZ_PARTITION",
                                EnvironmentVariable("GZ_PARTITION", default_value="uav_ugv_sim")),
         SetEnvironmentVariable("GZ_IP", "127.0.0.1"),
+        # Whole camera images over shared memory; UDP fragments overflow the default
+        # Linux receive buffer and drop most frames. An existing setting wins.
+        SetEnvironmentVariable(
+            "FASTRTPS_DEFAULT_PROFILES_FILE",
+            EnvironmentVariable("FASTRTPS_DEFAULT_PROFILES_FILE",
+                                default_value=str(project_root / "config/fastdds_local_shm.xml"))),
         SetEnvironmentVariable("PX4_PARAM_UXRCE_DDS_DOM_ID",
                                EnvironmentVariable("ROS_DOMAIN_ID", default_value="0")),
         SetParameter(name="use_sim_time", value=True),

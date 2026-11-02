@@ -69,6 +69,11 @@ inline bool clear_segment(
   return false;
 }
 
+// Block every cell from which a robot disk of `radius`, centered anywhere in that cell,
+// could touch a non-free cell or leave the grid. The test uses the exact gap between
+// two cell squares, so padding is round rather than a square that contains the disk.
+// Only non-free cells that border free space stamp the disk: the nearest non-free cell
+// to any free cell is always such a border cell.
 inline nav_msgs::msg::OccupancyGrid inflate_grid(
   const nav_msgs::msg::OccupancyGrid & grid, double radius)
 {
@@ -77,46 +82,64 @@ inline nav_msgs::msg::OccupancyGrid inflate_grid(
   }
   auto result = grid;
   const auto r = grid.info.resolution;
-  const auto edge = radius + r * std::sqrt(0.5);
-  // A square contains the circular footprint. Two distance-transform passes
-  // conservatively inflate in linear time, even for dense or fine grids.
-  const double cells = std::ceil(edge / r);
   const int width = static_cast<int>(grid.info.width), height = static_cast<int>(grid.info.height);
-  std::vector<int> distance(grid.data.size(), 1000001);
+  const int reach = static_cast<int>(std::floor(radius / r)) + 1;
+  std::vector<std::pair<int, int>> disk;
+  for (int dy = -reach; dy <= reach; ++dy) {
+    for (int dx = -reach; dx <= reach; ++dx) {
+      const auto gap_x = std::max(std::abs(dx) - 1, 0) * r;
+      const auto gap_y = std::max(std::abs(dy) - 1, 0) * r;
+      if (std::hypot(gap_x, gap_y) <= radius) {disk.emplace_back(dx, dy);}
+    }
+  }
   for (int y = 0; y < height; ++y) {
     for (int x = 0; x < width; ++x) {
       const auto i = static_cast<std::size_t>(y) * width + x;
-      if (!free_cell(grid, x, y)) {distance[i] = 0;}
-      for (const auto & offset : {std::pair<int, int>{-1, 0}, {-1, -1}, {0, -1}, {1, -1}}) {
-        const int nx = x + offset.first, ny = y + offset.second;
-        if (nx >= 0 && nx < width && ny >= 0) {
-          distance[i] = std::min(
-            distance[i],
-            distance[static_cast<std::size_t>(ny) * width + nx] + 1);
-        }
-      }
-    }
-  }
-  for (int y = height - 1; y >= 0; --y) {
-    for (int x = width - 1; x >= 0; --x) {
-      const auto i = static_cast<std::size_t>(y) * width + x;
-      for (const auto & offset : {std::pair<int, int>{1, 0}, {-1, 1}, {0, 1}, {1, 1}}) {
-        const int nx = x + offset.first, ny = y + offset.second;
-        if (nx >= 0 && nx < width && ny < height) {
-          distance[i] = std::min(
-            distance[i],
-            distance[static_cast<std::size_t>(ny) * width + nx] + 1);
-        }
-      }
-      if (distance[i] <= cells || std::min(
-          {x + 0.5, y + 0.5,
-            width - x - 0.5, height - y - 0.5}) * r <= edge)
-      {
+      // Cells whose square lies within the radius of the grid boundary.
+      if (std::min({x, y, width - 1 - x, height - 1 - y}) * r <= radius) {
         result.data[i] = 100;
+      }
+      if (free_cell(grid, x, y)) {continue;}
+      bool borders_free = false;
+      for (int dy = -1; dy <= 1 && !borders_free; ++dy) {
+        for (int dx = -1; dx <= 1 && !borders_free; ++dx) {
+          borders_free = free_cell(grid, x + dx, y + dy);
+        }
+      }
+      if (!borders_free) {continue;}
+      for (const auto & [dx, dy] : disk) {
+        const int nx = x + dx, ny = y + dy;
+        if (nx >= 0 && ny >= 0 && nx < width && ny < height) {
+          result.data[static_cast<std::size_t>(ny) * width + nx] = 100;
+        }
       }
     }
   }
   return result;
+}
+
+// Indices of a polyline that keep every shortcut clear: from each kept point, extend
+// to the last point reachable by one clear segment. The first and last points stay.
+inline std::vector<std::size_t> shortcut_indices(
+  const nav_msgs::msg::OccupancyGrid & grid,
+  const std::vector<std::pair<double, double>> & points)
+{
+  std::vector<std::size_t> kept;
+  if (points.empty()) {return kept;}
+  kept.push_back(0);
+  std::size_t anchor = 0;
+  while (anchor + 1 < points.size()) {
+    std::size_t next = anchor + 1;
+    while (next + 1 < points.size() && clear_segment(
+        grid, points[anchor].first, points[anchor].second,
+        points[next + 1].first, points[next + 1].second))
+    {
+      ++next;
+    }
+    kept.push_back(next);
+    anchor = next;
+  }
+  return kept;
 }
 }  // namespace uav_ugv_msgs
 #endif

@@ -80,3 +80,22 @@ TEST(PathFollower, DoesNotDriveAcrossABlockedBend)
   EXPECT_DOUBLE_EQ(command.linear.x, 0);
   EXPECT_GT(command.angular.z, 0);
 }
+
+TEST(PathFollower, DrivesThroughGentleBendsAndRotatesAtSharpOnes)
+{
+  geometry_msgs::msg::Pose pose;
+  pose.orientation.w = 1;
+  nav_msgs::msg::Path path;
+  geometry_msgs::msg::PoseStamped p;
+  p.pose.position.x = 10 * std::cos(0.3);
+  p.pose.position.y = 10 * std::sin(0.3);
+  path.poses.push_back(p);
+  auto cmd = ugv_control::follow_path(pose, path, {}, free_grid());
+  EXPECT_NEAR(cmd.linear.x, 0.5 * (1 - 0.3 / 0.6), 1e-9);
+  EXPECT_GT(cmd.angular.z, 0);
+  path.poses[0].pose.position.x = 10 * std::cos(0.8);
+  path.poses[0].pose.position.y = 10 * std::sin(0.8);
+  cmd = ugv_control::follow_path(pose, path, {}, free_grid());
+  EXPECT_DOUBLE_EQ(cmd.linear.x, 0);
+  EXPECT_GT(cmd.angular.z, 0);
+}

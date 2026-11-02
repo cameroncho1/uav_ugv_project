@@ -47,7 +47,7 @@ class TraversabilityMapper(Node):
     def __init__(self):
         super().__init__("traversability_mapper")
         cv2.setNumThreads(1)
-        self.resolution = self.declare_parameter("grid_resolution", .25).value
+        self.resolution = self.declare_parameter("grid_resolution", .1).value
         self.threshold = self.declare_parameter("obstacle_luminance_threshold", 32.).value
         self.max_age = self.declare_parameter("max_image_age", .5).value
         self.max_gap = self.declare_parameter("max_anchor_gap", .25).value

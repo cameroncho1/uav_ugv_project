@@ -36,7 +36,7 @@ ROS nodes use `/clock`, and `px4_goal_demo.sh` sets `UXRCE_DDS_SYNCT=0` so PX4 s
 Change the local goal, camera altitude, grid resolution, or image threshold with launch arguments:
 
 ```bash
-ros2 launch mission_manager simple_goal_demo.launch.py goal_x:=4.0 goal_y:=0.0 uav_altitude:=4.5 grid_resolution:=0.25 obstacle_luminance_threshold:=32.0
+ros2 launch mission_manager simple_goal_demo.launch.py goal_x:=4.0 goal_y:=0.0 uav_altitude:=4.5 grid_resolution:=0.1 obstacle_luminance_threshold:=32.0
 ```
 
 If the matching `simple_goal_demo` world, camera UAV, PX4, and DDS agent are already running, use `start_simulation:=false`. The basic `start_sim.sh` world and X500 are not that camera setup. To omit RViz, use `start_rviz:=false`. The camera still requires `DISPLAY`.

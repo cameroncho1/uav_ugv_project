@@ -253,6 +253,17 @@ private:
           break;
         }
       }
+      // Replace the eight-neighbor staircase with clear straight shortcuts so the
+      // follower is not forced to stop and turn at every 45-degree cell step.
+      std::vector<std::pair<double, double>> points;
+      for (const auto & pose : path.poses) {
+        points.emplace_back(pose.pose.position.x, pose.pose.position.y);
+      }
+      std::vector<geometry_msgs::msg::PoseStamped> shortened;
+      for (const auto index : uav_ugv_msgs::shortcut_indices(safety_grid_, points)) {
+        shortened.push_back(path.poses[index]);
+      }
+      path.poses = shortened;
     }
     if (cells.empty()) {
       const double min_x = grid_.info.origin.position.x;

@@ -67,8 +67,9 @@ LAYOUTS = {
         ],
     },
     "narrow": {
-        "desc": "Same wall with a 1.2 m opening, narrower than the planner clearance. "
-                "Stress test: expect a detour or no motion, never a collision.",
+        "desc": "Same wall with a 1.2 m opening, only 0.1 m wider than the planner's 1.1 m "
+                "clearance diameter. Stress test: with 0.1 m cells the route threads the gap "
+                "slowly; with 0.25 m cells it is blocked. Never a collision.",
         "stress": True,
         "shapes": [
             ("box", 0.0, -1.8, 0.4, 2.4),
