@@ -5,6 +5,7 @@
 ## Stable contract and ownership
 
 - Localization owns measured-input validation/fusion and one authoritative UGV pose. Relative sensing is independent of sensing technology.
+- The UAV follower reads the fused UGV pose only to choose where the UAV flies. The PX4 anchor and the relative-observation producer never subscribe to it, so measurement values stay independent of the estimate.
 - Shared global positions use ENU `map`; ROS body axes use FLU. PX4 NED/FRD conversion, covariance, and local-origin alignment are explicit in the UAV interface owner.
 - Acquisition stamps are preserved. Simulation assembly uses `/clock`; actual PX4 anchors use `UXRCE_DDS_SYNCT=0` and the matching ROS DDS domain.
 - Simulator truth is used only for synthesis and scoring. Estimation and navigation consume the stated measurement interfaces. The fused UGV pose is never fed into its UAV correction producer.
@@ -12,7 +13,7 @@
 | Owner | Responsibility |
 | --- | --- |
 | `cooperative_localization` | Geodetic adaptation, validity/time/uncertainty handling, cooperative correction matching, EKF, authoritative pose. |
-| `uav_control` | PX4 interface, reference initialization/resets, independent map-anchor publication. |
+| `uav_control` | PX4 interface, reference initialization/resets, independent map-anchor publication, UGV-following setpoints. |
 | `uav_sensing` | Camera calibration/detection and body-relative position producer. |
 | `traversability_mapping` | Acquisition-matched camera-to-grid projection. |
 | `simulation_support` | World/model integration, raw sensor bridge, shared `/clock` bridge, truth readers. |

@@ -26,9 +26,11 @@ public:
     max_grid_age_ = declare_parameter("max_grid_age", 2.0);
     robot_radius_ = declare_parameter("robot_radius", 0.5);
     clearance_ = declare_parameter("obstacle_clearance", 0.05);
+    unknown_cost_ = declare_parameter("unknown_cell_cost", 2.0);
     if (!std::isfinite(max_grid_age_) || max_grid_age_ <= 0 ||
       !std::isfinite(robot_radius_) || robot_radius_ <= 0 || robot_radius_ > 5 ||
-      !std::isfinite(clearance_) || clearance_ < 0 || clearance_ > 5)
+      !std::isfinite(clearance_) || clearance_ < 0 || clearance_ > 5 ||
+      !std::isfinite(unknown_cost_) || unknown_cost_ < 1 || unknown_cost_ > 100)
     {
       throw std::invalid_argument("Invalid planner limits");
     }
@@ -103,10 +105,11 @@ private:
            static_cast<std::size_t>(cell.x);
   }
 
+  // Planning may cross unseen ground; motion is limited to seen ground (safety_grid_).
   bool traversable(const Cell & cell) const
   {
-    return cell_in_bounds(cell) && safety_grid_.data[index_of(cell)] >= 0 &&
-           safety_grid_.data[index_of(cell)] < 50;
+    return cell_in_bounds(cell) && planning_grid_.data[index_of(cell)] >= 0 &&
+           planning_grid_.data[index_of(cell)] < 50;
   }
 
   Cell world_to_cell(double x, double y) const
@@ -195,7 +198,10 @@ private:
         if (closed[next_index]) {
           continue;
         }
-        const double next_cost = costs[current_index] + (diagonal ? std::sqrt(2.0) : 1.0);
+        // Prefer routes over seen ground; unseen cells cost more but stay admissible.
+        const double step = (diagonal ? std::sqrt(2.0) : 1.0) *
+          (grid_.data[next_index] < 0 ? unknown_cost_ : 1.0);
+        const double next_cost = costs[current_index] + step;
         if (next_cost < costs[next_index]) {
           costs[next_index] = next_cost;
           parents[next_index] = current_index;
@@ -211,13 +217,21 @@ private:
     nav_msgs::msg::Path path;
     path.header.frame_id = "map";
     path.header.stamp = now();
+    partial_ = false;
     if (!pose_guard_.check(now().nanoseconds(), uav_ugv_msgs::steady_time_ns()) ||
       !have_goal_ || !valid_grid())
     {
       publish_route(path);
       return;
     }
+    // Unseen cells block motion but not planning: the route may aim through ground the
+    // camera has not observed, and only its observed, clear prefix is published.
     safety_grid_ = uav_ugv_msgs::inflate_grid(grid_, robot_radius_ + clearance_);
+    auto optimistic = grid_;
+    for (auto & value : optimistic.data) {
+      if (value < 0) {value = 0;}
+    }
+    planning_grid_ = uav_ugv_msgs::inflate_grid(optimistic, robot_radius_ + clearance_);
     const auto & ugv_pose_ = pose_guard_.pose();
     // Bound coordinates before converting floating-point cells to integers.
     for (const auto & p : {ugv_pose_.position, goal_.pose.position}) {
@@ -248,17 +262,22 @@ private:
       for (std::size_t i = 1; i < path.poses.size(); ++i) {
         const auto & a = path.poses[i - 1].pose.position;
         const auto & b = path.poses[i].pose.position;
-        if (!uav_ugv_msgs::clear_segment(safety_grid_, a.x, a.y, b.x, b.y)) {
+        if (!uav_ugv_msgs::clear_segment(planning_grid_, a.x, a.y, b.x, b.y)) {
           path.poses.clear();
           break;
         }
       }
-      // Replace the eight-neighbor staircase with clear straight shortcuts so the
-      // follower is not forced to stop and turn at every 45-degree cell step.
+      // Keep the prefix that stays on observed, clear ground.
       std::vector<std::pair<double, double>> points;
       for (const auto & pose : path.poses) {
         points.emplace_back(pose.pose.position.x, pose.pose.position.y);
       }
+      const auto keep = uav_ugv_msgs::clear_prefix_length(safety_grid_, points);
+      partial_ = keep < path.poses.size();
+      path.poses.resize(keep < 2 ? 0 : keep);
+      points.resize(path.poses.size());
+      // Replace the eight-neighbor staircase with clear straight shortcuts so the
+      // follower is not forced to stop and turn at every 45-degree cell step.
       std::vector<geometry_msgs::msg::PoseStamped> shortened;
       for (const auto index : uav_ugv_msgs::shortcut_indices(safety_grid_, points)) {
         shortened.push_back(path.poses[index]);
@@ -292,17 +311,19 @@ private:
     route.goal = goal_;
     route.path = path;
     route.clearance_grid = safety_grid_;
+    route.partial = partial_ && !path.poses.empty();
     path_pub_->publish(path);
     route_pub_->publish(route);
   }
 
-  double robot_radius_{0.5}, clearance_{0.05};
+  double robot_radius_{0.5}, clearance_{0.05}, unknown_cost_{2.0};
+  bool partial_{false};
   bool have_grid_{false};
   bool have_goal_{false};
   uav_ugv_msgs::PoseGuard pose_guard_;
   double max_grid_age_{2.0};
   int64_t grid_receipt_{0};
-  nav_msgs::msg::OccupancyGrid grid_, safety_grid_;
+  nav_msgs::msg::OccupancyGrid grid_, safety_grid_, planning_grid_;
   geometry_msgs::msg::PoseStamped goal_;
   rclcpp::Subscription<nav_msgs::msg::OccupancyGrid>::SharedPtr grid_sub_;
   rclcpp::Subscription<geometry_msgs::msg::PoseStamped>::SharedPtr goal_sub_;

@@ -20,6 +20,8 @@ def generate_launch_description():
     localization_share = Path(get_package_share_directory("cooperative_localization"))
     start_simulation = LaunchConfiguration("start_simulation")
     start_rviz = LaunchConfiguration("start_rviz")
+    # Map position of PX4's local origin; shared by the anchor adapter and UAV follower.
+    map_origin = [0.0, 0.0, 0.3]
 
     world = ExecuteProcess(
         cmd=["bash", str(project_root / "scripts/world_goal_demo.sh")],
@@ -68,6 +70,9 @@ def generate_launch_description():
         DeclareLaunchArgument("systematic_position_stddev",
                               default_value=LaunchConfiguration("shared_position_stddev"),
                               description="Unreduced global position uncertainty prior (m)."),
+        DeclareLaunchArgument("uav_follow", default_value="true",
+                              description="Fly the camera UAV over the UGV's fused pose; "
+                                          "false keeps it hovering at its takeoff point."),
         DeclareLaunchArgument("goal_x", default_value="4.0",
                               description="Goal east coordinate in meters."),
         DeclareLaunchArgument("goal_y", default_value="0.0",
@@ -115,7 +120,7 @@ def generate_launch_description():
                               "uav_heading": LaunchConfiguration("uav_heading")}.items()),
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(str(uav_share / "launch/uav_pose.launch.py")),
-            launch_arguments={"use_sim_time": "true", "map_origin": "[0.0, 0.0, 0.3]",
+            launch_arguments={"use_sim_time": "true", "map_origin": str(map_origin),
                               "odometry_topic": PythonExpression([
                                   "'/simulation/biased_uav_odometry' if float('",
                                   LaunchConfiguration("shared_position_stddev"),
@@ -150,6 +155,8 @@ def generate_launch_description():
             parameters=[{
                 "uav_altitude": ParameterValue(
                     LaunchConfiguration("uav_altitude"), value_type=float),
+                "follow_ugv": ParameterValue(LaunchConfiguration("uav_follow"), value_type=bool),
+                "map_origin": map_origin,
             }],
             output="screen",
         ),

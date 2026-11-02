@@ -92,3 +92,42 @@ TEST(RouteSafety, ShortcutsKeepEndpointsAndOnlyClearSegments)
   const std::vector<std::pair<double, double>> line{{-3, 2}, {-2, 2}, {-1, 2}, {0, 2}};
   EXPECT_EQ(uav_ugv_msgs::shortcut_indices(g, line), (std::vector<std::size_t>{0, 3}));
 }
+
+TEST(RouteSafety, PrefixStopsWhereObservedGroundEnds)
+{
+  auto g = grid();
+  for (std::size_t i = 0; i < g.data.size(); ++i) {
+    if (i % 80 >= 20) {
+      g.data[i] = -1;  // Never observed for map x >= 0.
+    }
+  }
+  const std::vector<std::pair<double, double>> points{
+    {-2, 0}, {-1, 0}, {-0.1, 0}, {0.5, 0}, {2, 0}};
+  EXPECT_EQ(uav_ugv_msgs::clear_prefix_length(g, points), 3u);
+  EXPECT_EQ(uav_ugv_msgs::clear_prefix_length(g, {}), 0u);
+}
+
+TEST(RouteSafety, PartialRouteNeedsMatchingGoalAndTwoPoints)
+{
+  geometry_msgs::msg::PoseStamped goal;
+  goal.header.frame_id = "map";
+  goal.header.stamp.sec = 11;
+  goal.pose.position.x = 8;
+  uav_ugv_msgs::msg::PlannedRoute route;
+  route.header.frame_id = "map";
+  route.header.stamp.sec = 12;
+  route.goal = goal;
+  geometry_msgs::msg::PoseStamped point;
+  point.header.frame_id = "map";
+  route.path.poses.push_back(point);
+  point.pose.position.x = 2;
+  route.path.poses.push_back(point);
+  EXPECT_FALSE(uav_ugv_msgs::route_matches_goal(route, goal));  // Short of the goal.
+  route.partial = true;
+  EXPECT_TRUE(uav_ugv_msgs::route_matches_goal(route, goal));
+  route.goal.header.stamp.sec = 10;
+  EXPECT_FALSE(uav_ugv_msgs::route_matches_goal(route, goal));  // Older goal revision.
+  route.goal = goal;
+  route.path.poses.pop_back();
+  EXPECT_FALSE(uav_ugv_msgs::route_matches_goal(route, goal));
+}

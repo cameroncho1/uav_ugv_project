@@ -118,6 +118,21 @@ inline nav_msgs::msg::OccupancyGrid inflate_grid(
   return result;
 }
 
+// Number of leading polyline points joined by clear segments (0 for an empty line).
+inline std::size_t clear_prefix_length(
+  const nav_msgs::msg::OccupancyGrid & grid,
+  const std::vector<std::pair<double, double>> & points)
+{
+  std::size_t keep = points.empty() ? 0 : 1;
+  while (keep < points.size() && clear_segment(
+      grid, points[keep - 1].first, points[keep - 1].second,
+      points[keep].first, points[keep].second))
+  {
+    ++keep;
+  }
+  return keep;
+}
+
 // Indices of a polyline that keep every shortcut clear: from each kept point, extend
 // to the last point reachable by one clear segment. The first and last points stay.
 inline std::vector<std::size_t> shortcut_indices(

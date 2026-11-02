@@ -14,6 +14,16 @@ The eight-neighbor A* avoids diagonal corner cutting. Start/goal connections are
 
 Mapping remains a camera-luminance heuristic. It now uses ROS camera images/CameraInfo, a timestamp-matched independent map anchor, and calibrated optical/body extrinsics. Grid stamps retain image acquisition time. Missing anchor coverage produces no fresh map. A bounded-uncertainty, matched UGV pose masks its own visible body using a known 0.5 m radius / 0.5 m height cylinder projected through camera rays, with cell-coverage allowance. This removes the elevated roof's false ground obstacle; it does not feed the relative-observation producer. Flat-ground projection, known self-geometry masking and luminance classification do not establish semantic obstacle accuracy or detection behind the robot. The demo's visual-only goal ring stays above the dark-obstacle threshold.
 
+## Map memory and unseen ground
+
+The mapper fuses every camera grid into one fixed map (`map_bounds`, default x -12 to 12 m and y -10 to 10 m) by clamped log-odds: each dark view adds 0.6, each clear view subtracts 0.6, within -1.5 to 2.5. One clear view erases a single false dark view; a long-seen obstacle needs about five. Never-observed cells stay unknown (-1). `map_memory:=false` restores per-frame grids.
+
+The planner inflates two grids. The planning grid treats unknown cells as free and costs them twice as much, so A* can aim at a goal the camera has not seen while preferring observed ground. The clearance grid keeps unknown cells blocked. The published route is the route's prefix that stays clear in the clearance grid; if it stops before the goal, `PlannedRoute.partial` is true. The controller accepts a partial route for the current goal revision and drives only on observed, clear ground.
+
+## UAV following
+
+With `uav_follow:=true` (default) the offboard controller keeps its takeoff hold until PX4 reports Offboard, armed and at least 80% of the altitude setpoint. It then moves its horizontal setpoint toward the UGV fused pose, converted to PX4 NED with the same `map_origin` as the anchor adapter, at up to 1 m/s with a 0.15 m deadband. It holds whenever the fused pose is older than 0.5 s or its position standard deviation exceeds 0.5 m, so it never chases an unusable estimate. With GPS off at startup it holds until the camera's first UGV correction.
+
 ## Camera transport
 
 The goal-demo launch sets `FASTRTPS_DEFAULT_PROFILES_FILE` to [config/fastdds_local_shm.xml](../config/fastdds_local_shm.xml) unless it is already set. Whole 3.7 MB camera images then pass through shared memory. With default UDP fragments and the default Linux receive buffer, an ARM64 UTM VM received about 0.3 of the 5 rendered images per second, and the map was usually older than the planner's 2 s limit. Processes started outside the launch need the same variable to receive images reliably.
