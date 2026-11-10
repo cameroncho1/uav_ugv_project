@@ -1,0 +1,8 @@
+ ? external/PX4-Autopilot
+ M ros2_ws/src/fault_management/CMakeLists.txt
+ M scripts/world.sh
+?? ros2_ws/src/fault_management/launch/ugv_dataset.launch.py
+?? ros2_ws/src/fault_management/scripts/ugv_dataset_recorder.py
+?? ros2_ws/src/fault_management/test/test_ugv_dataset_recorder.py
+?? scripts/collect_ugv_dataset.sh
+?? simulation/worlds/ugv_dataset.sdf

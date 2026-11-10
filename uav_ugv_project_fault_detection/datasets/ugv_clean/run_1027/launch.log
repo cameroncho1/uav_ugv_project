@@ -1,0 +1,24 @@
+[INFO] [launch]: All log files can be found below /home/jeremyyin/.ros/log/2026-10-25-02-19-26-184804-uavugv-49270
+[INFO] [launch]: Default logging verbosity is set to INFO
+[INFO] [parameter_bridge-1]: process started with pid [49271]
+[INFO] [ugv_truth-2]: process started with pid [49273]
+[INFO] [parameter_bridge-3]: process started with pid [49275]
+[INFO] [ugv_dataset_recorder.py-4]: process started with pid [49277]
+[parameter_bridge-3] [INFO] [1792894767.237015880] [ugv_dataset_command_bridge]: Creating ROS->GZ Bridge: [/evaluation/ugv_cmd_vel (geometry_msgs/msg/Twist) -> /simple_ugv/drive_cmd_vel (gz.msgs.Twist)] (Lazy 0)
+[parameter_bridge-1] [INFO] [1792894767.237089307] [ugv_sensor_bridge]: Creating GZ->ROS Bridge: [/clock (gz.msgs.Clock) -> /clock (rosgraph_msgs/msg/Clock)] (Lazy 0)
+[parameter_bridge-1] [INFO] [1792894767.270570838] [ugv_sensor_bridge]: Creating GZ->ROS Bridge: [/simple_ugv/odom (gz.msgs.Odometry) -> /simulation/ugv/wheel_odom (nav_msgs/msg/Odometry)] (Lazy 0)
+[parameter_bridge-1] [INFO] [1792894767.275728875] [ugv_sensor_bridge]: Creating GZ->ROS Bridge: [/simple_ugv/imu (gz.msgs.IMU) -> /simulation/ugv/imu (sensor_msgs/msg/Imu)] (Lazy 0)
+[parameter_bridge-1] [INFO] [1792894767.279053996] [ugv_sensor_bridge]: Creating GZ->ROS Bridge: [/simple_ugv/gps (gz.msgs.NavSat) -> /simulation/ugv/gps (sensor_msgs/msg/NavSatFix)] (Lazy 0)
+[ugv_dataset_recorder.py-4] [INFO] [1792894767.334622835] [ugv_dataset_recorder]: Recording 120 s from sim time 2.15
+[parameter_bridge-3] [INFO] [1792894767.335539001] [ugv_dataset_command_bridge]: Passing message from ROS geometry_msgs/msg/Twist to Gazebo gz.msgs.Twist (showing msg only once per type)
+[ugv_dataset_recorder.py-4] [INFO] [1792894887.324023429] [ugv_dataset_recorder]: Wrote datasets/ugv_clean/run_1027: {'imu': 6000, 'wheel_odom': 2308, 'gps': 600, 'truth': 6062, 'cmd': 2400}
+[INFO] [ugv_dataset_recorder.py-4]: process has finished cleanly [pid 49277]
+[INFO] [parameter_bridge-3]: sending signal 'SIGINT' to process[parameter_bridge-3]
+[INFO] [ugv_truth-2]: sending signal 'SIGINT' to process[ugv_truth-2]
+[INFO] [parameter_bridge-1]: sending signal 'SIGINT' to process[parameter_bridge-1]
+[parameter_bridge-3] [INFO] [1792894887.452565085] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[ugv_truth-2] [INFO] [1792894887.453224432] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[parameter_bridge-1] [INFO] [1792894887.453403580] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[INFO] [ugv_truth-2]: process has finished cleanly [pid 49273]
+[INFO] [parameter_bridge-1]: process has finished cleanly [pid 49271]
+[INFO] [parameter_bridge-3]: process has finished cleanly [pid 49275]

@@ -1,7 +1,7 @@
 ros2_ws/build/
 ros2_ws/install/
 ros2_ws/log/
-datasets/
+# datasets/
 
 *.pyc
 __pycache__/
@@ -16,7 +16,7 @@ uav_ugv_project_fault_detection/include/
 uav_ugv_project_fault_detection/pyvenv.cfg
 
 # Training data (raw flight recordings; not source)
-uav_ugv_project_fault_detection/datasets/
+# uav_ugv_project_fault_detection/datasets/
 
 # TensorBoard event files (view live with: tensorboard --logdir runs)
 uav_ugv_project_fault_detection/runs/
