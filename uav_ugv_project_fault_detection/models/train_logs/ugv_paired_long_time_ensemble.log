@@ -1,0 +1,31 @@
+Loading UGV fault variants from "/Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/datasets/ugv_faulty" (domain=time, seq_len=100, paired=True) ...
+    train: 224540 windows -> 3793 faulty
+    val: 8480 windows -> 176 faulty
+    test: 8480 windows -> 91 faulty
+Train: 224540 windows, Val: 8480 windows, feat_dim=2
+   Clean-train reconstruction error p99 per channel (220747 windows):
+      gps/altitude           3.9236e-01
+      gps/latitude           1.0575e-01
+      gps/longitude          5.6243e-02
+      imu/ax                 1.0391e+00
+      imu/ay                 9.0611e-01
+      imu/az                 1.6259e+00
+      imu/wx                 4.7018e-01
+      imu/wy                 1.2865e+00
+      imu/wz                 4.5363e-02
+      wheel_odom/vx          3.5228e-02
+      wheel_odom/wz          5.2305e-01
+--- Ensemble (BiLSTM OR Autoencoder) val summary (8480 windows) ---
+   BiLSTM: Precision = 0.809   Recall = 0.818     F1 = 0.814   Accuracy = 0.992
+      recall short 0.30, noise 0.65, constant 0.88; clean FPR 0.0041
+   Autoencoder: Precision = 0.329   Recall = 0.131     F1 = 0.187   Accuracy = 0.976
+      recall short 0.10, noise 0.52, constant 0.07; clean FPR 0.0057
+   Ensemble: Precision = 0.643   Recall = 0.830     F1 = 0.725   Accuracy = 0.987
+      recall short 0.30, noise 0.70, constant 0.89; clean FPR 0.0098
+--- Ensemble (BiLSTM OR Autoencoder) test summary (8480 windows) ---
+   BiLSTM: Precision = 0.525   Recall = 0.681     F1 = 0.593   Accuracy = 0.990
+      recall short 0.60, noise 0.38, constant 0.87; clean FPR 0.0067
+   Autoencoder: Precision = 0.400   Recall = 0.264     F1 = 0.318   Accuracy = 0.988
+      recall short 0.10, noise 0.28, constant 0.29; clean FPR 0.0043
+   Ensemble: Precision = 0.405   Recall = 0.681     F1 = 0.508   Accuracy = 0.986
+      recall short 0.60, noise 0.38, constant 0.87; clean FPR 0.0108

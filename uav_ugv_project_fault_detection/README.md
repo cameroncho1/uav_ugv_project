@@ -104,3 +104,107 @@ Weights are written under `models/<name>Weights/` (and
 `models/<name>Weights_freq/` for the frequency domain), each containing
 `best_model.pt`, `final_model.pt`, `model_epoch_NNNN.pt` checkpoints, and a
 `loss_history.json`.
+
+# Simulated UGV sensor faults
+
+See [MODELS.md](MODELS.md) for each UGV model's inputs, outputs,
+architecture, training data, evaluation metrics, and results.
+
+`datasets/ugv_clean/` holds clean simulated UGV runs from
+[`scripts/collect_ugv_dataset.sh`](../scripts/collect_ugv_dataset.sh) (see
+[sensor dataset collection](../docs/sensor_dataset.md#batch-clean-ugv-runs)).
+`fault_injection.py` turns each clean run into labelled variants:
+
+```
+./bin/python fault_injection.py --input datasets/ugv_clean --output datasets/ugv_faulty
+./bin/python test_fault_injection.py
+```
+
+Every variant first receives nominal Gaussian noise (the
+`sim_ugv_sensors.py` defaults: IMU 0.01 rad/s and 0.1 m/s², wheel speed
+0.05 m/s and 0.02 rad/s, GPS 1.5 m horizontal and 3 m vertical). One fault is
+then injected into one randomly chosen channel (IMU `wx..az`, wheel `vx`/`wz`,
+GPS latitude/longitude/altitude). Magnitudes are multiples of that channel's
+nominal sigma:
+
+| Fault | Effect | Default parameters |
+| --- | --- | --- |
+| `short` | 3–8 spikes of 1–3 samples inside a 5–20 s window; only spike samples are labelled | 6–15 sigma, random sign |
+| `noise` | Extra Gaussian noise over a 5–30 s window | 3–8 sigma std |
+| `constant` | Fixed offset from onset to the end of the run | 3–10 sigma, random sign |
+
+Defaults write one fault-free (`normal`) and one variant per fault type for
+each run (`run_<seed>_<type>_<index>/`); change counts with `--per-type`,
+`--normal-variants`, and `--types`. `--count TYPE=N` overrides the count for one
+type, and `--noise-window MIN MAX` sets the noise-fault length in seconds.
+
+`datasets/ugv_clean_long/` holds 30 further 300 s drives (seeds 1030–1059,
+recorded at `UPDATE_RATE=1000`, so truth is about 15 Hz; sensor rates are
+unchanged). Their training variants add three longer noise faults per drive:
+
+```
+./bin/python fault_injection.py --input datasets/ugv_clean_long --output datasets/ugv_faulty_long \
+  --count noise=3 --noise-window 30 120 --seed 1
+./bin/python main.py --dataset ugv --extra-train-dir datasets/ugv_faulty_long ...
+```
+
+`--extra-train-dir` adds variants to the training split only; validation and
+test remain the five held-out drives each from `datasets/ugv_faulty`. With the
+long drives the training split grows from 33,920 to 224,540 windows and its
+noise-fault windows from 97 to 2,095. Each sensor CSV gains `fault` (0/1),
+`fault_type`, and `fault_column` per sample; `faults.json` stores the exact
+injection, its seed, and `source_run`. Split train/validation/test by
+`source_run` so variants of one drive never appear in two splits. Wheel
+odometry pose columns are left as recorded and drift with simulated wheel
+slip; faults are injected into the per-sample channels only.
+
+## Training on the UGV variants
+
+```
+./bin/python main.py --dataset ugv --model bilstm --epochs 2500 --batch-size 256 --device mps --save-every 250
+./bin/python main.py --dataset ugv --mode run --model bilstm     # val + test summaries
+./bin/python main.py --dataset ugv --mode run --model ensemble   # BiLSTM OR autoencoder
+```
+
+`ugv_dataset.py` cuts every faultable channel into 100-sample windows (2 s IMU,
+5 s wheel, 20 s GPS); a window is faulty when any sample in it carries that
+channel's fault label. Source runs are split 20 train / 5 validation / 5 test
+(`--val-runs`, `--test-runs`); checkpoints and thresholds use train and
+validation only, and summaries report the held-out test runs.
+
+Each window has two features: the channel and a reference for the same
+quantity from another sensor or the drive command (IMU yaw rate vs wheel yaw
+rate, wheel speed vs commanded speed, IMU ax/ay vs commanded acceleration,
+GPS vs wheel-odometry position; zeros for wx, wy, az, and altitude). On clean
+training windows the yaw-rate, speed, and GPS references correlate 0.89–0.99
+with their channels. `--single-channel` drops the reference. Windows are
+standardized with per-channel statistics from clean training windows, because
+a per-window z-score would erase constant offsets; the frequency domain uses
+orthonormal FFT magnitudes.
+
+- RNN / BiLSTM save `best_model.pt` at the highest validation F1 (faults are
+  about 1% of windows, so validation loss tracks confidence, not detection).
+- The autoencoder trains on fault-free windows and flags a window when its
+  reconstruction error exceeds the `--ae-percentile` (default 99) of clean
+  training errors for that channel; thresholds go to `threshold.json`.
+- `--model ensemble` (with `--mode run`) flags a window when the BiLSTM or the
+  autoencoder flags it.
+
+Weights go to `models/<name>Weights_ugv_paired[_freq]/`
+(`<name>Weights_ugv` holds the earlier single-channel run on a 24/6 split).
+`--device mps` uses the Apple GPU for the BiLSTM and autoencoder; `nn.RNN`
+trains faster on `--device cpu`.
+
+## Live training curves (TensorBoard)
+
+Every training run writes TensorBoard logs to `runs/<dataset>_<model>_<domain>_<time>/`:
+per-epoch `loss/train`, `loss/val`, `f1/val` (classifiers), `learning_rate`, `epoch_seconds`, the run
+arguments, and the final validation precision / recall / F1 / accuracy.
+
+```
+./bin/tensorboard --logdir runs     # then open http://localhost:6006
+```
+
+Use `--tensorboard-dir` to log elsewhere or `--no-tensorboard` to skip it.
+`runs/` is gitignored; per-epoch histories are also saved as
+`loss_history.json` in each weight folder.

@@ -25,7 +25,7 @@ class RNN(nn.Module):
 
     def forward(self, x):
         # x shape: (batch, seq_len, input_dim)
-        h0 = torch.zeros(self.num_layers, x.size(0), self.hidden_dim)
+        h0 = torch.zeros(self.num_layers, x.size(0), self.hidden_dim, device=x.device)
         out, _ = self.rnn(x, h0)
         out = self.fc(out[:, -1, :])
         return out

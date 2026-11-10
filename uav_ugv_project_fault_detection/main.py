@@ -22,6 +22,7 @@
 
 import os
 import json
+import time
 import argparse
 
 import numpy as np
@@ -29,9 +30,11 @@ import torch
 from torch import nn
 from torch import optim
 from torch.utils.data import Dataset
+from torch.utils.tensorboard import SummaryWriter
 
 import dataset as D
 import metrics
+import ugv_dataset as U
 from models.Trainer import Trainer
 from models.Autoencoder import Autoencoder
 from models.BiLstm import BiLSTM
@@ -52,6 +55,8 @@ f.close()
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(ROOT, "datasets", "processed")
+UGV_DIR = os.path.join(ROOT, "datasets", "ugv_faulty")
+RUNS_DIR = os.path.join(ROOT, "runs")
 MODELS_DIR = os.path.join(ROOT, "models")
 
 # Weight subfolder for each model type (created if missing).
@@ -62,11 +67,17 @@ WEIGHT_DIRS = {
 }
 
 
-def weight_folder(model_name, domain):
+def weight_folder(model_name, domain, dataset="alfa", paired=False, tag=""):
      # Return the checkpoint folder for a model and analysis domain. The time
      # domain keeps its historical subfolder; the frequency domain uses a
      # sibling ``<name>Weights_freq`` folder so the two never overwrite each other.
+     # UGV runs add ``_ugv`` (and ``_paired`` for reference features) so they
+     # never overwrite the ALFA or single-channel weights.
     base = WEIGHT_DIRS[model_name]
+    if dataset == "ugv":
+        base += "_ugv_paired" if paired else "_ugv"
+    if tag:   # --tag keeps separate experiments apart, e.g. *_ugv_paired_long
+        base += f"_{tag}"
     if domain == "time":
         return base
     return base + "_freq"
@@ -110,7 +121,7 @@ class WindowDataset(Dataset):
 
 
 # --- Model factory -----------------------------------------------------------
-def build_model(name, input_dim, num_classes=2):
+def build_model(name, input_dim, num_classes=2, readout="full"):
      # Instantiate a model by name for the given per-step input dimension.
      # The RNN/BiLSTM are binary fault classifiers and therefore always use
      # ``num_classes`` output units (fault vs normal), independent of the
@@ -133,6 +144,7 @@ def build_model(name, input_dim, num_classes=2):
              hidden_dim=config["bilstm"]["hidden_dim"],
              output_dim=num_classes,
              num_layers=config["bilstm"]["num_layers"],
+             readout=readout,
         )
     raise ValueError(f"Unknown model: {name}")
 
@@ -173,7 +185,7 @@ def _make_criterion(name, train_labels=None):
 
 
 # --- Evaluation --------------------------------------------------------------
-def _predict(name, model, windows):
+def _predict(name, model, windows, batch_size=1024):
      # Run a model over windows; return predictions / scores as a numpy array.
      # Classifiers yield a 0/1 fault prediction; the autoencoder yields the
      # per-window reconstruction error (anomaly score).
@@ -181,25 +193,25 @@ def _predict(name, model, windows):
     model.eval()
     out = []
     with torch.no_grad():
-        for i in range(len(windows)):
+        for start in range(0, len(windows), batch_size):
             x = torch.as_tensor(
-                 np.ascontiguousarray(windows[i]), dtype=torch.float32
+                 np.ascontiguousarray(windows[start:start + batch_size]),
+                 dtype=torch.float32,
             )
             if flatten:
-                xf = x.flatten().unsqueeze(0)
-                pred = model(xf)
-                err = float(((pred - xf) ** 2).mean().item())
-                out.append(err)
+                xf = x.flatten(start_dim=1)
+                out.append(((model(xf) - xf) ** 2).mean(dim=1).numpy())
             else:
-                prob = torch.softmax(model(x.unsqueeze(0)), dim=1)
-                out.append(int(torch.argmax(prob, dim=1).item()))
-    return np.asarray(out, dtype=np.float64)
+                out.append(torch.argmax(model(x), dim=1).numpy())
+    return np.concatenate(out).astype(np.float64)
 
 
-def _anomaly_labels(scores, labels):
-     # Turn autoencoder error scores into binary labels via a threshold. The
-     # threshold is the max mean-error of the *normal* windows, flagging anything
-     # that reconstructs worse than the worst normal case as faulty.
+def _anomaly_labels(scores, labels, threshold=None):
+     # Turn autoencoder error scores into binary labels via a threshold. When no
+     # threshold is given it is the max mean-error of the *normal* windows,
+     # flagging anything that reconstructs worse than the worst normal case.
+    if threshold is not None:   # scalar or one value per window
+        return (scores > threshold).astype(int), threshold
     if not np.any(labels == 0):
         threshold = float(np.median(scores))
     else:
@@ -207,19 +219,56 @@ def _anomaly_labels(scores, labels):
     return (scores > threshold).astype(int), threshold
 
 
-def print_summary(name, model, windows, labels, positive="fault"):
+def _channel_keys(info):
+    return (info["sensor"] + "/" + info["column"]).to_numpy()
+
+
+def _clean_error_thresholds(model, clean_windows, clean_info, percentile, weight_dir):
+     # Per-channel fault thresholds for the autoencoder: the given percentile of
+     # the reconstruction error over clean *training* windows of each channel
+     # (noisy IMU axes and smooth wheel speeds have very different error floors).
+     # Saved beside the weights so ``--mode run`` reuses them.
+    errors = _predict("Autoencoder", model, clean_windows)
+    keys = _channel_keys(clean_info)
+    thresholds = {k: float(np.percentile(errors[keys == k], percentile))
+                  for k in sorted(set(keys))}
+    with open(os.path.join(weight_dir, "threshold.json"), "w", encoding="utf-8") as f:
+        json.dump({"percentile": percentile, "per_channel": thresholds,
+                   "clean_train_windows": len(errors)}, f, indent=2)
+    print(f"   Clean-train reconstruction error p{percentile:g} per channel "
+          f"({len(errors)} windows):")
+    for key, value in thresholds.items():
+        print(f"      {key:22s} {value:.4e}")
+    return thresholds
+
+
+def _window_thresholds(thresholds, info):
+     # Map per-channel thresholds onto each window of ``info``.
+    return np.array([thresholds[k] for k in _channel_keys(info)])
+
+
+def print_summary(name, model, windows, labels, positive="fault", info=None,
+                  threshold=None):
      # Evaluate ``model`` on ``windows`` and print a P/R/F1 summary. Classifiers
      # are scored on their fault predictions; the autoencoder is scored by
-     # thresholding its reconstruction error against the normal data.
+     # thresholding its reconstruction error (``threshold`` when given).
     scores = _predict(name, model, windows)
     if name == "Autoencoder":
-        preds, threshold = _anomaly_labels(scores, labels)
-        print(f"   Autoencoder anomaly threshold = {threshold:.4e}")
+        preds, threshold = _anomaly_labels(scores, labels, threshold)
+        if np.ndim(threshold) == 0:
+            print(f"   Autoencoder anomaly threshold = {threshold:.4e}")
         positive = "anomaly"
     else:
         preds = scores.astype(int)
     text, result = metrics.summary(labels, preds, label=positive)
     print(f"   {name} {positive} metrics on {len(labels)} windows:\n{text}")
+    if info is not None:
+        # Recall per injected fault type, and false-positive rate on clean windows.
+        for kind in sorted(set(info["fault_type"]) - {"none"}):
+            rows = (info["fault_type"] == kind).to_numpy()
+            print(f"   {kind:>8} recall = {preds[rows].mean():.3f} ({rows.sum()} windows)")
+        clean = (info["fault_type"] == "none").to_numpy()
+        print(f"   clean false-positive rate = {preds[clean].mean():.4f}")
     return result
 
 
@@ -228,6 +277,8 @@ def build_train_val(args):
      # Load the single sensor channel and return the train/val data as
      # ``((train_windows, train_labels), (val_windows, val_labels))`` NumPy arrays
      # (validation may be ``(None, None)``).
+    if args.dataset == "ugv":
+        return build_ugv_train_val(args)
     print(
          f'Loading channel "{args.column}" from topic "{args.topic}" '
          f"(domain={args.domain}, features_per_step={args.features}, "
@@ -250,16 +301,53 @@ def build_train_val(args):
     )
 
 
+def build_ugv_train_val(args):
+     # Load every faultable channel of the simulated UGV variants (ugv_dataset.py),
+     # split train / val / test by source run. All splits and their per-window
+     # info stay on ``args`` (``args.splits``) for thresholds and test summaries.
+    if getattr(args, "splits", None) is None:
+        print(f'Loading UGV fault variants from "{args.ugv_dir}" (domain={args.domain}, '
+              f"seq_len={args.seq_len}, paired={args.paired}) ...")
+        args.splits = U.build_ugv_splits(
+             args.ugv_dir, seq_len=args.seq_len, val_runs=args.val_runs,
+             test_runs=args.test_runs, seed=args.seed, domain=args.domain,
+             paired=args.paired, extra_train_dirs=args.extra_train_dir,
+        )
+        for split, (windows, labels, _) in args.splits.items():
+            print(f"    {split}: {len(labels)} windows -> {int(labels.sum())} faulty")
+    args.train_info = args.splits["train"][2]
+    args.val_info = args.splits["val"][2]
+    (tw, ty, _), (vw, vy, _) = args.splits["train"], args.splits["val"]
+    return (tw, ty), (vw, vy)
+
+
+def ugv_summaries(name, model, args, thresholds=None):
+     # Print validation and held-out test summaries; return the test result.
+    for split in ("val", "test"):
+        windows, labels, info = args.splits[split]
+        threshold = None if thresholds is None else _window_thresholds(thresholds, info)
+        print(f"--- {split} summary ({len(labels)} windows) ---")
+        result = print_summary(name, model, windows, labels, info=info, threshold=threshold)
+    return result
+
+
 # --- Training ----------------------------------------------------------------
 def train_model(name, train_windows, train_labels, val_windows, val_labels,
                 args, feat_dim):
      # Train one model type and checkpoint its weights to its subfolder.
     print(f"\n=== Training {name} ===")
-    input_dim = _model_input_dim(name, feat_dim, args.seq_len)
+    input_dim = _model_input_dim(name, feat_dim, args.window_len)
     flatten = name == "Autoencoder"
 
     if val_windows is None:
         val_windows = val_labels = None
+    if flatten and args.dataset == "ugv":
+        # Reconstruction models learn normal behaviour only.
+        clean_info = args.train_info[train_labels == 0].reset_index(drop=True)
+        train_windows = train_windows[train_labels == 0]
+        train_labels = train_labels[train_labels == 0]
+        if val_windows is not None:
+            val_windows, val_labels = val_windows[val_labels == 0], val_labels[val_labels == 0]
 
      # The autoencoder ignores labels (it reconstructs its own input); the
      # RNN/BiLSTM classify fault vs normal.
@@ -281,13 +369,30 @@ def train_model(name, train_windows, train_labels, val_windows, val_labels,
          model.parameters(), lr=config["Trainer"]["learning_rate"]
     )
 
-    weight_dir = weight_folder(name, args.domain)
+    weight_dir = weight_folder(name, args.domain, args.dataset, args.paired, args.tag)
     os.makedirs(weight_dir, exist_ok=True)
+    # Record the readout so --mode run rebuilds the same network.
+    with open(os.path.join(weight_dir, "model_config.json"), "w", encoding="utf-8") as f:
+        json.dump({"readout": "full", "window_len": args.window_len}, f, indent=2)
 
     epochs = (
         args.epochs if args.epochs is not None
         else config["Trainer"]["num_epochs"]
     )
+
+    # Live curves: tensorboard --logdir runs  (one subfolder per training run).
+    writer = None
+    if not args.no_tensorboard:
+        run_name = (f"{args.dataset}{'_paired' if args.paired else ''}"
+                    f"{'_' + args.tag if args.tag else ''}_"
+                    f"{name.lower()}_{args.domain}_"
+                    f"{time.strftime('%Y%m%d-%H%M%S')}")
+        writer = SummaryWriter(os.path.join(args.tensorboard_dir, run_name))
+        writer.add_text("args", json.dumps(
+             {k: v for k, v in vars(args).items()
+              if not k.endswith("_info") and k != "splits"},
+             default=str, indent=2))
+        print(f"TensorBoard run: {os.path.join(args.tensorboard_dir, run_name)}")
 
     trainer = Trainer(
         model=model,
@@ -295,29 +400,102 @@ def train_model(name, train_windows, train_labels, val_windows, val_labels,
         val_data=val_ds,
         criterion=criterion,
         optimizer=optimizer,
-        batch_size=config["Trainer"]["batch_size"],
+        batch_size=args.batch_size or config["Trainer"]["batch_size"],
         num_epochs=epochs,
         save_dir=weight_dir,
         save_every=args.save_every,
+        device=args.device,
+        writer=writer,
+        # UGV classifiers keep the best validation F1; faults are ~1% of windows.
+        select_by="f1" if args.dataset == "ugv" and not flatten else "loss",
     )
     trainer.train()
+    model.to("cpu")   # evaluation below runs on the CPU
     print(f"{name} weights saved to {weight_dir}")
 
      # Report precision / recall / F1 on the held-out validation set when
      # available, otherwise on the training windows.
-    if val_windows is not None:
+    if args.dataset == "ugv":
+        # Score best_model.pt on every validation and held-out test window.
+        model.load_state_dict(torch.load(os.path.join(weight_dir, "best_model.pt"),
+                                         map_location="cpu"))
+        thresholds = (_clean_error_thresholds(   # train_windows are clean-only here
+             model, train_windows, clean_info, args.ae_percentile, weight_dir)
+             if flatten else None)
+        print("=== best_model.pt ===")
+        result = ugv_summaries(name, model, args, thresholds)
+    elif val_windows is not None:
         print("--- Validation summary ---")
-        print_summary(name, model, val_windows, val_labels)
+        result = print_summary(name, model, val_windows, val_labels)
     else:
         print("--- Training-data summary ---")
-        print_summary(name, model, train_windows, train_labels)
+        result = print_summary(name, model, train_windows, train_labels)
+    if writer is not None:
+        for key in ("precision", "recall", "f1", "accuracy"):
+            writer.add_scalar(f"final/{key}", result[key], epochs)
+        writer.close()
     return model
 
 
 # --- Inference / running a trained model -------------------------------------
+def _saved_readout(weight_dir):
+     # BiLSTM readout used when ``weight_dir`` was trained; folders without
+     # model_config.json predate the 'full' readout and use 'last'.
+    path = os.path.join(weight_dir, "model_config.json")
+    if not os.path.exists(path):
+        return "last"
+    with open(path, "r", encoding="utf-8") as f:
+        return json.load(f).get("readout", "last")
+
+
+def _ugv_ae_thresholds(model, args, weight_dir):
+     # Recompute the autoencoder's per-channel thresholds from clean train windows.
+    train_windows, train_labels, train_info = args.splits["train"]
+    clean = train_labels == 0
+    return _clean_error_thresholds(model, train_windows[clean],
+                                   train_info[clean].reset_index(drop=True),
+                                   args.ae_percentile, weight_dir)
+
+
+def _load_trained(name, args, feat_dim):
+    path = os.path.join(weight_folder(name, args.domain, args.dataset, args.paired, args.tag),
+                        "best_model.pt")
+    model = build_model(name, _model_input_dim(name, feat_dim, args.window_len),
+                        readout=_saved_readout(os.path.dirname(path)))
+    model.load_state_dict(torch.load(path, map_location="cpu"))
+    model.eval()
+    return model, os.path.dirname(path)
+
+
+def run_ensemble(args, feat_dim):
+     # UGV ensemble: a window is faulty when the BiLSTM classifier OR the
+     # autoencoder (per-channel reconstruction threshold) flags it. The two are
+     # complementary: the classifier finds offsets, the autoencoder finds spikes
+     # and noise bursts.
+    bilstm, _ = _load_trained("BiLSTM", args, feat_dim)
+    autoencoder, ae_dir = _load_trained("Autoencoder", args, feat_dim)
+    thresholds = _ugv_ae_thresholds(autoencoder, args, ae_dir)
+    for split in ("val", "test"):
+        windows, labels, info = args.splits[split]
+        classifier = _predict("BiLSTM", bilstm, windows).astype(int)
+        errors = _predict("Autoencoder", autoencoder, windows)
+        anomaly = (errors > _window_thresholds(thresholds, info)).astype(int)
+        print(f"--- Ensemble (BiLSTM OR Autoencoder) {split} summary ({len(labels)} windows) ---")
+        for label, preds in (("BiLSTM", classifier), ("Autoencoder", anomaly),
+                             ("Ensemble", classifier | anomaly)):
+            text, _ = metrics.summary(labels, preds)
+            per_type = ", ".join(
+                 f"{kind} {preds[(info['fault_type'] == kind).to_numpy()].mean():.2f}"
+                 for kind in ("short", "noise", "constant"))
+            print(f"   {label}: {text.splitlines()[1]}\n      recall {per_type}; "
+                  f"clean FPR {preds[(info['fault_type'] == 'none').to_numpy()].mean():.4f}")
+
+
+
 def run_model(name, args, feat_dim):
      # Load saved weights and run a trained model once over the data.
-    weight_path = os.path.join(weight_folder(name, args.domain), "best_model.pt")
+    weight_path = os.path.join(
+         weight_folder(name, args.domain, args.dataset, args.paired, args.tag), "best_model.pt")
     if not os.path.exists(weight_path):
         print(
              f"No trained weights at {weight_path}. Train first: "
@@ -326,11 +504,18 @@ def run_model(name, args, feat_dim):
         return None
 
     print(f"\n=== Running {name} (loading {weight_path}) ===")
-    input_dim = _model_input_dim(name, feat_dim, args.seq_len)
-    model = build_model(name, input_dim)
+    input_dim = _model_input_dim(name, feat_dim, args.window_len)
+    model = build_model(name, input_dim,
+                        readout=_saved_readout(os.path.dirname(weight_path)))
     model.load_state_dict(torch.load(weight_path, map_location="cpu"))
     model.eval()
 
+    if args.dataset == "ugv":
+        thresholds = None
+        if name == "Autoencoder":
+            thresholds = _ugv_ae_thresholds(model, args, os.path.dirname(weight_path))
+        ugv_summaries(name, model, args, thresholds)
+        return model
     windows, labels, _ = D.build_dataset(
          DATA_DIR,
          topic=args.topic,
@@ -353,9 +538,34 @@ def main():
     parser.add_argument("--mode", choices=["train", "run"], default="train")
     parser.add_argument(
          "--model",
-        choices=["all", "autoencoder", "rnn", "bilstm"],
+        choices=["all", "autoencoder", "rnn", "bilstm", "ensemble"],
         default="all",
     )
+    parser.add_argument("--dataset", choices=["alfa", "ugv"], default="alfa",
+                        help="ALFA flights (datasets/processed) or simulated UGV "
+                             "fault variants (fault_injection.py output).")
+    parser.add_argument("--ugv-dir", default=UGV_DIR)
+    parser.add_argument("--tag", default="",
+                        help="Suffix for weight folders and TensorBoard runs, e.g. long.")
+    parser.add_argument("--extra-train-dir", action="append", default=[],
+                        help="UGV: additional fault_injection.py output used for training "
+                             "only (repeatable); validation and test stay in --ugv-dir.")
+    parser.add_argument("--val-runs", type=int, default=5,
+                        help="UGV: source runs held out for validation.")
+    parser.add_argument("--test-runs", type=int, default=5,
+                        help="UGV: source runs held out for the final test.")
+    parser.add_argument("--single-channel", dest="paired", action="store_false",
+                        help="UGV: omit the cross-sensor reference feature.")
+    parser.add_argument("--tensorboard-dir", default=RUNS_DIR,
+                        help="TensorBoard log root; view with tensorboard --logdir runs.")
+    parser.add_argument("--no-tensorboard", action="store_true")
+    parser.add_argument("--device", default="cpu",
+                        help="Training device: cpu, mps (Apple GPU), or cuda.")
+    parser.add_argument("--ae-percentile", type=float, default=99.0,
+                        help="UGV autoencoder: flag windows whose reconstruction error exceeds "
+                             "this percentile of their channel's clean training errors.")
+    parser.add_argument("--batch-size", type=int, default=None,
+                        help="Override batch_size from the config.")
     parser.add_argument("--topic", default=D.DEFAULT_TOPIC)
     parser.add_argument("--column", default=D.DEFAULT_COLUMN)
     parser.add_argument(
@@ -382,6 +592,7 @@ def main():
         return
 
     feat_dim = train_windows.shape[2]
+    args.window_len = train_windows.shape[1]   # time steps (or FFT bins) per window
     print(
          f"Train: {len(train_windows)} windows, "
          f"Val: {0 if val_windows is None else len(val_windows)} windows, "
@@ -389,8 +600,15 @@ def main():
     )
 
     if args.mode == "run":
-        run_model(_normalize_model(args.model), args, feat_dim)
+        if args.model == "ensemble":
+            if args.dataset != "ugv":
+                raise SystemExit("--model ensemble is only defined for --dataset ugv")
+            run_ensemble(args, feat_dim)
+        else:
+            run_model(_normalize_model(args.model), args, feat_dim)
         return
+    if args.model == "ensemble":
+        raise SystemExit("--model ensemble combines trained models; use --mode run")
 
     models = (
         ["Autoencoder", "RNN", "BiLSTM"]
