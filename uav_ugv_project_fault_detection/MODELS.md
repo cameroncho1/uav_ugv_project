@@ -21,6 +21,7 @@ ranges below; they are not measurements of real sensors.
 5. [Training](#5-training)
 6. [Evaluation metrics](#6-evaluation-metrics)
 7. [Results](#7-results)
+   - [7.1 Long, noise-heavy training data](#71-long-noise-heavy-training-data)
 8. [Reproducing](#8-reproducing)
 9. [Limitations and known issues](#9-limitations-and-known-issues)
 
@@ -349,6 +350,53 @@ Observations on these runs:
 Logs: `models/train_logs/ugv_paired_<domain>_<model>_2500.log` and
 `ugv_paired_<domain>_ensemble.log`.
 
+### 7.1 Long, noise-heavy training data
+
+This experiment adds 30 training drives without changing validation or test.
+
+| Item | Value |
+| --- | --- |
+| Drives | seeds 1030–1059, 300 s each (150 min), `datasets/ugv_clean_long/`; recorded at `UPDATE_RATE=1000` (about 3× real time). Sensor and command rates match the original drives; truth is about 15 Hz. |
+| Variants per drive | 1 normal, 1 `short`, 1 `constant`, and 3 `noise` faults lasting 30–120 s (mean 74 s): `fault_injection.py --count noise=3 --noise-window 30 120 --seed 1` → `datasets/ugv_faulty_long/` |
+| Training split | 224,540 windows, 3,793 faulty (1.69%): 2,095 noise, 1,565 constant, 133 short. The original training split has 97 noise-fault windows. |
+| Training | `--extra-train-dir datasets/ugv_faulty_long --tag long`, 400 epochs (about the same number of optimizer steps as 2500 epochs on the original split), other settings as Section 5 |
+| Weights / logs | `models/<name>Weights_ugv_paired_long[_freq]/`, `models/train_logs/ugv_paired_long_<domain>_<model>_400.log` |
+
+Held-out test results (same 5 drives as Section 7):
+
+| Model | Domain | Best epoch (val F1) | Test F1 | Precision | Recall | Clean FPR | Short | Noise | Constant | Test F1 in Section 7 |
+| --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| BiLSTM | frequency | 325 (0.766) | **0.621** | 0.651 | 0.593 | 0.35% | 0.40 | 0.28 | 0.81 | 0.592 |
+| BiLSTM | time | 182 (0.814) | 0.593 | 0.525 | 0.681 | 0.67% | 0.60 | 0.38 | 0.87 | 0.716 |
+| RNN | frequency | 55 (0.629) | 0.430 | 0.374 | 0.505 | 0.92% | 0.10 | 0.24 | 0.73 | 0.423 |
+| Autoencoder | time | 355 (loss) | 0.318 | 0.400 | 0.264 | 0.43% | 0.10 | 0.28 | 0.29 | 0.345 |
+| RNN | time | 8 (0.327) | 0.250 | 0.154 | 0.659 | 3.92% | 0.20 | 0.28 | 0.96 | 0.356 |
+| Autoencoder | frequency | 29 (loss) | 0.132 | 0.132 | 0.132 | 0.94% | 0.30 | 0.31 | 0.00 | 0.270 |
+| Ensemble | time | — | 0.508 | 0.405 | 0.681 | 1.08% | 0.60 | 0.38 | 0.87 | 0.356 |
+| Ensemble | frequency | — | 0.445 | 0.345 | 0.626 | 1.29% | 0.50 | 0.34 | 0.81 | 0.362 |
+
+Observations:
+
+- For the time-domain BiLSTM, the noise-heavy data raised recall for short
+  faults (0.10 → 0.60) and noise faults (0.24 → 0.38). It also raised clean
+  false positives (0.15% → 0.67%), so test F1 fell from 0.716 to 0.593 while
+  validation F1 rose from 0.799 to 0.814. Most new false positives are GPS
+  windows: 2.9% of clean GPS test windows, compared with 0.3% before.
+- The frequency BiLSTM improved slightly (0.592 → 0.621) and is the best model
+  of this experiment.
+- The time-domain autoencoder flags fewer clean windows (2.2% → 0.4%) but
+  recalls far fewer constant faults (0.90 → 0.29). The ensemble therefore
+  improves (0.356 → 0.508) because its false positives fall.
+- The time RNN's best validation epoch is 8, so its result reflects an
+  unstable run rather than the data change.
+- **The test noise recall rests on about four fault events.** 19 of the 29
+  noise-fault test windows come from one fault on IMU `wz`, where nominal noise
+  (0.01 rad/s) is 2% of the channel's spread while driving. Both BiLSTMs miss
+  most of it (0/19 and 2/19). The other noise windows (IMU `wy`, GPS altitude,
+  GPS longitude) are mostly detected.
+- The training split is now 55% noise faults, while validation and test have
+  13% and 32%. That shift may contribute to the higher false-positive rate.
+
 ## 8. Reproducing
 
 From this folder, with the project venv:
@@ -373,7 +421,7 @@ SEEDS="$(seq 1000 1029)" DURATION=120 ../scripts/collect_ugv_dataset.sh datasets
 ./bin/tensorboard --logdir runs
 ```
 
-Useful options: `--single-channel`, `--val-runs`, `--test-runs`,
+Useful options: `--extra-train-dir`, `--tag`, `--single-channel`, `--val-runs`, `--test-runs`,
 `--ae-percentile`, `--seq-len`, `--seed`, `--no-tensorboard`.
 
 ## 9. Limitations and known issues
@@ -381,7 +429,8 @@ Useful options: `--single-channel`, `--val-runs`, `--test-runs`,
 - **Simulation only.** Noise and faults are injected assumptions with the
   ranges in Section 2.2. Results describe these conditions, not real sensors.
 - **Small evaluation sets.** 5 test drives give 91 faulty windows; per-type
-  recalls for `short` and `noise` rest on 10 and 29 windows.
+  recalls for `short` and `noise` rest on 10 and 29 windows, and the noise
+  windows come from about four fault events.
 - **One fault per variant.** Simultaneous faults are not represented.
 - **Window-level decisions.** A window with one spike sample counts as faulty;
   models do not locate the faulty samples within a window.

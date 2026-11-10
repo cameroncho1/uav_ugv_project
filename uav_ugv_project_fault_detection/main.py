@@ -67,7 +67,7 @@ WEIGHT_DIRS = {
 }
 
 
-def weight_folder(model_name, domain, dataset="alfa", paired=False):
+def weight_folder(model_name, domain, dataset="alfa", paired=False, tag=""):
      # Return the checkpoint folder for a model and analysis domain. The time
      # domain keeps its historical subfolder; the frequency domain uses a
      # sibling ``<name>Weights_freq`` folder so the two never overwrite each other.
@@ -76,6 +76,8 @@ def weight_folder(model_name, domain, dataset="alfa", paired=False):
     base = WEIGHT_DIRS[model_name]
     if dataset == "ugv":
         base += "_ugv_paired" if paired else "_ugv"
+    if tag:   # --tag keeps separate experiments apart, e.g. *_ugv_paired_long
+        base += f"_{tag}"
     if domain == "time":
         return base
     return base + "_freq"
@@ -367,7 +369,7 @@ def train_model(name, train_windows, train_labels, val_windows, val_labels,
          model.parameters(), lr=config["Trainer"]["learning_rate"]
     )
 
-    weight_dir = weight_folder(name, args.domain, args.dataset, args.paired)
+    weight_dir = weight_folder(name, args.domain, args.dataset, args.paired, args.tag)
     os.makedirs(weight_dir, exist_ok=True)
     # Record the readout so --mode run rebuilds the same network.
     with open(os.path.join(weight_dir, "model_config.json"), "w", encoding="utf-8") as f:
@@ -381,7 +383,8 @@ def train_model(name, train_windows, train_labels, val_windows, val_labels,
     # Live curves: tensorboard --logdir runs  (one subfolder per training run).
     writer = None
     if not args.no_tensorboard:
-        run_name = (f"{args.dataset}{'_paired' if args.paired else ''}_"
+        run_name = (f"{args.dataset}{'_paired' if args.paired else ''}"
+                    f"{'_' + args.tag if args.tag else ''}_"
                     f"{name.lower()}_{args.domain}_"
                     f"{time.strftime('%Y%m%d-%H%M%S')}")
         writer = SummaryWriter(os.path.join(args.tensorboard_dir, run_name))
@@ -455,7 +458,7 @@ def _ugv_ae_thresholds(model, args, weight_dir):
 
 
 def _load_trained(name, args, feat_dim):
-    path = os.path.join(weight_folder(name, args.domain, args.dataset, args.paired),
+    path = os.path.join(weight_folder(name, args.domain, args.dataset, args.paired, args.tag),
                         "best_model.pt")
     model = build_model(name, _model_input_dim(name, feat_dim, args.window_len),
                         readout=_saved_readout(os.path.dirname(path)))
@@ -492,7 +495,7 @@ def run_ensemble(args, feat_dim):
 def run_model(name, args, feat_dim):
      # Load saved weights and run a trained model once over the data.
     weight_path = os.path.join(
-         weight_folder(name, args.domain, args.dataset, args.paired), "best_model.pt")
+         weight_folder(name, args.domain, args.dataset, args.paired, args.tag), "best_model.pt")
     if not os.path.exists(weight_path):
         print(
              f"No trained weights at {weight_path}. Train first: "
@@ -542,6 +545,8 @@ def main():
                         help="ALFA flights (datasets/processed) or simulated UGV "
                              "fault variants (fault_injection.py output).")
     parser.add_argument("--ugv-dir", default=UGV_DIR)
+    parser.add_argument("--tag", default="",
+                        help="Suffix for weight folders and TensorBoard runs, e.g. long.")
     parser.add_argument("--extra-train-dir", action="append", default=[],
                         help="UGV: additional fault_injection.py output used for training "
                              "only (repeatable); validation and test stay in --ugv-dir.")
