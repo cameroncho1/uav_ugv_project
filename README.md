@@ -69,8 +69,13 @@ uav_ugv_project/
 │       └── uav_ugv_msgs/
 │
 ├── simulation/
+│   ├── models/
+│   │   ├── simple_ugv/             # the one UGV; worlds include model://simple_ugv
+│   │   ├── ugv_fiducial/
+│   │   └── cooperative_camera_uav/
 │   └── worlds/
-│       └── uav_ugv.sdf
+│       ├── uav_ugv.sdf
+│       └── simple_goal_demo*.sdf   # base demo plus generated obstacle variants
 │
 ├── scripts/
 └── README.md

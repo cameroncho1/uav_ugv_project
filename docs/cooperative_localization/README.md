@@ -17,7 +17,7 @@ cd ..
 ros2 launch mission_manager simple_goal_demo.launch.py initial_gps_enabled:=false
 ```
 
-This starts the simulated world, PX4, DDS, raw sensors, simulated measurement noise, camera detector, UAV anchor, estimator, mapper, planner, controller, and RViz. The UAV hovers while the UGV navigates to `(4, 0)`. The world has flat ground and no physical obstacles. Use Ctrl+C in the launch terminal to stop the demo.
+This starts the simulated world, PX4, DDS, raw sensors, simulated measurement noise, camera detector, UAV anchor, estimator, mapper, planner, controller, and RViz. The UAV flies over the UGV while it navigates to `(4, 0)`; `uav_follow:=false` keeps it hovering. The world has flat ground and no physical obstacles. Use Ctrl+C in the launch terminal to stop the demo.
 
 Use `uav_assistance:=false` for baseline-only fusion. Use `uav_heading:=false` for camera position without camera heading. RViz's **Camera heading** display shows `/uav/camera/heading_image`. Use `start_rviz:=false` to omit RViz. Camera rendering still needs a valid display. [Goal-demo instructions](../../README_simple_goal_demo.md) list the separate-terminal commands.
 

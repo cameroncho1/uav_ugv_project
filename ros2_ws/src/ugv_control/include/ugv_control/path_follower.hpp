@@ -50,8 +50,12 @@ inline geometry_msgs::msg::Twist follow_path(
   if (distance < 0.05) {return command;}
   const auto error = std::atan2(dy, dx) - uav_ugv_msgs::heading(pose.orientation);
   const auto wrapped = std::atan2(std::sin(error), std::cos(error));
-  // Turn before translating through a bend; never steer across blocked cells.
-  command.linear.x = std::abs(wrapped) <= 0.15 ? std::min(limits.speed, 0.5 * distance) : 0.0;
+  // Turn in place through sharp bends; below that, drive while turning and slow down in
+  // proportion to the heading error. The predicted arc below still vetoes any motion
+  // that would cross a blocked cell.
+  constexpr double turn_in_place = 0.6;
+  const auto alignment = std::max(0.0, 1.0 - std::abs(wrapped) / turn_in_place);
+  command.linear.x = std::min(limits.speed, 0.5 * distance) * alignment;
   command.angular.z = std::clamp(1.5 * wrapped, -limits.turn_rate, limits.turn_rate);
   double previous_x = pose.position.x, previous_y = pose.position.y;
   const auto yaw = uav_ugv_msgs::heading(pose.orientation);

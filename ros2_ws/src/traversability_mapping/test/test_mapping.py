@@ -85,3 +85,27 @@ def test_grid_waits_for_matching_anchor_and_preserves_image_time():
     finally:
         node.destroy_node()
         rclpy.try_shutdown()
+
+
+def test_map_memory_keeps_seen_cells_and_clears_after_free_views():
+    from grid_projection import fuse_into_map, map_values
+    log_odds, seen = np.zeros((10, 20)), np.zeros((10, 20), bool)
+    frame = np.full((4, 4), -1, np.int8)
+    frame[1:3, 1:3] = 0
+    frame[1, 1] = 100
+    # Frame origin (0.3, 0.2) on a 0.1 m lattice whose map origin is (0, 0).
+    fuse_into_map(log_odds, seen, (0., 0.), .1, (.3 + 1e-12, .2), frame)
+    values = map_values(log_odds, seen)
+    assert values[3, 4] == 100 and values[3, 5] == 0 and values[4, 4] == 0
+    assert values[2, 3] == -1 and values[0, 0] == -1  # Never observed stays unknown.
+    clear = np.where(frame == 100, 0, frame).astype(np.int8)
+    fuse_into_map(log_odds, seen, (0., 0.), .1, (.3, .2), clear)
+    assert map_values(log_odds, seen)[3, 4] == 0  # One free view clears a single dark view.
+    for _ in range(5):
+        fuse_into_map(log_odds, seen, (0., 0.), .1, (.3, .2), frame)
+    fuse_into_map(log_odds, seen, (0., 0.), .1, (.3, .2), clear)
+    assert map_values(log_odds, seen)[3, 4] == 100  # A long-seen obstacle needs more.
+    # Frames partly or wholly outside the map are clipped, not rejected.
+    fuse_into_map(log_odds, seen, (0., 0.), .1, (1.8, .8), frame)
+    fuse_into_map(log_odds, seen, (0., 0.), .1, (5., 5.), frame)
+    assert seen[9, 19] and seen.shape == (10, 20)

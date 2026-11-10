@@ -26,6 +26,8 @@ inline bool route_matches_goal(
 {
   if (!same_goal(route.goal, goal) || route.path.poses.empty() ||
     stamp_ns(route.header.stamp) < stamp_ns(goal.header.stamp)) {return false;}
+  // A partial route ends where observed ground ends; its goal revision already matched.
+  if (route.partial) {return route.path.poses.size() >= 2;}
   const auto & end = route.path.poses.back().pose.position;
   return std::hypot(end.x - goal.pose.position.x, end.y - goal.pose.position.y) <=
          endpoint_tolerance;

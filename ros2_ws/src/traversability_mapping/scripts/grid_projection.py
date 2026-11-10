@@ -57,3 +57,36 @@ def project_grid(gray, intrinsic, distortion, camera_position, map_from_optical,
         luminance = np.minimum(luminance, samples)
     grid = np.where(visible, np.where(luminance < threshold, 100, 0), -1).astype(np.int8)
     return origin, grid, x, y
+
+
+def fuse_into_map(log_odds, seen, map_origin, resolution, frame_origin, frame,
+                  hit=.6, miss=.6, low=-1.5, high=2.5):
+    """Add one camera grid (-1 unseen, 0 free, 100 occupied) to a persistent map in place.
+
+    Each observation moves a cell's log-odds toward occupied or free, clamped so that a
+    long-seen obstacle clears after a few free views and one dark view marks a new cell.
+    Both origins must lie on the same cell lattice; cells outside the map are ignored.
+    """
+    shift = (np.asarray(frame_origin[:2], float) - np.asarray(map_origin[:2], float)) / resolution
+    offset = np.rint(shift).astype(int)
+    if np.any(np.abs(shift - offset) > 1e-6):
+        raise ValueError("Camera grid is not aligned with the map lattice")
+    rows, cols = frame.shape
+    map_rows, map_cols = log_odds.shape
+    x0, y0 = int(offset[0]), int(offset[1])
+    fx0, fy0 = max(0, -x0), max(0, -y0)
+    fx1, fy1 = min(cols, map_cols - x0), min(rows, map_rows - y0)
+    if fx1 <= fx0 or fy1 <= fy0:
+        return
+    part = frame[fy0:fy1, fx0:fx1]
+    target = (slice(y0 + fy0, y0 + fy1), slice(x0 + fx0, x0 + fx1))
+    observed = part >= 0
+    view = log_odds[target]
+    view[observed] = np.clip(view[observed] + np.where(part[observed] >= 50, hit, -miss),
+                             low, high)
+    seen[target] |= observed
+
+
+def map_values(log_odds, seen):
+    """Occupancy values for publication: -1 never seen, 100 occupied, 0 free."""
+    return np.where(seen, np.where(log_odds > 0, 100, 0), -1).astype(np.int8)

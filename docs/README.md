@@ -18,6 +18,7 @@ The project uses UAV observations to map terrain, estimate a ground robot's pose
 | [System diagram](system_design.html) | Proposed project, implemented prototype, and work still proposed. Open in a browser. |
 | [Project overview](project/project_overview.md) | Project goal and current limits. |
 | [Technical plan](project/technical_plan.md) | Current stack, subsystem responsibilities, and original course schedule. |
+| [Completion plan](project/completion_plan.md) | Final demonstration scope, operating envelope, requirements, verification methods, and remaining work. |
 
 ## Subsystem documentation
 

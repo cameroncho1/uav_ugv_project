@@ -2,9 +2,9 @@
 
 [Documentation index](docs/README.md) · [System diagram](docs/system_design.html) · [Localization guide](docs/cooperative_localization/README.md)
 
-The goal demo keeps the UAV horizontally stationary while it climbs to a camera altitude. A local occupancy grid is derived from the downward camera image, A* plans through the grid from the UGV pose to the fixed goal, and the UGV follows that local path. The flat world uses a solid matte ground color and simple geometric vehicle and goal visuals, with shadows disabled to reduce rendering load. It has no physical obstacles. The image classifier is an initial dark-pixel heuristic, not semantic obstacle detection. There is no global path or global replanning yet.
+The camera UAV climbs to camera altitude, then flies over the UGV's fused pose as it drives (`uav_follow:=false` keeps it hovering at its takeoff point). The mapper fuses every downward camera frame into one remembered occupancy map. A* plans from the UGV pose to the fixed goal, through unseen ground when necessary, and the UGV drives only the part of that route the camera has seen to be clear. The flat world uses a solid matte ground color and simple geometric vehicle and goal visuals, with shadows disabled to reduce rendering load. It has no physical obstacles. The image classifier is an initial dark-pixel heuristic, not semantic obstacle detection. Unseen ground is assumed passable for planning only; the route is replanned at 5 Hz as the camera reveals it.
 
-The default local goal is `(4, 0)` in the ROS `map` frame. The UGV starts at `(-4, 0)` and the UAV holds its initial horizontal position at a 4.5 m altitude setpoint above its PX4 local origin so its camera footprint covers the route. The integration-owned world configuration supplies the UGV spawn and independent UAV map origin. Goal and altitude can be changed with launch arguments; if changing the goal coordinates, also update the bullseye pose in the world SDF.
+The default local goal is `(4, 0)` in the ROS `map` frame. The UGV starts at `(-4, 0)`. The UAV takes off from its PX4 local origin to a 4.5 m altitude setpoint and then follows the UGV. The integration-owned world configuration supplies the UGV spawn and independent UAV map origin. Goal and altitude can be changed with launch arguments; if changing the goal coordinates, also update the bullseye pose in the world SDF.
 
 ## Build
 
@@ -27,7 +27,7 @@ source ros2_ws/install/setup.bash
 ros2 launch mission_manager simple_goal_demo.launch.py
 ```
 
-The launch starts the Gazebo world, PX4 SITL, Micro XRCE-DDS Agent, the goal manager, stationary-XY UAV controller, camera grid mapper, local A-star planner, UGV path follower, and RViz. The UAV controller holds its initial horizontal position, streams the altitude setpoint, waits for PX4 preflight checks, then retries Offboard and arm requests until PX4 confirms the state. Keep the launch terminal open; Ctrl+C shuts down the launched processes.
+The launch starts the Gazebo world, PX4 SITL, Micro XRCE-DDS Agent, the goal manager, UAV controller, camera grid mapper, local A-star planner, UGV path follower, and RViz. The UAV controller streams the altitude setpoint, waits for PX4 preflight checks, then retries Offboard and arm requests until PX4 confirms the state. Near cruise height it moves its horizontal setpoint toward the UGV's fused pose at up to 1 m/s and holds whenever that pose is stale or its position uncertainty exceeds 0.5 m. Keep the launch terminal open; Ctrl+C shuts down the launched processes.
 
 The launch also starts UGV localization. An EKF combines wheel speed, IMU heading, GPS map position, and UAV-derived UGV position on `/ugv/localization/pose` with uncertainty. The UAV adapter converts the live PX4 anchor from NED/FRD to ENU/FLU after takeoff and a ten-second reference-settling interval. A calibrated AprilTag detector produces UGV-relative observations from camera pixels; a timestamp-matched adapter rotates them into map and includes UAV position and attitude uncertainty. `uav_assistance:=false` selects the GPS/wheel/IMU baseline. [The localization interfaces](docs/cooperative_localization/interfaces.md) define topics, gates, and evaluation commands. The planner and controller consume `/ugv/localization/pose` and stop on stale or uncertain estimates. Motion also requires a goal-associated `/ugv/navigation/route` with a footprint-clearance grid; `/local_path` is visualization/evaluation only. A steady-clock actuator watchdog expires commands if the controller or bridge disappears. [Navigation](docs/navigation.md) lists the configured limits and checks.
 
@@ -36,7 +36,7 @@ ROS nodes use `/clock`, and `px4_goal_demo.sh` sets `UXRCE_DDS_SYNCT=0` so PX4 s
 Change the local goal, camera altitude, grid resolution, or image threshold with launch arguments:
 
 ```bash
-ros2 launch mission_manager simple_goal_demo.launch.py goal_x:=4.0 goal_y:=0.0 uav_altitude:=4.5 grid_resolution:=0.25 obstacle_luminance_threshold:=32.0
+ros2 launch mission_manager simple_goal_demo.launch.py goal_x:=4.0 goal_y:=0.0 uav_altitude:=4.5 uav_follow:=true grid_resolution:=0.1 obstacle_luminance_threshold:=32.0
 ```
 
 If the matching `simple_goal_demo` world, camera UAV, PX4, and DDS agent are already running, use `start_simulation:=false`. The basic `start_sim.sh` world and X500 are not that camera setup. To omit RViz, use `start_rviz:=false`. The camera still requires `DISPLAY`.

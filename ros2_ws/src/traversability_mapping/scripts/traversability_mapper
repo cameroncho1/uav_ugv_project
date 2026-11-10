@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Build acquisition-stamped grids using independently localized camera poses."""
+"""Build acquisition-stamped grids using independently localized camera poses.
+
+With map memory on (the default) every camera frame is fused into one fixed map, so
+ground the camera has left keeps its last observed state and unseen ground stays -1.
+"""
 
 from collections import deque
 import time
@@ -13,7 +17,7 @@ from rclpy.executors import ExternalShutdownException
 from rclpy.node import Node
 from rclpy.qos import DurabilityPolicy, QoSProfile, qos_profile_sensor_data
 from sensor_msgs.msg import CameraInfo, Image
-from grid_projection import project_grid, robot_projection_mask
+from grid_projection import fuse_into_map, map_values, project_grid, robot_projection_mask
 
 
 def stamp_ns(message):
@@ -47,13 +51,16 @@ class TraversabilityMapper(Node):
     def __init__(self):
         super().__init__("traversability_mapper")
         cv2.setNumThreads(1)
-        self.resolution = self.declare_parameter("grid_resolution", .25).value
+        self.resolution = self.declare_parameter("grid_resolution", .1).value
         self.threshold = self.declare_parameter("obstacle_luminance_threshold", 32.).value
         self.max_age = self.declare_parameter("max_image_age", .5).value
         self.max_gap = self.declare_parameter("max_anchor_gap", .25).value
         self.radius = self.declare_parameter("ugv_body_radius", .5).value
         self.body_height = self.declare_parameter("ugv_body_height", .5).value
         self.ground_z = self.declare_parameter("ground_z", 0.).value
+        self.memory = self.declare_parameter("map_memory", True).value
+        bounds = np.asarray(self.declare_parameter(
+            "map_bounds", [-12., -10., 12., 10.]).value, float)
         self.mount = np.array(self.declare_parameter("body_from_optical_rotation",
             [0., -1., 0., -1., 0., 0., 0., 0., -1.]).value).reshape(3, 3)
         self.translation = np.array(self.declare_parameter("body_from_optical_translation",
@@ -66,6 +73,15 @@ class TraversabilityMapper(Node):
                 or not np.allclose(self.mount.T @ self.mount, np.eye(3), atol=1e-6)
                 or not np.isclose(np.linalg.det(self.mount), 1.)):
             raise ValueError("Invalid mapping geometry or timing")
+        if (bounds.shape != (4,) or not np.isfinite(bounds).all()
+                or bounds[2] <= bounds[0] or bounds[3] <= bounds[1]):
+            raise ValueError("map_bounds requires finite [min_x, min_y, max_x, max_y]")
+        self.map_origin = np.floor(bounds[:2] / self.resolution) * self.resolution
+        cols, rows = np.ceil((bounds[2:] - self.map_origin) / self.resolution).astype(int)
+        if rows * cols > 1_000_000:
+            raise ValueError("map_bounds exceed the planner's grid limit")
+        self.log_odds = np.zeros((rows, cols))
+        self.seen = np.zeros((rows, cols), bool)
         self.anchors = deque(maxlen=200)
         self.ugv = deque(maxlen=200)
         self.pending = deque(maxlen=10)
@@ -89,6 +105,8 @@ class TraversabilityMapper(Node):
             self.ugv.clear()
             self.pending.clear()
             self.last_image = None
+            self.log_odds[:] = 0.
+            self.seen[:] = False
         self.last_clock = now
         return now
 
@@ -174,6 +192,10 @@ class TraversabilityMapper(Node):
                 data[body & (data >= 0)] = 0
             if self.observe_clock() - stamp > self.max_age * 1e9:
                 continue
+            if self.memory:
+                fuse_into_map(self.log_odds, self.seen, self.map_origin, self.resolution,
+                              origin, data)
+                origin, data = self.map_origin, map_values(self.log_odds, self.seen)
             grid = OccupancyGrid()
             grid.header.stamp = image.header.stamp
             grid.header.frame_id = "map"

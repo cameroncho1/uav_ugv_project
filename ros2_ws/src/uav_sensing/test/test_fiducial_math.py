@@ -242,25 +242,37 @@ def test_calibration_matches_owned_camera_and_roof_mount():
     optical_to_camera = np.array([[0, 0, 1], [-1, 0, 0], [0, -1, 0]])
     np.testing.assert_allclose((mount @ optical_to_camera).ravel(),
                                values['body_from_optical_rotation'], atol=1e-12)
-    for world in ['uav_ugv', 'simple_goal_demo']:
-        tree = ET.parse(root / f'simulation/worlds/{world}.sdf')
-        model = tree.find("./world/model[@name='simple_ugv']")
-        assert model.attrib['canonical_link'] == 'chassis'
-        drive = model.find("./plugin[@name='gz::sim::systems::DiffDrive']")
-        assert drive.findtext('frame_id') == 'simple_ugv/odom'
-        assert drive.findtext('child_frame_id') == 'simple_ugv/chassis'
-        includes = tree.findall("./world/model[@name='simple_ugv']/include")
-        tag = next(item for item in includes if item.findtext('uri') == 'model://ugv_fiducial')
-        assert tag.find('pose').attrib['relative_to'] == 'chassis'
-        tag_pose = list(map(float, tag.findtext('pose').split()))
-        roll, pitch, yaw = tag_pose[3:]
-        chassis_from_marker = (cv2.Rodrigues(np.array([0., 0., yaw]))[0]
-                               @ cv2.Rodrigues(np.array([0., pitch, 0.]))[0]
-                               @ cv2.Rodrigues(np.array([roll, 0., 0.]))[0])
-        np.testing.assert_allclose(chassis_from_marker.T.ravel(),
-                                   values['marker_from_chassis_rotation'], atol=1e-12)
-        np.testing.assert_allclose(-chassis_from_marker.T @ np.array(tag_pose[:3]),
-                                   values['marker_to_chassis'])
+    ugv = ET.parse(root / 'simulation/models/simple_ugv/model.sdf')
+    model = ugv.find("./model[@name='simple_ugv']")
+    assert model.attrib['canonical_link'] == 'chassis'
+    drive = model.find("./plugin[@name='gz::sim::systems::DiffDrive']")
+    assert drive.findtext('frame_id') == 'simple_ugv/odom'
+    assert drive.findtext('child_frame_id') == 'simple_ugv/chassis'
+    tag = next(item for item in model.findall('./include')
+               if item.findtext('uri') == 'model://ugv_fiducial')
+    assert tag.find('pose').attrib['relative_to'] == 'chassis'
+    tag_pose = list(map(float, tag.findtext('pose').split()))
+    roll, pitch, yaw = tag_pose[3:]
+    chassis_from_marker = (cv2.Rodrigues(np.array([0., 0., yaw]))[0]
+                           @ cv2.Rodrigues(np.array([0., pitch, 0.]))[0]
+                           @ cv2.Rodrigues(np.array([roll, 0., 0.]))[0])
+    np.testing.assert_allclose(chassis_from_marker.T.ravel(),
+                               values['marker_from_chassis_rotation'], atol=1e-12)
+    np.testing.assert_allclose(-chassis_from_marker.T @ np.array(tag_pose[:3]),
+                               values['marker_to_chassis'])
+
+
+def test_every_ugv_world_includes_the_shared_vehicle():
+    root = Path(__file__).resolve().parents[4]
+    worlds = sorted((root / 'simulation/worlds').glob('*goal_demo*.sdf'))
+    worlds.append(root / 'simulation/worlds/uav_ugv.sdf')
+    for world in worlds:
+        tree = ET.parse(world)
+        assert tree.find("./world/model[@name='simple_ugv']") is None, (
+            f'{world.name} pastes its own UGV; include model://simple_ugv instead')
+        uris = [item.findtext('uri') for item in tree.findall('./world/include')
+                if item.findtext('name') == 'simple_ugv']
+        assert uris == ['model://simple_ugv'], world.name
 
 
 
