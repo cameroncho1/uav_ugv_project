@@ -236,8 +236,8 @@ The report states each claim with the search budget, the number of trials, the s
 | ID | Work | Owner (proposed) | Depends on | Done when |
 | --- | --- | --- | --- | --- |
 | W1 | Rerun localization and goal-navigation trials on current `main`; store results | Rylan | none | results in `docs/` with commands |
-| W2 | Hazard: world variant, spawn script, truth `hazard_in_grid` label | Sophie, Cameron | none | hazard appears at `t_h` in all four layouts |
-| W3 | Replan on blocked route; stop if no clear route; measure `tau_obs`, `tau_r` | Ethan | W2 | R5 monitor passes on 10 hand runs |
+| W2 | Initial infrastructure implemented: validated spawn/remove scenarios and confirmed world mutations | Sophie, Cameron | none | [Small camera example](../dynamic_obstacles/README.md); all-four-layout coverage remains pending |
+| W3 | Initial camera example observes an appearing box and evaluates the existing replanner/controller response | Ethan | W2 | [R5 example](../dynamic_obstacles/README.md); ten-run response characterization remains pending |
 | W4 | `uav_dropout` control and `faults.json` writer | Cameron | none | F1-F4 selectable per run; schedule recorded |
 | W5 | Run-recording script for a scenario row; batch runner | Cameron | W4 | one command runs and records a row |
 | W6 | Dataset collection: 60 labeled runs | Jeremy, Cameron | W5 | bags and `faults.json` on shared storage |

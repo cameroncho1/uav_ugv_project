@@ -35,6 +35,7 @@ class Recording:
                     "/local_grid",
                     "/ugv/navigation/route",
                     "/evaluation/faults",
+                    "/simulation/obstacle_scenario",
                 )
                 else "volatile",
             }
@@ -120,6 +121,8 @@ class Recording:
                     "WALL_TIMEOUT",
                     "UAV_ALTITUDE",
                     "UAV_HEADING",
+                    "OBSTACLE_SCENARIO",
+                    "RECORDING_SETUP",
                 )
             },
         }
@@ -192,8 +195,9 @@ if __name__ == "__main__":
     parser.add_argument("directory", type=Path)
     parser.add_argument("--world", type=Path, required=True)
     parser.add_argument("--result", type=Path)
+    parser.add_argument("--setup", default="camera_navigation")
     args = parser.parse_args()
-    recording = Recording(args.directory, "camera_navigation", args.world)
+    recording = Recording(args.directory, args.setup, args.world)
     for sig in (signal.SIGINT, signal.SIGTERM):
         signal.signal(sig, stop_recording)
     try:

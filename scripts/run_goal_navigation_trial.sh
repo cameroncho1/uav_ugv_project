@@ -60,8 +60,22 @@ until grep -Fq 'successfully created rt/fmu/out/vehicle_odometry' "$OUTPUT/px4.l
   (( SECONDS < deadline )) || { echo 'PX4 entity readiness timed out' >&2; exit 2; }
   sleep .25
 done
-setsid python3 "$ROOT/scripts/verification_recording.py" "$OUTPUT/verification" --world "$WORLD" --result "$OUTPUT/results.json" &
+setsid python3 "$ROOT/scripts/verification_recording.py" "$OUTPUT/verification" --world "$WORLD" \
+  --setup "${RECORDING_SETUP:-camera_navigation}" --result "$OUTPUT/results.json" &
 record_pid=$!
+if [[ -n "${OBSTACLE_SCENARIO:-}" ]]; then
+  mkdir -p "$OUTPUT/hazards"
+  observer_args=(--ros-args -p use_sim_time:=true -p scenario_file:="$OBSTACLE_SCENARIO"
+                 -p output_directory:="$OUTPUT/hazards")
+  if [[ -n "${HAZARD_OBSERVER_PARAMS:-}" ]]; then
+    observer_args+=(--params-file "$HAZARD_OBSERVER_PARAMS")
+  fi
+  setsid ros2 run simulation_support obstacle_scenario --ros-args \
+    -p use_sim_time:=true -p scenario_file:="$OBSTACLE_SCENARIO" \
+    -p output_directory:="$OUTPUT/hazards" >"$OUTPUT/hazards/scenario.log" 2>&1 & pids+=("$!")
+  setsid ros2 run fault_management hazard_observer.py "${observer_args[@]}" \
+    >"$OUTPUT/hazards/observer.log" 2>&1 & pids+=("$!")
+fi
 setsid ros2 launch mission_manager simple_goal_demo.launch.py \
   start_simulation:=false start_rviz:=false \
   world_file:="$WORLD" evaluation_trace:=true goal_x:="$GOAL_X" goal_y:="$GOAL_Y" \

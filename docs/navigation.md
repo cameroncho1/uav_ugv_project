@@ -65,3 +65,7 @@ Closed-loop baseline/assisted tracking uses separate fresh worlds with identical
 The path follower runs only when the persistent supervisor selects `NAVIGATE`. Other modes publish zero every timer tick. Completed-goal memory prevents estimated drift from restarting the same goal. Enabled detector holds require ten distinct clear decisions and five simulation seconds to recover; new goals do not bypass recovery. Detector enablement defaults to false until a producer is deployed.
 
 See the [supervisor specification](verification/supervisor.md), [finite proof and runtime evidence](project/results/supervisor/README.md), and [course/report mapping](verification/supervisor_course_alignment.md). The proof establishes discrete command permission under explicit input assumptions; the independent watchdog and recorded physical stopping checks remain necessary.
+
+## Dynamic obstacle example
+
+The [dynamic obstacle scenario](dynamic_obstacles/README.md) adds a scheduled box through Gazebo's world API. The UAV camera updates the existing map, the planner recomputes a route, and the controller follows it or holds. Scenario and truth geometry are evaluation inputs; navigation receives the same camera-map and measured-pose interfaces as before.

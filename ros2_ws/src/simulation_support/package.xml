@@ -6,6 +6,7 @@
   <maintainer email="rylanwwade@gmail.com">Rylan Wade</maintainer>
   <license>TODO: License declaration</license>
   <buildtool_depend>ament_cmake</buildtool_depend>
+  <buildtool_depend>ament_cmake_python</buildtool_depend>
   <buildtool_depend>pkg-config</buildtool_depend>
   <depend>rclcpp</depend>
   <depend>geometry_msgs</depend>
@@ -18,6 +19,10 @@
   <exec_depend>launch_ros</exec_depend>
   <exec_depend>ament_index_python</exec_depend>
   <exec_depend>python3-yaml</exec_depend>
+  <exec_depend>rclpy</exec_depend>
+  <exec_depend>rcl_interfaces</exec_depend>
+  <exec_depend>python3-gz-transport13</exec_depend>
+  <exec_depend>python3-gz-msgs10</exec_depend>
   <test_depend>ament_cmake_pytest</test_depend>
   <export><build_type>ament_cmake</build_type></export>
 </package>

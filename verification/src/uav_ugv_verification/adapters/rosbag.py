@@ -37,6 +37,7 @@ MESSAGE_TYPES = {
     "motion": "std_msgs/msg/String",
     "fault": "std_msgs/msg/String",
     "canonical": "std_msgs/msg/String",
+    "obstacle_scenario": "std_msgs/msg/String",
     "truth_pose": "geometry_msgs/msg/PoseStamped",
     "estimated_pose": "geometry_msgs/msg/PoseWithCovarianceStamped",
     "goal": "geometry_msgs/msg/PoseStamped",
@@ -70,9 +71,24 @@ def translate(
             frame,
         )
 
-    if kind in ("control", "watchdog", "motion", "fault", "canonical"):
+    if kind in ("control", "watchdog", "motion", "fault", "canonical", "obstacle_scenario"):
         value = parse_json(message.data)
         require(value.get("schema_version") == 1, "unsupported telemetry version")
+        if kind == "obstacle_scenario":
+            return [
+                record(
+                    "obstacles",
+                    {
+                        "static": False,
+                        "shapes": value["envelope"],
+                        "scope": "conservative_mutation_envelope",
+                    },
+                    time=value["sim_ns"],
+                    seq=value["sequence"],
+                    frame="map",
+                    valid=value["error"] is None,
+                )
+            ]
         if kind == "canonical":
             # Explicit canonical event/detector messages preserve their own clock/stamp.
             from ..validation import parse_record
@@ -239,6 +255,12 @@ def import_bag(
             "invalid topic/kind mapping",
         )
     require(setup.get("schema_version") == 1, "unsupported setup version")
+    dynamic_geometry = "obstacle_scenario" in setup["topics"].values()
+    require(
+        not dynamic_geometry or world is not None,
+        "obstacle scenarios require the baseline world for collision geometry",
+    )
+    static_shapes = collision_geometry(world, ignored) if world else []
     metadata = yaml.safe_load((bag / "metadata.yaml").read_text())["rosbag2_bagfile_information"]
     require(metadata["storage_identifier"] == "sqlite3", "only Humble sqlite3 bags are supported")
     try:
@@ -349,6 +371,8 @@ def import_bag(
                         sequence=counters[topic],
                         source=topic,
                     ):
+                        if topics[topic] == "obstacle_scenario":
+                            record.data["shapes"] = static_shapes + record.data["shapes"]
                         if record.clock.startswith("steady:"):
                             boot_ids.add(record.clock)
                         insert(record)
@@ -368,9 +392,9 @@ def import_bag(
         require(partitions, "no supported numerical messages found")
         if world:
             hashes["world"] = digest_file(world)
-            shapes = collision_geometry(world, setup.get("ignored_models", []))
+            shapes = static_shapes
             for (clock, part), (start, _) in list(partitions.items()):
-                if clock == "sim":
+                if clock == "sim" and not dynamic_geometry:
                     insert(
                         Record(
                             "obstacles",

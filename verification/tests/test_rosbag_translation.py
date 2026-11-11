@@ -13,6 +13,29 @@ from uav_ugv_verification.validation import ValidationError
 ROOT = Path(__file__).resolve().parents[2]
 
 
+def test_obstacle_scenario_preserves_geometry_acquisition_and_native_sequence():
+    value = dict(
+        schema_version=1,
+        sim_ns=100,
+        sequence=7,
+        error=None,
+        envelope=[dict(id="box", kind="box", x=1.0, y=2.0, half_x=0.3, half_y=0.3)],
+    )
+    records = telemetry("obstacle_scenario", value)
+    assert len(records) == 1
+    geometry = records[0]
+    assert (geometry.stream, geometry.time_ns, geometry.sequence, geometry.frame) == (
+        "obstacles",
+        100,
+        7,
+        "map",
+    )
+    assert not geometry.data["static"] and geometry.data["shapes"] == value["envelope"]
+    assert geometry.valid
+    value["error"] = "scene confirmation failed"
+    assert not telemetry("obstacle_scenario", value)[0].valid
+
+
 def telemetry(kind, value):
     return translate(
         kind,

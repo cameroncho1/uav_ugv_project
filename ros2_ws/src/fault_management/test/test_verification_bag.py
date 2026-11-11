@@ -4,12 +4,83 @@ import json
 
 import rosbag2_py
 import yaml
+import pytest
 from geometry_msgs.msg import PoseStamped
 from rclpy.serialization import serialize_message
 from rosgraph_msgs.msg import Clock
+from std_msgs.msg import String
 from uav_ugv_verification import evaluate
 from uav_ugv_verification.adapters.files import FileReader
 from uav_ugv_verification.adapters.rosbag import import_bag
+
+
+@pytest.mark.parametrize("geometry_available", [True, False])
+def test_dynamic_obstacle_geometry_is_merged_without_static_fallback(tmp_path, geometry_available):
+    bag = tmp_path / "bag"
+    writer = rosbag2_py.SequentialWriter()
+    writer.open(
+        rosbag2_py.StorageOptions(uri=str(bag), storage_id="sqlite3"),
+        rosbag2_py.ConverterOptions("", ""),
+    )
+    for name, kind in (
+        ("/clock", "rosgraph_msgs/msg/Clock"),
+        ("/truth", "geometry_msgs/msg/PoseStamped"),
+        ("/scenario", "std_msgs/msg/String"),
+    ):
+        writer.create_topic(
+            rosbag2_py.TopicMetadata(name=name, type=kind, serialization_format="cdr")
+        )
+    dynamic = dict(id="new_box", kind="box", x=0.0, y=0.0, half_x=0.3, half_y=0.3)
+    for sequence, seconds in enumerate((10, 11, 12)):
+        clock = Clock()
+        clock.clock.sec = seconds
+        pose = PoseStamped()
+        pose.header.stamp = clock.clock
+        pose.header.frame_id = "map"
+        pose.pose.position.x = -3.0
+        writer.write("/clock", serialize_message(clock), seconds * 10**9)
+        writer.write("/truth", serialize_message(pose), seconds * 10**9)
+        if geometry_available:
+            value = dict(
+                schema_version=1,
+                sim_ns=seconds * 10**9,
+                sequence=sequence,
+                envelope=[dynamic] if sequence == 1 else [],
+                error=None,
+            )
+            writer.write(
+                "/scenario", serialize_message(String(data=json.dumps(value))), seconds * 10**9
+            )
+    del writer
+    world = tmp_path / "world.sdf"
+    world.write_text(
+        '<sdf><world name="fixture"><model name="existing"><static>true</static>'
+        '<pose>10 0 0 0 0 0</pose><link name="body"><collision name="wall">'
+        "<geometry><box><size>1 1 1</size></box></geometry></collision></link>"
+        "</model></world></sdf>"
+    )
+    setup = tmp_path / "setup.yaml"
+    setup.write_text(
+        yaml.safe_dump(
+            dict(
+                schema_version=1,
+                id="dynamic-fixture",
+                topics={"/truth": "truth_pose", "/scenario": "obstacle_scenario"},
+            )
+        )
+    )
+    output = tmp_path / "normalized"
+    import_bag(bag, setup, output, status="completed", world=world)
+    reader = FileReader(output)
+    interval = reader.manifest.intervals[0]
+    geometry = list(reader.records("obstacles", interval))
+    if geometry_available:
+        assert len(geometry) == 3
+        assert [len(v.data["shapes"]) for v in geometry] == [1, 2, 1]
+        assert [v.sequence for v in geometry] == [0, 1, 2]
+        assert all(not v.data["static"] for v in geometry)
+    else:
+        assert geometry == []  # Missing dynamic truth cannot become an empty-world pass.
 
 
 def test_real_cdr_clock_rewind_and_image_exclusion(tmp_path):
