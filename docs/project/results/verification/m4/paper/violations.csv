@@ -1,0 +1,9 @@
+attempt,case_id,category,requirement,reason,time_ns
+16,dense-b-nominal-s631,matrix,R2,goal_deadline_missed,81068000000
+17,dense-b-nominal-s632,matrix,R2,goal_deadline_missed,81828000000
+18,dense-b-nominal-s633,matrix,R2,goal_deadline_missed,81464000000
+31,dense-b-outage-s631,matrix,R2,goal_deadline_missed,81436000000
+32,dense-b-outage-s632,matrix,R2,goal_deadline_missed,81212000000
+33,dense-b-outage-s633,matrix,R2,goal_deadline_missed,81084000000
+50,diagnostic-R2-a16,diagnostic_replay,R2,goal_deadline_missed,80268000000
+51,diagnostic-R2-a17,diagnostic_replay,R2,goal_deadline_missed,80240000000

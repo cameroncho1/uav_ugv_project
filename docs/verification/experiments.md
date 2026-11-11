@@ -20,11 +20,13 @@ Use the Linux environment from [simulator integration](simulator_integration.md)
 python scripts/verification_experiments.py verification/outputs/m3 --stage all
 ```
 
-The runner uses server-only Gazebo, disables RViz, and launches processes in the background. It checks actual world control-service responses and ROS observations with bounded waits. All producer/consumer nodes start before the ROS readiness barrier; PX4 observations can depend on the active bridge setup.
+The runner uses server-only Gazebo, disables RViz, and launches processes in the background. It checks world control-service responses, native PX4 writer creation, and actual ROS observations with bounded waits. Producer/consumer nodes start before the ROS observation barrier. The guard fixture observes a controller command before starting its cases.
+
+ROS domain IDs use 20-79, within the [documented Linux range](https://github.com/ros2/ros2_documentation/blob/humble/source/Concepts/Intermediate/About-Domain-ID.rst). Gazebo partitions and process groups are isolated per attempt. M3 retains its original initialization/domain policy; the startup corrections form the separate M4 demo cohort.
 
 The matrix, search, and replay stages can also run separately. Repeating a command resumes completed work. Interrupted attempts remain in the ledger and receive a fresh attempt directory on retry. A source, world, profile, or plan change requires a new cohort directory. Terminal attempts cannot be edited into successes. Do not run two campaigns concurrently against XRCE port 8888; the runner holds an exclusive lock.
 
-`freeze.json` contains the expanded plan and source hashes before the first attempt. SQLite WAL with full synchronization records each attempt before launch and makes terminal transitions durable. `ledger.json` is an atomic portable snapshot. Each attempt preserves configuration, command, effective environment, log, recording, evaluator verdicts, and terminal status. Startup failure, timeout, interruption, invalid data, and witnessed requirement failure remain separate outcomes.
+`freeze.json` contains the expanded plan and source hashes before the first attempt, including report templates. Source consistency is checked before every matrix, search, and replay attempt. SQLite WAL with full synchronization records each attempt before launch and makes terminal transitions durable. `ledger.json` is an atomic portable snapshot. Each attempt preserves configuration, command, effective environment, log, recording, evaluator verdicts, and terminal status. Startup failure, timeout, interruption, invalid data, and witnessed requirement failure remain separate outcomes. An explicit failed readiness report retains `startup_failed` status even when partial recordings exist.
 
 The runner tracks its own process groups, including children that create new sessions. Timeout/cancellation gives existing cleanup traps time to finalize recording, then escalates only those owned groups. A parent-death signal interrupts the trial runner if its coordinator exits unexpectedly. A Linux regression checks cleanup of independent child sessions.
 
@@ -41,6 +43,6 @@ python scripts/verification_experiments.py verification/outputs/m3 --stage expor
   --export-output docs/project/results/verification/m3
 ```
 
-The portable export retains every attempted outcome, saved results, bound profiles, input manifests, source hashes, generated search worlds, and display series. Figure inputs are downsampled with discrete state transitions retained; verdicts always use full-resolution recordings. Export verifies the numerical stream hashes against the saved result. Missing artifacts remain listed. Raw bags remain at the archive path recorded in `campaign.json`; their availability is explicit.
+The portable export retains every attempted outcome, saved results, bound profiles, input manifests, source hashes, generated search worlds, and display series with separate checksums. Readiness diagnostics survive export even when recording never starts. Figure inputs are downsampled with discrete state transitions retained; verdicts always use full-resolution recordings. Export verifies the numerical stream hashes against the saved result. Missing artifacts remain listed. Raw bags remain at the archive path recorded in `campaign.json`; their availability is explicit.
 
 Reporting uses saved results and exported display series without starting simulation or recomputing verdicts. Counts retain incomplete/failed attempts. Calibration and test cohorts remain separate; repeated deterministic guard/watchdog fixtures are repeatability checks rather than independent statistical trials.

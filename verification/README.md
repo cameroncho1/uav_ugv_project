@@ -57,3 +57,32 @@ The offline suite covers exact deadlines, incomplete horizons, sustained holds, 
 The [integration guide](../docs/verification/simulator_integration.md) provides Linux build, recording, import, profile-binding, and evaluation commands. Setup mappings are in `setups/`; calibrated pilot templates are `profiles/m2_*.yaml`. `bind-profile` resolves `steady:recording` from a recording's verified boot clock without changing thresholds.
 
 `import-bag` supports Humble sqlite3 storage with bounded-memory acquisition sorting, clock resets, native telemetry counters, and numerical topic selection. It records missing capabilities and source/adapter hashes. It requires sourced ROS 2 Humble; other library commands retain their ROS-free numerical boundary. See the [M2 evidence index](../docs/project/results/verification/m2/README.md) for actual camera/guard/watchdog outcomes and sampling limits.
+
+
+## Experiments, paper, and demo
+
+Linux, with the ROS workspace sourced:
+
+```bash
+python scripts/verification_experiments.py verification/outputs/campaign --stage all
+python scripts/verification_demo.py verification/outputs/demo
+python scripts/test_verification_demo_cleanup.py verification/outputs/interruption
+```
+
+The [experiment guide](../docs/verification/experiments.md) defines the fixed matrix, source freeze, durable ledger, bounded search, and owned-process cleanup. The [M3 evidence](../docs/project/results/verification/m3/README.md) retains all completed attempts, including reproduced arrival failures and startup aborts. Live runs use fresh output directories and server-only Gazebo.
+
+Saved-result reproduction works without ROS or source bags:
+
+```bash
+python scripts/verification_report.py docs/project/results/verification/m3 verification/outputs/paper
+python scripts/verification_demo.py verification/outputs/replay --mode replay \
+  --campaign docs/project/results/verification/m4/demo
+```
+
+Add `--compile-pdf` to the report command when `pdflatex` is installed. Paper output includes numerical tables, evaluated bounds, paired assistance outcomes, claim/evidence limits, and eight static figures. Figure bounds come from saved results. The [demo guide](../docs/verification/demo.md) documents statuses, timing, cancellation, and recorded replay.
+
+## Additional simulator setups
+
+The numerical package accepts the [normalized contract](../docs/verification/interfaces.md) independently of the simulator. Add a setup mapping/adapter, declare actual capabilities, transform global coordinates into the declared map/reference point, and preserve acquisition/receipt clocks. Calibrate a separate profile before held-out evaluation. Existing monitors and saved-result reports consume that profile without simulator imports.
+
+The supplied process runner launches this project's Linux camera/guard/watchdog scenarios. Other simulators provide their own launch/recording path and feed the same offline CLI; they do not need to duplicate requirement logic. Unsupported signals remain unavailable. Future hazard/detector producers must supply actual events/decisions before those claims can be measured.

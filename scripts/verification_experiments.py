@@ -18,9 +18,9 @@ from pathlib import Path
 
 import yaml
 from uav_ugv_verification import evaluate
-from uav_ugv_verification.campaign import export_campaign
 from uav_ugv_verification.adapters.profile import bind_profile
 from uav_ugv_verification.adapters.rosbag import import_bag
+from uav_ugv_verification.campaign import export_campaign
 from uav_ugv_verification.experiments import (
     Ledger,
     load_plan,
@@ -167,11 +167,13 @@ def evaluate_recording(root, case, attempt_dir):
 
 
 def execute(ledger, case, parameters, *, category="matrix"):
+    require(source_snapshot(ROOT)["sha256"] == ledger.source_sha256,
+            "source changed during campaign; start a new cohort")
     attempt = ledger.start(case, category)
     directory = Path(attempt["directory"])
     env = os.environ.copy()
     env.update(
-        ROS_DOMAIN_ID=str(90 + attempt["id"] % 100),
+        ROS_DOMAIN_ID=str(20 + attempt["id"] % 60),
         GZ_PARTITION=f"verification_{os.getpid()}_{attempt['id']}",
         SEED=str(case["seed"]),
     )
@@ -247,9 +249,12 @@ def execute(ledger, case, parameters, *, category="matrix"):
             except (ValueError, OSError, KeyError) as exc:
                 detail.setdefault("evaluation_errors", []).append(str(exc))
         codes = [e["exit_code"] for e in detail["evaluations"]]
+        readiness = directory / "run/readiness.json"
+        if readiness.is_file():
+            detail["readiness"] = json.loads(readiness.read_text())
         if process["timed_out"]:
             status = "timed_out"
-        elif not codes:
+        elif detail.get("readiness", {}).get("ready") is False or not codes:
             status = "startup_failed"
         elif 1 in codes:
             status = "failed"
@@ -338,6 +343,7 @@ def main():
         )
         ledger.recover()
         signal.signal(signal.SIGTERM, interrupt)
+        signal.signal(signal.SIGINT, interrupt)
         try:
             if args.stage in ("all", "matrix"):
                 for case in plan["cases"]:

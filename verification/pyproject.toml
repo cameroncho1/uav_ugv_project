@@ -25,6 +25,9 @@ uav-ugv-verify = "uav_ugv_verification.__main__:main"
 [tool.setuptools.packages.find]
 where = ["src"]
 
+[tool.setuptools.package-data]
+uav_ugv_verification = ["reporting/templates/*.md", "reporting/templates/*.tex"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-ra"

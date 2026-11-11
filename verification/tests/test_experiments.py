@@ -72,3 +72,19 @@ def test_search_never_rewards_missing_evidence(verdict, missing, expected):
         ]
     }
     assert objective(result) == expected
+
+
+def test_publication_templates_are_frozen_but_generated_outputs_are_not(tmp_path):
+    from uav_ugv_verification.experiments import source_snapshot
+
+    (tmp_path / "verification/src/reporting/templates").mkdir(parents=True)
+    for name in ("pyproject.toml", "requirements-tested.txt"):
+        (tmp_path / "verification" / name).write_text("test")
+    template = tmp_path / "verification/src/reporting/templates/paper.tex"
+    template.write_text("first")
+    before = source_snapshot(tmp_path)
+    (tmp_path / "verification/outputs").mkdir()
+    (tmp_path / "verification/outputs/paper.tex").write_text("generated")
+    assert source_snapshot(tmp_path)["sha256"] == before["sha256"]
+    template.write_text("changed")
+    assert source_snapshot(tmp_path)["sha256"] != before["sha256"]

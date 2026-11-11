@@ -153,8 +153,13 @@ def main():
                 [str(binary), '--ros-args', '-p', 'use_sim_time:=true', '-p', 'evaluation_trace:=true'],
                 stdout=log, stderr=subprocess.STDOUT))
         deadline = time.monotonic() + 20
-        while node.pose.get_subscription_count() < 2:
-            assert time.monotonic() < deadline, 'Planner/controller discovery timed out'
+        while node.pose.get_subscription_count() < 2 or not node.commands:
+            assert time.monotonic() < deadline, 'Planner/controller command readiness timed out'
+            # Endpoint discovery alone does not establish command delivery. Advance a
+            # positive clock and observe the real controller before starting cases.
+            clock = Clock()
+            clock.clock.sec = int(node.clock_time)
+            node.clock.publish(clock)
             rclpy.spin_once(node, timeout_sec=0.1)
         cases = [('raw_only', False), ('valid', True), ('uncertain_position', False),
                  ('recovery', True), ('uncertain_heading', False), ('correlated_xy', False),
@@ -183,12 +188,15 @@ def main():
             except subprocess.TimeoutExpired:
                 process.kill()
                 process.wait()
-        for log in logs:
-            log.close()
-        recording.close(status)
-        recording.normalize()
-        node.destroy_node()
-        rclpy.shutdown()
+        try:
+            recording.close(status)
+        finally:
+            node.destroy_node()
+            rclpy.try_shutdown()
+            for log in logs:
+                log.close()
+        if status == "completed":
+            recording.normalize()
 
 
 if __name__ == '__main__':

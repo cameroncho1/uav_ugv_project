@@ -40,7 +40,7 @@ def write_json(path: Path, value) -> None:
 
 def write_csv(path: Path, rows: list[dict], fields: list[str]) -> None:
     buffer = io.StringIO(newline="")
-    writer = csv.DictWriter(buffer, fieldnames=fields)
+    writer = csv.DictWriter(buffer, fieldnames=fields, lineterminator="\n")
     writer.writeheader()
     writer.writerows(rows)
     atomic_text(path, buffer.getvalue())

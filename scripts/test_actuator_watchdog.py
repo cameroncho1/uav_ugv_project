@@ -174,11 +174,15 @@ def case(output, mode, clock_mode="normal"):
         return result
     finally:
         stop(processes)
-        recording.close(status)
-        recording.normalize()
-        node.destroy_node()
-        rclpy.try_shutdown()
-        for log in logs: log.close()
+        try:
+            recording.close(status)
+        finally:
+            node.destroy_node()
+            rclpy.try_shutdown()
+            for log in logs:
+                log.close()
+        if status == "completed":
+            recording.normalize()
 
 
 def main():

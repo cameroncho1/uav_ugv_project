@@ -40,7 +40,19 @@ def source_snapshot(repository: Path) -> dict:
                     tree == "simulation"
                     or path.name == "CMakeLists.txt"
                     or path.suffix
-                    in (".py", ".cpp", ".hpp", ".yaml", ".json", ".sdf", ".sh", ".msg", ".xml")
+                    in (
+                        ".py",
+                        ".cpp",
+                        ".hpp",
+                        ".yaml",
+                        ".json",
+                        ".sdf",
+                        ".sh",
+                        ".msg",
+                        ".xml",
+                        ".md",
+                        ".tex",
+                    )
                 )
             ):
                 files[str(path.relative_to(repository))] = digest_file(path)
@@ -95,6 +107,7 @@ class Ledger:
     def __init__(self, root: Path, plan: dict, source_sha256: str):
         root.mkdir(parents=True, exist_ok=True)
         self.root = root
+        self.source_sha256 = source_sha256
         self.connection = sqlite3.connect(root / "ledger.sqlite3", timeout=30)
         self.connection.execute("PRAGMA journal_mode=WAL")
         self.connection.execute("PRAGMA synchronous=FULL")

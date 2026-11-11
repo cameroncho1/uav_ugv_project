@@ -1,6 +1,6 @@
 # Verification implementation reference
 
-Status: research and source inspection, 2026-11-10. M1 implementation is documented in [validation status](status.md); simulator validation and D01-D06 corrections remain M2.
+Baseline research and source inspection: 2026-11-10. The inventory and proposed instrumentation below describe that inspected baseline. D01-D06 are corrected in M2; current implementation, runtime checks, and recorded limits are in [validation status](status.md).
 
 [Specification](milestone_plan.md) | [Verification index](README.md)
 
@@ -14,7 +14,7 @@ Status: research and source inspection, 2026-11-10. M1 implementation is documen
 | Figures | Matplotlib; load only for report generation | Existing [requirements](../../requirements.txt) |
 | Monitor comparison | RTAMT is an optional test oracle for supported `always`/`eventually` formulas, not a runtime dependency | [RTAMT documentation](https://github.com/nickovic/rtamt), [tool paper](https://arxiv.org/abs/2005.11827) |
 
-Use the Ubuntu 22.04 ROS environment's Python interpreter for bag decoding. A virtual environment needs access to installed ROS packages, for example via `--system-site-packages`. Pin versions after the Linux compatibility checks; no dependency set is claimed tested here. Core fixtures must run without importing the ROS adapter.
+Use the Ubuntu 22.04 ROS environment's Python interpreter for bag decoding. A virtual environment needs access to installed ROS packages, for example via `--system-site-packages`. Tested pins are in [requirements-tested.txt](../../verification/requirements-tested.txt). Core fixtures run without importing the ROS adapter.
 
 The RTAMT discrete-time API has sampling assumptions; do not feed irregular sensor timestamps into it as though samples were seconds. A comparison must state time units, sampling/interpolation, and horizon coverage. Its result does not replace the project's data-quality and trigger-coverage verdicts. [RTAMT timing documentation](https://github.com/nickovic/rtamt#working-with-time-units-and-timing-assumptions)
 

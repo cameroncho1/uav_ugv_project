@@ -1,6 +1,6 @@
 # Verification specification
 
-Status: M1-M3 implemented; M4 planned. Updated: 2026-11-11. [Validation status](status.md).
+Status: M1-M4 implemented. Optional E1 remains unimplemented. Updated: 2026-11-11. [Validation status](status.md) | [M3 experiments](../project/results/verification/m3/README.md) | [M4 report/demo](../project/results/verification/m4/README.md).
 
 [Verification index](README.md) | [Implementation reference](implementation_reference.md) | [Completion plan](../project/completion_plan.md) | [Navigation](../navigation.md)
 

@@ -19,6 +19,6 @@ def bind_profile(run: Path, template: Path, output: Path) -> dict:
             rule["clock"] = next(iter(clocks))
     require(not output.exists(), "bound profile already exists")
     output.parent.mkdir(parents=True, exist_ok=True)
-    output.write_text(yaml.safe_dump(raw, sort_keys=False), encoding="utf-8")
+    output.write_text(yaml.safe_dump(raw, sort_keys=False), encoding="utf-8", newline="\n")
     load_profile(output)
     return {"profile": str(output), "steady_clocks": sorted(clocks)}

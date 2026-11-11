@@ -50,6 +50,16 @@ until [[ "$(timeout 3s gz service -s /world/simple_goal_demo/control \
 done
 setsid MicroXRCEAgent udp4 -p 8888 >"$OUTPUT/dds.log" 2>&1 & pids+=("$!")
 setsid "$ROOT/scripts/px4_goal_demo.sh" >"$OUTPUT/px4.log" 2>&1 & pids+=("$!")
+# Let the native XRCE session establish its writers before starting the ROS graph.
+# This is a transport barrier; actual ROS observations are checked below.
+printf '%s\n' '{"ready":false,"stage":"px4_entities"}' >"$OUTPUT/readiness.json"
+px4_pid="${pids[-1]}"
+deadline=$((SECONDS + 45))
+until grep -Fq 'successfully created rt/fmu/out/vehicle_odometry' "$OUTPUT/px4.log"; do
+  kill -0 "$px4_pid" || { echo 'PX4 exited before entity readiness' >&2; exit 2; }
+  (( SECONDS < deadline )) || { echo 'PX4 entity readiness timed out' >&2; exit 2; }
+  sleep .25
+done
 setsid python3 "$ROOT/scripts/verification_recording.py" "$OUTPUT/verification" --world "$WORLD" --result "$OUTPUT/results.json" &
 record_pid=$!
 setsid ros2 launch mission_manager simple_goal_demo.launch.py \

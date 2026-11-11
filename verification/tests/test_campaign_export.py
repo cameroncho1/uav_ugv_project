@@ -43,3 +43,21 @@ def test_export_rejects_evidence_outside_campaign(tmp_path):
     with pytest.raises(ValidationError, match="escapes campaign"):
         export_campaign(source, tmp_path / "portable")
     ledger.close()
+
+
+def test_export_retains_readiness_when_recording_never_started(tmp_path):
+    source = tmp_path / "raw"
+    ledger = Ledger(source, {"cases": [{"case_id": "startup"}]}, "source")
+    attempt = ledger.start({"case_id": "startup"})
+    directory = source / "attempts/0001-startup/run"
+    directory.mkdir()
+    (directory / "readiness.json").write_text('{"ready":false,"stage":"px4_entities"}\n')
+    ledger.finish(attempt["id"], "startup_failed", {})
+    (source / "freeze.json").write_text("{}")
+    output = tmp_path / "export"
+    summary = export_campaign(source, output)
+    assert not summary["recordings"]
+    assert summary["diagnostics"][0]["attempt"] == attempt["id"]
+    path = output / summary["diagnostics"][0]["path"]
+    assert json.loads(path.read_text())["stage"] == "px4_entities"
+    ledger.close()

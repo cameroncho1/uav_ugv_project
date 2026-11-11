@@ -14,6 +14,7 @@ def test_bind_preserves_timing_thresholds(run_factory, profile_factory, tmp_path
     template = profile_factory("R4", clock="steady:recording", parameters={"expiry_ns": 450000000})
     output = tmp_path / "bound.yaml"
     bind_profile(run, template, output)
+    assert b"\r" not in output.read_bytes()
     rule = load_profile(output).rules["R4"]
     assert rule.clock == "steady:boot-123"
     assert rule.parameters["expiry_ns"] == 450000000

@@ -2,12 +2,13 @@
 
 from __future__ import annotations
 
+import json
 import shutil
 from collections import Counter
 from pathlib import Path
 
 from .adapters.files import FileReader
-from .reporting.files import write_json
+from .reporting.files import atomic_text, write_json
 from .validation import digest_file, read_json, require
 
 FIELDS = {
@@ -93,8 +94,21 @@ def export_campaign(source: Path, output: Path) -> dict:
             read_json(output / "campaign.json")["source_sha256"] == ledger["source_sha256"],
             "export contains a different source cohort",
         )
-    recordings, missing = [], []
+    recordings, missing, diagnostics = [], [], []
     for attempt in ledger["attempts"]:
+        readiness = (
+            source / "attempts" / f"{attempt['id']:04d}-{attempt['case_id']}" / "run/readiness.json"
+        )
+        if readiness.is_file():
+            relative = Path("diagnostics") / f"a{attempt['id']:04d}-readiness.json"
+            destination = output / relative
+            destination.parent.mkdir(exist_ok=True)
+            shutil.copyfile(readiness, destination)
+            diagnostics.append(
+                dict(
+                    attempt=attempt["id"], path=relative.as_posix(), sha256=digest_file(destination)
+                )
+            )
         for index, evidence in enumerate(attempt["detail"].get("evaluations", [])):
             result_path = Path(evidence["result_path"]).resolve()
             require(result_path.is_relative_to(source), "result path escapes campaign")
@@ -112,7 +126,13 @@ def export_campaign(source: Path, output: Path) -> dict:
             normalized = result_path.parent.parent / "normalized"
             if (normalized / "manifest.json").is_file():
                 shutil.copyfile(normalized / "manifest.json", destination / "input_manifest.json")
-                write_json(destination / "series.json", figure_series(normalized, result))
+                atomic_text(
+                    destination / "series.json",
+                    json.dumps(
+                        figure_series(normalized, result), separators=(",", ":"), allow_nan=False
+                    )
+                    + "\n",
+                )
             for name in ("evaluation_profile.yaml", "recording.json"):
                 path = result_path.parent.parent / name
                 if path.is_file():
@@ -130,10 +150,20 @@ def export_campaign(source: Path, output: Path) -> dict:
                     configuration=attempt["configuration"],
                     directory=relative.as_posix(),
                     result_sha256=digest_file(destination / "result.json"),
+                    series_sha256=digest_file(destination / "series.json")
+                    if (destination / "series.json").is_file()
+                    else None,
                 )
             )
-    for name in ("freeze.json", "ledger.json"):
-        shutil.copyfile(source / name, output / name)
+    for name in (
+        "freeze.json",
+        "ledger.json",
+        "source_archive.json",
+        "diagnostic_R2_plan.json",
+        "diagnostic_summary.json",
+    ):
+        if (source / name).is_file():
+            shutil.copyfile(source / name, output / name)
     if (source / "search_worlds").is_dir():
         shutil.copytree(source / "search_worlds", output / "search_worlds", dirs_exist_ok=True)
     completed = {
@@ -148,6 +178,7 @@ def export_campaign(source: Path, output: Path) -> dict:
         plan=ledger["plan"],
         recordings=recordings,
         missing_artifacts=missing,
+        diagnostics=diagnostics,
         attempt_counts=dict(Counter(a["status"] for a in ledger["attempts"])),
         matrix_cases_planned=len(ledger["plan"]["cases"]),
         matrix_cases_attempted=len(completed),
