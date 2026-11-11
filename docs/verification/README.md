@@ -4,11 +4,13 @@
 
 Offline evaluation of recorded behavior against R1-R8, using normalized signals and recording adapters.
 
-Status: M1 offline evaluation and M2 simulator integration implemented. M3 experiments and M4 final report/demo remain planned.
+Status: M1-M3 implemented: offline evaluation, simulator integration, and recorded experiments. M4 report/demo remains planned.
 
 - [Technical specification](milestone_plan.md): architecture, data contracts, requirements, four milestones, and acceptance checks.
 - [CLI and examples](../../verification/README.md): installation, evaluation, saved-result reporting, and tests.
 - [Simulator integration](simulator_integration.md): Linux build/record/import commands, telemetry, setup extension, and calibrated profiles.
+- [Experiment execution](experiments.md): frozen matrix, durable ledger, bounded search, replay, cleanup, and portable exports.
+- [M3 evidence](../project/results/verification/m3/README.md): all 51 attempts, reproduced arrival failures, startup diagnostics, and the completed search budget.
 - [M2 evidence](../project/results/verification/m2/README.md): camera, guard, and watchdog recordings, failed pilots, calibration, and limits.
 - [Interfaces](interfaces.md): normalized records, profiles, adapter API, and result schemas.
 - [Executable requirements](requirements.md): R1-R8 definitions, timing semantics, parameters, and limits.

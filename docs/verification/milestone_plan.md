@@ -1,6 +1,6 @@
 # Verification specification
 
-Status: M1-M2 implemented; M3-M4 planned. Updated: 2026-11-10. [Validation status](status.md).
+Status: M1-M3 implemented; M4 planned. Updated: 2026-11-11. [Validation status](status.md).
 
 [Verification index](README.md) | [Implementation reference](implementation_reference.md) | [Completion plan](../project/completion_plan.md) | [Navigation](../navigation.md)
 

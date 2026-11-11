@@ -17,30 +17,39 @@ export GZ_SIM_RESOURCE_PATH="$ROOT/simulation/models:$GZ_SIM_RESOURCE_PATH"
 export PX4_PARAM_UXRCE_DDS_DOM_ID="${ROS_DOMAIN_ID:-0}"
 python3 "$ROOT/scripts/check_sim_dependencies.py"
 source "$ROOT/scripts/process_cleanup.sh"
+ulimit -c 0
 mkdir -p "$OUTPUT"
 pids=()
 WORLD="${WORLD_FILE:-$ROOT/simulation/worlds/simple_goal_demo.sdf}"
 export WORLD_FILE="$WORLD" GOAL_X="${GOAL_X:-4.0}" GOAL_Y="${GOAL_Y:-0.0}"
 export UAV_ASSISTANCE="${UAV_ASSISTANCE:-true}"
 record_pid=""
+recorder_status=0
 cleanup() {
   if [[ -n "$record_pid" ]]; then
     kill -INT -- "-$record_pid" 2>/dev/null || true
-    wait "$record_pid" || true
+    wait "$record_pid" || recorder_status=$?
     record_pid=""
   fi
   stop_process_groups "${pids[@]}"
   pids=()
+  return "$recorder_status"
 }
 trap cleanup EXIT
 trap 'exit 130' INT
 trap 'exit 143' TERM
 setsid gz sim -s -r --render-engine-server "${RENDER_ENGINE:-ogre}" \
   "$WORLD" >"$OUTPUT/world.log" 2>&1 & pids+=("$!")
-sleep 3
+deadline=$((SECONDS + 30))
+until [[ "$(timeout 3s gz service -s /world/simple_goal_demo/control \
+  --reqtype gz.msgs.WorldControl --reptype gz.msgs.Boolean --timeout 500 \
+  --req 'pause: false' 2>/dev/null || true)" == *'data: true'* ]]; do
+  kill -0 "${pids[0]}" || exit 2
+  (( SECONDS < deadline )) || { echo 'World readiness timed out' >&2; exit 2; }
+  sleep .25
+done
 setsid MicroXRCEAgent udp4 -p 8888 >"$OUTPUT/dds.log" 2>&1 & pids+=("$!")
 setsid "$ROOT/scripts/px4_goal_demo.sh" >"$OUTPUT/px4.log" 2>&1 & pids+=("$!")
-sleep 15
 setsid python3 "$ROOT/scripts/verification_recording.py" "$OUTPUT/verification" --world "$WORLD" --result "$OUTPUT/results.json" &
 record_pid=$!
 setsid ros2 launch mission_manager simple_goal_demo.launch.py \
@@ -55,6 +64,11 @@ setsid ros2 launch mission_manager simple_goal_demo.launch.py \
   >"$OUTPUT/launch.log" 2>&1 & pids+=("$!")
 setsid ros2 run simulation_support ugv_truth --ros-args \
   -p world:=simple_goal_demo -p use_sim_time:=true -p evaluation_trace:=true >"$OUTPUT/truth.log" 2>&1 & pids+=("$!")
+python3 "$ROOT/scripts/verification_readiness.py" --timeout 60 \
+  /clock=rosgraph_msgs/msg/Clock /evaluation/control=std_msgs/msg/String \
+  /evaluation/ugv_truth=geometry_msgs/msg/PoseStamped \
+  /fmu/out/vehicle_odometry=px4_msgs/msg/VehicleOdometry >"$OUTPUT/readiness.json"
+kill -0 "$record_pid" || { echo 'Recorder exited before readiness' >&2; exit 2; }
 score_args=(--timeout "${TRIAL_TIMEOUT:-600}" --seed "${SEED:-513}"
   --wall-timeout "${WALL_TIMEOUT:-900}" --goal-x "$GOAL_X" --goal-y "$GOAL_Y" --uav-assistance "$UAV_ASSISTANCE"
   --gps-outage-after-motion "${GPS_OUTAGE_AFTER_MOTION:--1}"

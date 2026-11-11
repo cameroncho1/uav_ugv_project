@@ -1,0 +1,14 @@
+[
+  {
+    "attempt": 50,
+    "parent_attempt": 16,
+    "requirement": "R2",
+    "outcome": "reproduced"
+  },
+  {
+    "attempt": 51,
+    "parent_attempt": 17,
+    "requirement": "R2",
+    "outcome": "reproduced"
+  }
+]

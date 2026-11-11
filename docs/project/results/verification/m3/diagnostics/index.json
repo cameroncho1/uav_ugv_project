@@ -1,0 +1,194 @@
+[
+  {
+    "attempt": 1,
+    "excerpt": "diagnostics/a0001/run-px4.log.excerpt.txt",
+    "source": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0001-empty-a-nominal-s631/run/px4.log",
+    "source_sha256": "9bf4433e4a8a91d1b873b9015dbdb4d97952e409dcedc176ef45bfffad416b2f"
+  },
+  {
+    "attempt": 1,
+    "excerpt": "diagnostics/a0001/readiness.json",
+    "source": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0001-empty-a-nominal-s631/run/readiness.json",
+    "source_sha256": "14a3ca1559f9cf4c55a20d24039dedd43db082f0ead2f7cf4d41eee47354a631"
+  },
+  {
+    "attempt": 2,
+    "excerpt": "diagnostics/a0002/run-px4.log.excerpt.txt",
+    "source": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0002-empty-a-nominal-s632/run/px4.log",
+    "source_sha256": "bdbcc47ad87b6f9c44e35f81b8d41dcb635fe1e60644bb3ae16743cc0ff4f229"
+  },
+  {
+    "attempt": 2,
+    "excerpt": "diagnostics/a0002/readiness.json",
+    "source": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0002-empty-a-nominal-s632/run/readiness.json",
+    "source_sha256": "e8fa79fb794bfad60c3c630f56dffef46ec754afad154afaf11afa2a8d861a9e"
+  },
+  {
+    "attempt": 3,
+    "excerpt": "diagnostics/a0003/run-px4.log.excerpt.txt",
+    "source": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0003-empty-a-nominal-s633/run/px4.log",
+    "source_sha256": "6925418fd114ff0082b8f4e755fa6cf37f251850bfc3863db46c6d4b353afde2"
+  },
+  {
+    "attempt": 3,
+    "excerpt": "diagnostics/a0003/readiness.json",
+    "source": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0003-empty-a-nominal-s633/run/readiness.json",
+    "source_sha256": "75a76cbe9003a258a9976ac4743c4e6c537a65a00f13becb541582b187773ab2"
+  },
+  {
+    "attempt": 16,
+    "excerpt": "diagnostics/a0016/runner.log.excerpt.txt",
+    "source": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0016-dense-b-nominal-s631/runner.log",
+    "source_sha256": "02b17f5d9fe0096e81336dc7c1d48db54ffa56edbba91e5cd0a83c188c6e0f77"
+  },
+  {
+    "attempt": 16,
+    "excerpt": "diagnostics/a0016/run-launch.log.excerpt.txt",
+    "source": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0016-dense-b-nominal-s631/run/launch.log",
+    "source_sha256": "e4ebbdae114301e1ead15c736db2985b3bd1a6f8f4ac753496db9d4be3466715"
+  },
+  {
+    "attempt": 16,
+    "excerpt": "diagnostics/a0016/readiness.json",
+    "source": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0016-dense-b-nominal-s631/run/readiness.json",
+    "source_sha256": "5af922d9757b45bf04e57571060ec52759d81c46caa9f37fd8b0b6e57f82cbb5"
+  },
+  {
+    "attempt": 17,
+    "excerpt": "diagnostics/a0017/runner.log.excerpt.txt",
+    "source": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0017-dense-b-nominal-s632/runner.log",
+    "source_sha256": "d2708c7fcbb427a9f813f0aaa68067d8523f2baab55bb335358e18d6e50e5388"
+  },
+  {
+    "attempt": 17,
+    "excerpt": "diagnostics/a0017/run-launch.log.excerpt.txt",
+    "source": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0017-dense-b-nominal-s632/run/launch.log",
+    "source_sha256": "ad700e29cd6367e4f79be5cbe40ba106bfaed55a5113910d8ab7ff3bd9cda415"
+  },
+  {
+    "attempt": 17,
+    "excerpt": "diagnostics/a0017/readiness.json",
+    "source": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0017-dense-b-nominal-s632/run/readiness.json",
+    "source_sha256": "13daa8c09f6a663e9fc1b5252daa541fd9b43107188feb4f0fee972d775a2615"
+  },
+  {
+    "attempt": 18,
+    "excerpt": "diagnostics/a0018/runner.log.excerpt.txt",
+    "source": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0018-dense-b-nominal-s633/runner.log",
+    "source_sha256": "f010474f8e35451f4795281524cad76bd85a5f4c0fe3dbf91abfb9a7c596f947"
+  },
+  {
+    "attempt": 18,
+    "excerpt": "diagnostics/a0018/run-launch.log.excerpt.txt",
+    "source": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0018-dense-b-nominal-s633/run/launch.log",
+    "source_sha256": "013addacef4e47a2e28856fb2adbbad02662531ecf2a446df2d8d9416c990423"
+  },
+  {
+    "attempt": 18,
+    "excerpt": "diagnostics/a0018/readiness.json",
+    "source": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0018-dense-b-nominal-s633/run/readiness.json",
+    "source_sha256": "d1d2688fcc9578024957bfc92950d0be24f3b859385b1dbc7c7cdc766bd6a986"
+  },
+  {
+    "attempt": 31,
+    "excerpt": "diagnostics/a0031/runner.log.excerpt.txt",
+    "source": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0031-dense-b-outage-s631/runner.log",
+    "source_sha256": "abb54ce543002e94102e321d9aa51af03e6e66a882edeb772e18106f8bfbbbd1"
+  },
+  {
+    "attempt": 31,
+    "excerpt": "diagnostics/a0031/run-launch.log.excerpt.txt",
+    "source": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0031-dense-b-outage-s631/run/launch.log",
+    "source_sha256": "4157435cb96fdca7cdfb924f0fc064b7d057324c28269c729f0388d6b719b95b"
+  },
+  {
+    "attempt": 31,
+    "excerpt": "diagnostics/a0031/readiness.json",
+    "source": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0031-dense-b-outage-s631/run/readiness.json",
+    "source_sha256": "5ed6bc3e8ea09a5c1bb5ca0573776b5c4ac9996d553d14962eecba59360cf174"
+  },
+  {
+    "attempt": 32,
+    "excerpt": "diagnostics/a0032/runner.log.excerpt.txt",
+    "source": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0032-dense-b-outage-s632/runner.log",
+    "source_sha256": "064ff34c2ac9b08a2bc6e60e012b691e88e5955c1830937df764ed2c8623d480"
+  },
+  {
+    "attempt": 32,
+    "excerpt": "diagnostics/a0032/run-launch.log.excerpt.txt",
+    "source": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0032-dense-b-outage-s632/run/launch.log",
+    "source_sha256": "8aee1efefa761aadb229120083d685323e71e290068e136f38d9bdbf963b247e"
+  },
+  {
+    "attempt": 32,
+    "excerpt": "diagnostics/a0032/readiness.json",
+    "source": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0032-dense-b-outage-s632/run/readiness.json",
+    "source_sha256": "5b53e6f9cd2a0cd192fb60688b291bda85f1d8b271f224318e65571aa6cb3a7b"
+  },
+  {
+    "attempt": 33,
+    "excerpt": "diagnostics/a0033/runner.log.excerpt.txt",
+    "source": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0033-dense-b-outage-s633/runner.log",
+    "source_sha256": "1c1f4ecabcacbfd24aa95402ade5a04c017da712a0eff7913c0e4b698c5bce05"
+  },
+  {
+    "attempt": 33,
+    "excerpt": "diagnostics/a0033/run-launch.log.excerpt.txt",
+    "source": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0033-dense-b-outage-s633/run/launch.log",
+    "source_sha256": "e40874df27f5d4ce825f1ce4cd2b21df4d58cf11bf30777c2b2e7e73de1d7f6d"
+  },
+  {
+    "attempt": 33,
+    "excerpt": "diagnostics/a0033/readiness.json",
+    "source": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0033-dense-b-outage-s633/run/readiness.json",
+    "source_sha256": "9c3629bc3cd854b6b20dcb4e61a38fdb54a69e47aa801b1f77841b4d7d12ce07"
+  },
+  {
+    "attempt": 40,
+    "excerpt": "diagnostics/a0040/runner.log.excerpt.txt",
+    "source": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0040-guard-s631/runner.log",
+    "source_sha256": "c81791c2a816b1496c6f8b6da759b5a47b090625fb1c83144e7ecf7536163299"
+  },
+  {
+    "attempt": 41,
+    "excerpt": "diagnostics/a0041/runner.log.excerpt.txt",
+    "source": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0041-guard-s632/runner.log",
+    "source_sha256": "c81791c2a816b1496c6f8b6da759b5a47b090625fb1c83144e7ecf7536163299"
+  },
+  {
+    "attempt": 50,
+    "excerpt": "diagnostics/a0050/runner.log.excerpt.txt",
+    "source": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0050-diagnostic-R2-a16/runner.log",
+    "source_sha256": "2aa3f2ee2747f95d2680744d7c6b1e45653c3860482a42a5dc9d621f9f2e1dc8"
+  },
+  {
+    "attempt": 50,
+    "excerpt": "diagnostics/a0050/run-launch.log.excerpt.txt",
+    "source": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0050-diagnostic-R2-a16/run/launch.log",
+    "source_sha256": "dadbb97ff06d809463a827ceaee4256752226fe7ceb4b27730166f863d98791c"
+  },
+  {
+    "attempt": 50,
+    "excerpt": "diagnostics/a0050/readiness.json",
+    "source": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0050-diagnostic-R2-a16/run/readiness.json",
+    "source_sha256": "f2ba439aea863cf2afd25ee0f6e9560b1398721a704c1793d36108763d6097fa"
+  },
+  {
+    "attempt": 51,
+    "excerpt": "diagnostics/a0051/runner.log.excerpt.txt",
+    "source": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0051-diagnostic-R2-a17/runner.log",
+    "source_sha256": "9b4eda549f5d5aa38a818185c29856373765f235985c49b1b63659a55138e90c"
+  },
+  {
+    "attempt": 51,
+    "excerpt": "diagnostics/a0051/run-launch.log.excerpt.txt",
+    "source": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0051-diagnostic-R2-a17/run/launch.log",
+    "source_sha256": "33e1a89116ec5c1c9adbd3c3c226b5a72ed9a61918ef288f685f8e2b6ba821aa"
+  },
+  {
+    "attempt": 51,
+    "excerpt": "diagnostics/a0051/readiness.json",
+    "source": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0051-diagnostic-R2-a17/run/readiness.json",
+    "source_sha256": "c28004ca4a7dde16f655f28a9c64dde7e155914a52bf9034dcd8a2f7576f2573"
+  }
+]

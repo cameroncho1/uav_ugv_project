@@ -1,0 +1,1787 @@
+{
+  "attempt_counts": {
+    "failed": 8,
+    "inconclusive": 3,
+    "passed": 38,
+    "startup_failed": 2
+  },
+  "matrix_cases_attempted": 45,
+  "matrix_cases_planned": 45,
+  "missing_artifacts": [],
+  "plan": {
+    "cases": [
+      {
+        "assistance": true,
+        "case_id": "empty-a-nominal-s631",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "empty-a-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 631,
+        "world": "simulation/worlds/simple_goal_demo.sdf",
+        "world_sha256": "0f12df287b4c55a6c71f139e1ff957d1330559762dc7a6aab814a8b72feb3bb3"
+      },
+      {
+        "assistance": true,
+        "case_id": "empty-a-nominal-s632",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "empty-a-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 632,
+        "world": "simulation/worlds/simple_goal_demo.sdf",
+        "world_sha256": "0f12df287b4c55a6c71f139e1ff957d1330559762dc7a6aab814a8b72feb3bb3"
+      },
+      {
+        "assistance": true,
+        "case_id": "empty-a-nominal-s633",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "empty-a-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 633,
+        "world": "simulation/worlds/simple_goal_demo.sdf",
+        "world_sha256": "0f12df287b4c55a6c71f139e1ff957d1330559762dc7a6aab814a8b72feb3bb3"
+      },
+      {
+        "assistance": true,
+        "case_id": "empty-b-nominal-s631",
+        "goal": [
+          3.0,
+          0.5
+        ],
+        "id": "empty-b-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 631,
+        "world": "simulation/worlds/simple_goal_demo.sdf",
+        "world_sha256": "0f12df287b4c55a6c71f139e1ff957d1330559762dc7a6aab814a8b72feb3bb3"
+      },
+      {
+        "assistance": true,
+        "case_id": "empty-b-nominal-s632",
+        "goal": [
+          3.0,
+          0.5
+        ],
+        "id": "empty-b-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 632,
+        "world": "simulation/worlds/simple_goal_demo.sdf",
+        "world_sha256": "0f12df287b4c55a6c71f139e1ff957d1330559762dc7a6aab814a8b72feb3bb3"
+      },
+      {
+        "assistance": true,
+        "case_id": "empty-b-nominal-s633",
+        "goal": [
+          3.0,
+          0.5
+        ],
+        "id": "empty-b-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 633,
+        "world": "simulation/worlds/simple_goal_demo.sdf",
+        "world_sha256": "0f12df287b4c55a6c71f139e1ff957d1330559762dc7a6aab814a8b72feb3bb3"
+      },
+      {
+        "assistance": true,
+        "case_id": "sparse-a-nominal-s631",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "sparse-a-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 631,
+        "world": "simulation/worlds/simple_goal_demo_sparse.sdf",
+        "world_sha256": "345e873cffc911fc7a13ce6e9a011ebedf076b2beaca466d7d779f5195d37391"
+      },
+      {
+        "assistance": true,
+        "case_id": "sparse-a-nominal-s632",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "sparse-a-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 632,
+        "world": "simulation/worlds/simple_goal_demo_sparse.sdf",
+        "world_sha256": "345e873cffc911fc7a13ce6e9a011ebedf076b2beaca466d7d779f5195d37391"
+      },
+      {
+        "assistance": true,
+        "case_id": "sparse-a-nominal-s633",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "sparse-a-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 633,
+        "world": "simulation/worlds/simple_goal_demo_sparse.sdf",
+        "world_sha256": "345e873cffc911fc7a13ce6e9a011ebedf076b2beaca466d7d779f5195d37391"
+      },
+      {
+        "assistance": true,
+        "case_id": "sparse-b-nominal-s631",
+        "goal": [
+          3.0,
+          0.5
+        ],
+        "id": "sparse-b-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 631,
+        "world": "simulation/worlds/simple_goal_demo_sparse.sdf",
+        "world_sha256": "345e873cffc911fc7a13ce6e9a011ebedf076b2beaca466d7d779f5195d37391"
+      },
+      {
+        "assistance": true,
+        "case_id": "sparse-b-nominal-s632",
+        "goal": [
+          3.0,
+          0.5
+        ],
+        "id": "sparse-b-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 632,
+        "world": "simulation/worlds/simple_goal_demo_sparse.sdf",
+        "world_sha256": "345e873cffc911fc7a13ce6e9a011ebedf076b2beaca466d7d779f5195d37391"
+      },
+      {
+        "assistance": true,
+        "case_id": "sparse-b-nominal-s633",
+        "goal": [
+          3.0,
+          0.5
+        ],
+        "id": "sparse-b-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 633,
+        "world": "simulation/worlds/simple_goal_demo_sparse.sdf",
+        "world_sha256": "345e873cffc911fc7a13ce6e9a011ebedf076b2beaca466d7d779f5195d37391"
+      },
+      {
+        "assistance": true,
+        "case_id": "dense-a-nominal-s631",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "dense-a-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 631,
+        "world": "simulation/worlds/simple_goal_demo_dense.sdf",
+        "world_sha256": "21bfa8b92d59c24f0c2afb1365832393b45c7b704ed036bd78c4438ce0a3a48f"
+      },
+      {
+        "assistance": true,
+        "case_id": "dense-a-nominal-s632",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "dense-a-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 632,
+        "world": "simulation/worlds/simple_goal_demo_dense.sdf",
+        "world_sha256": "21bfa8b92d59c24f0c2afb1365832393b45c7b704ed036bd78c4438ce0a3a48f"
+      },
+      {
+        "assistance": true,
+        "case_id": "dense-a-nominal-s633",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "dense-a-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 633,
+        "world": "simulation/worlds/simple_goal_demo_dense.sdf",
+        "world_sha256": "21bfa8b92d59c24f0c2afb1365832393b45c7b704ed036bd78c4438ce0a3a48f"
+      },
+      {
+        "assistance": true,
+        "case_id": "dense-b-nominal-s631",
+        "goal": [
+          3.0,
+          0.5
+        ],
+        "id": "dense-b-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 631,
+        "world": "simulation/worlds/simple_goal_demo_dense.sdf",
+        "world_sha256": "21bfa8b92d59c24f0c2afb1365832393b45c7b704ed036bd78c4438ce0a3a48f"
+      },
+      {
+        "assistance": true,
+        "case_id": "dense-b-nominal-s632",
+        "goal": [
+          3.0,
+          0.5
+        ],
+        "id": "dense-b-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 632,
+        "world": "simulation/worlds/simple_goal_demo_dense.sdf",
+        "world_sha256": "21bfa8b92d59c24f0c2afb1365832393b45c7b704ed036bd78c4438ce0a3a48f"
+      },
+      {
+        "assistance": true,
+        "case_id": "dense-b-nominal-s633",
+        "goal": [
+          3.0,
+          0.5
+        ],
+        "id": "dense-b-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 633,
+        "world": "simulation/worlds/simple_goal_demo_dense.sdf",
+        "world_sha256": "21bfa8b92d59c24f0c2afb1365832393b45c7b704ed036bd78c4438ce0a3a48f"
+      },
+      {
+        "assistance": true,
+        "case_id": "corridor-a-nominal-s631",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "corridor-a-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 631,
+        "world": "simulation/worlds/simple_goal_demo_corridor.sdf",
+        "world_sha256": "6fb6a38ea3b0fe599ff9f412ca421e44cb4cf5efcb0c25bdeb74d424474b6f34"
+      },
+      {
+        "assistance": true,
+        "case_id": "corridor-a-nominal-s632",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "corridor-a-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 632,
+        "world": "simulation/worlds/simple_goal_demo_corridor.sdf",
+        "world_sha256": "6fb6a38ea3b0fe599ff9f412ca421e44cb4cf5efcb0c25bdeb74d424474b6f34"
+      },
+      {
+        "assistance": true,
+        "case_id": "corridor-a-nominal-s633",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "corridor-a-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 633,
+        "world": "simulation/worlds/simple_goal_demo_corridor.sdf",
+        "world_sha256": "6fb6a38ea3b0fe599ff9f412ca421e44cb4cf5efcb0c25bdeb74d424474b6f34"
+      },
+      {
+        "assistance": true,
+        "case_id": "corridor-b-nominal-s631",
+        "goal": [
+          3.0,
+          0.5
+        ],
+        "id": "corridor-b-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 631,
+        "world": "simulation/worlds/simple_goal_demo_corridor.sdf",
+        "world_sha256": "6fb6a38ea3b0fe599ff9f412ca421e44cb4cf5efcb0c25bdeb74d424474b6f34"
+      },
+      {
+        "assistance": true,
+        "case_id": "corridor-b-nominal-s632",
+        "goal": [
+          3.0,
+          0.5
+        ],
+        "id": "corridor-b-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 632,
+        "world": "simulation/worlds/simple_goal_demo_corridor.sdf",
+        "world_sha256": "6fb6a38ea3b0fe599ff9f412ca421e44cb4cf5efcb0c25bdeb74d424474b6f34"
+      },
+      {
+        "assistance": true,
+        "case_id": "corridor-b-nominal-s633",
+        "goal": [
+          3.0,
+          0.5
+        ],
+        "id": "corridor-b-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 633,
+        "world": "simulation/worlds/simple_goal_demo_corridor.sdf",
+        "world_sha256": "6fb6a38ea3b0fe599ff9f412ca421e44cb4cf5efcb0c25bdeb74d424474b6f34"
+      },
+      {
+        "assistance": true,
+        "case_id": "empty-a-outage-s631",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "empty-a-outage",
+        "kind": "navigation",
+        "outage": true,
+        "seed": 631,
+        "world": "simulation/worlds/simple_goal_demo.sdf",
+        "world_sha256": "0f12df287b4c55a6c71f139e1ff957d1330559762dc7a6aab814a8b72feb3bb3"
+      },
+      {
+        "assistance": true,
+        "case_id": "empty-a-outage-s632",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "empty-a-outage",
+        "kind": "navigation",
+        "outage": true,
+        "seed": 632,
+        "world": "simulation/worlds/simple_goal_demo.sdf",
+        "world_sha256": "0f12df287b4c55a6c71f139e1ff957d1330559762dc7a6aab814a8b72feb3bb3"
+      },
+      {
+        "assistance": true,
+        "case_id": "empty-a-outage-s633",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "empty-a-outage",
+        "kind": "navigation",
+        "outage": true,
+        "seed": 633,
+        "world": "simulation/worlds/simple_goal_demo.sdf",
+        "world_sha256": "0f12df287b4c55a6c71f139e1ff957d1330559762dc7a6aab814a8b72feb3bb3"
+      },
+      {
+        "assistance": true,
+        "case_id": "sparse-a-outage-s631",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "sparse-a-outage",
+        "kind": "navigation",
+        "outage": true,
+        "seed": 631,
+        "world": "simulation/worlds/simple_goal_demo_sparse.sdf",
+        "world_sha256": "345e873cffc911fc7a13ce6e9a011ebedf076b2beaca466d7d779f5195d37391"
+      },
+      {
+        "assistance": true,
+        "case_id": "sparse-a-outage-s632",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "sparse-a-outage",
+        "kind": "navigation",
+        "outage": true,
+        "seed": 632,
+        "world": "simulation/worlds/simple_goal_demo_sparse.sdf",
+        "world_sha256": "345e873cffc911fc7a13ce6e9a011ebedf076b2beaca466d7d779f5195d37391"
+      },
+      {
+        "assistance": true,
+        "case_id": "sparse-a-outage-s633",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "sparse-a-outage",
+        "kind": "navigation",
+        "outage": true,
+        "seed": 633,
+        "world": "simulation/worlds/simple_goal_demo_sparse.sdf",
+        "world_sha256": "345e873cffc911fc7a13ce6e9a011ebedf076b2beaca466d7d779f5195d37391"
+      },
+      {
+        "assistance": true,
+        "case_id": "dense-b-outage-s631",
+        "goal": [
+          3.0,
+          0.5
+        ],
+        "id": "dense-b-outage",
+        "kind": "navigation",
+        "outage": true,
+        "seed": 631,
+        "world": "simulation/worlds/simple_goal_demo_dense.sdf",
+        "world_sha256": "21bfa8b92d59c24f0c2afb1365832393b45c7b704ed036bd78c4438ce0a3a48f"
+      },
+      {
+        "assistance": true,
+        "case_id": "dense-b-outage-s632",
+        "goal": [
+          3.0,
+          0.5
+        ],
+        "id": "dense-b-outage",
+        "kind": "navigation",
+        "outage": true,
+        "seed": 632,
+        "world": "simulation/worlds/simple_goal_demo_dense.sdf",
+        "world_sha256": "21bfa8b92d59c24f0c2afb1365832393b45c7b704ed036bd78c4438ce0a3a48f"
+      },
+      {
+        "assistance": true,
+        "case_id": "dense-b-outage-s633",
+        "goal": [
+          3.0,
+          0.5
+        ],
+        "id": "dense-b-outage",
+        "kind": "navigation",
+        "outage": true,
+        "seed": 633,
+        "world": "simulation/worlds/simple_goal_demo_dense.sdf",
+        "world_sha256": "21bfa8b92d59c24f0c2afb1365832393b45c7b704ed036bd78c4438ce0a3a48f"
+      },
+      {
+        "assistance": true,
+        "case_id": "corridor-b-outage-s631",
+        "goal": [
+          3.0,
+          0.5
+        ],
+        "id": "corridor-b-outage",
+        "kind": "navigation",
+        "outage": true,
+        "seed": 631,
+        "world": "simulation/worlds/simple_goal_demo_corridor.sdf",
+        "world_sha256": "6fb6a38ea3b0fe599ff9f412ca421e44cb4cf5efcb0c25bdeb74d424474b6f34"
+      },
+      {
+        "assistance": true,
+        "case_id": "corridor-b-outage-s632",
+        "goal": [
+          3.0,
+          0.5
+        ],
+        "id": "corridor-b-outage",
+        "kind": "navigation",
+        "outage": true,
+        "seed": 632,
+        "world": "simulation/worlds/simple_goal_demo_corridor.sdf",
+        "world_sha256": "6fb6a38ea3b0fe599ff9f412ca421e44cb4cf5efcb0c25bdeb74d424474b6f34"
+      },
+      {
+        "assistance": true,
+        "case_id": "corridor-b-outage-s633",
+        "goal": [
+          3.0,
+          0.5
+        ],
+        "id": "corridor-b-outage",
+        "kind": "navigation",
+        "outage": true,
+        "seed": 633,
+        "world": "simulation/worlds/simple_goal_demo_corridor.sdf",
+        "world_sha256": "6fb6a38ea3b0fe599ff9f412ca421e44cb4cf5efcb0c25bdeb74d424474b6f34"
+      },
+      {
+        "assistance": false,
+        "case_id": "empty-a-unassisted-s631",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "empty-a-unassisted",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 631,
+        "world": "simulation/worlds/simple_goal_demo.sdf",
+        "world_sha256": "0f12df287b4c55a6c71f139e1ff957d1330559762dc7a6aab814a8b72feb3bb3"
+      },
+      {
+        "assistance": false,
+        "case_id": "empty-a-unassisted-s632",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "empty-a-unassisted",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 632,
+        "world": "simulation/worlds/simple_goal_demo.sdf",
+        "world_sha256": "0f12df287b4c55a6c71f139e1ff957d1330559762dc7a6aab814a8b72feb3bb3"
+      },
+      {
+        "assistance": false,
+        "case_id": "empty-a-unassisted-s633",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "empty-a-unassisted",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 633,
+        "world": "simulation/worlds/simple_goal_demo.sdf",
+        "world_sha256": "0f12df287b4c55a6c71f139e1ff957d1330559762dc7a6aab814a8b72feb3bb3"
+      },
+      {
+        "case_id": "guard-s631",
+        "id": "guard",
+        "kind": "guard",
+        "seed": 631
+      },
+      {
+        "case_id": "guard-s632",
+        "id": "guard",
+        "kind": "guard",
+        "seed": 632
+      },
+      {
+        "case_id": "guard-s633",
+        "id": "guard",
+        "kind": "guard",
+        "seed": 633
+      },
+      {
+        "case_id": "watchdog-s631",
+        "id": "watchdog",
+        "kind": "watchdog",
+        "seed": 631
+      },
+      {
+        "case_id": "watchdog-s632",
+        "id": "watchdog",
+        "kind": "watchdog",
+        "seed": 632
+      },
+      {
+        "case_id": "watchdog-s633",
+        "id": "watchdog",
+        "kind": "watchdog",
+        "seed": 633
+      }
+    ],
+    "exclusions": {
+      "R5": "No hazard-event producer is available.",
+      "R7_R8": "No online detector exists; enabled/disabled/forced-miss comparisons are unavailable.",
+      "combinations": "Outage trials use goal A for empty/sparse and goal B for dense/corridor; both goals have nominal trials in every layout.",
+      "seeds": "Seeds configure synthetic sensor corruption; PX4/render scheduling is not deterministic."
+    },
+    "expanded_sha256": "d5a7bcb93b723b15d98d9a4e6c38a97e5ed9a27d0db6d1aac8df57cbbbdcb9b9",
+    "id": "verification-m3-v1",
+    "parameters": {
+      "attempt_timeout_s": 215,
+      "replay_limit": 2,
+      "search_seed": 20261110,
+      "search_trials": 4,
+      "search_wall_budget_s": 900,
+      "simulation_timeout_s": 100,
+      "wall_timeout_s": 160
+    },
+    "plan_sha256": "66e5a9efd323deeae758d396240233a55a479ef70f260df498dac225a8f7127a",
+    "profiles": {
+      "verification/profiles/m2_camera.yaml": "d49c612360ae5af3098513d51980b100b8bffdc6fc9658cb7cf0ad401bac45a1",
+      "verification/profiles/m2_guard.yaml": "7dfc52bd2a2a6054f703231a9b6f5a8c9841d0470adc55e011a0cf875ddcf3ad",
+      "verification/profiles/m2_watchdog.yaml": "21bcfa746906b6ccf527620135cc70f1881b44908e27363dad9a67ee0f4ae1e1"
+    },
+    "schema_version": 1
+  },
+  "raw_archive": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1",
+  "raw_archive_committed": false,
+  "recordings": [
+    {
+      "attempt": 1,
+      "case_id": "empty-a-nominal-s631",
+      "category": "matrix",
+      "configuration": {
+        "assistance": true,
+        "case_id": "empty-a-nominal-s631",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "empty-a-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 631,
+        "world": "simulation/worlds/simple_goal_demo.sdf",
+        "world_sha256": "0f12df287b4c55a6c71f139e1ff957d1330559762dc7a6aab814a8b72feb3bb3"
+      },
+      "directory": "recordings/a0001-r0",
+      "result_sha256": "64a7e16e719a3f31849b9c97e3f94703a19550ff7acd7901671fc776b941022e",
+      "series_sha256": "f98399e100a2527bdbc48b28e5239f374c21abf65339aebf7c9731e4c0d35e42"
+    },
+    {
+      "attempt": 2,
+      "case_id": "empty-a-nominal-s632",
+      "category": "matrix",
+      "configuration": {
+        "assistance": true,
+        "case_id": "empty-a-nominal-s632",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "empty-a-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 632,
+        "world": "simulation/worlds/simple_goal_demo.sdf",
+        "world_sha256": "0f12df287b4c55a6c71f139e1ff957d1330559762dc7a6aab814a8b72feb3bb3"
+      },
+      "directory": "recordings/a0002-r0",
+      "result_sha256": "d992ecfc31d54371f94acbf070d1ac65b5e24170f6c9a108b5cb099b0181f358",
+      "series_sha256": "18590a43a6aab48fcd6f5a3896d8a0b4cf2b7ffd35f27be717ff8eff4ffb8580"
+    },
+    {
+      "attempt": 3,
+      "case_id": "empty-a-nominal-s633",
+      "category": "matrix",
+      "configuration": {
+        "assistance": true,
+        "case_id": "empty-a-nominal-s633",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "empty-a-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 633,
+        "world": "simulation/worlds/simple_goal_demo.sdf",
+        "world_sha256": "0f12df287b4c55a6c71f139e1ff957d1330559762dc7a6aab814a8b72feb3bb3"
+      },
+      "directory": "recordings/a0003-r0",
+      "result_sha256": "05cb7cb1dce85386a99ae09b680665fb29c8af4a70775f912bc0dc19d65a54fe",
+      "series_sha256": "1184839bfe3a677b3438cd9b7b61896bd7c8ae33568792d059bf94136eef90fb"
+    },
+    {
+      "attempt": 4,
+      "case_id": "empty-b-nominal-s631",
+      "category": "matrix",
+      "configuration": {
+        "assistance": true,
+        "case_id": "empty-b-nominal-s631",
+        "goal": [
+          3.0,
+          0.5
+        ],
+        "id": "empty-b-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 631,
+        "world": "simulation/worlds/simple_goal_demo.sdf",
+        "world_sha256": "0f12df287b4c55a6c71f139e1ff957d1330559762dc7a6aab814a8b72feb3bb3"
+      },
+      "directory": "recordings/a0004-r0",
+      "result_sha256": "b404627a61ed0e7d229b7be06b7b42d8fe84d00dfad1a2894cc6177e29544341",
+      "series_sha256": "bae29aa9f54226d9ed4e7aeb4f14913a1940353d051201ac346b33557282de2e"
+    },
+    {
+      "attempt": 5,
+      "case_id": "empty-b-nominal-s632",
+      "category": "matrix",
+      "configuration": {
+        "assistance": true,
+        "case_id": "empty-b-nominal-s632",
+        "goal": [
+          3.0,
+          0.5
+        ],
+        "id": "empty-b-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 632,
+        "world": "simulation/worlds/simple_goal_demo.sdf",
+        "world_sha256": "0f12df287b4c55a6c71f139e1ff957d1330559762dc7a6aab814a8b72feb3bb3"
+      },
+      "directory": "recordings/a0005-r0",
+      "result_sha256": "14a780f184dd4e495a4eeea72b77b55eca7a38844565fe886f07500b10a08d7c",
+      "series_sha256": "35ab6f41dbb0a3492f3fa27421b4274929bb00aa84948fd4d7c2190e536d716e"
+    },
+    {
+      "attempt": 6,
+      "case_id": "empty-b-nominal-s633",
+      "category": "matrix",
+      "configuration": {
+        "assistance": true,
+        "case_id": "empty-b-nominal-s633",
+        "goal": [
+          3.0,
+          0.5
+        ],
+        "id": "empty-b-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 633,
+        "world": "simulation/worlds/simple_goal_demo.sdf",
+        "world_sha256": "0f12df287b4c55a6c71f139e1ff957d1330559762dc7a6aab814a8b72feb3bb3"
+      },
+      "directory": "recordings/a0006-r0",
+      "result_sha256": "a8aab3283713f7f3f779e6e17c74d50bf3420f9f0e4b63738b98ba499ebff6d0",
+      "series_sha256": "d225390b059e44b55e241ddb82153da9d312807867dabce9d15881ca085ce580"
+    },
+    {
+      "attempt": 7,
+      "case_id": "sparse-a-nominal-s631",
+      "category": "matrix",
+      "configuration": {
+        "assistance": true,
+        "case_id": "sparse-a-nominal-s631",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "sparse-a-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 631,
+        "world": "simulation/worlds/simple_goal_demo_sparse.sdf",
+        "world_sha256": "345e873cffc911fc7a13ce6e9a011ebedf076b2beaca466d7d779f5195d37391"
+      },
+      "directory": "recordings/a0007-r0",
+      "result_sha256": "c2bf2d5f8b2be92c34534cc5fa12951ae1806084bb3010ea3de06b5a32e4b8c6",
+      "series_sha256": "3c4a2ab3c3e258f93c633ac2b2c7be8b21310707078745b356a4a61fddc13d13"
+    },
+    {
+      "attempt": 8,
+      "case_id": "sparse-a-nominal-s632",
+      "category": "matrix",
+      "configuration": {
+        "assistance": true,
+        "case_id": "sparse-a-nominal-s632",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "sparse-a-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 632,
+        "world": "simulation/worlds/simple_goal_demo_sparse.sdf",
+        "world_sha256": "345e873cffc911fc7a13ce6e9a011ebedf076b2beaca466d7d779f5195d37391"
+      },
+      "directory": "recordings/a0008-r0",
+      "result_sha256": "0159af4252b1577cc01704a9e56a3741e4c206bcb86df82aea44700a67454454",
+      "series_sha256": "6c5c1295eae59eecb11c57c0a9e303a76b02fc8ab719432b9bd9e49508ca12c9"
+    },
+    {
+      "attempt": 9,
+      "case_id": "sparse-a-nominal-s633",
+      "category": "matrix",
+      "configuration": {
+        "assistance": true,
+        "case_id": "sparse-a-nominal-s633",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "sparse-a-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 633,
+        "world": "simulation/worlds/simple_goal_demo_sparse.sdf",
+        "world_sha256": "345e873cffc911fc7a13ce6e9a011ebedf076b2beaca466d7d779f5195d37391"
+      },
+      "directory": "recordings/a0009-r0",
+      "result_sha256": "a8327da00ff6a3ef3657b52f4625fe8fbc1b4ea5d3f519c70edc8075f33ce6c4",
+      "series_sha256": "56b3c79add98061b00315bdc73ee74806cd8fc433ec9be785b1f8688d86a396d"
+    },
+    {
+      "attempt": 10,
+      "case_id": "sparse-b-nominal-s631",
+      "category": "matrix",
+      "configuration": {
+        "assistance": true,
+        "case_id": "sparse-b-nominal-s631",
+        "goal": [
+          3.0,
+          0.5
+        ],
+        "id": "sparse-b-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 631,
+        "world": "simulation/worlds/simple_goal_demo_sparse.sdf",
+        "world_sha256": "345e873cffc911fc7a13ce6e9a011ebedf076b2beaca466d7d779f5195d37391"
+      },
+      "directory": "recordings/a0010-r0",
+      "result_sha256": "2bc9569e5affb1f8d4675be4a11a73a4ff7e582f3e0cdf67c395c56aec12862a",
+      "series_sha256": "d5388c4c909ea4d89e1ea1461c6840bc0d0834ead464da83b8e1c3e355c3f49e"
+    },
+    {
+      "attempt": 11,
+      "case_id": "sparse-b-nominal-s632",
+      "category": "matrix",
+      "configuration": {
+        "assistance": true,
+        "case_id": "sparse-b-nominal-s632",
+        "goal": [
+          3.0,
+          0.5
+        ],
+        "id": "sparse-b-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 632,
+        "world": "simulation/worlds/simple_goal_demo_sparse.sdf",
+        "world_sha256": "345e873cffc911fc7a13ce6e9a011ebedf076b2beaca466d7d779f5195d37391"
+      },
+      "directory": "recordings/a0011-r0",
+      "result_sha256": "f0c620d7d917d8d702e238f060d44d988907f0c19e7ffa9ba9ace2c445492adc",
+      "series_sha256": "cd829834ba6dabfd096b1308a6071dcdc4f41d57b84d1c7a4ec2144391b9bf43"
+    },
+    {
+      "attempt": 12,
+      "case_id": "sparse-b-nominal-s633",
+      "category": "matrix",
+      "configuration": {
+        "assistance": true,
+        "case_id": "sparse-b-nominal-s633",
+        "goal": [
+          3.0,
+          0.5
+        ],
+        "id": "sparse-b-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 633,
+        "world": "simulation/worlds/simple_goal_demo_sparse.sdf",
+        "world_sha256": "345e873cffc911fc7a13ce6e9a011ebedf076b2beaca466d7d779f5195d37391"
+      },
+      "directory": "recordings/a0012-r0",
+      "result_sha256": "66085df22462dfff4c0ad2e2161e9f3008e36bf9fc47139c297598fe2de0168d",
+      "series_sha256": "2b456912f0461ab2da29c6807b670cbd9a9d1b3674eac844bb69dfe27c577260"
+    },
+    {
+      "attempt": 13,
+      "case_id": "dense-a-nominal-s631",
+      "category": "matrix",
+      "configuration": {
+        "assistance": true,
+        "case_id": "dense-a-nominal-s631",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "dense-a-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 631,
+        "world": "simulation/worlds/simple_goal_demo_dense.sdf",
+        "world_sha256": "21bfa8b92d59c24f0c2afb1365832393b45c7b704ed036bd78c4438ce0a3a48f"
+      },
+      "directory": "recordings/a0013-r0",
+      "result_sha256": "2d36eaa247d5b2410a641963c0aceb07a7a6563bb08d9433c260c248263ccfd5",
+      "series_sha256": "e21f32d7820271bc329a67081d813540368cd369fae9c6cceac2dd96f2f9f7cb"
+    },
+    {
+      "attempt": 14,
+      "case_id": "dense-a-nominal-s632",
+      "category": "matrix",
+      "configuration": {
+        "assistance": true,
+        "case_id": "dense-a-nominal-s632",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "dense-a-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 632,
+        "world": "simulation/worlds/simple_goal_demo_dense.sdf",
+        "world_sha256": "21bfa8b92d59c24f0c2afb1365832393b45c7b704ed036bd78c4438ce0a3a48f"
+      },
+      "directory": "recordings/a0014-r0",
+      "result_sha256": "626464f373b1263f562c7beb4d33765b5546b244efe072b1ab9066e8a8c06d6d",
+      "series_sha256": "66a8046a9e429454cf1c6cb51498617e60ffa9787460e320d5fd0c5438dbffd6"
+    },
+    {
+      "attempt": 15,
+      "case_id": "dense-a-nominal-s633",
+      "category": "matrix",
+      "configuration": {
+        "assistance": true,
+        "case_id": "dense-a-nominal-s633",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "dense-a-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 633,
+        "world": "simulation/worlds/simple_goal_demo_dense.sdf",
+        "world_sha256": "21bfa8b92d59c24f0c2afb1365832393b45c7b704ed036bd78c4438ce0a3a48f"
+      },
+      "directory": "recordings/a0015-r0",
+      "result_sha256": "63d77dbeec3a12f92d10e42307586779bc3244262953dc254617946a6c005dc9",
+      "series_sha256": "ca104baf9b156fa82cac1108d8d031ed1a4c44e1e93727c98535ec87ba47e5e8"
+    },
+    {
+      "attempt": 16,
+      "case_id": "dense-b-nominal-s631",
+      "category": "matrix",
+      "configuration": {
+        "assistance": true,
+        "case_id": "dense-b-nominal-s631",
+        "goal": [
+          3.0,
+          0.5
+        ],
+        "id": "dense-b-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 631,
+        "world": "simulation/worlds/simple_goal_demo_dense.sdf",
+        "world_sha256": "21bfa8b92d59c24f0c2afb1365832393b45c7b704ed036bd78c4438ce0a3a48f"
+      },
+      "directory": "recordings/a0016-r0",
+      "result_sha256": "afeb2c38e8599a5c79e221e89b5b0749c4ff57818326b56105742dbf6e27d9db",
+      "series_sha256": "f70c9ee74b9e0f8ae02ee46af35957668d1b4b3c3b2752c46603e39d35c3b840"
+    },
+    {
+      "attempt": 17,
+      "case_id": "dense-b-nominal-s632",
+      "category": "matrix",
+      "configuration": {
+        "assistance": true,
+        "case_id": "dense-b-nominal-s632",
+        "goal": [
+          3.0,
+          0.5
+        ],
+        "id": "dense-b-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 632,
+        "world": "simulation/worlds/simple_goal_demo_dense.sdf",
+        "world_sha256": "21bfa8b92d59c24f0c2afb1365832393b45c7b704ed036bd78c4438ce0a3a48f"
+      },
+      "directory": "recordings/a0017-r0",
+      "result_sha256": "add38dc65ce0102b7f158bd466cf8fbc85fe02f630dfa89096cf44f38213d972",
+      "series_sha256": "7e50f7bfb17a73388a376346a7eef0ace6d3c384606483832d40b19cc1aa7685"
+    },
+    {
+      "attempt": 18,
+      "case_id": "dense-b-nominal-s633",
+      "category": "matrix",
+      "configuration": {
+        "assistance": true,
+        "case_id": "dense-b-nominal-s633",
+        "goal": [
+          3.0,
+          0.5
+        ],
+        "id": "dense-b-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 633,
+        "world": "simulation/worlds/simple_goal_demo_dense.sdf",
+        "world_sha256": "21bfa8b92d59c24f0c2afb1365832393b45c7b704ed036bd78c4438ce0a3a48f"
+      },
+      "directory": "recordings/a0018-r0",
+      "result_sha256": "1b5bbb45c6564d76daaef145b9d38d06575fe4a4d5829f2339aaaf1887bba229",
+      "series_sha256": "e69d480ae2f08af7bec301042d93af9cd3d49d1172473d906d6a2bb53f074d44"
+    },
+    {
+      "attempt": 19,
+      "case_id": "corridor-a-nominal-s631",
+      "category": "matrix",
+      "configuration": {
+        "assistance": true,
+        "case_id": "corridor-a-nominal-s631",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "corridor-a-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 631,
+        "world": "simulation/worlds/simple_goal_demo_corridor.sdf",
+        "world_sha256": "6fb6a38ea3b0fe599ff9f412ca421e44cb4cf5efcb0c25bdeb74d424474b6f34"
+      },
+      "directory": "recordings/a0019-r0",
+      "result_sha256": "a80a53521b5c796e7bd997d19718c9415ffefb3aae2d72c4cf46f57369e6f589",
+      "series_sha256": "04bfb5f69dd22d68d9c11df1f53808b123f747492df3117927c58e3edfc8d306"
+    },
+    {
+      "attempt": 20,
+      "case_id": "corridor-a-nominal-s632",
+      "category": "matrix",
+      "configuration": {
+        "assistance": true,
+        "case_id": "corridor-a-nominal-s632",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "corridor-a-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 632,
+        "world": "simulation/worlds/simple_goal_demo_corridor.sdf",
+        "world_sha256": "6fb6a38ea3b0fe599ff9f412ca421e44cb4cf5efcb0c25bdeb74d424474b6f34"
+      },
+      "directory": "recordings/a0020-r0",
+      "result_sha256": "bc2e6c943439a5c7d3d8827091921cb4484680dd099dfa47c1181da0c7c70b0f",
+      "series_sha256": "fa0b3bbc69f53770b9177a8b492a3e2e6bb48e48e0892362d4d7a6ffd28adaae"
+    },
+    {
+      "attempt": 21,
+      "case_id": "corridor-a-nominal-s633",
+      "category": "matrix",
+      "configuration": {
+        "assistance": true,
+        "case_id": "corridor-a-nominal-s633",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "corridor-a-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 633,
+        "world": "simulation/worlds/simple_goal_demo_corridor.sdf",
+        "world_sha256": "6fb6a38ea3b0fe599ff9f412ca421e44cb4cf5efcb0c25bdeb74d424474b6f34"
+      },
+      "directory": "recordings/a0021-r0",
+      "result_sha256": "9fbeeb8a4a7e46c273d0e083fbfb27b16e496f276be3d40977bbe53795ea1950",
+      "series_sha256": "49957d53314fe0f510d2ba01e3936a112e920a88af079a13093e3d51d85e720b"
+    },
+    {
+      "attempt": 22,
+      "case_id": "corridor-b-nominal-s631",
+      "category": "matrix",
+      "configuration": {
+        "assistance": true,
+        "case_id": "corridor-b-nominal-s631",
+        "goal": [
+          3.0,
+          0.5
+        ],
+        "id": "corridor-b-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 631,
+        "world": "simulation/worlds/simple_goal_demo_corridor.sdf",
+        "world_sha256": "6fb6a38ea3b0fe599ff9f412ca421e44cb4cf5efcb0c25bdeb74d424474b6f34"
+      },
+      "directory": "recordings/a0022-r0",
+      "result_sha256": "c64d04fd64bbcc4ed7f095c364b7b4bb5fc0648b35f48b0ed1656dfb78ec67e1",
+      "series_sha256": "a70fcb11e02b4bdd3f56da168dd8f1c35229e0230ac3a27aadf297c30c2d8136"
+    },
+    {
+      "attempt": 23,
+      "case_id": "corridor-b-nominal-s632",
+      "category": "matrix",
+      "configuration": {
+        "assistance": true,
+        "case_id": "corridor-b-nominal-s632",
+        "goal": [
+          3.0,
+          0.5
+        ],
+        "id": "corridor-b-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 632,
+        "world": "simulation/worlds/simple_goal_demo_corridor.sdf",
+        "world_sha256": "6fb6a38ea3b0fe599ff9f412ca421e44cb4cf5efcb0c25bdeb74d424474b6f34"
+      },
+      "directory": "recordings/a0023-r0",
+      "result_sha256": "c8fe8b18b5e63f866d6585a8637a6394320824a80afcb4fb7ccf2c10577e7507",
+      "series_sha256": "328cf3463028baa5a7968ece0646b44ce0e5a19479d1daef243dd26b5f9f010e"
+    },
+    {
+      "attempt": 24,
+      "case_id": "corridor-b-nominal-s633",
+      "category": "matrix",
+      "configuration": {
+        "assistance": true,
+        "case_id": "corridor-b-nominal-s633",
+        "goal": [
+          3.0,
+          0.5
+        ],
+        "id": "corridor-b-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 633,
+        "world": "simulation/worlds/simple_goal_demo_corridor.sdf",
+        "world_sha256": "6fb6a38ea3b0fe599ff9f412ca421e44cb4cf5efcb0c25bdeb74d424474b6f34"
+      },
+      "directory": "recordings/a0024-r0",
+      "result_sha256": "45a7f6c48a48ed8fd000285035895f632f5ef6a7bdb414b1ed6d6bb0bb731d28",
+      "series_sha256": "a22920c7ee2fac70c78280022a7a0dc7114f01da868f6bfefa2139e2a58ce935"
+    },
+    {
+      "attempt": 25,
+      "case_id": "empty-a-outage-s631",
+      "category": "matrix",
+      "configuration": {
+        "assistance": true,
+        "case_id": "empty-a-outage-s631",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "empty-a-outage",
+        "kind": "navigation",
+        "outage": true,
+        "seed": 631,
+        "world": "simulation/worlds/simple_goal_demo.sdf",
+        "world_sha256": "0f12df287b4c55a6c71f139e1ff957d1330559762dc7a6aab814a8b72feb3bb3"
+      },
+      "directory": "recordings/a0025-r0",
+      "result_sha256": "a6633e8ce3a5cc0b5cb53037fb798a29e0167749644fac2334217d8e673c71e1",
+      "series_sha256": "846944d3ffa9cb5b0bd54dce6caf63de697439d3e95dc3fbde2d5f8344e87316"
+    },
+    {
+      "attempt": 26,
+      "case_id": "empty-a-outage-s632",
+      "category": "matrix",
+      "configuration": {
+        "assistance": true,
+        "case_id": "empty-a-outage-s632",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "empty-a-outage",
+        "kind": "navigation",
+        "outage": true,
+        "seed": 632,
+        "world": "simulation/worlds/simple_goal_demo.sdf",
+        "world_sha256": "0f12df287b4c55a6c71f139e1ff957d1330559762dc7a6aab814a8b72feb3bb3"
+      },
+      "directory": "recordings/a0026-r0",
+      "result_sha256": "5a0cfd9eb9fd24f8497acee42a3d8e1f1eba11d1a1cffdb13493c634f2f38cab",
+      "series_sha256": "71d2b57fd496ac7bc527380188312554f4e0b2fc882addbfcfabd4ca984f140a"
+    },
+    {
+      "attempt": 27,
+      "case_id": "empty-a-outage-s633",
+      "category": "matrix",
+      "configuration": {
+        "assistance": true,
+        "case_id": "empty-a-outage-s633",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "empty-a-outage",
+        "kind": "navigation",
+        "outage": true,
+        "seed": 633,
+        "world": "simulation/worlds/simple_goal_demo.sdf",
+        "world_sha256": "0f12df287b4c55a6c71f139e1ff957d1330559762dc7a6aab814a8b72feb3bb3"
+      },
+      "directory": "recordings/a0027-r0",
+      "result_sha256": "2e4cb51b8a58113c00dd0e2e1ee4bc16bd4b5bc0bfc9afc4e8f0fc13e95bb32c",
+      "series_sha256": "547eec084a7366f63142d758fc551c76d171afe4eb10cba56b9db418c3af9710"
+    },
+    {
+      "attempt": 28,
+      "case_id": "sparse-a-outage-s631",
+      "category": "matrix",
+      "configuration": {
+        "assistance": true,
+        "case_id": "sparse-a-outage-s631",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "sparse-a-outage",
+        "kind": "navigation",
+        "outage": true,
+        "seed": 631,
+        "world": "simulation/worlds/simple_goal_demo_sparse.sdf",
+        "world_sha256": "345e873cffc911fc7a13ce6e9a011ebedf076b2beaca466d7d779f5195d37391"
+      },
+      "directory": "recordings/a0028-r0",
+      "result_sha256": "55fbdc1df4aecf6b6efccf47d72d71920de1703fea8156fed6def7c8fcdcb146",
+      "series_sha256": "604a2d883cfc2bc59b763fe2bfecfcafe2aeecc69a5be0de6a7ecc20db34ebe9"
+    },
+    {
+      "attempt": 29,
+      "case_id": "sparse-a-outage-s632",
+      "category": "matrix",
+      "configuration": {
+        "assistance": true,
+        "case_id": "sparse-a-outage-s632",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "sparse-a-outage",
+        "kind": "navigation",
+        "outage": true,
+        "seed": 632,
+        "world": "simulation/worlds/simple_goal_demo_sparse.sdf",
+        "world_sha256": "345e873cffc911fc7a13ce6e9a011ebedf076b2beaca466d7d779f5195d37391"
+      },
+      "directory": "recordings/a0029-r0",
+      "result_sha256": "5e7edbab29ed4ce7c403d7b489630f4664a2a22114f0559dac5a5352f7d6aca5",
+      "series_sha256": "0ec899cf67cb43e4abae6daaa0fa35d7b468c029cc95c4a5372fbd2390507a59"
+    },
+    {
+      "attempt": 30,
+      "case_id": "sparse-a-outage-s633",
+      "category": "matrix",
+      "configuration": {
+        "assistance": true,
+        "case_id": "sparse-a-outage-s633",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "sparse-a-outage",
+        "kind": "navigation",
+        "outage": true,
+        "seed": 633,
+        "world": "simulation/worlds/simple_goal_demo_sparse.sdf",
+        "world_sha256": "345e873cffc911fc7a13ce6e9a011ebedf076b2beaca466d7d779f5195d37391"
+      },
+      "directory": "recordings/a0030-r0",
+      "result_sha256": "ceb210e990e4b236992acbe311e06a2453601eccf1d329a426d7dd7e10e2f3ef",
+      "series_sha256": "a612f36d0885b02be5c771af53901876c6cabfacecf3909908554b64f2ff8466"
+    },
+    {
+      "attempt": 31,
+      "case_id": "dense-b-outage-s631",
+      "category": "matrix",
+      "configuration": {
+        "assistance": true,
+        "case_id": "dense-b-outage-s631",
+        "goal": [
+          3.0,
+          0.5
+        ],
+        "id": "dense-b-outage",
+        "kind": "navigation",
+        "outage": true,
+        "seed": 631,
+        "world": "simulation/worlds/simple_goal_demo_dense.sdf",
+        "world_sha256": "21bfa8b92d59c24f0c2afb1365832393b45c7b704ed036bd78c4438ce0a3a48f"
+      },
+      "directory": "recordings/a0031-r0",
+      "result_sha256": "ea892bb8ff1ceb398af02a19aca0993963c40be693811e091ff351f3822ec4b1",
+      "series_sha256": "3cf9b368eedc2992a159a06df8de175cf3c83ed59f6a19dbb3e13418a96a727a"
+    },
+    {
+      "attempt": 32,
+      "case_id": "dense-b-outage-s632",
+      "category": "matrix",
+      "configuration": {
+        "assistance": true,
+        "case_id": "dense-b-outage-s632",
+        "goal": [
+          3.0,
+          0.5
+        ],
+        "id": "dense-b-outage",
+        "kind": "navigation",
+        "outage": true,
+        "seed": 632,
+        "world": "simulation/worlds/simple_goal_demo_dense.sdf",
+        "world_sha256": "21bfa8b92d59c24f0c2afb1365832393b45c7b704ed036bd78c4438ce0a3a48f"
+      },
+      "directory": "recordings/a0032-r0",
+      "result_sha256": "b6411dd2f7633ffee67d04e77b342f5e5342d65e1b7bf067d93e42ca5fa6377f",
+      "series_sha256": "435bf07f345776156747fcae8bf981921e6bfeb2a4d5ec70027c45e6b701c60c"
+    },
+    {
+      "attempt": 33,
+      "case_id": "dense-b-outage-s633",
+      "category": "matrix",
+      "configuration": {
+        "assistance": true,
+        "case_id": "dense-b-outage-s633",
+        "goal": [
+          3.0,
+          0.5
+        ],
+        "id": "dense-b-outage",
+        "kind": "navigation",
+        "outage": true,
+        "seed": 633,
+        "world": "simulation/worlds/simple_goal_demo_dense.sdf",
+        "world_sha256": "21bfa8b92d59c24f0c2afb1365832393b45c7b704ed036bd78c4438ce0a3a48f"
+      },
+      "directory": "recordings/a0033-r0",
+      "result_sha256": "41bbe338cd84bf87698a80a801a1f7df306c2fdcf8098ee79d20862dee6e0167",
+      "series_sha256": "6ea2a9d472b9fd4486456772e2eeb2a4f5618d2525d5e3db68e0a624c126bc50"
+    },
+    {
+      "attempt": 34,
+      "case_id": "corridor-b-outage-s631",
+      "category": "matrix",
+      "configuration": {
+        "assistance": true,
+        "case_id": "corridor-b-outage-s631",
+        "goal": [
+          3.0,
+          0.5
+        ],
+        "id": "corridor-b-outage",
+        "kind": "navigation",
+        "outage": true,
+        "seed": 631,
+        "world": "simulation/worlds/simple_goal_demo_corridor.sdf",
+        "world_sha256": "6fb6a38ea3b0fe599ff9f412ca421e44cb4cf5efcb0c25bdeb74d424474b6f34"
+      },
+      "directory": "recordings/a0034-r0",
+      "result_sha256": "0f426af626b3bd56e0d33d57a59de9abfcc101cbf2da04cc3bde6d35b1e6b1e0",
+      "series_sha256": "59d3f6923891d0b903937cf46f0baaeec1f23d15a4c3b37e9978e8f258a1cfff"
+    },
+    {
+      "attempt": 35,
+      "case_id": "corridor-b-outage-s632",
+      "category": "matrix",
+      "configuration": {
+        "assistance": true,
+        "case_id": "corridor-b-outage-s632",
+        "goal": [
+          3.0,
+          0.5
+        ],
+        "id": "corridor-b-outage",
+        "kind": "navigation",
+        "outage": true,
+        "seed": 632,
+        "world": "simulation/worlds/simple_goal_demo_corridor.sdf",
+        "world_sha256": "6fb6a38ea3b0fe599ff9f412ca421e44cb4cf5efcb0c25bdeb74d424474b6f34"
+      },
+      "directory": "recordings/a0035-r0",
+      "result_sha256": "b6e6f2f77c291a5265bdef4ed616ae3b3fdb839a2e3b5915605215c2e25c6448",
+      "series_sha256": "6ef9e2966510bc2da7671fdecdf51b3d0ffb777f6bee3abf9cea7c66b5139587"
+    },
+    {
+      "attempt": 36,
+      "case_id": "corridor-b-outage-s633",
+      "category": "matrix",
+      "configuration": {
+        "assistance": true,
+        "case_id": "corridor-b-outage-s633",
+        "goal": [
+          3.0,
+          0.5
+        ],
+        "id": "corridor-b-outage",
+        "kind": "navigation",
+        "outage": true,
+        "seed": 633,
+        "world": "simulation/worlds/simple_goal_demo_corridor.sdf",
+        "world_sha256": "6fb6a38ea3b0fe599ff9f412ca421e44cb4cf5efcb0c25bdeb74d424474b6f34"
+      },
+      "directory": "recordings/a0036-r0",
+      "result_sha256": "41361150dba88f961a705608620b8fc7a369bebb0eb309d9dcef8d061c5d921e",
+      "series_sha256": "722783b7d2cbdac70bf989e1ba1b8f7fb82a28f7af085823e416e2b6f94da99a"
+    },
+    {
+      "attempt": 37,
+      "case_id": "empty-a-unassisted-s631",
+      "category": "matrix",
+      "configuration": {
+        "assistance": false,
+        "case_id": "empty-a-unassisted-s631",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "empty-a-unassisted",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 631,
+        "world": "simulation/worlds/simple_goal_demo.sdf",
+        "world_sha256": "0f12df287b4c55a6c71f139e1ff957d1330559762dc7a6aab814a8b72feb3bb3"
+      },
+      "directory": "recordings/a0037-r0",
+      "result_sha256": "862c9495fc45f07e2aa93d71f897016dece4bddbebff398aecec1a2dc3bcf2ed",
+      "series_sha256": "14b2e50568b816f6fcd12a1906bca887dad30064dc79e9d229d47c4a0380247a"
+    },
+    {
+      "attempt": 38,
+      "case_id": "empty-a-unassisted-s632",
+      "category": "matrix",
+      "configuration": {
+        "assistance": false,
+        "case_id": "empty-a-unassisted-s632",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "empty-a-unassisted",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 632,
+        "world": "simulation/worlds/simple_goal_demo.sdf",
+        "world_sha256": "0f12df287b4c55a6c71f139e1ff957d1330559762dc7a6aab814a8b72feb3bb3"
+      },
+      "directory": "recordings/a0038-r0",
+      "result_sha256": "0a76895e59beab7a83e3e29e78d569a2c6eb0dafad9457e066992a870555edfb",
+      "series_sha256": "7880a11606e9ec166a114b80cf5856b4a565a96611bf9c82d75cb452a0105e08"
+    },
+    {
+      "attempt": 39,
+      "case_id": "empty-a-unassisted-s633",
+      "category": "matrix",
+      "configuration": {
+        "assistance": false,
+        "case_id": "empty-a-unassisted-s633",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "empty-a-unassisted",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 633,
+        "world": "simulation/worlds/simple_goal_demo.sdf",
+        "world_sha256": "0f12df287b4c55a6c71f139e1ff957d1330559762dc7a6aab814a8b72feb3bb3"
+      },
+      "directory": "recordings/a0039-r0",
+      "result_sha256": "7d295a363ddc7bacc7182940449ed115d065c793905668a6b30e06d06fd60621",
+      "series_sha256": "15ce8252e3268470ebe6ea59c1ded4fe4acd523767220847d60811717da90396"
+    },
+    {
+      "attempt": 42,
+      "case_id": "guard-s633",
+      "category": "matrix",
+      "configuration": {
+        "case_id": "guard-s633",
+        "id": "guard",
+        "kind": "guard",
+        "seed": 633
+      },
+      "directory": "recordings/a0042-r0",
+      "result_sha256": "3b10c7e595a600915c4554bec7c92729235eba08d39ce94a8e63c2ed163f314b",
+      "series_sha256": "f65025570e701d2b6010b1f5238efd734a7870c69b93df010a1f3531fc0ff745"
+    },
+    {
+      "attempt": 43,
+      "case_id": "watchdog-s631",
+      "category": "matrix",
+      "configuration": {
+        "case_id": "watchdog-s631",
+        "id": "watchdog",
+        "kind": "watchdog",
+        "seed": 631
+      },
+      "directory": "recordings/a0043-r0",
+      "result_sha256": "9e0357798f4b181daa7aec6d4743c74fdaa09b40857f8456fb00d165d091f351",
+      "series_sha256": "97ad9c0539d7513f9d43a73b4e17af3617c796984d6a523c7806f493de4f4b23"
+    },
+    {
+      "attempt": 43,
+      "case_id": "watchdog-s631",
+      "category": "matrix",
+      "configuration": {
+        "case_id": "watchdog-s631",
+        "id": "watchdog",
+        "kind": "watchdog",
+        "seed": 631
+      },
+      "directory": "recordings/a0043-r1",
+      "result_sha256": "ff45f1893a67df25df85a2d804116becd5380a04aa1257f063da4a320d9bf380",
+      "series_sha256": "473a3c360932afaada3321c8932e7d302f849cfd842eb06a6fdec28ee8f13ff6"
+    },
+    {
+      "attempt": 44,
+      "case_id": "watchdog-s632",
+      "category": "matrix",
+      "configuration": {
+        "case_id": "watchdog-s632",
+        "id": "watchdog",
+        "kind": "watchdog",
+        "seed": 632
+      },
+      "directory": "recordings/a0044-r0",
+      "result_sha256": "b30635c4948cee7dce3ecebe62156c5553053fd4b705d28afc5e72c2607b87aa",
+      "series_sha256": "a49590d16333d32b699f81ec0a284788256111d8354436c4ab7a424c20c451b4"
+    },
+    {
+      "attempt": 44,
+      "case_id": "watchdog-s632",
+      "category": "matrix",
+      "configuration": {
+        "case_id": "watchdog-s632",
+        "id": "watchdog",
+        "kind": "watchdog",
+        "seed": 632
+      },
+      "directory": "recordings/a0044-r1",
+      "result_sha256": "2105ce4b704a6fb5b5db84fd5018e5f6a259ebafc08c30e68b8926f5d9b8a4be",
+      "series_sha256": "aecbee29d8be7936730866c7b6790456f8a62490bcfd3aa01dacead113db0b78"
+    },
+    {
+      "attempt": 45,
+      "case_id": "watchdog-s633",
+      "category": "matrix",
+      "configuration": {
+        "case_id": "watchdog-s633",
+        "id": "watchdog",
+        "kind": "watchdog",
+        "seed": 633
+      },
+      "directory": "recordings/a0045-r0",
+      "result_sha256": "87bbfe7e77cb720b06e9a93c2de3add4b505cb0d33f087452d6a81ee63778eaf",
+      "series_sha256": "3b66e3fee0bc54778cd3396d59bacd53989c605ccfd4fbbf950dcd4ee006fda5"
+    },
+    {
+      "attempt": 45,
+      "case_id": "watchdog-s633",
+      "category": "matrix",
+      "configuration": {
+        "case_id": "watchdog-s633",
+        "id": "watchdog",
+        "kind": "watchdog",
+        "seed": 633
+      },
+      "directory": "recordings/a0045-r1",
+      "result_sha256": "b4b67db8b6d61b09766b3e45b8fb6e3c2ff1d3c62bc9ee3f9af7b117109af865",
+      "series_sha256": "8174e76831b4878a9a3586c4d5246ffa57db8a6bbf2a7d6a167115571b5c085e"
+    },
+    {
+      "attempt": 46,
+      "case_id": "search-00",
+      "category": "search",
+      "configuration": {
+        "assistance": true,
+        "case_id": "search-00",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "kind": "navigation",
+        "layout": "sparse",
+        "offsets": {
+          "obstacle_1": [
+            -0.10041581599179072,
+            -0.16295068500077614
+          ],
+          "obstacle_2": [
+            0.16948526620045595,
+            0.11209706765128113
+          ],
+          "obstacle_3": [
+            0.11369133986990526,
+            -0.06343126178104991
+          ]
+        },
+        "outage": false,
+        "seed": 700,
+        "world_absolute": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/search_worlds/search-00.sdf",
+        "world_sha256": "05b23b4bd381883403454fb0482d39dd4490efcf8158fb2bb8a6e4cedd88b5ab"
+      },
+      "directory": "recordings/a0046-r0",
+      "result_sha256": "db5544c8ca525798c6fb617d29d7e8ed1610d69cd5e9986682ac56c99c9af59a",
+      "series_sha256": "a3db3b1516b0c34c22f3e77de588df736d509f0d59572338446a041367e625ba"
+    },
+    {
+      "attempt": 47,
+      "case_id": "search-01",
+      "category": "search",
+      "configuration": {
+        "assistance": true,
+        "case_id": "search-01",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "kind": "navigation",
+        "layout": "dense",
+        "offsets": {
+          "obstacle_1": [
+            -0.15999152675395523,
+            -0.08640129876270758
+          ],
+          "obstacle_2": [
+            -0.13566240368124777,
+            -0.08605552639214903
+          ],
+          "obstacle_3": [
+            0.022679073373096603,
+            0.016620975511102143
+          ],
+          "obstacle_4": [
+            0.22348002698580088,
+            -0.07403728477660237
+          ],
+          "obstacle_5": [
+            0.046702815025267075,
+            0.11496279165414497
+          ],
+          "obstacle_6": [
+            0.15626290712031482,
+            -0.13858504900852975
+          ],
+          "obstacle_7": [
+            0.03235634671366655,
+            -0.0015587861032999029
+          ]
+        },
+        "outage": false,
+        "seed": 701,
+        "world_absolute": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/search_worlds/search-01.sdf",
+        "world_sha256": "f26474f3c593ca23ec802af29313970d33549708cdb93d6017229c13bdf9a487"
+      },
+      "directory": "recordings/a0047-r0",
+      "result_sha256": "29cba171701b5ec41fdeb10d3d09cc8d0e11701f31905b777b04cdcb9aa52b1f",
+      "series_sha256": "b37e1501d2d560e2e3fb2b4979df6b83d583a46ef84339958eb8b4fd96e266fd"
+    },
+    {
+      "attempt": 48,
+      "case_id": "search-02",
+      "category": "search",
+      "configuration": {
+        "assistance": true,
+        "case_id": "search-02",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "kind": "navigation",
+        "layout": "corridor",
+        "offsets": {
+          "obstacle_1": [
+            -0.14713582711744183,
+            0.22503615976244606
+          ],
+          "obstacle_2": [
+            -0.1468318094887328,
+            0.12077120317931062
+          ]
+        },
+        "outage": false,
+        "seed": 702,
+        "world_absolute": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/search_worlds/search-02.sdf",
+        "world_sha256": "dfa43aff23854f90ded01e366a5e0ba493f6d31c19bf9d5bd7803e1e0c2d0cc1"
+      },
+      "directory": "recordings/a0048-r0",
+      "result_sha256": "8358de5e79187bf0c213152a7324f438dc6bb105f031d1482def06cacc8e9a69",
+      "series_sha256": "5e1cf56e8c2e0996be5a278f129201d63e500c03da193764a282b5e8c862b517"
+    },
+    {
+      "attempt": 49,
+      "case_id": "search-03",
+      "category": "search",
+      "configuration": {
+        "assistance": true,
+        "case_id": "search-03",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "kind": "navigation",
+        "layout": "narrow",
+        "offsets": {
+          "obstacle_1": [
+            -0.21688636365429326,
+            0.24821845183715302
+          ],
+          "obstacle_2": [
+            0.2171498182493211,
+            -0.22447970106532955
+          ]
+        },
+        "outage": false,
+        "seed": 703,
+        "world_absolute": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/search_worlds/search-03.sdf",
+        "world_sha256": "397dfc1d4e04b63495d988e7dc6fc41766c30a6ceae14be0caff3cfbd1ce6ae9"
+      },
+      "directory": "recordings/a0049-r0",
+      "result_sha256": "f9af6508bf4ae647fffc724ac4034a7b4cc78b803f55aac90239dec5eb8a7630",
+      "series_sha256": "9441d5893441f527553a9a2f7bba22112b1b95eb343926b47187b3cdb245afe2"
+    },
+    {
+      "attempt": 50,
+      "case_id": "diagnostic-R2-a16",
+      "category": "diagnostic_replay",
+      "configuration": {
+        "assistance": true,
+        "case_id": "diagnostic-R2-a16",
+        "goal": [
+          3.0,
+          0.5
+        ],
+        "id": "dense-b-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "parent_attempt": 16,
+        "replay_requirement": "R2",
+        "seed": 631,
+        "selection_role": "post_hoc_diagnostic",
+        "world": "simulation/worlds/simple_goal_demo_dense.sdf",
+        "world_sha256": "21bfa8b92d59c24f0c2afb1365832393b45c7b704ed036bd78c4438ce0a3a48f"
+      },
+      "directory": "recordings/a0050-r0",
+      "result_sha256": "4910ad103ad583b6a60bc34ecf300a35736823c81f35763a02edf3e56ad5fc9c",
+      "series_sha256": "f26eaebabb4dd9b3cc9906542278734c606fbd42eb1837f416ddbcea60e9d789"
+    },
+    {
+      "attempt": 51,
+      "case_id": "diagnostic-R2-a17",
+      "category": "diagnostic_replay",
+      "configuration": {
+        "assistance": true,
+        "case_id": "diagnostic-R2-a17",
+        "goal": [
+          3.0,
+          0.5
+        ],
+        "id": "dense-b-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "parent_attempt": 17,
+        "replay_requirement": "R2",
+        "seed": 632,
+        "selection_role": "post_hoc_diagnostic",
+        "world": "simulation/worlds/simple_goal_demo_dense.sdf",
+        "world_sha256": "21bfa8b92d59c24f0c2afb1365832393b45c7b704ed036bd78c4438ce0a3a48f"
+      },
+      "directory": "recordings/a0051-r0",
+      "result_sha256": "0203126d576cea61c4f5fbacc8bd2d84010ddac8b7a511486486e67f3709140e",
+      "series_sha256": "dc71cb9d3733e15a8d37f3084cc455697d806e76bab644b3ac547c0323238a19"
+    }
+  ],
+  "schema_version": 1,
+  "search_attempts": 4,
+  "search_wall_s": 274.8242545930002,
+  "source_sha256": "64524f665a1ad0cd576ef2ebf25bca7cad7e347cf5e08283f5c14ee5252e765a"
+}
