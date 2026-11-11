@@ -2,6 +2,8 @@
 
 Implemented schema: `1`. Package: `uav-ugv-verification` 0.1.0. [Requirements](requirements.md) | [CLI](../../verification/README.md)
 
+ROS bag/setup mappings, native telemetry, clock binding, and SDF geometry are specified in [simulator integration](simulator_integration.md). Numerical record and monitor contracts remain independent of ROS.
+
 ## Python API
 
 ```python

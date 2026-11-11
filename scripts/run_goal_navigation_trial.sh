@@ -3,6 +3,10 @@
 set -eo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 OUTPUT="${1:-$ROOT/localization_results/goal_navigation}"
+if [[ -e "$OUTPUT/results.json" || -e "$OUTPUT/verification" ]]; then
+  echo "Trial output already contains results or a recording; choose a new directory." >&2
+  exit 2
+fi
 source /opt/ros/humble/setup.bash
 source "$ROOT/ros2_ws/install/setup.bash"
 PX4="$ROOT/external/PX4-Autopilot"
@@ -15,7 +19,16 @@ python3 "$ROOT/scripts/check_sim_dependencies.py"
 source "$ROOT/scripts/process_cleanup.sh"
 mkdir -p "$OUTPUT"
 pids=()
+WORLD="${WORLD_FILE:-$ROOT/simulation/worlds/simple_goal_demo.sdf}"
+export WORLD_FILE="$WORLD" GOAL_X="${GOAL_X:-4.0}" GOAL_Y="${GOAL_Y:-0.0}"
+export UAV_ASSISTANCE="${UAV_ASSISTANCE:-true}"
+record_pid=""
 cleanup() {
+  if [[ -n "$record_pid" ]]; then
+    kill -INT -- "-$record_pid" 2>/dev/null || true
+    wait "$record_pid" || true
+    record_pid=""
+  fi
   stop_process_groups "${pids[@]}"
   pids=()
 }
@@ -23,13 +36,17 @@ trap cleanup EXIT
 trap 'exit 130' INT
 trap 'exit 143' TERM
 setsid gz sim -s -r --render-engine-server "${RENDER_ENGINE:-ogre}" \
-  "$ROOT/simulation/worlds/simple_goal_demo.sdf" >"$OUTPUT/world.log" 2>&1 & pids+=("$!")
+  "$WORLD" >"$OUTPUT/world.log" 2>&1 & pids+=("$!")
 sleep 3
 setsid MicroXRCEAgent udp4 -p 8888 >"$OUTPUT/dds.log" 2>&1 & pids+=("$!")
 setsid "$ROOT/scripts/px4_goal_demo.sh" >"$OUTPUT/px4.log" 2>&1 & pids+=("$!")
 sleep 15
+setsid python3 "$ROOT/scripts/verification_recording.py" "$OUTPUT/verification" --world "$WORLD" --result "$OUTPUT/results.json" &
+record_pid=$!
 setsid ros2 launch mission_manager simple_goal_demo.launch.py \
   start_simulation:=false start_rviz:=false \
+  world_file:="$WORLD" evaluation_trace:=true goal_x:="$GOAL_X" goal_y:="$GOAL_Y" \
+  uav_assistance:="$UAV_ASSISTANCE" \
   initial_gps_enabled:="${INITIAL_GPS_ENABLED:-false}" \
   uav_altitude:="${UAV_ALTITUDE:-4.5}" \
   uav_heading:="${UAV_HEADING:-true}" \
@@ -37,8 +54,10 @@ setsid ros2 launch mission_manager simple_goal_demo.launch.py \
   systematic_position_stddev:="${SYSTEMATIC_POSITION_STDDEV:-${SHARED_POSITION_STDDEV:-0.0}}" \
   >"$OUTPUT/launch.log" 2>&1 & pids+=("$!")
 setsid ros2 run simulation_support ugv_truth --ros-args \
-  -p world:=simple_goal_demo -p use_sim_time:=true >"$OUTPUT/truth.log" 2>&1 & pids+=("$!")
+  -p world:=simple_goal_demo -p use_sim_time:=true -p evaluation_trace:=true >"$OUTPUT/truth.log" 2>&1 & pids+=("$!")
 score_args=(--timeout "${TRIAL_TIMEOUT:-600}" --seed "${SEED:-513}"
+  --wall-timeout "${WALL_TIMEOUT:-900}" --goal-x "$GOAL_X" --goal-y "$GOAL_Y" --uav-assistance "$UAV_ASSISTANCE"
+  --gps-outage-after-motion "${GPS_OUTAGE_AFTER_MOTION:--1}"
   --uav-heading "${UAV_HEADING:-true}"
   --uav-altitude "${UAV_ALTITUDE:-4.5}"
   --shared-position-stddev "${SHARED_POSITION_STDDEV:-0.0}"

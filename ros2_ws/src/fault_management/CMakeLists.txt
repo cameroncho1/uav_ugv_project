@@ -12,5 +12,10 @@ if(BUILD_TESTING)
   ament_add_pytest_test(sim_sensor_test test/test_sim_sensors.py)
   ament_add_pytest_test(launch_modes_test test/test_launch_modes.py)
   ament_add_pytest_test(ugv_dataset_recorder_test test/test_ugv_dataset_recorder.py)
+  ament_add_pytest_test(verification_test ../../../verification/tests
+    TIMEOUT 180
+    APPEND_ENV PYTHONPATH=${CMAKE_CURRENT_SOURCE_DIR}/../../../verification/src)
+  ament_add_pytest_test(verification_bag_test test/test_verification_bag.py
+    APPEND_ENV PYTHONPATH=${CMAKE_CURRENT_SOURCE_DIR}/../../../verification/src)
 endif()
 ament_package()

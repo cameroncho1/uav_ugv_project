@@ -21,7 +21,8 @@ def test_committed_example_exercises_all_requirements():
 
 def test_all_standard_profiles_are_valid():
     for path in (Path(__file__).parents[1] / "profiles").glob("*.yaml"):
-        assert load_profile(path).calibration == "provisional"
+        expected = "calibrated" if path.stem.startswith("m2_") else "provisional"
+        assert load_profile(path).calibration == expected
 
 
 @pytest.mark.parametrize("start", [0, 9000])

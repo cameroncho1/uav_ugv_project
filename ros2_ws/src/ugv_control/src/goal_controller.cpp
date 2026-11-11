@@ -11,6 +11,8 @@
 #include <uav_ugv_msgs/pose_guard.hpp>
 #include <uav_ugv_msgs/grid_geometry.hpp>
 #include <uav_ugv_msgs/route_contract.hpp>
+#include <uav_ugv_msgs/evaluation_trace.hpp>
+#include <std_msgs/msg/string.hpp>
 
 using namespace std::chrono_literals;
 
@@ -29,7 +31,9 @@ public:
     pose_sub_ = create_subscription<geometry_msgs::msg::PoseWithCovarianceStamped>(
       "/ugv/localization/pose", 10,
       [this](geometry_msgs::msg::PoseWithCovarianceStamped::SharedPtr msg) {
-        pose_guard_.update(*msg, now().nanoseconds(), uav_ugv_msgs::steady_time_ns());
+        pose_receipt_ = uav_ugv_msgs::steady_time_ns();
+        pose_stamp_ = uav_ugv_msgs::stamp_ns(msg->header.stamp);
+        pose_guard_.update(*msg, now().nanoseconds(), pose_receipt_);
       });
     path_sub_ = create_subscription<uav_ugv_msgs::msg::PlannedRoute>(
       "/ugv/navigation/route", latched, [this](uav_ugv_msgs::msg::PlannedRoute::SharedPtr msg) {
@@ -46,6 +50,9 @@ public:
         if (changed) {path_ = nav_msgs::msg::Path(); route_ = uav_ugv_msgs::msg::PlannedRoute();}
       });
     command_pub_ = create_publisher<geometry_msgs::msg::Twist>("/ugv/cmd_vel", 10);
+    if (declare_parameter<bool>("evaluation_trace", false)) {
+      trace_pub_ = create_publisher<std_msgs::msg::String>("/evaluation/control", 50);
+    }
     timer_ = create_wall_timer(100ms, [this]() {control_tick();});
   }
 
@@ -98,7 +105,9 @@ private:
     geometry_msgs::msg::Twist command;
     const auto ros_now = now().nanoseconds(), steady_now = uav_ugv_msgs::steady_time_ns();
     std::string status;
-    if (!pose_guard_.check(ros_now, steady_now)) {
+    const bool guard_valid = pose_guard_.check(ros_now, steady_now);
+    const std::string guard_reason = pose_guard_.reason();
+    if (!guard_valid) {
       status = pose_guard_.reason();
     } else if (!have_goal_) {
       status = "Waiting for a map goal";
@@ -118,6 +127,23 @@ private:
     }
     // Publish zero every tick during a hold, including when /clock stops.
     command_pub_->publish(command);
+    const auto command_steady_ns = uav_ugv_msgs::trace_steady_ns();
+    if (trace_pub_) {
+      if (ros_now < last_trace_sim_) {++trace_epoch_;}
+      last_trace_sim_ = ros_now;
+      uav_ugv_msgs::EvaluationJson trace;
+      trace.integer("schema_version", 1).text("kind", "control_tick")
+        .text("host_id", uav_ugv_msgs::trace_host_id()).integer("sequence", trace_sequence_++)
+        .integer("steady_ns", steady_now).integer("sim_ns", ros_now).integer("epoch", trace_epoch_)
+        .integer("command_steady_ns", command_steady_ns)
+        .integer("pose_stamp_ns", pose_stamp_).integer("pose_receipt_ns", pose_receipt_)
+        .boolean("guard_valid", guard_valid).text("guard_reason", guard_reason)
+        .text("hold_reason", status).integer("goal_revision", uav_ugv_msgs::stamp_ns(goal_.header.stamp))
+        .number("linear", command.linear.x).number("angular", command.angular.z);
+      std_msgs::msg::String message;
+      message.data = trace.str();
+      trace_pub_->publish(message);
+    }
     if (status != status_) {
       RCLCPP_INFO(get_logger(), "%s", status.c_str());
       status_ = status;
@@ -128,6 +154,7 @@ private:
   ugv_control::FollowerLimits follower_;
   double goal_tolerance_{0.5}, max_path_age_{1.0};
   int64_t path_receipt_{0};
+  int64_t pose_receipt_{0}, pose_stamp_{0}, last_trace_sim_{0}, trace_epoch_{0}, trace_sequence_{0};
   bool have_goal_{false};
   std::string status_;
   nav_msgs::msg::Path path_;
@@ -137,6 +164,7 @@ private:
   rclcpp::Subscription<uav_ugv_msgs::msg::PlannedRoute>::SharedPtr path_sub_;
   rclcpp::Subscription<geometry_msgs::msg::PoseStamped>::SharedPtr goal_sub_;
   rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr command_pub_;
+  rclcpp::Publisher<std_msgs::msg::String>::SharedPtr trace_pub_;
   rclcpp::TimerBase::SharedPtr timer_;
 };
 

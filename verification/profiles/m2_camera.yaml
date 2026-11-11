@@ -1,0 +1,18 @@
+schema_version: 1
+id: m2-camera
+version: '1'
+calibration: calibrated
+max_gap_ns: 500000000
+requirements:
+  R1: {applicable: true, mandatory: true}
+  R2: {applicable: true, mandatory: true}
+  R3:
+    applicable: true
+    mandatory: false
+    clock: steady:recording
+    max_gap_ns: 250000000
+  R6: {applicable: true, mandatory: true}
+  R4: {applicable: false, mandatory: false, reason: No controlled command loss in navigation trial.}
+  R5: {applicable: false, mandatory: false, reason: No hazard event producer.}
+  R7: {applicable: false, mandatory: false, reason: No online detector decision producer.}
+  R8: {applicable: false, mandatory: false, reason: No online detector decision producer.}

@@ -130,7 +130,7 @@ Position standard deviation uses the largest x/y covariance eigenvalue: `sqrt((c
 
 ## 6. Required adjacent corrections
 
-Source inspection establishes the branches and missing interfaces below. Runtime consequences remain to be reproduced in Linux. Changes belong in M2/M3 before final trials; this document applies none of them.
+D01-D06 are implemented in M2. [Corrections and pilot regressions](../project/results/verification/m2/README.md#corrections-and-unsuccessful-pilots) record validation and limits. The table retains the original findings and acceptance scope; the complete four-layout/two-goal matrix remains M3 work.
 
 | ID | Source finding | Required correction and regression |
 | --- | --- | --- |

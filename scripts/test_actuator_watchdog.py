@@ -8,6 +8,7 @@ from pathlib import Path
 import signal
 import subprocess
 import time
+from verification_recording import Recording
 
 import rclpy
 from rclpy.node import Node
@@ -39,7 +40,8 @@ class Fixture(Node):
         self.clock = message.clock
 
     def on_truth(self, message):
-        self.truth.append((time.monotonic(), message.pose.position.x, message.pose.position.y))
+        stamp = message.header.stamp.sec * 10**9 + message.header.stamp.nanosec
+        self.truth.append((time.monotonic(), message.pose.position.x, message.pose.position.y, stamp))
 
     def tick(self):
         stamp = ((self.clock.sec, self.clock.nanosec) if self.clock is not None else None)
@@ -97,12 +99,19 @@ def stop(processes):
         if p.poll() is not None: p.wait()
 
 
-def case(output, mode):
-    directory = output / mode
+def case(output, mode, clock_mode="normal"):
+    directory = output / (mode if clock_mode == "normal" else mode + "_" + clock_mode)
     directory.mkdir(parents=True, exist_ok=True)
-    os.environ["GZ_PARTITION"] = "watchdog_" + mode + "_" + str(os.getpid())
+    os.environ["GZ_PARTITION"] = "watchdog_" + directory.name + "_" + str(os.getpid())
     os.environ["GZ_IP"] = "127.0.0.1"
     processes, logs = [], []
+    world = ROOT / "simulation/worlds/uav_ugv.sdf"
+    if clock_mode == "slow":
+        slow_world = directory / "world.sdf"
+        slow_world.write_text(world.read_text().replace('<real_time_factor>1.0</real_time_factor>',
+                                                        '<real_time_factor>0.2</real_time_factor>'))
+        world = slow_world.resolve()
+    os.environ["WORLD_FILE"] = str(world)
 
     def launch(label, command):
         log = (directory / (label + ".log")).open("w")
@@ -114,15 +123,19 @@ def case(output, mode):
 
     rclpy.init()
     node = Fixture()
+    recording = Recording(directory / "verification", world=world)
+    status = "aborted"
     try:
         launch("world", ["bash", str(ROOT / "scripts/world.sh")])
         launch("sensors", ["ros2", "launch", "simulation_support", "ugv_sensors.launch.py"])
         launch("truth", ["ros2", "run", "simulation_support", "ugv_truth", "--ros-args",
-                         "-p", "world:=uav_ugv", "-p", "use_sim_time:=true"])
+                         "-p", "world:=uav_ugv", "-p", "use_sim_time:=true", "-p", "evaluation_trace:=true"])
         bridge = launch("command_bridge", ["ros2", "run", "ros_gz_bridge", "parameter_bridge",
             "--ros-args", "-p", "config_file:=" + str(ROOT / "ros2_ws/src/mission_manager/config/ugv_command_bridge.yaml")])
+        launch("diagnostics_bridge", ["ros2", "run", "ros_gz_bridge", "parameter_bridge", "--ros-args", "-p",
+            "config_file:=" + str(ROOT / "ros2_ws/src/mission_manager/config/evaluation_watchdog_bridge.yaml")])
         controller = launch("controller", ["ros2", "run", "ugv_control", "goal_controller",
-                                           "--ros-args", "-p", "use_sim_time:=true"])
+                                           "--ros-args", "-p", "use_sim_time:=true", "-p", "evaluation_trace:=true"])
         deadline = time.monotonic() + 35
         initial = None
         while time.monotonic() < deadline:
@@ -132,23 +145,37 @@ def case(output, mode):
                 if node.truth[-1][1] - initial[1] >= .15:
                     break
         assert initial is not None and node.truth[-1][1] - initial[1] >= .15, "No physical pre-fault motion"
+        if clock_mode == "frozen":
+            paused = subprocess.run(["gz", "service", "-s", "/world/uav_ugv/control", "--reqtype",
+                "gz.msgs.WorldControl", "--reptype", "gz.msgs.Boolean", "--timeout", "3000",
+                "--req", "pause: true"], capture_output=True, text=True, check=True)
+            assert "data: true" in paused.stdout, "World did not acknowledge pause"
         killed = controller if mode == "controller_death" else bridge
         lost_at = time.monotonic()
         os.killpg(killed.pid, signal.SIGKILL)
+        recording.command_loss(mode)
         while time.monotonic() - lost_at < 1.6:
             node.tick()
         late = [row for row in node.truth if row[0] >= lost_at + .75]
-        assert len(late) >= 5, "Missing physical truth after command loss"
-        distance = max(((row[1] - late[0][1])**2 + (row[2] - late[0][2])**2)**.5 for row in late)
-        result = {"case": mode, "pre_fault_motion_m": node.truth[-1][1] - initial[1],
+        if clock_mode != "frozen":
+            assert len(late) >= 5, "Missing physical truth after command loss"
+        distance = (max(((row[1] - late[0][1])**2 + (row[2] - late[0][2])**2)**.5 for row in late)
+                    if late else None)
+        result = {"case": mode, "clock_mode": clock_mode, "pre_fault_motion_m": node.truth[-1][1] - initial[1],
                   "watchdog_timeout_wall_s": .35, "maximum_additional_delivery_period_wall_s": .05,
                   "settled_check_after_wall_s": .75, "late_truth_samples": len(late),
-                  "maximum_late_displacement_m": distance, "passed": distance < .02}
+                  "maximum_late_displacement_m": distance,
+                  "physical_settling_available": clock_mode != "frozen",
+                  "passed": (distance < .02 if clock_mode != "frozen" else
+                             bool(late) and len({row[3] for row in late}) == 1)}
         (directory / "result.json").write_text(json.dumps(result, indent=2) + "\n")
         assert result["passed"], "Actuator kept moving after controller/transport loss"
+        status = "completed"
         return result
     finally:
         stop(processes)
+        recording.close(status)
+        recording.normalize()
         node.destroy_node()
         rclpy.try_shutdown()
         for log in logs: log.close()
@@ -157,9 +184,11 @@ def case(output, mode):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("output", type=Path)
+    parser.add_argument("--clock-mode", choices=("normal", "slow", "frozen"), default="normal")
     args = parser.parse_args()
     args.output.mkdir(parents=True, exist_ok=True)
-    results = [case(args.output, mode) for mode in ("controller_death", "command_transport_loss")]
+    results = [case(args.output, mode, args.clock_mode)
+               for mode in ("controller_death", "command_transport_loss")]
     (args.output / "summary.json").write_text(json.dumps(results, indent=2) + "\n")
     print(json.dumps(results))
 

@@ -1,0 +1,17 @@
+schema_version: 1
+id: camera-navigation-v1
+mission_start: first_drive
+ignored_models: [ground_plane, simple_ugv, goal_marker]
+topics:
+  /evaluation/ugv_truth: truth_pose
+  /ugv/localization/pose: estimated_pose
+  /global_goal_pose: goal
+  /ugv/navigation/route: route
+  /local_grid: grid
+  /ugv/sensors/uav_relative_pose: uav_observation
+  /evaluation/control: control
+  /evaluation/watchdog: watchdog
+  /evaluation/truth: motion
+  /evaluation/faults: fault
+  /evaluation/hazards: canonical
+  /evaluation/detector: canonical

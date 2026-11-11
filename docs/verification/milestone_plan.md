@@ -1,6 +1,6 @@
 # Verification specification
 
-Status: M1 implemented; M2-M4 planned. Updated: 2026-11-10. [Validation status](status.md).
+Status: M1-M2 implemented; M3-M4 planned. Updated: 2026-11-10. [Validation status](status.md).
 
 [Verification index](README.md) | [Implementation reference](implementation_reference.md) | [Completion plan](../project/completion_plan.md) | [Navigation](../navigation.md)
 
@@ -143,6 +143,8 @@ Formal definitions, executable interpretations, dependencies, and scope are defi
 **Outputs:** package/API, schemas, profiles, fixtures, sample results, and test results.
 
 ### M2: simulator integration and cross-setup reuse
+
+**Implemented:** [integration commands and contracts](simulator_integration.md), [pilot evidence and calibration](../project/results/verification/m2/README.md). Camera and controlled setups use the same monitors. Paused physical settling remains inconclusive; hazard and online detector producers remain unavailable.
 
 **Dependencies:** M1 API/fixtures and existing recording paths. Unavailable hazard/detector signals are reported as missing capabilities.
 

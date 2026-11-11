@@ -1,0 +1,49 @@
+{
+  "guard_state": {
+    "sim": {
+      "positive_intervals": 169,
+      "max_gap_ns": 108000000,
+      "median_gap_ns": 92000000
+    },
+    "steady:f81d473e-065e-45a0-92e0-4d8d7416a2d8": {
+      "positive_intervals": 169,
+      "max_gap_ns": 101787522,
+      "median_gap_ns": 96983992
+    }
+  },
+  "actuator_input": {
+    "steady:f81d473e-065e-45a0-92e0-4d8d7416a2d8": {
+      "positive_intervals": 169,
+      "max_gap_ns": 106110398,
+      "median_gap_ns": 97141305
+    }
+  },
+  "actuator_output": {
+    "steady:f81d473e-065e-45a0-92e0-4d8d7416a2d8": {
+      "positive_intervals": 321,
+      "max_gap_ns": 57153310,
+      "median_gap_ns": 50432778
+    }
+  },
+  "measured_motion": {
+    "steady:f81d473e-065e-45a0-92e0-4d8d7416a2d8": {
+      "positive_intervals": 849,
+      "max_gap_ns": 41382517,
+      "median_gap_ns": 19151809
+    }
+  },
+  "estimated_pose": {
+    "sim": {
+      "positive_intervals": 463,
+      "max_gap_ns": 60000000,
+      "median_gap_ns": 40000000
+    }
+  },
+  "uav_observation": {
+    "sim": {
+      "positive_intervals": 76,
+      "max_gap_ns": 200000000,
+      "median_gap_ns": 200000000.0
+    }
+  }
+}

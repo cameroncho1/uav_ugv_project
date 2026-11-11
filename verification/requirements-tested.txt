@@ -1,7 +1,6 @@
-# Direct dependencies validated with Python 3.10.19 on Windows x86-64.
-# ROS/Humble integration and Linux validation are M2 work.
+# Direct dependencies for Python 3.10 on Windows and ROS 2 Humble Linux.
 numpy==1.26.4
 PyYAML==6.0.3
 scipy==1.15.3
 matplotlib==3.10.9
-pytest==9.2.0
+pytest==8.4.2

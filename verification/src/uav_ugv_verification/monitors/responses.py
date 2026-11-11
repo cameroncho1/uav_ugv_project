@@ -18,6 +18,7 @@ class Obligation:
     unknown: bool = False
     violated: bool = False
     guard_gap: bool = False
+    response_gap: bool = False
 
 
 def guard_response(reader: TraceReader, rule: Rule, interval: Interval):
@@ -47,7 +48,10 @@ def guard_response(reader: TraceReader, rule: Rule, interval: Interval):
             deadline = obligation.start_ns + p["response_ns"]
             if command is None or state is None:
                 if snapshot.duration_ns and (t <= deadline or obligation.recovered_ns is None):
-                    obligation.unknown = True
+                    obligation.response_gap = True
+                    # A witnessed bounded response needs no command prehistory.
+                    # After that response, the sustained hold needs full coverage.
+                    obligation.unknown |= state is None or obligation.responded_ns is not None
                     obligation.guard_gap |= state is None
             if obligation.responded_ns is None and t <= deadline and command and quiet(command, p):
                 obligation.responded_ns = t
@@ -63,7 +67,8 @@ def guard_response(reader: TraceReader, rule: Rule, interval: Interval):
                     if obligation.responded_ns is None:
                         obligation.responded_ns = emission.time_ns
                 elif (
-                    stopped_in_batch
+                    not quiet(emission, p)
+                    and stopped_in_batch
                     and obligation.recovered_ns is None
                     and not obligation.guard_gap
                 ):
@@ -87,7 +92,7 @@ def guard_response(reader: TraceReader, rule: Rule, interval: Interval):
                     evidence.fail(t, "command_resumed_before_guard_recovery")
                     obligation.violated = True
             if obligation.responded_ns is None and t >= deadline:
-                if obligation.unknown:
+                if obligation.unknown or obligation.response_gap:
                     evidence.missing(t, "guard_response_window_incomplete")
                 else:
                     evidence.fail(deadline, "guard_response_deadline_missed")

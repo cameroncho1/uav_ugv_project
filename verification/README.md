@@ -50,4 +50,10 @@ A CSV run requires `metadata.json`, `imu.csv`, `wheel_odom.csv`, `gps.csv`, `tru
 python -m pytest verification/tests
 ```
 
-The semantic fixtures cover exact deadlines, incomplete horizons, hold violations, missing streams, clock epochs, source loss, geometry, detector scope, false-alarm exposure, CLI statuses, and reporting without source recordings. No simulation is started. Bag reading, telemetry, ROS test registration, and actual simulation trials are M2.
+The offline suite covers exact deadlines, incomplete horizons, sustained holds, missing streams, clock epochs, source loss, geometry, detector scope, false-alarm exposure, CLI statuses, and reporting without source recordings. It starts no simulation. Linux `colcon test` additionally runs real CDR bag regressions.
+
+## Simulator integration
+
+The [integration guide](../docs/verification/simulator_integration.md) provides Linux build, recording, import, profile-binding, and evaluation commands. Setup mappings are in `setups/`; calibrated pilot templates are `profiles/m2_*.yaml`. `bind-profile` resolves `steady:recording` from a recording's verified boot clock without changing thresholds.
+
+`import-bag` supports Humble sqlite3 storage with bounded-memory acquisition sorting, clock resets, native telemetry counters, and numerical topic selection. It records missing capabilities and source/adapter hashes. It requires sourced ROS 2 Humble; other library commands retain their ROS-free numerical boundary. See the [M2 evidence index](../docs/project/results/verification/m2/README.md) for actual camera/guard/watchdog outcomes and sampling limits.

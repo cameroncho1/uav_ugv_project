@@ -1,49 +1,39 @@
 # Verification validation
 
-Date: 2026-11-10. M1: offline evaluator implemented. M2-M4: pending.
+Date: 2026-11-10. M1 and M2 implemented. M3 experiments and M4 final report/demo remain planned.
 
-## M1
+## Implemented behavior
 
-- Installable Python package, public trace-reader API, normalized JSONL and current dataset CSV adapters.
-- Versioned schemas/profiles/results, capability inventory, strict validation, sequence/epoch/gap handling, deterministic exit codes.
-- R1-R8 checks with box/cylinder geometry, arrival dwell, sustained guard holds, actuator expiry/settling, hazard responses, acquisition-matched error, detector scopes, and nominal false-alarm exposure.
-- JSON/CSV output and saved-result SVG reporting; evaluator/source/profile hashes, separated cohorts, source-run-grouped exact detector statistics.
-- Seven provisional setup profiles and a labeled synthetic example exercising all eight checks. No ROS/Gazebo imports or simulation processes.
+- Installable numerical package, typed contracts, strict validation, normalized JSONL/current dataset CSV adapters, R1–R8 monitors, CLI, JSON/CSV results, and saved-result plots.
+- Humble sqlite3 bag import with disk-backed acquisition sorting, clock epochs, native sequence gaps, source hashes, setup mappings, independent static box/cylinder extraction, and profile clock binding.
+- Consumer guard and command-publication telemetry, actuator receipt/output diagnostics independent of command transport, applied GPS fault events, and acquisition/receipt-aware physical-motion measurements.
+- Shared numerical recorder, configuration-aware navigation scoring, simulation-time arrival dwell/deadline, independent wall watchdog, consistent world/goal/assistance forwarding, and expanded bag topics/QoS.
+- Sustained-guard regressions covering zero commands after the response deadline, actual resumed motion, and a witnessed response before command prehistory is available.
 
-Environment: Windows x86-64, Python 3.10.19. Direct tested dependencies are in [requirements-tested.txt](../../verification/requirements-tested.txt). Linux/ROS compatibility is not established by these checks.
+## Validation
 
-## Validation commands
+| Check | Result |
+| --- | --- |
+| Offline Windows Python 3.10 suite | 102 tests pass; Ruff lint/format pass |
+| Linux touched packages | `uav_ugv_msgs`, `ugv_control`, `simulation_support`, `fault_management`, `mission_manager` build successfully |
+| Registered Linux checks | 197 checks; zero errors/failures; eight cppcheck skips for headers or packages without C++ sources; functional checks run without skips |
+| Real CDR regressions | Acquisition timestamps, storage insertion order across reset, unselected invalid image blobs, missing historical telemetry, native sequence loss, stable source-run identity, and mission boundaries |
+| Controlled navigation | 23 cases pass, including slow/frozen clocks; R3 completes five obligations |
+| Camera navigation | Revised-goal and applied-GPS-outage recordings pass R1/R2/R6 within the declared first-drive mission interval |
+| Actuator command loss | Controller/bridge loss tested at normal and slow clocks; R4 passes. Paused clocks retain output-expiry evidence and return physical R4 inconclusive |
+| Sensor-only CSV | `run_1030_noise_2` imports; all navigation/detector checks explicitly excluded; evaluation exits 2 |
+| Synthetic example | R1–R8 pass; labeled synthetic, separate from simulation evidence |
 
-Run from the repository root after [installation](../../verification/README.md#install):
+Linux environment: Ubuntu 22.04/WSL, ROS 2 Humble, Gazebo 8.15.0, Python 3.10. Tested Python dependencies are in [requirements-tested.txt](../../verification/requirements-tested.txt). pytest 8.4.2 is compatible with Humble's installed test plugin.
 
-```bash
-python -m pytest verification/tests
-python -m uav_ugv_verification inspect verification/examples/full_run \
-  --profile verification/examples/full_run.yaml
-python -m uav_ugv_verification evaluate verification/examples/full_run \
-  --profile verification/examples/full_run.yaml --output verification/outputs/example
-python -m uav_ugv_verification report verification/outputs/example \
-  --output verification/outputs/report
-```
+Commands, frozen pilot bounds, individual result files, source checksums, unsuccessful pilots, and recording locations are in the [integration guide](simulator_integration.md) and [M2 evidence index](../project/results/verification/m2/README.md). The evidence directory contains metadata/results, not large raw bags. Trial processes are stopped after evaluation.
 
-Additional development checks (install `verification[dev]`):
+## Remaining scope
 
-```bash
-ruff check verification/src verification/tests
-ruff format --check verification/src verification/tests
-python -m build verification --outdir verification/dist --no-isolation
-```
+- R5 and online R7/R8 require actual hazard/detector producers. Their absence remains explicit; no new behavior/model fills those interfaces.
+- Camera R3 is optional and unexercised in the scoped missions. Earlier camera telemetry also lacks the separate command-publication timestamp. The final controlled fixture establishes R3 timing.
+- Calibrated profiles cover the recorded pilot conditions, not arbitrary loads or future setups. Sampling gaps, uncertainty, and scheduling overruns remain observable incomplete/failed outcomes.
+- M3 must execute the frozen scenario matrix, preserve every attempt, and perform budgeted failure search/replay. Calibration pilots do not count as held-out experiments.
+- M4 must produce the final cohort figures, claim/evidence table, and rehearsed demo. No supervisor model checking is implemented.
 
-Validation: 85 tests pass; Ruff lint/format checks pass. Source distribution and wheel build successfully; an isolated wheel installation imports the package and evaluates the example without ROS/Gazebo. The tests include numeric boundary/counterexample cases, CSV labels/completion metadata, invalid schemas, public API, CLI status/error artifacts, report regeneration without recordings, source-run clustering, and bounded-memory alignment of 20,002 generated records, including discarded prehistory. The example returns `PASS` for R1-R8 and exit code 0; its signals are synthetic, not a simulated vehicle trajectory.
-
-Existing CSV input checked: `uav_ugv_project_fault_detection/datasets/ugv_faulty_long/run_1030_noise_2`. Inventory: 15,000 IMU, 5,769 wheel, 1,500 GPS, 4,412 truth, 6,000 command samples, and two actual label-transition events. Source ID: `run_1030`. This confirms adapter compatibility with that recording; it supplies no navigation or online-detector verdict.
-
-## M2 prerequisites and scope
-
-- Implement Humble bag decoding and acquisition/receipt-aware recording; register library checks with `colcon test`.
-- Add real guard, applied-fault, geometry, actuator receipt/output, and physical-motion telemetry. Normalize source clocks/reference points before evaluation.
-- Reproduce/correct D01-D06 in the [implementation reference](implementation_reference.md#6-required-adjacent-corrections), including baseline scoring, world/goal settings, event onset, clock labels, stopping measurements, and missing topics.
-- Run Linux builds/tests and controlled guard/watchdog plus camera-navigation trials. Demonstrate unchanged monitor code across two setups.
-- Calibrate/freeze timing/gap/uncertainty profiles on pilot runs before M3. Preserve unavailable hazard/detector capabilities as explicit missing evidence.
-
-Bag reading, runtime instrumentation, simulator trials, supervisor model checking, and final experiment/report claims are not completed by M1. Root `AGENTS.md` records the numerical library boundary; runtime localization, navigation, and actuator code are unchanged.
+Measurement/filter behavior is unchanged. This change instruments and evaluates existing interfaces; paired localization trials are not required by the repository's measurement-change rule.

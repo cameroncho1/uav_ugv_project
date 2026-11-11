@@ -1,0 +1,9 @@
+run_id,requirement,version,mandatory,verdict,reason,eligible_duration_ns,triggers,completed_obligations,missing_data_count
+release_normalized-1b53ced6d92f,R1,1,False,NOT_APPLICABLE,not_selected_by_profile,0,0,0,0
+release_normalized-1b53ced6d92f,R2,1,False,NOT_APPLICABLE,not_selected_by_profile,0,0,0,0
+release_normalized-1b53ced6d92f,R3,1,False,NOT_APPLICABLE,not_selected_by_profile,0,0,0,0
+release_normalized-1b53ced6d92f,R4,1,True,INCONCLUSIVE,incomplete_or_unexercised,348728265,1,0,1
+release_normalized-1b53ced6d92f,R5,1,False,NOT_APPLICABLE,not_selected_by_profile,0,0,0,0
+release_normalized-1b53ced6d92f,R6,1,False,NOT_APPLICABLE,not_selected_by_profile,0,0,0,0
+release_normalized-1b53ced6d92f,R7,1,False,NOT_APPLICABLE,not_selected_by_profile,0,0,0,0
+release_normalized-1b53ced6d92f,R8,1,False,NOT_APPLICABLE,not_selected_by_profile,0,0,0,0

@@ -81,6 +81,9 @@ def _cohort(value: dict) -> str:
     }
     context["code_commit"] = value["provenance"].get("code_commit", "unrecorded")
     context["dirty_patch_sha256"] = value["provenance"].get("dirty_patch_sha256", "unrecorded")
+    context["source_snapshot_sha256"] = value["provenance"].get(
+        "source_snapshot_sha256", "unrecorded"
+    )
     return hashlib.sha256(json.dumps(context, sort_keys=True).encode()).hexdigest()[:16]
 
 
@@ -178,6 +181,9 @@ def report(source: str | Path, output: str | Path) -> dict:
             "profile_sha256": runs[0]["profile_sha256"],
             "calibration": runs[0]["calibration"],
             "code_commit": runs[0]["provenance"].get("code_commit", "unrecorded"),
+            "source_snapshot_sha256": runs[0]["provenance"].get(
+                "source_snapshot_sha256", "unrecorded"
+            ),
             "R7_detection": _detector_statistics(runs, "R7"),
             "R8_false_alarm": _detector_statistics(runs, "R8"),
         }
