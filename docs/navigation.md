@@ -59,3 +59,9 @@ The ROS guard harness includes blocked starts and delayed obsolete-goal routes i
 Closed-loop baseline/assisted tracking uses separate fresh worlds with identical configured seeds, map and goal. Trajectories and sensor sequences differ under feedback. The fixture supplies a declared free grid, fixed-observer synthetic observations, and the drift profile. GPS outage begins no earlier than 2 s after first motion and after at least 11 received fixes, preserving the GPS evidence threshold. This isolates tracking from camera-grid accuracy. Baseline holds/failures remain recorded.
 
 [Historical results](cooperative_localization/evaluation_results.md) identify the tested GPS-branch conditions. Uneven terrain, hardware camera calibration, unknown shared global bias and reliable semantic mapping remain outside these simulation claims.
+
+## Verified supervisor
+
+The path follower runs only when the persistent supervisor selects `NAVIGATE`. Other modes publish zero every timer tick. Completed-goal memory prevents estimated drift from restarting the same goal. Enabled detector holds require ten distinct clear decisions and five simulation seconds to recover; new goals do not bypass recovery. Detector enablement defaults to false until a producer is deployed.
+
+See the [supervisor specification](verification/supervisor.md), [finite proof and runtime evidence](project/results/supervisor/README.md), and [course/report mapping](verification/supervisor_course_alignment.md). The proof establishes discrete command permission under explicit input assumptions; the independent watchdog and recorded physical stopping checks remain necessary.

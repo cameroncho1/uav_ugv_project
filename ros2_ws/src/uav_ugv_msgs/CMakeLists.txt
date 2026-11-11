@@ -11,12 +11,12 @@ find_package(geometry_msgs REQUIRED)
 find_package(nav_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
-rosidl_generate_interfaces(${PROJECT_NAME} "msg/PlannedRoute.msg"
+rosidl_generate_interfaces(${PROJECT_NAME} "msg/PlannedRoute.msg" "msg/FaultStatus.msg"
   DEPENDENCIES geometry_msgs nav_msgs std_msgs)
 
 install(DIRECTORY include/ DESTINATION include/${PROJECT_NAME})
 ament_export_include_directories(include/${PROJECT_NAME})
-ament_export_dependencies(geometry_msgs nav_msgs rosidl_default_runtime)
+ament_export_dependencies(geometry_msgs nav_msgs std_msgs rosidl_default_runtime)
 # uncomment the following section in order to fill in
 # further dependencies manually.
 # find_package(<dependency> REQUIRED)

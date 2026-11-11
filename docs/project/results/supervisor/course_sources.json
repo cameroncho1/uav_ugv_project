@@ -1,0 +1,110 @@
+{
+  "sources": [
+    {
+      "id": "home",
+      "url": "https://jdeshmukh.github.io/teaching/cs513-autocps-fall-2025/index.html",
+      "material_year": 2025,
+      "retrieved_date": "2026-11-11",
+      "read": "full document",
+      "cached_representation": "HTML",
+      "cached_content_sha256": "d06a47e99cebd64524e3c080dfbf8590ecdbb4c5a8dcecbfa8bd39e865fc9b79",
+      "cached_bytes": 4862
+    },
+    {
+      "id": "project",
+      "url": "https://jdeshmukh.github.io/teaching/cs513-autocps-fall-2025/projects.html",
+      "material_year": 2025,
+      "retrieved_date": "2026-11-11",
+      "read": "full document",
+      "cached_representation": "extracted text",
+      "cached_content_sha256": "407f85aac63c537ad4e9c83c6addb14202d1f095da47cde664bacb5edc46da3e",
+      "cached_bytes": 210
+    },
+    {
+      "id": "policy",
+      "url": "https://jdeshmukh.github.io/teaching/cs513-autocps-fall-2025/policies.html",
+      "material_year": 2025,
+      "retrieved_date": "2026-11-11",
+      "read": "full document",
+      "cached_representation": "extracted text",
+      "cached_content_sha256": "3adbe2fc1f04923e09b1a843eda480da13a802d1329b9144f48ed6cf620975f1",
+      "cached_bytes": 2762
+    },
+    {
+      "id": "schedule",
+      "url": "https://jdeshmukh.github.io/teaching/cs513-autocps-fall-2025/schedule.html",
+      "material_year": 2025,
+      "retrieved_date": "2026-11-11",
+      "read": "full document",
+      "cached_representation": "extracted text",
+      "cached_content_sha256": "a5c8c38754f599f0a328609ca624f65091691d664986d1792c8dae5f92f3a409",
+      "cached_bytes": 1013
+    },
+    {
+      "id": "report_template",
+      "url": "https://docs.google.com/document/d/1lMb6jLL3d95x2ixvJQQkNiAKz2m37j4iMq9wWyq-SWA/edit",
+      "material_year": 2025,
+      "retrieved_date": "2026-11-11",
+      "read": "full document",
+      "cached_representation": "plain text export",
+      "cached_content_sha256": "9b41de08d939f9b4c5539c2ef377e82623c48855e9bdbc93841dbff731a9a9fa",
+      "cached_bytes": 1009
+    },
+    {
+      "id": "introduction",
+      "url": null,
+      "material_year": 2025,
+      "retrieved_date": "2026-11-11",
+      "read": "full document",
+      "cached_representation": "all 20 slides extracted text",
+      "cached_content_sha256": "ed77a06d9b9654ebd78d1531c193d0984ad00e2ac8e3f6addad1dd2900ea7ca9",
+      "cached_bytes": 5969,
+      "original_filename": "CourseIntro.pptx",
+      "original_sha256": "f731e767f78de8184bd135957ca20bcb5e385bbb3b05dc5f9b3d1a9a2838dc8e",
+      "original_bytes": 4792179,
+      "source": "local course lecture supplied with project"
+    },
+    {
+      "id": "resources",
+      "url": "https://docs.google.com/document/d/1TL3oLyf1XpNYqUxy-IX-ItT2ryQhbpqtqL7BH-Idfdo/edit",
+      "read": "full document by independent scope reviewer",
+      "material_year": 2025,
+      "retrieved_date": "2026-11-11",
+      "content_hash_available": false
+    },
+    {
+      "id": "project_ideas",
+      "url": "https://docs.google.com/document/d/1MUwnWh_XTWh82I_145M6hkTqPC58PqoBiKNdK7jxqhA/edit",
+      "read": "full document by independent scope reviewer",
+      "material_year": 2025,
+      "retrieved_date": "2026-11-11",
+      "content_hash_available": false
+    },
+    {
+      "id": "proposal_template",
+      "url": "https://docs.google.com/document/d/1UCfJp_dt8yjBLgzYLbjZrc7eqYHUI9Jhj0KpFYOt0Ac/edit",
+      "read": "full document by independent scope reviewer",
+      "material_year": 2025,
+      "retrieved_date": "2026-11-11",
+      "content_hash_available": false
+    }
+  ],
+  "source_year_caveat": "Supplied introduction is Fall 2025; inaccessible assumed 2026 links do not establish current grading or deadlines.",
+  "source_retention": "Original materials remain at canonical sources; local course cache is not redistributed.",
+  "grading_2025": {
+    "project_percent": 25,
+    "presentation_percent": 10,
+    "report_demo_percent": 15,
+    "feature_specific_rubric": false
+  },
+  "report_page_limit": 10,
+  "report_sections": [
+    "Introduction",
+    "Background and related work",
+    "Solution overview",
+    "Methods and algorithms",
+    "Implementation",
+    "Experimental results and analysis",
+    "Conclusion"
+  ]
+}

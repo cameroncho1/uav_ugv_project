@@ -1,6 +1,6 @@
 # Verification specification
 
-Status: M1-M4 implemented. Optional E1 remains unimplemented. Updated: 2026-11-11. [Validation status](status.md) | [M3 experiments](../project/results/verification/m3/README.md) | [M4 report/demo](../project/results/verification/m4/README.md).
+Status: M1-M4 implemented. W10/E1 supervisor checking is implemented; see [supervisor specification](supervisor.md) and [evidence](../project/results/supervisor/README.md). Updated: 2026-11-11. [Validation status](status.md) | [M3 experiments](../project/results/verification/m3/README.md) | [M4 report/demo](../project/results/verification/m4/README.md).
 
 [Verification index](README.md) | [Implementation reference](implementation_reference.md) | [Completion plan](../project/completion_plan.md) | [Navigation](../navigation.md)
 
@@ -15,7 +15,7 @@ Evaluate recorded system behavior against R1-R8. Produce per-run verdicts, viola
 | M3: experiments and failure search | Fixed scenario matrix, run ledger, counterexample replay | M2 capabilities and calibrated profiles |
 | M4: report and demo | Figures, tables, evidence index, repeatable demonstration | M3 results; reporting can start against M1 fixtures |
 
-Optional: supervisor model checking (E1). Excluded: surrogate models, advanced optimizers, live dashboards, detector training, and additional simulator integrations.
+Implemented extension: supervisor model checking (W10/E1). Excluded: surrogate models, advanced optimizers, live dashboards, detector training, and additional simulator integrations.
 
 Include scoring, launch, and recording corrections D01-D06 in the [implementation reference](implementation_reference.md#6-required-adjacent-corrections). Preserve existing behavior outside the corrected cases. Reproduce each case and add its regression before final experiments.
 
@@ -203,12 +203,12 @@ Formal definitions, executable interpretations, dependencies, and scope are defi
 
 ## 6. Optional E1: supervisor model and conformance
 
-Optional extension corresponding to completion-plan W10. Independent of M1-M4.
+Implemented extension corresponding to completion-plan W10, independent of historical M1-M4 cohorts. See the [implemented specification](supervisor.md), [course alignment](supervisor_course_alignment.md), and [results](../project/results/supervisor/README.md). The acceptance criteria below describe its verification scope.
 
 - Files: `verification/supervisor/`, conformance tests, and `ugv_control`. Model reachable recovery counters, goal revisions, resets, and other memory; five named states times 32 Boolean inputs is incomplete when memory exists.
 - Check temporal safety properties independently of the shared transition table, then compare C++ behavior over reachable sequences. Distinguish transition enumeration from temporal model checking.
 - Build/test touched packages and rerun guard/watchdog checks in Linux. Report explored states/transitions, assumptions, counterexamples, and conformance coverage. Timing/physical stopping remain trace-monitor claims.
-- If omitted, remove model-checking claims from the paper and retain measured guard evidence.
+- Bind model-checking claims to the checked source/policy hashes; retain measured guard evidence separately.
 
 ## 7. Validation
 

@@ -86,3 +86,13 @@ Add `--compile-pdf` to the report command when `pdflatex` is installed. Paper ou
 The numerical package accepts the [normalized contract](../docs/verification/interfaces.md) independently of the simulator. Add a setup mapping/adapter, declare actual capabilities, transform global coordinates into the declared map/reference point, and preserve acquisition/receipt clocks. Calibrate a separate profile before held-out evaluation. Existing monitors and saved-result reports consume that profile without simulator imports.
 
 The supplied process runner launches this project's Linux camera/guard/watchdog scenarios. Other simulators provide their own launch/recording path and feed the same offline CLI; they do not need to duplicate requirement logic. Unsupported signals remain unavailable. Future hazard/detector producers must supply actual events/decisions before those claims can be measured.
+
+## Navigation supervisor proof and paper material
+
+```bash
+python scripts/check_navigation_supervisor.py --output verification/outputs/supervisor/model.json
+python scripts/supervisor_report.py docs/project/results/supervisor/model.json \
+  docs/project/results/supervisor/controlled verification/outputs/supervisor/paper --compile-pdf
+```
+
+The first command checks the finite model without ROS; add `--probe` pointing to the Linux-built `supervisor_transition_probe` to establish compiled C++ conformance. The second reproduces saved proof/ROS tables and figures without source bags; PDF compilation requires `pdflatex`. The [specification](../docs/verification/supervisor.md) defines assumptions and runtime commands. The [results](../docs/project/results/supervisor/README.md) provide the source-bound proof, mutation counterexamples, controlled cases, and a two-page report insertion.

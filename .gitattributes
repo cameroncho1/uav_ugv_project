@@ -1,3 +1,10 @@
 # Shell scripts run on Linux and must keep LF line endings, even when checked out on Windows.
 *.sh text eol=lf
 *.py text eol=lf
+
+# Source digests used by supervisor conformance must survive cross-platform checkouts.
+ros2_ws/src/ugv_control/include/ugv_control/supervisor*.hpp text eol=lf
+ros2_ws/src/ugv_control/src/supervisor_transition_probe.cpp text eol=lf
+ros2_ws/src/ugv_control/src/goal_controller.cpp text eol=lf
+ros2_ws/src/uav_ugv_msgs/msg/FaultStatus.msg text eol=lf
+config/fastdds_fixture_udp.xml text eol=lf

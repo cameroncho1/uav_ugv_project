@@ -22,9 +22,9 @@
 - `uav_control` owns the PX4 interface and independent map-anchor producer; `uav_sensing` owns the camera relative-observation producer.
 - `traversability_mapping` owns camera-to-grid projection and acquisition-time matching. It consumes independent map anchors and does not produce localization corrections.
 - `simulation_support` owns Gazebo models, raw sensor bridges, the shared clock bridge, and truth readers. `fault_management` owns synthetic sensor corruption, explicit outage controls, trial driving, and scoring.
-- `route_planning` owns footprint clearance and routes associated with goal revisions. `ugv_control` owns path following and the actuator command watchdog.
+- `route_planning` owns footprint clearance and routes associated with goal revisions. `ugv_control` owns path following, the persistent navigation supervisor, validated detector/goal inputs, and the actuator command watchdog.
 - `localization_common` contains numerical frame, covariance, and geodesy operations without ROS or simulator imports.
-- `verification` evaluates normalized offline traces and produces requirement evidence; numerical monitors have no ROS or simulator imports. Recording, event production, and simulation orchestration remain in their existing packages.
+- `verification` evaluates normalized offline traces and checks the finite supervisor model against independent properties and compiled C++ conformance; numerical monitors and model checking have no ROS or simulator imports. Recording, event production, and simulation orchestration remain in their existing packages.
 
 ## Documentation and Git
 

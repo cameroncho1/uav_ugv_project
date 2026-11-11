@@ -1,0 +1,64 @@
+\documentclass[10pt]{article}
+\usepackage[margin=0.8in]{geometry}
+\usepackage{graphicx,booktabs,hyperref}
+\hypersetup{hidelinks}
+\setlength{\emergencystretch}{3em}
+\title{Finite-State Verification of UGV Navigation Decisions}
+\author{}\date{}
+\begin{document}\maketitle
+\section{Architecture and assumptions}
+The UGV controller has five persistent supervisor modes: INIT, NAVIGATE, HOLD\_GUARD,
+HOLD\_FAULT, and GOAL. Only NAVIGATE permits the existing path follower; all other modes
+request zero linear and angular velocity. The existing full pose and route guards remain authoritative.
+Memory includes a fault latch, a clear-decision counter, recovery age, and completed-goal memory.
+The completion latch prevents estimated drift or intervening holds from restarting the same goal.
+It records an estimated-threshold observation, not R2's independent physical/quiet dwell.
+The supplied decision-precedence diagram is available separately as \texttt{figures/supervisor.pdf}.
+The detector boundary is optional and disabled in the camera deployment because no online producer
+is available. When enabled, missing, stale, invalid, or discontinuous decisions hold. Recovery requires
+ten distinct valid clear decisions and at least five simulation seconds from the first clear acquisition
+stamp, with fresh latest evidence. New goals never clear fault recovery.
+\section{Formal method and implementation}
+A versioned decision table generates C++ mode-selection data and supplies a Python reference model.
+Independent temporal safety and next-step predicates constrain permission, completion, resets,
+readiness, and exact recovery-memory updates. An independently maintained completion monitor is
+composed with the reachable-state graph. Examples include
+\[
+G(\mathrm{permit}\rightarrow\mathrm{goalValid}\land\mathrm{poseValid}\land
+\mathrm{routeValid}\land\neg\mathrm{faultLatch}\land\neg\mathrm{done})
+\]
+and \(G(\mathrm{done}\land\neg\mathrm{newGoal}\rightarrow X\mathrm{done})\).
+Breadth-first exploration includes all latch/counter memory and recovery-age classes;
+it is exhaustive finite-state safety checking rather than only mode/input enumeration.
+Exact numerical tests establish timestamp/freshness boundaries, including five seconds plus/minus one nanosecond.
+The pure C++ transition and validators have no ROS/Gazebo imports. Every received detector decision
+updates recovery, including alarm/clear bursts. The ROS controller reevaluates permission before
+periodic command publication. Policy and implementation digests bind the compiled probe to the checked sources.
+\section{Results and analysis}
+The checked graph contains ${controller_states} controller states, ${product_states} product states,
+and ${transitions} transitions. All ${properties} properties hold in this abstraction, and the compiled
+C++ function conforms over all ${transitions} contexts/inputs. All ${detected_mutations} unsafe mutations
+produce retained counterexamples, including early recovery, double counting, invented maturity,
+forgotten completion, and vacuous indefinite holds. The actual ROS controller passes ${controlled_cases}
+controlled cases; these use declared detector/pose/route inputs and do not measure detector accuracy.
+\begin{center}\includegraphics[width=.92\linewidth]{figures/recovery.pdf}\end{center}
+Ten endpoints at half-second spacing span only 4.5 seconds. The separate elapsed-time gate prevents
+release then; a later tick may release at five seconds if the latest decision remains fresh.
+\begin{center}\includegraphics[width=.92\linewidth]{figures/goal_memory.pdf}\end{center}
+Completion survives estimated drift, invalid guards, and fault recovery. A valid new revision permits
+a new mission only when the other navigation conditions hold. Tables and witnesses are in
+\texttt{properties.csv}, \texttt{cases.csv}, \texttt{mutations.csv}, and the saved proof.
+\section{Scope and course connection}
+The proof concerns finite decision logic under validated-input and time-abstraction assumptions.
+It does not prove delivery, scheduling, perception, learned detection, continuous clearance, or physical
+braking. Clock epochs are locally inferred; message types do not identify numerically coincident old
+messages after rewind. Timing and physical stopping remain separate measured trace claims.
+Historical M3/M4 cohorts are not retroactively covered by this proof.
+This insertion addresses architecture/assumptions, methods, implementation, and quantitative analysis
+in sections 3--6 of the course report template. Provided course materials are labelled Fall 2025;
+no current-year deadline or grading rule is inferred. Source provenance is documented in
+\texttt{docs/verification/supervisor\_course\_alignment.md}.
+\paragraph{Tooling acknowledgment.} Codex assistance was used for implementation and documentation.
+The correctness argument consists of the explicit model checks, negative controls, conformance,
+and recorded runtime evidence.
+\end{document}
