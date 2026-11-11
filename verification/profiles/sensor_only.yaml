@@ -1,0 +1,14 @@
+schema_version: 1
+id: sensor_only
+version: '1'
+calibration: provisional
+max_gap_ns: 500000000
+requirements:
+  R1: {applicable: false, mandatory: false, reason: No obstacle geometry}
+  R2: {applicable: false, mandatory: false, reason: No goal or localization estimate}
+  R3: {applicable: false, mandatory: false, reason: No guard telemetry}
+  R4: {applicable: false, mandatory: false, reason: No actuator telemetry}
+  R5: {applicable: false, mandatory: false, reason: No grid or route}
+  R6: {applicable: false, mandatory: false, reason: No localization estimate}
+  R7: {applicable: false, mandatory: false, reason: No detector decisions}
+  R8: {applicable: false, mandatory: false, reason: No detector decisions}

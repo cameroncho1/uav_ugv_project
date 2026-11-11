@@ -1,0 +1,2 @@
+{"clock": "steady:watchdog", "data": {"angular": 0, "linear": 0.5}, "epoch": 0, "sequence": 0, "source": "actuator_output", "time_ns": 0}
+{"clock": "steady:watchdog", "data": {"angular": 0, "linear": 0}, "epoch": 0, "sequence": 1, "source": "actuator_output", "time_ns": 1300000000}

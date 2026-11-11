@@ -1,0 +1,14 @@
+schema_version: 1
+id: detector
+version: '1'
+calibration: provisional
+max_gap_ns: 25000000000
+requirements:
+  R7:
+    applicable: true
+    mandatory: true
+    parameters: {alarm_scope: binary}
+  R8:
+    applicable: true
+    mandatory: true
+    parameters: {decision_keys: [binary], recovery_ns: 1000000000}

@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "uav-ugv-verification"
+version = "0.1.0"
+description = "Offline, acquisition-aware requirement checks for UAV/UGV trials"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+  "numpy>=1.23,<2",
+  "PyYAML>=6,<7",
+  "scipy>=1.10,<2",
+  "matplotlib>=3.7,<4",
+]
+
+[project.optional-dependencies]
+test = ["pytest>=8,<10"]
+dev = ["build>=1,<2", "ruff>=0.9,<1"]
+
+[project.scripts]
+uav-ugv-verify = "uav_ugv_verification.__main__:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+
+[tool.ruff]
+target-version = "py310"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]

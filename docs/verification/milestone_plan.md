@@ -1,6 +1,6 @@
 # Verification specification
 
-Status: proposed. Updated: 2026-11-10.
+Status: M1 implemented; M2-M4 planned. Updated: 2026-11-10. [Validation status](status.md).
 
 [Verification index](README.md) | [Implementation reference](implementation_reference.md) | [Completion plan](../project/completion_plan.md) | [Navigation](../navigation.md)
 
@@ -71,7 +71,7 @@ Records preserve acquisition stamp, frame, units, validity, source identity, clo
 
 Read incrementally with bounded matching buffers and skip camera image deserialization. Cache numerical streams by source/adapter hashes. Validate per-stream ordering and split clock resets into epochs. Declare matching gaps; interpolate continuous pose only within those gaps. Never interpolate discrete events/commands or use future samples for causal checks.
 
-Evaluation accepts a normalized trace reader and profile and returns typed requirement results. Adapters do not decide verdicts; reports do not recompute monitor logic. Field schemas and the public API are specified in `docs/verification/interfaces.md` during M1. Apply the reference's [temporal rules and analytic fixtures](implementation_reference.md#3-temporal-evaluation-rules); boundary behavior is part of the interface.
+Evaluation accepts a normalized trace reader and profile and returns typed requirement results. Adapters do not decide verdicts; reports do not recompute monitor logic. Field schemas and the public API are defined in [interfaces](interfaces.md). Apply the reference's [temporal rules and analytic fixtures](implementation_reference.md#3-temporal-evaluation-rules); boundary behavior is part of the interface.
 
 ### Verdict and result contract
 
@@ -88,7 +88,7 @@ An untriggered implication is unexercised and inconclusive for empirical verific
 
 ### CLI
 
-Target interface; not yet implemented:
+Implemented in M1; run in the [package environment](../../verification/README.md#install):
 
 ```bash
 python3 -m pip install -e './verification[test]'
@@ -108,7 +108,7 @@ Each setup supplies topic/field mappings, transforms, footprint/obstacle geometr
 
 ## 4. Requirements
 
-Formal definitions, executable interpretations, dependencies, and scope are specified in `docs/verification/requirements.md` during M1. Retain R1-R8 IDs and version revisions. Constants remain provisional until M2 calibration; unmeasured bounds are labeled uncalibrated.
+Formal definitions, executable interpretations, dependencies, and scope are defined in [requirements](requirements.md). Retain R1-R8 IDs and version revisions. Constants remain provisional until M2 calibration; unmeasured bounds are labeled uncalibrated.
 
 | Requirement | M1: implement against normalized fixtures | M2: supply or validate real evidence |
 | --- | --- | --- |

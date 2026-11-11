@@ -1,6 +1,6 @@
 # Verification implementation reference
 
-Status: research and source inspection, 2026-11-10. No implementation or simulator validation.
+Status: research and source inspection, 2026-11-10. M1 implementation is documented in [validation status](status.md); simulator validation and D01-D06 corrections remain M2.
 
 [Specification](milestone_plan.md) | [Verification index](README.md)
 

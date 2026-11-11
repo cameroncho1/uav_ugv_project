@@ -1,0 +1,3 @@
+{"clock": "sim", "data": {"guard_valid": true, "reason": "Ready"}, "epoch": 0, "sequence": 0, "source": "guard_state", "time_ns": 0}
+{"clock": "sim", "data": {"guard_valid": false, "reason": "Declared fixture outage"}, "epoch": 0, "sequence": 1, "source": "guard_state", "time_ns": 1000000000}
+{"clock": "sim", "data": {"guard_valid": true, "reason": "Ready"}, "epoch": 0, "sequence": 2, "source": "guard_state", "time_ns": 2000000000}

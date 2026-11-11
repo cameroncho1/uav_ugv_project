@@ -1,0 +1,1 @@
+{"clock": "sim", "data": {"shapes": [{"half_x": 0.2, "half_y": 0.2, "id": "hazard-box", "kind": "box", "x": 1, "y": 0}, {"id": "cylinder", "kind": "cylinder", "radius": 0.4, "x": 4, "y": 4}], "static": true}, "epoch": 0, "sequence": 0, "source": "obstacles", "time_ns": 0}

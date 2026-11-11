@@ -1,0 +1,35 @@
+schema_version: 1
+id: synthetic-full-run
+version: '1'
+calibration: fixture
+max_gap_ns: 10000000000
+requirements:
+  R1:
+    applicable: true
+    mandatory: true
+  R2:
+    applicable: true
+    mandatory: true
+  R3:
+    applicable: true
+    mandatory: true
+  R4:
+    applicable: true
+    mandatory: true
+    clock: steady:watchdog
+  R5:
+    applicable: true
+    mandatory: true
+  R6:
+    applicable: true
+    mandatory: true
+  R7:
+    applicable: true
+    mandatory: true
+  R8:
+    applicable: true
+    mandatory: true
+    parameters:
+      recovery_ns: 100000000
+      decision_keys:
+      - binary
