@@ -13,7 +13,9 @@ ugv_goal_controller:
     lookahead_distance: 0.6
     max_linear_speed: 0.5
     max_angular_speed: 1.0
-    goal_tolerance: 0.5
+    # Complete inside the verifier's 0.5 m estimated-arrival boundary so
+    # post-stop estimate variation does not immediately invalidate its dwell.
+    goal_tolerance: 0.35
 local_astar_planner:
   ros__parameters:
     max_grid_age: 2.0

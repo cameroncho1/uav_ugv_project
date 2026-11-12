@@ -1,0 +1,41 @@
+{
+  "scenario_id": "single_box_v1",
+  "status": "completed",
+  "error": null,
+  "started_ns": 19544000000,
+  "history": [
+    {
+      "kind": "obstacle_requested",
+      "operation": {
+        "id": "add_route_box",
+        "at_ns": 500000000,
+        "action": "spawn",
+        "obstacle": "route_box"
+      },
+      "requested_ns": 20056000000
+    },
+    {
+      "kind": "obstacle_applied",
+      "operation": {
+        "id": "add_route_box",
+        "at_ns": 500000000,
+        "action": "spawn",
+        "obstacle": "route_box"
+      },
+      "obstacle": {
+        "id": "scenario_route_box",
+        "kind": "box",
+        "x": 0.5,
+        "y": 0.0,
+        "half_x": 0.3,
+        "half_y": 0.3,
+        "yaw": 0.0
+      },
+      "requested_ns": 20056000000,
+      "confirmed_ns": 20644000000,
+      "entity_name": "scenario_route_box",
+      "entity_id": 132,
+      "confirmation": "scene_present"
+    }
+  ]
+}

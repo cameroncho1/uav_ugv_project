@@ -21,6 +21,13 @@ def identity(value: dict) -> str:
     return hashlib.sha256(json.dumps(value, sort_keys=True, allow_nan=False).encode()).hexdigest()
 
 
+def _extensionless_script(path: Path) -> bool:
+    if path.suffix:
+        return False
+    with path.open("rb") as stream:
+        return stream.read(2) == b"#!"
+
+
 def source_snapshot(repository: Path) -> dict:
     files = {}
     for tree in (
@@ -41,6 +48,7 @@ def source_snapshot(repository: Path) -> dict:
                 and (
                     tree == "simulation"
                     or path.name == "CMakeLists.txt"
+                    or _extensionless_script(path)
                     or path.suffix
                     in (
                         ".py",

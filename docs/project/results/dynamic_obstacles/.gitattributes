@@ -1,0 +1,10 @@
+# Keep source/evidence hashes stable across platforms.
+*.json text eol=lf
+*.jsonl text eol=lf
+*.yaml text eol=lf
+*.csv text eol=lf
+*.md text eol=lf
+*.txt text eol=lf
+*.svg text eol=lf whitespace=-blank-at-eol
+*.png binary
+*.pdf binary

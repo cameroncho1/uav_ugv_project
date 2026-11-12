@@ -19,6 +19,7 @@ The project uses UAV observations to map terrain, estimate a ground robot's pose
 | [Project overview](project/project_overview.md) | Project goal and current limits. |
 | [Technical plan](project/technical_plan.md) | Current stack, subsystem responsibilities, and original course schedule. |
 | [Completion plan](project/completion_plan.md) | Final demonstration scope, operating envelope, requirements, verification methods, and remaining work. |
+| [Combined PR validation](project/results/integration/README.md) | Clean build, runtime regressions, integration fixes, and retained evidence for PRs #5-#7. |
 
 ## Subsystem documentation
 
@@ -27,6 +28,7 @@ The project uses UAV observations to map terrain, estimate a ground robot's pose
 | [Cooperative localization](cooperative_localization/README.md) | Sensor fusion, UAV assistance, interfaces, extension points, results, research, presentations, and implementation history. |
 | [Requirements and verification](verification/README.md) | Reusable R1-R8 evaluator, recorded experiments, six-page report, headless demo/replay, schemas, and validation. |
 | [Verified navigation supervisor](verification/supervisor.md) | Persistent fault/goal holds, finite-state proof, compiled conformance, and paper evidence. |
+| [Dynamic obstacle scenarios](dynamic_obstacles/README.md) | Scheduled obstacles, camera-map observation, reusable trial infrastructure, and hazard-response evaluation. |
 | [Navigation](navigation.md) | Goal-associated routes, footprint clearance, path following, actuator expiry, and scoring. |
 | [Camera heading](cooperative_localization/camera_heading.md) | Measured UGV direction overlay, relative orientation, joint heading fusion, and calibration. |
 | [Heading validation](cooperative_localization/heading_validation.md) | Executed checks, measured simulation results, and operating limits. |

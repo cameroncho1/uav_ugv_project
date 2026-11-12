@@ -4,10 +4,17 @@
 import argparse
 import copy
 import json
+import os
 from pathlib import Path
 import signal
 import subprocess
 import time
+
+# Select transport before ROS imports can load Fast DDS. Children inherit it;
+# a parent camera trial retains its own shared-memory profile.
+os.environ["FASTRTPS_DEFAULT_PROFILES_FILE"] = str(
+    Path(__file__).resolve().parents[1] / "config/fastdds_fixture_udp.xml"
+)
 
 from ament_index_python.packages import get_package_prefix
 from geometry_msgs.msg import PoseStamped, PoseWithCovarianceStamped, Twist
@@ -93,12 +100,17 @@ class GuardTrial(Node):
                 grid.header = copy.deepcopy(goal.header)
                 grid.header.stamp = clock.clock
                 grid.info.resolution = 0.25
-                grid.info.width, grid.info.height = 80, 40
-                grid.info.origin.position.x = grid.info.origin.position.y = -5.0
+                # Cover both goals and footprint clearance without large DDS
+                # samples obscuring the numerical guard cases.
+                grid.info.width = grid.info.height = 24
+                grid.info.origin.position.x = grid.info.origin.position.y = -1.5
                 grid.info.origin.orientation.w = 1.0
-                grid.data = [100 if name == 'blocked_grid' else 0] * 3200
+                grid.data = [100 if name == 'blocked_grid' else 0] * (
+                    grid.info.width * grid.info.height)
                 if name == 'blocked_start':
-                    grid.data[20 * 80 + 20] = 100
+                    column = int(-grid.info.origin.position.x / grid.info.resolution)
+                    row = int(-grid.info.origin.position.y / grid.info.resolution)
+                    grid.data[row * grid.info.width + column] = 100
                 if name == 'invalid_grid':
                     grid.data = []
                 self.grid.publish(grid)

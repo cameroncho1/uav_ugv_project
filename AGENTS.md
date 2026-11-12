@@ -21,7 +21,7 @@
 - `cooperative_localization` validates measured inputs, matches independent anchors, fuses measurements, and publishes the authoritative pose. It does not own PX4 subscriptions, image detection, simulator truth, or injected faults.
 - `uav_control` owns the PX4 interface and independent map-anchor producer; `uav_sensing` owns the camera relative-observation producer.
 - `traversability_mapping` owns camera-to-grid projection and acquisition-time matching. It consumes independent map anchors and does not produce localization corrections.
-- `simulation_support` owns Gazebo models, raw sensor bridges, the shared clock bridge, and truth readers. `fault_management` owns synthetic sensor corruption, explicit outage controls, trial driving, and scoring.
+- `simulation_support` owns Gazebo models, raw sensor bridges, the shared clock bridge, truth readers, and scheduled world mutations. `fault_management` owns synthetic sensor corruption, explicit outage controls, trial driving, scoring, and hazard-observation eligibility.
 - `route_planning` owns footprint clearance and routes associated with goal revisions. `ugv_control` owns path following, the persistent navigation supervisor, validated detector/goal inputs, and the actuator command watchdog.
 - `localization_common` contains numerical frame, covariance, and geodesy operations without ROS or simulator imports.
 - `verification` evaluates normalized offline traces and checks the finite supervisor model against independent properties and compiled C++ conformance; numerical monitors and model checking have no ROS or simulator imports. Recording, event production, and simulation orchestration remain in their existing packages.
@@ -30,4 +30,4 @@
 
 - Describe implemented behavior and measured conditions in present tense. Link results, assumptions, and runnable commands.
 - Keep `AGENTS.md` as shared instructions and `CLAUDE.md` as its import.
-- Commit subjects must be concise; bodies contain 1–4 `-` bullets summarizing the change.
+- Commit subjects must be concise; bodies contain 1-4 `-` bullets summarizing the change.

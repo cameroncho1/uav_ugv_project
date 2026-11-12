@@ -6,6 +6,7 @@ Offline evaluation of recorded behavior against R1-R8, using normalized signals 
 
 Status: M1-M4 and W10/E1 implemented: offline evaluation, simulator integration, recorded experiments, and a rehearsed report/demo. Recorded failures and unavailable capabilities remain explicit.
 
+- [Dynamic obstacle scenarios](../dynamic_obstacles/README.md): scheduled world mutations, actual camera-map observation, and R5 response evaluation.
 - [Navigation supervisor](supervisor.md): persistent holds, recovery timing, goal revisions, exhaustive properties, and C++ conformance.
 - [Supervisor evidence](../project/results/supervisor/README.md): source-bound proof, controlled ROS cases, simulator regressions, and two-page paper material.
 - [Course alignment](supervisor_course_alignment.md): formal-method expectations, report sections, source provenance, and claim limits.
