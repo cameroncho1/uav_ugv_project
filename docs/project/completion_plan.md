@@ -36,8 +36,9 @@ One UAV and one UGV in a Gazebo world with static obstacles. The UGV drives to a
 ## 2. Baseline on `main`
 
 - Implemented: PX4 SITL and Gazebo Harmonic world; EKF localization with wheel, IMU, GPS and UAV measurements; camera heading; luminance mapper with map memory; A* planner with partial routes; path follower; actuator watchdog; UAV follow; four generated obstacle worlds. See [navigation](../navigation.md) and [localization](../cooperative_localization/README.md).
+- Verification: reusable R1-R8 evaluation, frozen experiment campaigns, headless demo/replay, source-bound supervisor checking, and scheduled dynamic obstacles with camera-observation scoring. See [verification](../verification/README.md), [dynamic obstacles](../dynamic_obstacles/README.md), and [combined validation](results/integration/README.md).
 - Measured: nine paired short-route localization trials and goal-navigation trials on five courses. The localization results are dated 2026-10-11 and predate the planner, mapper and world changes ([evaluation results](../cooperative_localization/evaluation_results.md)). They are rerun in this plan.
-- Not present: formal requirements, runtime monitors, a hazard world, a detector in the ROS graph, and a scenario matrix runner.
+- Not present: a learned detector in the ROS graph, detector-driven closed-loop evaluation, and expanded dynamic-hazard coverage across the full scenario matrix.
 
 ## 3. Operating envelope
 
@@ -47,7 +48,7 @@ The envelope bounds every requirement in section 5. A scenario outside it is rec
 | --- | --- | --- |
 | UGV footprint radius, planner clearance | 0.50 m, 0.05 m | `local_astar_planner` |
 | UGV maximum linear / angular speed | 0.5 m/s, 1.0 rad/s | `mission_manager/config/navigation.yaml` |
-| Goal tolerance | 0.5 m | `navigation.yaml` |
+| Controller completion / R2 estimated arrival | 0.35 m / 0.5 m | `navigation.yaml` / [R2](../verification/requirements.md#r2-goal-arrival-with-dwell) |
 | Pose guard: age, position stddev, heading stddev | 0.5 s, 0.5 m, 0.2 rad | `navigation.yaml` |
 | Grid age limit, path age limit | 2.0 s, 1.0 s | `navigation.yaml` |
 | Actuator command expiry | 0.35 s | `command_watchdog.cpp` |

@@ -19,6 +19,7 @@ The project uses UAV observations to map terrain, estimate a ground robot's pose
 | [Project overview](project/project_overview.md) | Project goal and current limits. |
 | [Technical plan](project/technical_plan.md) | Current stack, subsystem responsibilities, and original course schedule. |
 | [Completion plan](project/completion_plan.md) | Final demonstration scope, operating envelope, requirements, verification methods, and remaining work. |
+| [Combined PR validation](project/results/integration/README.md) | Clean build, runtime regressions, integration fixes, and retained evidence for PRs #5-#7. |
 
 ## Subsystem documentation
 

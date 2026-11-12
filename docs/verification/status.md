@@ -40,7 +40,7 @@ Commands, frozen pilot bounds, individual result files, source checksums, unsucc
 
 ## Scope and recorded limits
 
-- R5 and online R7/R8 require actual hazard/detector producers. Their absence remains explicit; no new behavior/model fills those interfaces.
+- Dynamic R5 is measured separately in the [one-box camera example](../project/results/dynamic_obstacles/README.md). Online R7/R8 still require an actual detector producer and remain excluded from the navigation demo.
 - Camera R3 is optional and unexercised in the scoped missions. Earlier camera telemetry also lacks the separate command-publication timestamp. The final controlled fixture establishes R3 timing.
 - Calibrated profiles cover the recorded pilot conditions, not arbitrary loads or future setups. Sampling gaps, uncertainty, and scheduling overruns remain observable incomplete/failed outcomes.
 - M3 executes 45 fixed matrix attempts, four clearance-search trials, and two supplemental R2 replays. Dense/B arrival failures reproduce; incomplete starts and aborted guard trials remain in the ledger. See the [M3 evidence](../project/results/verification/m3/README.md).

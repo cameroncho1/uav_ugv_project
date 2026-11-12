@@ -1,0 +1,11 @@
+{
+  "candidate_commit": "c68a955",
+  "source_sha256": "9b07a257029d54558d721f2b6184c3296ca7a3ed98927b716b5cfeba558074af",
+  "compared_files": 238,
+  "mismatches": [],
+  "source_archive_sha256": "a0873534fd578302fcb9f55142118dd308a32c1cf571532a267d45413dc36b4d",
+  "runtime_executables": [
+    "ros2_ws/src/simulation_support/scripts/obstacle_scenario",
+    "ros2_ws/src/traversability_mapping/scripts/traversability_mapper"
+  ]
+}

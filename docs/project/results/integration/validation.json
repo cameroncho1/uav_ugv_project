@@ -1,0 +1,112 @@
+{
+  "build": {
+    "clean_workspace": true,
+    "packages": 12,
+    "retested_after_fixes": [
+      "fault_management",
+      "traversability_mapping",
+      "mission_manager"
+    ],
+    "status": "PASS",
+    "underlay": "/opt/ros/humble"
+  },
+  "candidate_commit": "c68a955",
+  "date": "2026-11-11",
+  "demo": {
+    "attempt_counts": {
+      "passed": 3
+    },
+    "duration_wall_s": 117.688355822,
+    "exit_code": 0,
+    "mode": "live",
+    "new_simulation": true,
+    "process": {
+      "duration_wall_s": 114.06348441999944,
+      "returncode": 0,
+      "timed_out": false
+    },
+    "startup_to_first_drive_wall_s": 24.634447527
+  },
+  "dynamic": {
+    "exercised_hazards": [
+      "add_route_box"
+    ],
+    "exit_code": 0,
+    "expected_hazards": [
+      "add_route_box"
+    ],
+    "process": {
+      "duration_wall_s": 57.08087207000062,
+      "returncode": 0,
+      "timed_out": false
+    },
+    "recorded_hazards": [
+      "add_route_box"
+    ],
+    "scenario_id": "single_box_v1",
+    "seed": 744,
+    "source_unchanged": true,
+    "status": "completed",
+    "verdicts": {
+      "R1": "PASS",
+      "R2": "PASS",
+      "R3": "INCONCLUSIVE",
+      "R4": "NOT_APPLICABLE",
+      "R5": "PASS",
+      "R6": "PASS",
+      "R7": "NOT_APPLICABLE",
+      "R8": "NOT_APPLICABLE"
+    }
+  },
+  "environment": {
+    "gazebo": "Harmonic 8.15.0",
+    "headless": true,
+    "platform": "Ubuntu 22.04 / WSL2",
+    "python": "3.10.12",
+    "ros": "Humble",
+    "runtime_root": "/home/rylanwwade/uav-integration"
+  },
+  "fault_injection_tests": 7,
+  "interruption_exit_code": 130,
+  "lifecycle_cases": 5,
+  "limits": [
+    "One flat-world scheduled box; no multi-layout dynamic-hazard campaign.",
+    "Camera R3 is unexercised; controlled guard R3 is checked separately.",
+    "No online detector producer; R7/R8 remain excluded.",
+    "Historical matrix failures remain unchanged; the 45-case matrix is not rerun."
+  ],
+  "publication": {
+    "dynamic_evidence_and_timeline_replay_byte_equality": true,
+    "historical_csv_byte_equality": [
+      "bounds.csv",
+      "metrics.csv",
+      "claims.csv",
+      "claims_by_category.csv",
+      "metric_ranges.csv",
+      "assistance_comparisons.csv",
+      "attempts.csv",
+      "violations.csv"
+    ],
+    "supervisor_pdf_pages": 2,
+    "verification_pdf_pages": 6
+  },
+  "pull_requests": [
+    5,
+    6,
+    7
+  ],
+  "registered_tests": {
+    "errors": 0,
+    "failures": 0,
+    "skipped": 9,
+    "total": 389
+  },
+  "supervisor": {
+    "cpp_conformance": "PASS",
+    "properties": 11,
+    "ros_cases": 29,
+    "states": 92,
+    "transitions": 7120,
+    "unsafe_mutations_detected": 9
+  }
+}
