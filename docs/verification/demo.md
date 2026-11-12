@@ -2,6 +2,8 @@
 
 The live demonstration runs assisted camera arrival, controlled guard response, and both controller-death/command-transport-loss checks. It reuses the experiment runner, recorder, adapters, frozen numerical profiles, and cleanup. Gazebo runs server-only; RViz and desktop preview windows stay disabled.
 
+The watchdog fixture confirms at least 100 ms of input silence in fresh actuator telemetry before recording its loss event. This lets an in-flight command finish delivery after producer termination. Expiry and settling deadlines remain measured from the last accepted actuator input; resumed input still makes the observation inconclusive.
+
 ## Live command
 
 Activate the [Linux runtime](simulator_integration.md), then run from the repository root:

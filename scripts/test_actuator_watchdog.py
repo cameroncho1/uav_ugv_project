@@ -16,6 +16,7 @@ from rclpy.qos import QoSProfile, DurabilityPolicy, qos_profile_sensor_data
 from geometry_msgs.msg import PoseStamped, PoseWithCovarianceStamped
 from nav_msgs.msg import OccupancyGrid
 from rosgraph_msgs.msg import Clock
+from std_msgs.msg import String
 from uav_ugv_msgs.msg import PlannedRoute
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -28,6 +29,7 @@ class Fixture(Node):
         self.truth = []
         self.goal_revision = None
         self.last_fixture_stamp = None
+        self.watchdog_output = None
         latched = QoSProfile(depth=1, durability=DurabilityPolicy.TRANSIENT_LOCAL)
         self.pose_pub = self.create_publisher(PoseWithCovarianceStamped, "/ugv/localization/pose", 10)
         self.goal_pub = self.create_publisher(PoseStamped, "/global_goal_pose", latched)
@@ -35,6 +37,7 @@ class Fixture(Node):
         self.create_subscription(Clock, "/clock", self.on_clock, qos_profile_sensor_data)
         self.create_subscription(PoseStamped, "/evaluation/ugv_truth", self.on_truth,
                                  qos_profile_sensor_data)
+        self.create_subscription(String, "/evaluation/watchdog", self.on_watchdog, 10)
 
     def on_clock(self, message):
         self.clock = message.clock
@@ -42,6 +45,26 @@ class Fixture(Node):
     def on_truth(self, message):
         stamp = message.header.stamp.sec * 10**9 + message.header.stamp.nanosec
         self.truth.append((time.monotonic(), message.pose.position.x, message.pose.position.y, stamp))
+
+    def on_watchdog(self, message):
+        trace = json.loads(message.data)
+        if trace["kind"] == "watchdog_output":
+            self.watchdog_output = trace
+
+    def confirm_input_loss(self, killed_at_ns):
+        # Killing a producer does not drain commands already in transport. Observe
+        # silence at the actuator while its last nonzero input is still unexpired.
+        deadline = time.monotonic() + 1.0
+        while time.monotonic() < deadline:
+            self.tick()
+            trace = self.watchdog_output
+            if (trace is not None and trace["steady_ns"] >= killed_at_ns
+                    and time.monotonic_ns() - trace["steady_ns"] <= 100_000_000
+                    and 100_000_000 <= trace["input_age_ns"] <= 250_000_000
+                    and not trace["expired"] and trace["queued"]
+                    and abs(trace["linear"]) + abs(trace["angular"]) > 0.05):
+                return
+        raise AssertionError("Actuator did not confirm nonzero input loss before expiry")
 
     def tick(self):
         stamp = ((self.clock.sec, self.clock.nanosec) if self.clock is not None else None)
@@ -152,7 +175,10 @@ def case(output, mode, clock_mode="normal"):
             assert "data: true" in paused.stdout, "World did not acknowledge pause"
         killed = controller if mode == "controller_death" else bridge
         lost_at = time.monotonic()
+        killed_at_ns = time.monotonic_ns()
         os.killpg(killed.pid, signal.SIGKILL)
+        killed.wait(timeout=5)
+        node.confirm_input_loss(killed_at_ns)
         recording.command_loss(mode)
         while time.monotonic() - lost_at < 1.6:
             node.tick()

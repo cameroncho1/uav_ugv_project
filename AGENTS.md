@@ -30,4 +30,4 @@
 
 - Describe implemented behavior and measured conditions in present tense. Link results, assumptions, and runnable commands.
 - Keep `AGENTS.md` as shared instructions and `CLAUDE.md` as its import.
-- Commit subjects must be concise; bodies contain 1â€“4 `-` bullets summarizing the change.
+- Commit subjects must be concise; bodies contain 1-4 `-` bullets summarizing the change.

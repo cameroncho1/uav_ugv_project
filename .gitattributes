@@ -12,3 +12,6 @@ config/fastdds_fixture_udp.xml text eol=lf
 # Scenario executables and frozen input hashes must survive Windows checkouts.
 ros2_ws/src/simulation_support/scripts/obstacle_scenario text eol=lf
 ros2_ws/src/simulation_support/config/scenarios/*.yaml text eol=lf
+
+# The mapper is an extensionless Python executable invoked directly on Linux.
+ros2_ws/src/traversability_mapping/scripts/traversability_mapper text eol=lf

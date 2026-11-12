@@ -88,3 +88,25 @@ def test_publication_templates_are_frozen_but_generated_outputs_are_not(tmp_path
     assert source_snapshot(tmp_path)["sha256"] == before["sha256"]
     template.write_text("changed")
     assert source_snapshot(tmp_path)["sha256"] != before["sha256"]
+
+
+@pytest.mark.parametrize(
+    "package,executable",
+    [
+        ("traversability_mapping", "traversability_mapper"),
+        ("simulation_support", "obstacle_scenario"),
+    ],
+)
+def test_extensionless_runtime_changes_invalidate_frozen_source(tmp_path, package, executable):
+    from uav_ugv_verification.experiments import source_snapshot
+
+    (tmp_path / "verification").mkdir()
+    for name in ("pyproject.toml", "requirements-tested.txt"):
+        (tmp_path / "verification" / name).write_text("test")
+    script = tmp_path / "ros2_ws/src" / package / "scripts" / executable
+    script.parent.mkdir(parents=True)
+    script.write_text("#!/usr/bin/env python3\nprint('first')\n")
+    before = source_snapshot(tmp_path)
+    assert str(script.relative_to(tmp_path)) in before["files"]
+    script.write_text("#!/usr/bin/env python3\nprint('changed')\n")
+    assert source_snapshot(tmp_path)["sha256"] != before["sha256"]
