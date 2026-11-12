@@ -1,0 +1,7 @@
+{"clock": "sim", "data": {}, "epoch": 0, "sequence": 0, "source": "uav_observation", "time_ns": 0}
+{"clock": "sim", "data": {}, "epoch": 0, "sequence": 1, "source": "uav_observation", "time_ns": 500000000}
+{"clock": "sim", "data": {}, "epoch": 0, "sequence": 2, "source": "uav_observation", "time_ns": 1000000000}
+{"clock": "sim", "data": {}, "epoch": 0, "sequence": 3, "source": "uav_observation", "time_ns": 1500000000}
+{"clock": "sim", "data": {}, "epoch": 0, "sequence": 4, "source": "uav_observation", "time_ns": 2000000000}
+{"clock": "sim", "data": {}, "epoch": 0, "sequence": 5, "source": "uav_observation", "time_ns": 2500000000}
+{"clock": "sim", "data": {}, "epoch": 0, "sequence": 6, "source": "uav_observation", "time_ns": 3000000000}

@@ -17,6 +17,7 @@ import rclpy
 from rclpy.node import Node
 from rclpy.qos import DurabilityPolicy, QoSProfile
 from rosgraph_msgs.msg import Clock
+from verification_recording import Recording
 
 
 class GuardTrial(Node):
@@ -43,7 +44,9 @@ class GuardTrial(Node):
         start = time.monotonic()
         while time.monotonic() - start < duration:
             elapsed = time.monotonic() - start
-            if name != 'frozen_clock':
+            if name == 'slow_clock':
+                self.clock_time += .005
+            elif name != 'frozen_clock':
                 self.clock_time = 10 + time.monotonic() - self.started
             clock = Clock()
             clock.clock.sec = int(self.clock_time)
@@ -138,6 +141,8 @@ def main():
     processes, logs, results = [], [], []
     rclpy.init()
     node = GuardTrial()
+    recording = Recording(args.output.parent / "verification")
+    status = "aborted"
     try:
         for package, executable in [('route_planning', 'local_astar_planner'),
                                     ('ugv_control', 'goal_controller')]:
@@ -145,17 +150,22 @@ def main():
             logs.append(log)
             binary = Path(get_package_prefix(package)) / 'lib' / package / executable
             processes.append(subprocess.Popen(
-                [str(binary), '--ros-args', '-p', 'use_sim_time:=true'],
+                [str(binary), '--ros-args', '-p', 'use_sim_time:=true', '-p', 'evaluation_trace:=true'],
                 stdout=log, stderr=subprocess.STDOUT))
         deadline = time.monotonic() + 20
-        while node.pose.get_subscription_count() < 2:
-            assert time.monotonic() < deadline, 'Planner/controller discovery timed out'
+        while node.pose.get_subscription_count() < 2 or not node.commands:
+            assert time.monotonic() < deadline, 'Planner/controller command readiness timed out'
+            # Endpoint discovery alone does not establish command delivery. Advance a
+            # positive clock and observe the real controller before starting cases.
+            clock = Clock()
+            clock.clock.sec = int(node.clock_time)
+            node.clock.publish(clock)
             rclpy.spin_once(node, timeout_sec=0.1)
         cases = [('raw_only', False), ('valid', True), ('uncertain_position', False),
                  ('recovery', True), ('uncertain_heading', False), ('correlated_xy', False),
                  ('wrong_frame', False), ('stale_pose', False), ('future_pose', False),
                  ('recovery', True), ('missing_pose', False), ('recovery', True),
-                 ('frozen_clock', False), ('recovery', True), ('missing_grid', False),
+                 ('frozen_clock', False), ('recovery', True), ('slow_clock', True), ('missing_grid', False),
                  ('invalid_grid', False), ('blocked_grid', False), ('blocked_start', False), ('recovery', True),
                  ('goal_reached', False)]
         for name, moving in cases:
@@ -168,6 +178,7 @@ def main():
         results.append(node.phase("recovery", True))
         args.output.write_text(json.dumps({'cases': results, 'passed': True}, indent=2) + '\n')
         print(f'{len(results)} navigation cases passed')
+        status = "completed"
     finally:
         for process in processes:
             process.send_signal(signal.SIGINT)
@@ -177,10 +188,15 @@ def main():
             except subprocess.TimeoutExpired:
                 process.kill()
                 process.wait()
-        for log in logs:
-            log.close()
-        node.destroy_node()
-        rclpy.shutdown()
+        try:
+            recording.close(status)
+        finally:
+            node.destroy_node()
+            rclpy.try_shutdown()
+            for log in logs:
+                log.close()
+        if status == "completed":
+            recording.normalize()
 
 
 if __name__ == '__main__':

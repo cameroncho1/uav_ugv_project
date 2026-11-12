@@ -1,0 +1,370 @@
+{
+  "calibration": "fixture",
+  "evaluator_sha256": "511205faa9b4fa176bc2e4b4cf7da17e049ab24ba77274459b92dca8a372bdab",
+  "evaluator_version": "0.1.0",
+  "execution_status": "completed",
+  "exit_code": 0,
+  "profile_id": "synthetic-full-run",
+  "profile_sha256": "d2a06a8e45cd6e9a686dfdb492d551f15c925ecb9b7b518d39f7a11bef581f1e",
+  "profile_version": "1",
+  "provenance": {
+    "code_commit": "fixture",
+    "description": "Independent monitor examples; not a dynamically consistent vehicle simulation",
+    "kind": "synthetic",
+    "seed": 0
+  },
+  "reason": "mandatory_requirements_passed",
+  "results": [
+    {
+      "completed_obligations": 0,
+      "eligible_duration_ns": 3000000000,
+      "intervals": [
+        {
+          "clock": "sim",
+          "end_ns": 3000000000,
+          "epoch": 0,
+          "start_ns": 0
+        }
+      ],
+      "mandatory": true,
+      "metrics": {
+        "by_interval": [
+          {
+            "checks": 4,
+            "clock": "sim",
+            "end_ns": 3000000000,
+            "epoch": 0,
+            "minimum_clearance_m": 0.19999999999999996,
+            "scope": "sampled_disk_proxy",
+            "start_ns": 0,
+            "violations": 0
+          }
+        ]
+      },
+      "missing_data_count": 0,
+      "parameters": {
+        "contact_tolerance_m": 0.0,
+        "radius_m": 0.5
+      },
+      "reason": "property_holds",
+      "requirement": "R1",
+      "trigger_count": 0,
+      "verdict": "PASS",
+      "version": "1",
+      "witnesses": []
+    },
+    {
+      "completed_obligations": 1,
+      "eligible_duration_ns": 2500000000,
+      "intervals": [
+        {
+          "clock": "sim",
+          "end_ns": 3000000000,
+          "epoch": 0,
+          "start_ns": 0
+        }
+      ],
+      "mandatory": true,
+      "metrics": {
+        "by_interval": [
+          {
+            "arrival_latency_ns": 2500000000,
+            "checks": 1,
+            "clock": "sim",
+            "end_ns": 3000000000,
+            "epoch": 0,
+            "estimated_min_distance_m": 0.2,
+            "physical_min_distance_m": 0.1,
+            "start_ns": 0,
+            "violations": 0
+          }
+        ]
+      },
+      "missing_data_count": 0,
+      "parameters": {
+        "angular_epsilon_rps": 0.001,
+        "deadline_ns": 60000000000,
+        "dwell_ns": 1000000000,
+        "goal_tolerance_m": 0.5,
+        "linear_epsilon_mps": 0.001,
+        "physical_tolerance_m": 0.85
+      },
+      "reason": "property_holds",
+      "requirement": "R2",
+      "trigger_count": 1,
+      "verdict": "PASS",
+      "version": "1",
+      "witnesses": []
+    },
+    {
+      "completed_obligations": 1,
+      "eligible_duration_ns": 3000000000,
+      "intervals": [
+        {
+          "clock": "sim",
+          "end_ns": 3000000000,
+          "epoch": 0,
+          "start_ns": 0
+        }
+      ],
+      "mandatory": true,
+      "metrics": {
+        "by_interval": [
+          {
+            "checks": 1,
+            "clock": "sim",
+            "end_ns": 3000000000,
+            "epoch": 0,
+            "maximum_response_latency_ns": 500000000,
+            "minimum_response_slack_ns": 0,
+            "start_ns": 0,
+            "violations": 0
+          }
+        ]
+      },
+      "missing_data_count": 0,
+      "parameters": {
+        "angular_epsilon_rps": 0.001,
+        "linear_epsilon_mps": 0.001,
+        "response_ns": 500000000
+      },
+      "reason": "property_holds",
+      "requirement": "R3",
+      "trigger_count": 1,
+      "verdict": "PASS",
+      "version": "1",
+      "witnesses": []
+    },
+    {
+      "completed_obligations": 1,
+      "eligible_duration_ns": 500000000,
+      "intervals": [
+        {
+          "clock": "steady:watchdog",
+          "end_ns": 3000000000,
+          "epoch": 0,
+          "start_ns": 0
+        }
+      ],
+      "mandatory": true,
+      "metrics": {
+        "by_interval": [
+          {
+            "actuator_output_maximum_latency_ns": 300000000,
+            "actuator_output_minimum_slack_ns": 100000000,
+            "checks": 1,
+            "clock": "steady:watchdog",
+            "end_ns": 3000000000,
+            "epoch": 0,
+            "measured_motion_maximum_latency_ns": 400000000,
+            "measured_motion_minimum_slack_ns": 350000000,
+            "start_ns": 0,
+            "violations": 0
+          }
+        ]
+      },
+      "missing_data_count": 0,
+      "parameters": {
+        "angular_epsilon_rps": 0.001,
+        "dwell_ns": 200000000,
+        "expiry_ns": 400000000,
+        "linear_epsilon_mps": 0.001,
+        "settling_ns": 750000000,
+        "speed_epsilon_mps": 0.02,
+        "yaw_rate_epsilon_rps": 0.02
+      },
+      "reason": "property_holds",
+      "requirement": "R4",
+      "trigger_count": 1,
+      "verdict": "PASS",
+      "version": "1",
+      "witnesses": []
+    },
+    {
+      "completed_obligations": 1,
+      "eligible_duration_ns": 0,
+      "intervals": [
+        {
+          "clock": "sim",
+          "end_ns": 3000000000,
+          "epoch": 0,
+          "start_ns": 0
+        }
+      ],
+      "mandatory": true,
+      "metrics": {
+        "by_interval": [
+          {
+            "checks": 1,
+            "clock": "sim",
+            "end_ns": 3000000000,
+            "epoch": 0,
+            "maximum_response_latency_ns": 100000000,
+            "minimum_response_slack_ns": 1900000000,
+            "start_ns": 0,
+            "violations": 0
+          }
+        ]
+      },
+      "missing_data_count": 0,
+      "parameters": {
+        "angular_epsilon_rps": 0.001,
+        "linear_epsilon_mps": 0.001,
+        "radius_m": 0.5,
+        "response_ns": 2000000000,
+        "stop_dwell_ns": 200000000
+      },
+      "reason": "property_holds",
+      "requirement": "R5",
+      "trigger_count": 1,
+      "verdict": "PASS",
+      "version": "1",
+      "witnesses": []
+    },
+    {
+      "completed_obligations": 0,
+      "eligible_duration_ns": 2000000000,
+      "intervals": [
+        {
+          "clock": "sim",
+          "end_ns": 3000000000,
+          "epoch": 0,
+          "start_ns": 0
+        }
+      ],
+      "mandatory": true,
+      "metrics": {
+        "by_interval": [
+          {
+            "checks": 4,
+            "clock": "sim",
+            "conditional_rmse_m": 0.1,
+            "eligible_samples": 4,
+            "end_ns": 3000000000,
+            "epoch": 0,
+            "full_run_matched_samples": 7,
+            "full_run_rmse_m": 0.1,
+            "maximum_error_m": 0.1,
+            "minimum_margin_m": 0.4,
+            "start_ns": 0,
+            "violations": 0
+          }
+        ]
+      },
+      "missing_data_count": 0,
+      "parameters": {
+        "error_limit_m": 0.5,
+        "uav_max_age_ns": 500000000
+      },
+      "reason": "property_holds",
+      "requirement": "R6",
+      "trigger_count": 4,
+      "verdict": "PASS",
+      "version": "1",
+      "witnesses": []
+    },
+    {
+      "completed_obligations": 1,
+      "eligible_duration_ns": 0,
+      "intervals": [
+        {
+          "clock": "sim",
+          "end_ns": 3000000000,
+          "epoch": 0,
+          "start_ns": 0
+        }
+      ],
+      "mandatory": true,
+      "metrics": {
+        "by_interval": [
+          {
+            "checks": 1,
+            "clock": "sim",
+            "end_ns": 3000000000,
+            "epoch": 0,
+            "maximum_detection_latency_ns": 400000000,
+            "minimum_detection_slack_ns": 4600000000,
+            "pre_existing_alarms": 0,
+            "start_ns": 0,
+            "violations": 0
+          }
+        ]
+      },
+      "missing_data_count": 0,
+      "parameters": {
+        "alarm_scope": "class",
+        "response_ns": 5000000000
+      },
+      "reason": "property_holds",
+      "requirement": "R7",
+      "trigger_count": 1,
+      "verdict": "PASS",
+      "version": "1.class",
+      "witnesses": []
+    },
+    {
+      "completed_obligations": 0,
+      "eligible_duration_ns": 1900000000,
+      "intervals": [
+        {
+          "clock": "sim",
+          "end_ns": 3000000000,
+          "epoch": 0,
+          "start_ns": 0
+        }
+      ],
+      "mandatory": true,
+      "metrics": {
+        "by_interval": [
+          {
+            "checks": 2,
+            "clock": "sim",
+            "end_ns": 3000000000,
+            "epoch": 0,
+            "false_alarm_events": 0,
+            "false_alarm_events_per_hour": 0.0,
+            "fault_free_run": false,
+            "nominal_exposure_ns": 1900000000,
+            "observed_nominal_alarm": false,
+            "start_ns": 0,
+            "violations": 0
+          }
+        ]
+      },
+      "missing_data_count": 0,
+      "parameters": {
+        "decision_keys": [
+          "binary"
+        ],
+        "merge_gap_ns": 0,
+        "recovery_ns": 100000000,
+        "warmup_ns": 0
+      },
+      "reason": "property_holds",
+      "requirement": "R8",
+      "trigger_count": 0,
+      "verdict": "PASS",
+      "version": "1",
+      "witnesses": []
+    }
+  ],
+  "run_id": "synthetic-full-run",
+  "schema_version": 1,
+  "source_run_id": "synthetic-source",
+  "source_sha256": {
+    "actuator_input.jsonl": "a4521d7e3fe3d55b9561b9022444bb3b0795bc88d44c530cf73fb0c037ab30a8",
+    "actuator_output.jsonl": "d98294fca44089d7438ea4b07a463eab5cc01cd6617ffed2a439b1ebc951bf42",
+    "detector_decision.jsonl": "089d60fbd042eac721a7fb52a0a8ec55b67270bf13ae37645f235321812a74f0",
+    "estimated_pose.jsonl": "66baa74ab61f289d781344c3943e46c23b214c3917e4d2815517be4fd0675f9e",
+    "events.jsonl": "0e2975202ec057cb365ded33882aa745608f31cdceaddd23b51e07ca04fac65a",
+    "goal.jsonl": "d765fa61ebca279d7bfac344e92cda0017be49f4afd60d5c25c39f3569e13e13",
+    "guard_state.jsonl": "d05bffff26e078c83165bcfc1eac4b49667c39729e70c15fa099c7569f50cc33",
+    "manifest.json": "0376aede6bc36e80e9e024560ae8d1002e873f9d39ce713c69fb72d85100ac5f",
+    "measured_motion.jsonl": "1268bf049edfc5ae04b247367133d43afe0a42b6d70e35711c869043e23f2b4a",
+    "obstacles.jsonl": "6a4f321b87ea682ed5e9540748a30182c40c435877d8329a2cd88bf0d20af850",
+    "requested_command.jsonl": "88409f684dec9361f74287725adf54ecec5cb691f644ef17ca5b17930fb1ac48",
+    "route.jsonl": "dc1a6fe1b693f315768025c9b5261f6ddc31cb6ac3bfcff3c50bda89fea123a6",
+    "truth_pose.jsonl": "2e8d56fafcf531d8df2245e8e2efc77e3552469b38458a3395ec1b1cd4b85a45",
+    "uav_observation.jsonl": "be683030e15aa887b3f7a6dd3923cc5c702c5f2227e3ec40042e48d68febb32d"
+  }
+}

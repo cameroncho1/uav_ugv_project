@@ -123,7 +123,8 @@ ros2 bag record --storage sqlite3 --use-sim-time \
   /uav/camera/image /uav/camera/camera_info \
   /uav/camera/heading_image \
   /evaluation/ugv_truth \
-  /global_goal_pose /ugv/navigation/route /ugv/cmd_vel \
+  /global_goal_pose /ugv/navigation/route /local_grid /ugv/cmd_vel \
+  /evaluation/control /evaluation/watchdog /evaluation/truth /evaluation/faults \
   /diagnostics /tf /tf_static
 ```
 
@@ -136,7 +137,7 @@ ros2 bag record --storage sqlite3 --use-sim-time \
 ```bash
 source datasets/run_001/session.env
 ros2 run simulation_support ugv_truth --ros-args \
-  -p use_sim_time:=true -p world:=simple_goal_demo
+  -p use_sim_time:=true -p world:=simple_goal_demo -p evaluation_trace:=true
 ```
 
 Leave it running. Labels use the UGV model origin in ENU `map`. For 3D chassis labels, apply the model-to-chassis transform from the world geometry.
@@ -148,7 +149,7 @@ source datasets/run_001/session.env
 test -n "$DISPLAY" || { echo 'Use an Ubuntu desktop or WSLg terminal.'; exit 1; }
 
 ros2 launch mission_manager simple_goal_demo.launch.py \
-  start_rviz:=false \
+  start_rviz:=false evaluation_trace:=true \
   measurement_config:=datasets/run_001/noise.yaml \
   measurement_profile:="$DATASET_PROFILE" \
   seed:="$DATASET_SEED" \

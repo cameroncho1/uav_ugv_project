@@ -1,0 +1,37 @@
+{
+  "attempt_statuses": [
+    "interrupted"
+  ],
+  "cleanup_wall_s": 6.075565688999973,
+  "command": [
+    "/home/rylanwwade/uav-verification-m2/.venv/bin/python",
+    "/home/rylanwwade/uav-verification-m2/scripts/verification_demo.py",
+    "/home/rylanwwade/uav-verification-m2/evidence/m4_interruption_1/demo"
+  ],
+  "demo_summary": {
+    "exit_code": 130,
+    "mode": "live",
+    "new_simulation": true,
+    "status": "interrupted"
+  },
+  "duration_wall_s": 18.268919255999975,
+  "finalized_recordings": 1,
+  "interruption": "SIGINT to demo coordinator after bag creation",
+  "owned_process_groups": [
+    3707,
+    3739,
+    3753,
+    3791,
+    3793,
+    3830,
+    3846,
+    3847,
+    3850,
+    4492,
+    4493,
+    4494,
+    4498
+  ],
+  "remaining_owned_processes": [],
+  "returncode": 130
+}

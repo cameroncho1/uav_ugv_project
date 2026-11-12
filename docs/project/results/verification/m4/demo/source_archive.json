@@ -1,0 +1,8 @@
+{
+  "path": "/home/rylanwwade/uav-verification-m2/evidence/m4_rehearsal_1/raw/source.tar.gz",
+  "sha256": "e1658fc54277b2cf174e3e4b2677551ac6c49ec2418ef5f54a8def2be434b7b7",
+  "files": 206,
+  "frozen_source_sha256": "0e6b230f427b9b9d31491e2ebf003975e969a6af6adc5aa96239bfb99872f264",
+  "availability": "Machine-local WSL archive; not committed or uploaded.",
+  "source_commit_before_rehearsal": "6c5e6a0"
+}

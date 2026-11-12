@@ -1,0 +1,12 @@
+schema_version: 1
+id: controlled-navigation-v1
+ignored_models: [ground_plane, simple_ugv]
+topics:
+  /evaluation/ugv_truth: truth_pose
+  /ugv/localization/pose: estimated_pose
+  /global_goal_pose: goal
+  /ugv/navigation/route: route
+  /local_grid: grid
+  /evaluation/control: control
+  /evaluation/watchdog: watchdog
+  /evaluation/truth: motion

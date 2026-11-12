@@ -1,0 +1,4 @@
+31: ERROR [uxrce_dds_client] create entities failed: participant: 255
+32: ERROR [uxrce_dds_client] session setup failed, will retry now
+31: ERROR [uxrce_dds_client] create entities failed: participant: 255
+32: ERROR [uxrce_dds_client] session setup failed, will retry now

@@ -1,0 +1,2 @@
+8: AssertionError: Goal arrival check failed; inspect the recorded conditions
+8: AssertionError: Goal arrival check failed; inspect the recorded conditions

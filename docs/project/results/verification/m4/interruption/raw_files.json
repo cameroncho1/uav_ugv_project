@@ -1,0 +1,111 @@
+{
+  "archive": "/home/rylanwwade/uav-verification-m2/evidence/m4_interruption_1",
+  "committed": false,
+  "availability": "Machine-local WSL archive.",
+  "files": {
+    "demo.log": {
+      "bytes": 84,
+      "sha256": "aeca3a47f00bc953b676c50b6b64080643e2eee918cf08e97b7c93088445d1ea"
+    },
+    "interruption_result.json": {
+      "bytes": 796,
+      "sha256": "8c2dcb57de408422255fc2428cdb6330f681378dd0f1a1fca3f10f407a956f84"
+    },
+    "demo/demo_plan.yaml": {
+      "bytes": 542,
+      "sha256": "c3ebe15d0006e4a7d2c27b4473e622a6f5cd026d6541dff12dfff2abc078ea99"
+    },
+    "demo/runner.log": {
+      "bytes": 839,
+      "sha256": "b8a8f62570b09ef902eb6590bca65e986d60e43bc059b13bc1ded9b8126678a6"
+    },
+    "demo/demo_summary.json": {
+      "bytes": 94,
+      "sha256": "bdbbe8f186192eabde3a73263fd629f1961e1a8c764d3281a4b2d4d17acba866"
+    },
+    "demo/raw/freeze.json": {
+      "bytes": 27514,
+      "sha256": "22fa13d342abdb6a019f1735617b1691bd8ac41a5289f73cfee1525071ed3dc4"
+    },
+    "demo/raw/ledger.json": {
+      "bytes": 3204,
+      "sha256": "64e1526e8186daf9ec81990b179999b63682cd3e2baaaa86ed94566a42f9e0c2"
+    },
+    "demo/raw/ledger.sqlite3": {
+      "bytes": 16384,
+      "sha256": "b133ae809710415958e779514252097b2be006019b19ca0c95d41b567a4d4653"
+    },
+    "demo/raw/attempts/0001-assisted-arrival-s641/invocation.json": {
+      "bytes": 629,
+      "sha256": "39f41b1468f6e1b5bb4230c290e787c65429c74a76c406ae74f717eda5bbf923"
+    },
+    "demo/raw/attempts/0001-assisted-arrival-s641/runner.log": {
+      "bytes": 1222,
+      "sha256": "08499166d086c55e105ea416b441aa600e5308087781658256e4c256d52929a5"
+    },
+    "demo/raw/attempts/0001-assisted-arrival-s641/run/world.log": {
+      "bytes": 2424,
+      "sha256": "0df1e4695726120323718d559953e8c2c6dbcf88c35cc94bec44519c73aa3f0d"
+    },
+    "demo/raw/attempts/0001-assisted-arrival-s641/run/dds.log": {
+      "bytes": 44051,
+      "sha256": "013c80661692087134c5c285505a9d07acb144eeca9148f82d2a0f42409c3bf7"
+    },
+    "demo/raw/attempts/0001-assisted-arrival-s641/run/px4.log": {
+      "bytes": 6666,
+      "sha256": "24c16cce1f21d564786d5143db273b522701ee3d9f234730c8ffbebde7238fae"
+    },
+    "demo/raw/attempts/0001-assisted-arrival-s641/run/launch.log": {
+      "bytes": 9371,
+      "sha256": "61f995225980d1e75e26f70c5787510da4343bb6fbebb0a78f74d8dc3b2c4b28"
+    },
+    "demo/raw/attempts/0001-assisted-arrival-s641/run/readiness.json": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "demo/raw/attempts/0001-assisted-arrival-s641/run/truth.log": {
+      "bytes": 71,
+      "sha256": "2052ec6531dced142498c434532c1f7724917c18b9096e2ba2c372ecc04b473c"
+    },
+    "demo/raw/attempts/0001-assisted-arrival-s641/run/verification/events.jsonl": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "demo/raw/attempts/0001-assisted-arrival-s641/run/verification/recording.json": {
+      "bytes": 20933,
+      "sha256": "a0081fc26567198da2a5179cbcc4b768cb802184daf2d77985dbebf3b3661b4a"
+    },
+    "demo/raw/attempts/0001-assisted-arrival-s641/run/verification/recorder_qos.yaml": {
+      "bytes": 1400,
+      "sha256": "4f17b65d167f887aa32799aadafd03e51e091aa9c0eac88a61c07d238a767857"
+    },
+    "demo/raw/attempts/0001-assisted-arrival-s641/run/verification/recorder.log": {
+      "bytes": 1246,
+      "sha256": "0e48450d07f95d52f521f71e0d313f1bbfbf60fa0f5fe97e0d6a83dd2ff4b7de"
+    },
+    "demo/raw/attempts/0001-assisted-arrival-s641/run/verification/bag/bag_0.db3": {
+      "bytes": 36864,
+      "sha256": "2320a8173a32884c18e210f5a67ddb06eb440a896b81af862f4c6dfea042a0b2"
+    },
+    "demo/raw/attempts/0001-assisted-arrival-s641/run/verification/bag/metadata.yaml": {
+      "bytes": 1460,
+      "sha256": "1afef8242a03d4f579d840ecb7d4e3913fdbe73fcf2abce62020a9a825e029d6"
+    },
+    "demo/raw/attempts/0001-assisted-arrival-s641/run/verification/normalized/manifest.json": {
+      "bytes": 24349,
+      "sha256": "d737cc6bc37fab04438ae1557746c090e18966a74084997d3d0056938ed399e8"
+    },
+    "demo/raw/attempts/0001-assisted-arrival-s641/run/verification/normalized/truth_pose.jsonl": {
+      "bytes": 6029,
+      "sha256": "3c0d9f8c9d07c87c280d25490ef036ef09fd72e653da3eea1d2ffddfb76674b3"
+    },
+    "demo/raw/attempts/0001-assisted-arrival-s641/run/verification/normalized/obstacles.jsonl": {
+      "bytes": 176,
+      "sha256": "4836073612be97093b65991f3bf7841e43aa71a44148ce43d22325ecf4c3933c"
+    },
+    "demo/raw/attempts/0001-assisted-arrival-s641/run/verification/normalized/measured_motion.jsonl": {
+      "bytes": 5320,
+      "sha256": "c3d11ba0d3dea87de79a1e22bd5c00a34b8bd6c31563ee367b485d1d48952a7a"
+    }
+  }
+}

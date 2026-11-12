@@ -1,0 +1,10 @@
+schema_version: 1
+id: m2-guard
+version: '1'
+calibration: calibrated
+max_gap_ns: 250000000
+requirements:
+  R3:
+    applicable: true
+    mandatory: true
+    clock: steady:6d529eaf-f655-4b3b-90db-ec3e87c9f9f4

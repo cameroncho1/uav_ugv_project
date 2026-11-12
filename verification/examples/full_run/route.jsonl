@@ -1,0 +1,2 @@
+{"clock": "sim", "data": {"goal_revision": "old", "points": [[-2, 0], [2, 0]]}, "epoch": 0, "frame": "map", "sequence": 0, "source": "route", "time_ns": 0}
+{"clock": "sim", "data": {"goal_revision": "goal-1", "points": [[-2, 2], [0, 2], [0, 0]]}, "epoch": 0, "frame": "map", "sequence": 1, "source": "route", "time_ns": 600000000}

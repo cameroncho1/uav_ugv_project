@@ -28,6 +28,7 @@ def generate_launch_description():
         cwd=str(project_root),
         output="screen",
         name="gazebo_world",
+        additional_env={"WORLD_FILE": LaunchConfiguration("world_file")},
         condition=IfCondition(start_simulation),
     )
     agent = ExecuteProcess(
@@ -49,6 +50,9 @@ def generate_launch_description():
             "start_simulation", default_value="true",
             description="Start Gazebo, PX4 SITL, and Micro XRCE-DDS Agent.",
         ),
+        DeclareLaunchArgument("world_file", default_value=str(
+            project_root / "simulation/worlds/simple_goal_demo.sdf")),
+        DeclareLaunchArgument("evaluation_trace", default_value="false"),
         DeclareLaunchArgument(
             "start_rviz", default_value="true",
             description="Start RViz with the simple goal demo configuration.",
@@ -104,6 +108,7 @@ def generate_launch_description():
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(str(fault_share / "launch/sim_ugv_sensors.launch.py")),
             launch_arguments={"world": "simple_goal_demo", "seed": LaunchConfiguration("seed"),
+                              "evaluation_trace": LaunchConfiguration("evaluation_trace"),
                               "measurement_config": LaunchConfiguration("measurement_config"),
                               "measurement_profile": LaunchConfiguration("measurement_profile"),
                               "shared_position_stddev":
@@ -164,7 +169,10 @@ def generate_launch_description():
             package="ugv_control",
             executable="goal_controller",
             name="ugv_goal_controller",
-            parameters=[str(package_share / "config/navigation.yaml")],
+            parameters=[str(package_share / "config/navigation.yaml"), {
+                "evaluation_trace": ParameterValue(
+                    LaunchConfiguration("evaluation_trace"), value_type=bool),
+            }],
             output="screen",
         ),
         Node(
@@ -200,4 +208,9 @@ def generate_launch_description():
             condition=IfCondition(start_rviz),
         ),
         TimerAction(period=2.0, actions=[px4]),
+        Node(package="ros_gz_bridge", executable="parameter_bridge",
+             name="evaluation_watchdog_bridge",
+             parameters=[{"config_file": str(
+                 package_share / "config/evaluation_watchdog_bridge.yaml")}],
+             condition=IfCondition(LaunchConfiguration("evaluation_trace"))),
     ])

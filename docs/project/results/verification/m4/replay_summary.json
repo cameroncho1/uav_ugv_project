@@ -1,0 +1,10 @@
+{
+  "attempt_counts": {
+    "passed": 3
+  },
+  "duration_wall_s": 17.734,
+  "exit_code": 0,
+  "mode": "recorded_replay",
+  "new_simulation": false,
+  "original_campaign_sha256": "0e6b230f427b9b9d31491e2ebf003975e969a6af6adc5aa96239bfb99872f264"
+}

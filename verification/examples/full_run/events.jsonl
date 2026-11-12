@@ -1,0 +1,4 @@
+{"clock": "sim", "data": {"event_id": "hazard", "goal_revision": "goal-1", "kind": "hazard_observed", "obstacle_id": "hazard-box", "qualifying": true}, "epoch": 0, "sequence": 0, "source": "events", "time_ns": 500000000}
+{"clock": "sim", "data": {"channel": "wz", "event_id": "fault", "fault_class": "noise", "kind": "fault_start", "sensor": "imu"}, "epoch": 0, "sequence": 1, "source": "events", "time_ns": 1000000000}
+{"clock": "sim", "data": {"channel": "wz", "event_id": "fault", "fault_class": "noise", "kind": "fault_end", "sensor": "imu"}, "epoch": 0, "sequence": 2, "source": "events", "time_ns": 2000000000}
+{"clock": "steady:watchdog", "data": {"event_id": "command-loss", "kind": "command_loss"}, "epoch": 0, "sequence": 0, "source": "events", "time_ns": 1100000000}

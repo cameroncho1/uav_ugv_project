@@ -1,0 +1,121 @@
+\documentclass[10pt]{article}
+\usepackage[margin=0.85in]{geometry}
+\usepackage{graphicx,booktabs,hyperref}
+\hypersetup{hidelinks}
+\setlength{\emergencystretch}{3em}
+\title{Recorded Verification of UAV--UGV Navigation}
+\author{}\date{}
+\begin{document}\maketitle
+\begin{abstract}
+This report evaluates recorded behavior through reusable, acquisition-aware requirement monitors.
+Simulator adapters supply independent geometry and actual consumer/actuator timing.
+Missing evidence remains inconclusive; unmeasured requirements remain unavailable.
+The results are finite sampled-trace evidence, not continuous safety or discrete supervisor proofs.
+\end{abstract}
+\section{System and requirements}
+The system uses ROS 2 Humble, PX4 SITL, and Gazebo Harmonic in Linux.
+The UAV supplies independent camera observations; the UGV consumes a fused map pose and guarded routes.
+Truth is confined to sensor synthesis and scoring. Positions use ENU map coordinates and body data use FLU.
+The verification library consumes normalized numerical traces independently of ROS and Gazebo.
+\begin{center}\includegraphics[width=\linewidth]{figures/architecture.pdf}\end{center}
+R1 checks sampled planar disk clearance against static boxes/cylinders.
+R2 checks arrival within the declared deadline, with estimated and physical tolerances and a quiet dwell.
+R3 checks bounded response to an actual invalid guard, followed by a sustained zero command until recovery.
+R4 separates actuator-output expiry from independently measured physical settling.
+R6 checks acquisition-matched position error conditional on a valid pose and fresh UAV input.
+Availability follows the exported profiles and capability table. Planned exclusions are ${exclusions_tex}.
+No supervisor model checker is implemented.
+\paragraph{Recorded-trace conditions.}
+Let \(A\) denote a confirmed arrival dwell inside both tolerances with quiet commands;
+\(I,Q,V\) denote invalid guard, quiet command, and valid guard; and \(E\) denote fresh UAV input with valid pose.
+\[
+\begin{array}{ll}
+R1:&G_{\rm valid}(d_{\rm clear}\geq-\delta_C)\\
+R2:&F_{[0,D_A]}A\\
+R3:&G(I\rightarrow F_{[0,D_G]}(Q\land(Q\ W\ V)))\\
+R6:&G(E\rightarrow e_{\rm matched}\leq\epsilon_L)
+\end{array}
+\]
+Weak until \(W\) permits a quiet hold to continue to recording end without requiring recovery.
+R4 bounds actuator-output expiry and independently measured physical settling with a confirming dwell.
+The profile supplies the arrival deadline $$D_A$$, guard deadline $$D_G$$, error bound $$\epsilon_L$$, dwell times, and all other numerical bounds; \texttt{bounds.csv} retains every evaluated parameter set.
+Source profiles and saved parameters remain authoritative.
+\section{Temporal semantics and instrumentation}
+Integer nanosecond stamps retain clock domain and epoch. Acquisition, consumer receipt,
+command publication, actuator receipt/output, and truth motion remain separate reference points.
+Closed response windows include the deadline. Discrete samples expire at their maximum validity gap;
+interpolation is confined to continuous pose scoring within declared matching gaps.
+Missing coverage, untriggered obligations, and insufficient horizons remain inconclusive.
+A witnessed violation is retained despite unrelated incomplete evidence.
+R4 uses steady time and interval-average physical motion with sampling uncertainty.
+A paused simulator cannot establish physical settling from repeated unchanged positions.
+\section{Experiment design}
+The frozen matrix has ${matrix_cases_planned} planned attempts and ${matrix_cases_attempted} attempted cases. The complete ledger retains ${attempts} attempts and ${recordings} saved result recordings across ${cohort_count} source/profile/evaluator cohorts.
+
+Recorded matrix factors are ${factors_tex}.
+Seeds configure injected sensor noise, not deterministic PX4 or renderer scheduling.
+The exported plan records paired comparisons, calibration separation, and exclusions.
+Predetermined seeds provide coverage, not a high-confidence probability guarantee.
+The assistance comparison table retains ${assistance_pairs} seed/world/goal/outage pairs, both attempt outcomes, and available arrival values. Missing startup evidence prevents an assistance-benefit claim for that pair.
+All attempted outcomes, including startup failure, timeout, interruption, invalid data,
+and incomplete evidence, remain in the ledger. Deterministic fixture repetitions are repeatability checks.
+\begin{center}\includegraphics[width=.82\linewidth,height=.48\textheight,keepaspectratio]{figures/outcomes.pdf}\end{center}
+\section{Results}
+Unmeasured requirements: ${unmeasured}. Exact evaluated parameters are in \texttt{bounds.csv}.
+\begin{center}\begin{tabular}{lrrrrr}\toprule
+Requirement & PASS & FAIL & Incomplete & Excluded & Triggers\\\midrule
+${claim_rows}
+\bottomrule\end{tabular}\end{center}
+Counts refer to saved recordings; a watchdog attempt produces two separate recordings.
+Attempt-level denominators and missing recordings are retained separately in the outcome ledger.
+Totals are descriptive across matrix, search, and replay recordings in the listed cohorts,
+not a pooled success probability. Category counts are in \texttt{claims\_by\_category.csv}.
+\begin{center}\small\begin{tabular}{lrrrl}\toprule
+Measured metric & Recordings & Minimum & Maximum & Unit\\\midrule
+${metric_rows}
+\bottomrule\end{tabular}\end{center}
+Metric counts include recordings with a measured value and a decided requirement verdict.
+All other attempted outcomes remain in the ledger. The complete witness list is in \texttt{violations.csv};
+original failures remain alongside their fresh-world replays.
+\begin{center}\includegraphics[width=.68\linewidth]{figures/navigation.pdf}\end{center}
+The trajectory is a representative recorded trace with independently extracted collision geometry.
+Figure inputs are downsampled for display; all verdicts use full-resolution saved evaluations.
+\begin{center}\includegraphics[width=.9\linewidth,height=.45\textheight,keepaspectratio]{figures/arrival.pdf}\end{center}
+Arrival values include R2 PASS recordings only. All other outcomes remain in the table and ledger.
+Physical and estimated arrival tolerances can differ; the profile-specific physical tolerance remains authoritative.
+\begin{center}\includegraphics[width=.9\linewidth,height=.45\textheight,keepaspectratio]{figures/localization.pdf}\end{center}
+Conditional position-error metrics retain guard/UAV eligibility, acquisition matching, and sample counts.
+They do not characterize unavailable UAV intervals or establish accuracy outside the recorded envelope.
+\begin{center}\includegraphics[width=.9\linewidth,height=.45\textheight,keepaspectratio]{figures/clearance.pdf}\end{center}
+Empty worlds have no finite nearest-obstacle clearance and do not supply a scalar search score.
+Negative clearance is a sampled disk-proxy overlap, distinct from exact rigid-body contact.
+\begin{center}\includegraphics[width=.86\linewidth]{figures/guard.pdf}\end{center}
+\begin{center}\includegraphics[width=.86\linewidth]{figures/watchdog.pdf}\end{center}
+Consumer command response and watchdog output are distinct from measured physical settling.
+Authoritative timing metrics, including sampling uncertainty decisions, are retained in the saved results.
+\section{Failure search and replay}
+Search records ${search_trials} attempts and ${search_wall_s_formatted} measured driver wall seconds,
+with ${replay_attempts} search-counterexample replays and ${diagnostic_replay_attempts} supplemental diagnostic replays.
+
+The sole search objective is minimum sampled R1 clearance. Missing evidence has no objective value.
+Generated worlds, offsets, seeds, commands, budgets, original failures, and replay links are retained.
+Matching seeds need not reproduce identical feedback trajectories. A finite search without a
+counterexample does not prove safety. Reproduced and non-reproduced outcomes remain separate.
+Post-hoc diagnostic replays remain separate from the held-out matrix and original search budget.
+\section{Claims, limits, and reproduction}
+The claim/evidence table records every requirement's verdict counts and trigger/eligible coverage.
+The results do not establish continuous collision freedom, online detector benefit, hazard response,
+or a discrete supervisor proof. Incompatible source/profile/evaluator cohorts remain separate.
+Calibration assumptions and evaluated source-run identities remain explicit. Raw recording availability is explicit.
+Saved results and portable display series regenerate these tables and figures without simulation.
+The live demo reuses launch, recording, evaluation, and cleanup; mandatory failure or incomplete
+evidence prevents a successful verification summary. Recorded replay is labeled as replay.
+\paragraph{Artifacts.} See \texttt{metrics.csv}, \texttt{attempts.csv}, \texttt{claims.csv},
+\texttt{figure\_sources.json}, and the portable campaign ledger for exact numerical values,
+source hashes, profiles, commands, exclusions, and recording references.
+\paragraph{Method references.} Repository documents \texttt{docs/verification/requirements.md},
+\texttt{interfaces.md}, and \texttt{experiments.md} define the executable requirements,
+finite-trace semantics, data contracts, and experiment protocol. The M2 evidence index records
+calibration conditions and bounds. This report covers the verification feature for integration
+into the project's ten-page report; it does not claim unimplemented project components.
+\end{document}

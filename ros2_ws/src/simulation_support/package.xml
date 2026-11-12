@@ -9,6 +9,8 @@
   <buildtool_depend>pkg-config</buildtool_depend>
   <depend>rclcpp</depend>
   <depend>geometry_msgs</depend>
+  <depend>std_msgs</depend>
+  <depend>uav_ugv_msgs</depend>
   <depend>gz-transport13</depend>
   <depend>gz-msgs10</depend>
   <exec_depend>ros_gz_bridge</exec_depend>

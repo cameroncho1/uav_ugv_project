@@ -1,0 +1,246 @@
+{
+  "artifact_inputs": {
+    "campaign.json": "93f9dd8554d0d502b732a1f7b57c4372a76c3ef99c97c118fffb859ea118f91c",
+    "ledger.json": "948d13254bb200b7dd3d1b30c796e55b3d6a53cc4ad4c3dbcfbdaf296554b53e"
+  },
+  "assistance_pairs": 3,
+  "attempt_counts": {
+    "failed": 8,
+    "inconclusive": 3,
+    "passed": 38,
+    "startup_failed": 2
+  },
+  "attempts": 51,
+  "campaign_source_sha256": "64524f665a1ad0cd576ef2ebf25bca7cad7e347cf5e08283f5c14ee5252e765a",
+  "claims": [
+    {
+      "FAIL": 0,
+      "INCONCLUSIVE": 2,
+      "NOT_APPLICABLE": 7,
+      "PASS": 43,
+      "availability": "measured",
+      "claim": "Sampled planar disk clearance against independent static boxes/cylinders.",
+      "clock_domains": "sim",
+      "eligible_seconds": 1605.6,
+      "evidence": "recordings/a0003-r0/result.json; recordings/a0004-r0/result.json; recordings/a0005-r0/result.json; recordings/a0006-r0/result.json; recordings/a0007-r0/result.json; recordings/a0008-r0/result.json; recordings/a0009-r0/result.json; recordings/a0010-r0/result.json; recordings/a0011-r0/result.json; recordings/a0012-r0/result.json; recordings/a0013-r0/result.json; recordings/a0014-r0/result.json; recordings/a0015-r0/result.json; recordings/a0016-r0/result.json; recordings/a0017-r0/result.json; recordings/a0018-r0/result.json; recordings/a0019-r0/result.json; recordings/a0020-r0/result.json; recordings/a0021-r0/result.json; recordings/a0022-r0/result.json; recordings/a0023-r0/result.json; recordings/a0024-r0/result.json; recordings/a0025-r0/result.json; recordings/a0026-r0/result.json; recordings/a0027-r0/result.json; recordings/a0028-r0/result.json; recordings/a0029-r0/result.json; recordings/a0030-r0/result.json; recordings/a0031-r0/result.json; recordings/a0032-r0/result.json; recordings/a0033-r0/result.json; recordings/a0034-r0/result.json; recordings/a0035-r0/result.json; recordings/a0036-r0/result.json; recordings/a0037-r0/result.json; recordings/a0038-r0/result.json; recordings/a0039-r0/result.json; recordings/a0046-r0/result.json; recordings/a0047-r0/result.json; recordings/a0048-r0/result.json; recordings/a0049-r0/result.json; recordings/a0050-r0/result.json; recordings/a0051-r0/result.json",
+      "limit": "Sampled recorded conditions; no continuous or discrete proof.",
+      "requirement": "R1",
+      "triggers": 0
+    },
+    {
+      "FAIL": 8,
+      "INCONCLUSIVE": 3,
+      "NOT_APPLICABLE": 7,
+      "PASS": 34,
+      "availability": "measured",
+      "claim": "Acquisition-time arrival with physical/estimated tolerances and a quiet dwell.",
+      "clock_domains": "sim",
+      "eligible_seconds": 1496.816,
+      "evidence": "recordings/a0004-r0/result.json; recordings/a0005-r0/result.json; recordings/a0006-r0/result.json; recordings/a0007-r0/result.json; recordings/a0008-r0/result.json; recordings/a0009-r0/result.json; recordings/a0010-r0/result.json; recordings/a0011-r0/result.json; recordings/a0012-r0/result.json; recordings/a0013-r0/result.json; recordings/a0014-r0/result.json; recordings/a0015-r0/result.json; recordings/a0016-r0/result.json; recordings/a0017-r0/result.json; recordings/a0018-r0/result.json; recordings/a0019-r0/result.json; recordings/a0020-r0/result.json; recordings/a0021-r0/result.json; recordings/a0022-r0/result.json; recordings/a0023-r0/result.json; recordings/a0024-r0/result.json; recordings/a0025-r0/result.json; recordings/a0026-r0/result.json; recordings/a0027-r0/result.json; recordings/a0028-r0/result.json; recordings/a0029-r0/result.json; recordings/a0030-r0/result.json; recordings/a0031-r0/result.json; recordings/a0032-r0/result.json; recordings/a0033-r0/result.json; recordings/a0034-r0/result.json; recordings/a0035-r0/result.json; recordings/a0036-r0/result.json; recordings/a0037-r0/result.json; recordings/a0038-r0/result.json; recordings/a0039-r0/result.json; recordings/a0046-r0/result.json; recordings/a0047-r0/result.json; recordings/a0048-r0/result.json; recordings/a0049-r0/result.json; recordings/a0050-r0/result.json; recordings/a0051-r0/result.json",
+      "limit": "Sampled recorded conditions; no continuous or discrete proof.",
+      "requirement": "R2",
+      "triggers": 43
+    },
+    {
+      "FAIL": 0,
+      "INCONCLUSIVE": 45,
+      "NOT_APPLICABLE": 6,
+      "PASS": 1,
+      "availability": "measured",
+      "claim": "Consumer-observed invalid guard followed by a sustained zero command.",
+      "clock_domains": "steady",
+      "eligible_seconds": 1755.49197506,
+      "evidence": "recordings/a0042-r0/result.json",
+      "limit": "Sampled recorded conditions; no continuous or discrete proof.",
+      "requirement": "R3",
+      "triggers": 6
+    },
+    {
+      "FAIL": 0,
+      "INCONCLUSIVE": 0,
+      "NOT_APPLICABLE": 46,
+      "PASS": 6,
+      "availability": "measured",
+      "claim": "Steady-time watchdog expiry and independently measured physical settling.",
+      "clock_domains": "steady",
+      "eligible_seconds": 4.285135105,
+      "evidence": "recordings/a0043-r0/result.json; recordings/a0043-r1/result.json; recordings/a0044-r0/result.json; recordings/a0044-r1/result.json; recordings/a0045-r0/result.json; recordings/a0045-r1/result.json",
+      "limit": "Sampled recorded conditions; no continuous or discrete proof.",
+      "requirement": "R4",
+      "triggers": 6
+    },
+    {
+      "FAIL": 0,
+      "INCONCLUSIVE": 0,
+      "NOT_APPLICABLE": 52,
+      "PASS": 0,
+      "availability": "unmeasured",
+      "claim": "Bounded response to an actual qualifying hazard observation.",
+      "clock_domains": "",
+      "eligible_seconds": 0.0,
+      "evidence": "No decided recorded evidence",
+      "limit": "Unavailable or excluded in these profiles; see campaign exclusions.",
+      "requirement": "R5",
+      "triggers": 0
+    },
+    {
+      "FAIL": 0,
+      "INCONCLUSIVE": 3,
+      "NOT_APPLICABLE": 10,
+      "PASS": 39,
+      "availability": "measured",
+      "claim": "Acquisition-matched error conditional on valid pose and fresh UAV input.",
+      "clock_domains": "sim",
+      "eligible_seconds": 1375.032,
+      "evidence": "recordings/a0004-r0/result.json; recordings/a0005-r0/result.json; recordings/a0006-r0/result.json; recordings/a0007-r0/result.json; recordings/a0008-r0/result.json; recordings/a0009-r0/result.json; recordings/a0010-r0/result.json; recordings/a0011-r0/result.json; recordings/a0012-r0/result.json; recordings/a0013-r0/result.json; recordings/a0014-r0/result.json; recordings/a0015-r0/result.json; recordings/a0016-r0/result.json; recordings/a0017-r0/result.json; recordings/a0018-r0/result.json; recordings/a0019-r0/result.json; recordings/a0020-r0/result.json; recordings/a0021-r0/result.json; recordings/a0022-r0/result.json; recordings/a0023-r0/result.json; recordings/a0024-r0/result.json; recordings/a0025-r0/result.json; recordings/a0026-r0/result.json; recordings/a0027-r0/result.json; recordings/a0028-r0/result.json; recordings/a0029-r0/result.json; recordings/a0030-r0/result.json; recordings/a0031-r0/result.json; recordings/a0032-r0/result.json; recordings/a0033-r0/result.json; recordings/a0034-r0/result.json; recordings/a0035-r0/result.json; recordings/a0036-r0/result.json; recordings/a0046-r0/result.json; recordings/a0047-r0/result.json; recordings/a0048-r0/result.json; recordings/a0049-r0/result.json; recordings/a0050-r0/result.json; recordings/a0051-r0/result.json",
+      "limit": "Sampled recorded conditions; no continuous or discrete proof.",
+      "requirement": "R6",
+      "triggers": 40901
+    },
+    {
+      "FAIL": 0,
+      "INCONCLUSIVE": 0,
+      "NOT_APPLICABLE": 52,
+      "PASS": 0,
+      "availability": "unmeasured",
+      "claim": "Actual detector decisions after onset, using the declared alarm scope.",
+      "clock_domains": "",
+      "eligible_seconds": 0.0,
+      "evidence": "No decided recorded evidence",
+      "limit": "Unavailable or excluded in these profiles; see campaign exclusions.",
+      "requirement": "R7",
+      "triggers": 0
+    },
+    {
+      "FAIL": 0,
+      "INCONCLUSIVE": 0,
+      "NOT_APPLICABLE": 52,
+      "PASS": 0,
+      "availability": "unmeasured",
+      "claim": "Nominal decision exposure and source-run-clustered false-alarm outcomes.",
+      "clock_domains": "",
+      "eligible_seconds": 0.0,
+      "evidence": "No decided recorded evidence",
+      "limit": "Unavailable or excluded in these profiles; see campaign exclusions.",
+      "requirement": "R8",
+      "triggers": 0
+    }
+  ],
+  "cohorts": [
+    "258a8d4a8823282f",
+    "51605416c6f588d2",
+    "6d3ee663d48b5df8",
+    "84c56082ed298d86"
+  ],
+  "diagnostic_replay_attempts": 2,
+  "exclusions": {
+    "R5": "No hazard-event producer is available.",
+    "R7_R8": "No online detector exists; enabled/disabled/forced-miss comparisons are unavailable.",
+    "combinations": "Outage trials use goal A for empty/sparse and goal B for dense/corridor; both goals have nominal trials in every layout.",
+    "seeds": "Seeds configure synthetic sensor corruption; PX4/render scheduling is not deterministic."
+  },
+  "factors": {
+    "goals": [
+      [
+        3.0,
+        0.5
+      ],
+      [
+        4.0,
+        0.0
+      ]
+    ],
+    "layouts": [
+      "simple_goal_demo",
+      "simple_goal_demo_corridor",
+      "simple_goal_demo_dense",
+      "simple_goal_demo_sparse"
+    ],
+    "seeds": [
+      631,
+      632,
+      633
+    ]
+  },
+  "matrix_cases_attempted": 45,
+  "matrix_cases_planned": 45,
+  "metric_ranges": [
+    {
+      "maximum": 0.48035266787363173,
+      "metric": "minimum_clearance_m",
+      "minimum": 0.12095733477290038,
+      "recordings": 33,
+      "unit": "m"
+    },
+    {
+      "maximum": 41.78,
+      "metric": "arrival_s",
+      "minimum": 14.868,
+      "recordings": 34,
+      "unit": "simulation s"
+    },
+    {
+      "maximum": 0.08591904857080564,
+      "metric": "conditional_rmse_m",
+      "minimum": 0.024097572120591305,
+      "recordings": 39,
+      "unit": "m"
+    },
+    {
+      "maximum": 0.1585582967672871,
+      "metric": "maximum_position_error_m",
+      "minimum": 0.06743223898618,
+      "recordings": 39,
+      "unit": "m"
+    },
+    {
+      "maximum": 0.138375,
+      "metric": "guard_response_ms",
+      "minimum": 0.138375,
+      "recordings": 1,
+      "unit": "steady ms"
+    },
+    {
+      "maximum": 381.620019,
+      "metric": "watchdog_expiry_ms",
+      "minimum": 366.105877,
+      "recordings": 6,
+      "unit": "steady ms"
+    },
+    {
+      "maximum": 454.561283,
+      "metric": "physical_settling_ms",
+      "minimum": 426.636094,
+      "recordings": 6,
+      "unit": "steady ms"
+    }
+  ],
+  "missing_artifacts": [],
+  "parameter_sets": [
+    {
+      "parameters": "{\"contact_tolerance_m\": 0.0, \"radius_m\": 0.5}",
+      "requirement": "R1"
+    },
+    {
+      "parameters": "{\"angular_epsilon_rps\": 0.001, \"deadline_ns\": 60000000000, \"dwell_ns\": 1000000000, \"goal_tolerance_m\": 0.5, \"linear_epsilon_mps\": 0.001, \"physical_tolerance_m\": 0.85}",
+      "requirement": "R2"
+    },
+    {
+      "parameters": "{\"angular_epsilon_rps\": 0.001, \"linear_epsilon_mps\": 0.001, \"response_ns\": 500000000}",
+      "requirement": "R3"
+    },
+    {
+      "parameters": "{\"angular_epsilon_rps\": 0.001, \"dwell_ns\": 200000000, \"expiry_ns\": 400000000, \"linear_epsilon_mps\": 0.001, \"settling_ns\": 750000000, \"speed_epsilon_mps\": 0.02, \"yaw_rate_epsilon_rps\": 0.02}",
+      "requirement": "R4"
+    },
+    {
+      "parameters": "{\"error_limit_m\": 0.5, \"uav_max_age_ns\": 500000000}",
+      "requirement": "R6"
+    }
+  ],
+  "recordings": 52,
+  "replay_attempts": 0,
+  "schema_version": 1,
+  "search_trials": 4,
+  "search_wall_s": 274.8242545930002
+}

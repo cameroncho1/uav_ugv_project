@@ -1,0 +1,42 @@
+{
+  "adapter": "normalized",
+  "intervals": [
+    {
+      "clock": "sim",
+      "end_ns": 3000000000,
+      "epoch": 0,
+      "start_ns": 0
+    },
+    {
+      "clock": "steady:watchdog",
+      "end_ns": 3000000000,
+      "epoch": 0,
+      "start_ns": 0
+    }
+  ],
+  "provenance": {
+    "code_commit": "fixture",
+    "description": "Independent monitor examples; not a dynamically consistent vehicle simulation",
+    "kind": "synthetic",
+    "seed": 0
+  },
+  "run_id": "synthetic-full-run",
+  "schema_version": 1,
+  "source_run_id": "synthetic-source",
+  "status": "completed",
+  "streams": {
+    "actuator_input": "actuator_input.jsonl",
+    "actuator_output": "actuator_output.jsonl",
+    "detector_decision": "detector_decision.jsonl",
+    "estimated_pose": "estimated_pose.jsonl",
+    "events": "events.jsonl",
+    "goal": "goal.jsonl",
+    "guard_state": "guard_state.jsonl",
+    "measured_motion": "measured_motion.jsonl",
+    "obstacles": "obstacles.jsonl",
+    "requested_command": "requested_command.jsonl",
+    "route": "route.jsonl",
+    "truth_pose": "truth_pose.jsonl",
+    "uav_observation": "uav_observation.jsonl"
+  }
+}

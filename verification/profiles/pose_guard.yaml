@@ -1,0 +1,7 @@
+schema_version: 1
+id: pose_guard
+version: '1'
+calibration: provisional
+max_gap_ns: 250000000
+requirements:
+  R3: {applicable: true, mandatory: true}
