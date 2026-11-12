@@ -1,0 +1,100 @@
+{
+  "schema_version": 1,
+  "plan": {
+    "cases": [
+      {
+        "assistance": true,
+        "case_id": "assisted-arrival-s641",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "assisted-arrival",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 641,
+        "world": "simulation/worlds/simple_goal_demo.sdf",
+        "world_sha256": "0f12df287b4c55a6c71f139e1ff957d1330559762dc7a6aab814a8b72feb3bb3"
+      },
+      {
+        "case_id": "guard-response-s641",
+        "id": "guard-response",
+        "kind": "guard",
+        "seed": 641
+      },
+      {
+        "case_id": "watchdog-response-s641",
+        "id": "watchdog-response",
+        "kind": "watchdog",
+        "seed": 641
+      }
+    ],
+    "exclusions": {
+      "R5": "No actual hazard producer.",
+      "R7_R8": "No online detector producer."
+    },
+    "expanded_sha256": "9e07fc5bd2df7014d36a44fa89d67d18e190535170638ca2198f763aa869fdc1",
+    "id": "verification-live-demo-v1",
+    "parameters": {
+      "attempt_timeout_s": 240,
+      "replay_limit": 0,
+      "search_seed": 0,
+      "search_trials": 0,
+      "search_wall_budget_s": 0,
+      "simulation_timeout_s": 100,
+      "wall_timeout_s": 160
+    },
+    "plan_sha256": "c3ebe15d0006e4a7d2c27b4473e622a6f5cd026d6541dff12dfff2abc078ea99",
+    "profiles": {
+      "verification/profiles/m2_camera.yaml": "d49c612360ae5af3098513d51980b100b8bffdc6fc9658cb7cf0ad401bac45a1",
+      "verification/profiles/m2_guard.yaml": "7dfc52bd2a2a6054f703231a9b6f5a8c9841d0470adc55e011a0cf875ddcf3ad",
+      "verification/profiles/m2_watchdog.yaml": "21bcfa746906b6ccf527620135cc70f1881b44908e27363dad9a67ee0f4ae1e1"
+    },
+    "schema_version": 1
+  },
+  "source_sha256": "bdeadf424519604ebd82634908ff233f6c9d2e8b01a9c9164c8ab5abda58075e",
+  "attempts": [
+    {
+      "id": 1,
+      "case_id": "assisted-arrival-s641",
+      "category": "matrix",
+      "configuration": {
+        "assistance": true,
+        "case_id": "assisted-arrival-s641",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "assisted-arrival",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 641,
+        "world": "simulation/worlds/simple_goal_demo.sdf",
+        "world_sha256": "0f12df287b4c55a6c71f139e1ff957d1330559762dc7a6aab814a8b72feb3bb3"
+      },
+      "started_ns": 1794426765580749330,
+      "ended_ns": 1794426775831991276,
+      "status": "interrupted",
+      "detail": {
+        "command": [
+          "bash",
+          "/home/rylanwwade/uav-supervisor-w10/scripts/run_goal_navigation_trial.sh",
+          "/home/rylanwwade/uav-supervisor-w10/evidence/w10_final/interruption/demo/raw/attempts/0001-assisted-arrival-s641/run"
+        ],
+        "environment": {
+          "GOAL_X": "4.0",
+          "GOAL_Y": "0.0",
+          "GPS_OUTAGE_AFTER_MOTION": "-1",
+          "GZ_PARTITION": "verification_3963_1",
+          "ROS_DOMAIN_ID": "21",
+          "SEED": "641",
+          "TRIAL_TIMEOUT": "100",
+          "UAV_ASSISTANCE": "true",
+          "WALL_TIMEOUT": "160",
+          "WORLD_FILE": "/home/rylanwwade/uav-supervisor-w10/simulation/worlds/simple_goal_demo.sdf"
+        },
+        "evaluations": []
+      }
+    }
+  ]
+}

@@ -35,7 +35,7 @@ Types below omit the `/msg/` segment. Present means implemented at the inspected
 | `actuator_output` | Gazebo `/simple_ugv/cmd_vel`, `gz.msgs.Twist` | Watchdog emission, not physical speed; no current receipt/expiry trace |
 | `guard_state` | `PoseGuard::check()` and `goal_controller::control_tick()` | Guard result and hold reason exist internally; only changing text status is logged |
 | `obstacles` | Selected world SDF `<collision>` elements | Static boxes and upright cylinders; dynamic spawn/transform events need recording |
-| `detector_decision` | Offline fault-model pipeline | No `FaultStatus` message or online detector node found in `ros2_ws/src` |
+| `detector_decision` | Offline fault-model pipeline | W10 adds `FaultStatus` and a validated controller subscription; the online detector producer remains absent |
 | Dataset CSV | `imu.csv`, `wheel_odom.csv`, `gps.csv`, `truth.csv`, `cmd.csv`, `metadata.json` | Acquisition seconds; command CSV includes sim stamp. No navigation estimate, route, grid, or online detector decision |
 
 Source paths: [truth](../../ros2_ws/src/simulation_support/src/ugv_truth.cpp), [pose adapter](../../ros2_ws/src/cooperative_localization/scripts/ugv_fused_pose.py), [route](../../ros2_ws/src/uav_ugv_msgs/msg/PlannedRoute.msg), [mapper](../../ros2_ws/src/traversability_mapping/scripts/traversability_mapper), [controller](../../ros2_ws/src/ugv_control/src/goal_controller.cpp), [watchdog](../../ros2_ws/src/ugv_control/src/command_watchdog.cpp), [dataset recorder](../../ros2_ws/src/fault_management/scripts/ugv_dataset_recorder.py).

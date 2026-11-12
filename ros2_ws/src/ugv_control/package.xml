@@ -7,7 +7,9 @@
   <depend>rclcpp</depend><depend>nav_msgs</depend><depend>geometry_msgs</depend>
   <depend>uav_ugv_msgs</depend>
   <depend>std_msgs</depend>
+  <depend>rcl_interfaces</depend>
   <test_depend>ament_cmake_gtest</test_depend>
+  <test_depend>ament_cmake_pytest</test_depend>
   <buildtool_depend>pkg-config</buildtool_depend>
   <depend>gz-sim8</depend><depend>gz-transport13</depend>
   <depend>gz-msgs10</depend><depend>gz-plugin2</depend>

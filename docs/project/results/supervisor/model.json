@@ -1,0 +1,924 @@
+{
+  "checker_sha256": "e47c3b60419458f02a11ec38ad1882aeb852509562d6fb56a74274267d71fe66",
+  "conformance": {
+    "output_sha256": "6634349ec126d274c93c302e7291b1ccc329050dc57cfd98383c77c4a969be3b",
+    "probe_sha256": "fbbcea614b9a01943553c264f46034cc721086bbfdf822c84c4eff3447f43846",
+    "status": "PASS",
+    "transitions": 7120
+  },
+  "controller_states": 92,
+  "exploration": "breadth-first reachable-state/product-monitor safety check",
+  "implementation_sha256": "bd4b7647792d83fc602279acfd518b8f4396aaa28f4ad50e0555a1b9ebe7544e",
+  "implementation_sources": {
+    "ros2_ws/src/ugv_control/include/ugv_control/supervisor.hpp": "61f69ea0e56b080527952fa17272fc3fc6098f8b070eeb77996c6a2f46831589",
+    "ros2_ws/src/ugv_control/include/ugv_control/supervisor_inputs.hpp": "eaec230b916aad56045a4185307b98d4eaa856569dd3d7359b617f642b076572",
+    "ros2_ws/src/ugv_control/src/goal_controller.cpp": "8634adf750dc46a5c7b259b7113b900d5efa4fe29bfb2a5123a8b250d2789821",
+    "ros2_ws/src/ugv_control/src/supervisor_transition_probe.cpp": "77589a4acaaa10a2c1641d7b75e01b40792f0e45409ffceee9a6f573b390d3fb",
+    "scripts/generate_supervisor_policy.py": "7cb54fe161ee97013eddff48dad46f5664b8cc86a40b92fcca9e3715e0c98620"
+  },
+  "input_corpus_sha256": "f1d9cc974167588de09f21b4d3689ed32f0573dde0a84cdf593ce559d9e3ca42",
+  "mutations": {
+    "double_count": {
+      "counterexample": [
+        {
+          "after": {
+            "age": "YOUNG",
+            "clear_count": 2,
+            "enabled": true,
+            "fault_latched": true,
+            "goal_completed": false,
+            "mode": "INIT"
+          },
+          "before": {
+            "age": "NONE",
+            "clear_count": 0,
+            "enabled": true,
+            "fault_latched": true,
+            "goal_completed": false,
+            "mode": "INIT"
+          },
+          "input": {
+            "fault": "CLEAR",
+            "goal_reached": false,
+            "have_goal": false,
+            "mature": false,
+            "new_goal": false,
+            "pose_valid": false,
+            "reset": false,
+            "route_valid": false
+          }
+        }
+      ],
+      "properties_failed": [
+        "S11_recovery_memory_integrity"
+      ],
+      "states": 5,
+      "status": "FAIL",
+      "transitions": 17
+    },
+    "early_recovery": {
+      "counterexample": [
+        {
+          "after": {
+            "age": "YOUNG",
+            "clear_count": 1,
+            "enabled": true,
+            "fault_latched": true,
+            "goal_completed": false,
+            "mode": "INIT"
+          },
+          "before": {
+            "age": "NONE",
+            "clear_count": 0,
+            "enabled": true,
+            "fault_latched": true,
+            "goal_completed": false,
+            "mode": "INIT"
+          },
+          "input": {
+            "fault": "CLEAR",
+            "goal_reached": false,
+            "have_goal": false,
+            "mature": false,
+            "new_goal": false,
+            "pose_valid": false,
+            "reset": false,
+            "route_valid": false
+          }
+        },
+        {
+          "after": {
+            "age": "YOUNG",
+            "clear_count": 2,
+            "enabled": true,
+            "fault_latched": true,
+            "goal_completed": false,
+            "mode": "INIT"
+          },
+          "before": {
+            "age": "YOUNG",
+            "clear_count": 1,
+            "enabled": true,
+            "fault_latched": true,
+            "goal_completed": false,
+            "mode": "INIT"
+          },
+          "input": {
+            "fault": "CLEAR",
+            "goal_reached": false,
+            "have_goal": false,
+            "mature": false,
+            "new_goal": false,
+            "pose_valid": false,
+            "reset": false,
+            "route_valid": false
+          }
+        },
+        {
+          "after": {
+            "age": "YOUNG",
+            "clear_count": 3,
+            "enabled": true,
+            "fault_latched": true,
+            "goal_completed": false,
+            "mode": "INIT"
+          },
+          "before": {
+            "age": "YOUNG",
+            "clear_count": 2,
+            "enabled": true,
+            "fault_latched": true,
+            "goal_completed": false,
+            "mode": "INIT"
+          },
+          "input": {
+            "fault": "CLEAR",
+            "goal_reached": false,
+            "have_goal": false,
+            "mature": false,
+            "new_goal": false,
+            "pose_valid": false,
+            "reset": false,
+            "route_valid": false
+          }
+        },
+        {
+          "after": {
+            "age": "YOUNG",
+            "clear_count": 4,
+            "enabled": true,
+            "fault_latched": true,
+            "goal_completed": false,
+            "mode": "INIT"
+          },
+          "before": {
+            "age": "YOUNG",
+            "clear_count": 3,
+            "enabled": true,
+            "fault_latched": true,
+            "goal_completed": false,
+            "mode": "INIT"
+          },
+          "input": {
+            "fault": "CLEAR",
+            "goal_reached": false,
+            "have_goal": false,
+            "mature": false,
+            "new_goal": false,
+            "pose_valid": false,
+            "reset": false,
+            "route_valid": false
+          }
+        },
+        {
+          "after": {
+            "age": "YOUNG",
+            "clear_count": 5,
+            "enabled": true,
+            "fault_latched": true,
+            "goal_completed": false,
+            "mode": "INIT"
+          },
+          "before": {
+            "age": "YOUNG",
+            "clear_count": 4,
+            "enabled": true,
+            "fault_latched": true,
+            "goal_completed": false,
+            "mode": "INIT"
+          },
+          "input": {
+            "fault": "CLEAR",
+            "goal_reached": false,
+            "have_goal": false,
+            "mature": false,
+            "new_goal": false,
+            "pose_valid": false,
+            "reset": false,
+            "route_valid": false
+          }
+        },
+        {
+          "after": {
+            "age": "YOUNG",
+            "clear_count": 6,
+            "enabled": true,
+            "fault_latched": true,
+            "goal_completed": false,
+            "mode": "INIT"
+          },
+          "before": {
+            "age": "YOUNG",
+            "clear_count": 5,
+            "enabled": true,
+            "fault_latched": true,
+            "goal_completed": false,
+            "mode": "INIT"
+          },
+          "input": {
+            "fault": "CLEAR",
+            "goal_reached": false,
+            "have_goal": false,
+            "mature": false,
+            "new_goal": false,
+            "pose_valid": false,
+            "reset": false,
+            "route_valid": false
+          }
+        },
+        {
+          "after": {
+            "age": "YOUNG",
+            "clear_count": 7,
+            "enabled": true,
+            "fault_latched": true,
+            "goal_completed": false,
+            "mode": "INIT"
+          },
+          "before": {
+            "age": "YOUNG",
+            "clear_count": 6,
+            "enabled": true,
+            "fault_latched": true,
+            "goal_completed": false,
+            "mode": "INIT"
+          },
+          "input": {
+            "fault": "CLEAR",
+            "goal_reached": false,
+            "have_goal": false,
+            "mature": false,
+            "new_goal": false,
+            "pose_valid": false,
+            "reset": false,
+            "route_valid": false
+          }
+        },
+        {
+          "after": {
+            "age": "YOUNG",
+            "clear_count": 8,
+            "enabled": true,
+            "fault_latched": true,
+            "goal_completed": false,
+            "mode": "INIT"
+          },
+          "before": {
+            "age": "YOUNG",
+            "clear_count": 7,
+            "enabled": true,
+            "fault_latched": true,
+            "goal_completed": false,
+            "mode": "INIT"
+          },
+          "input": {
+            "fault": "CLEAR",
+            "goal_reached": false,
+            "have_goal": false,
+            "mature": false,
+            "new_goal": false,
+            "pose_valid": false,
+            "reset": false,
+            "route_valid": false
+          }
+        },
+        {
+          "after": {
+            "age": "YOUNG",
+            "clear_count": 9,
+            "enabled": true,
+            "fault_latched": true,
+            "goal_completed": false,
+            "mode": "INIT"
+          },
+          "before": {
+            "age": "YOUNG",
+            "clear_count": 8,
+            "enabled": true,
+            "fault_latched": true,
+            "goal_completed": false,
+            "mode": "INIT"
+          },
+          "input": {
+            "fault": "CLEAR",
+            "goal_reached": false,
+            "have_goal": false,
+            "mature": false,
+            "new_goal": false,
+            "pose_valid": false,
+            "reset": false,
+            "route_valid": false
+          }
+        },
+        {
+          "after": {
+            "age": "NONE",
+            "clear_count": 0,
+            "enabled": true,
+            "fault_latched": false,
+            "goal_completed": false,
+            "mode": "INIT"
+          },
+          "before": {
+            "age": "YOUNG",
+            "clear_count": 9,
+            "enabled": true,
+            "fault_latched": true,
+            "goal_completed": false,
+            "mode": "INIT"
+          },
+          "input": {
+            "fault": "CLEAR",
+            "goal_reached": false,
+            "have_goal": false,
+            "mature": false,
+            "new_goal": false,
+            "pose_valid": false,
+            "reset": false,
+            "route_valid": false
+          }
+        }
+      ],
+      "properties_failed": [
+        "S11_recovery_memory_integrity",
+        "S3_recovery_threshold"
+      ],
+      "states": 44,
+      "status": "FAIL",
+      "transitions": 2927
+    },
+    "forgot_completion": {
+      "counterexample": [
+        {
+          "after": {
+            "age": "NONE",
+            "clear_count": 0,
+            "enabled": false,
+            "fault_latched": false,
+            "goal_completed": true,
+            "mode": "GOAL"
+          },
+          "before": {
+            "age": "NONE",
+            "clear_count": 0,
+            "enabled": false,
+            "fault_latched": false,
+            "goal_completed": false,
+            "mode": "INIT"
+          },
+          "input": {
+            "fault": "NONE",
+            "goal_reached": true,
+            "have_goal": true,
+            "mature": false,
+            "new_goal": false,
+            "pose_valid": true,
+            "reset": false,
+            "route_valid": false
+          }
+        },
+        {
+          "after": {
+            "age": "NONE",
+            "clear_count": 0,
+            "enabled": false,
+            "fault_latched": false,
+            "goal_completed": false,
+            "mode": "INIT"
+          },
+          "before": {
+            "age": "NONE",
+            "clear_count": 0,
+            "enabled": false,
+            "fault_latched": false,
+            "goal_completed": true,
+            "mode": "GOAL"
+          },
+          "input": {
+            "fault": "NONE",
+            "goal_reached": false,
+            "have_goal": false,
+            "mature": false,
+            "new_goal": false,
+            "pose_valid": false,
+            "reset": false,
+            "route_valid": false
+          }
+        }
+      ],
+      "properties_failed": [
+        "S10_completion_integrity",
+        "S6_completion_memory"
+      ],
+      "states": 8,
+      "status": "FAIL",
+      "transitions": 88
+    },
+    "forgot_creation": {
+      "counterexample": [
+        {
+          "after": {
+            "age": "NONE",
+            "clear_count": 0,
+            "enabled": false,
+            "fault_latched": false,
+            "goal_completed": false,
+            "mode": "HOLD_GUARD"
+          },
+          "before": {
+            "age": "NONE",
+            "clear_count": 0,
+            "enabled": false,
+            "fault_latched": false,
+            "goal_completed": false,
+            "mode": "INIT"
+          },
+          "input": {
+            "fault": "NONE",
+            "goal_reached": true,
+            "have_goal": true,
+            "mature": false,
+            "new_goal": false,
+            "pose_valid": true,
+            "reset": false,
+            "route_valid": false
+          }
+        }
+      ],
+      "properties_failed": [
+        "S10_completion_integrity"
+      ],
+      "states": 3,
+      "status": "FAIL",
+      "transitions": 9
+    },
+    "invented_maturity": {
+      "counterexample": [
+        {
+          "after": {
+            "age": "MATURE",
+            "clear_count": 1,
+            "enabled": true,
+            "fault_latched": true,
+            "goal_completed": false,
+            "mode": "INIT"
+          },
+          "before": {
+            "age": "NONE",
+            "clear_count": 0,
+            "enabled": true,
+            "fault_latched": true,
+            "goal_completed": false,
+            "mode": "INIT"
+          },
+          "input": {
+            "fault": "CLEAR",
+            "goal_reached": false,
+            "have_goal": false,
+            "mature": false,
+            "new_goal": false,
+            "pose_valid": false,
+            "reset": false,
+            "route_valid": false
+          }
+        }
+      ],
+      "properties_failed": [
+        "S11_recovery_memory_integrity"
+      ],
+      "states": 5,
+      "status": "FAIL",
+      "transitions": 17
+    },
+    "permanent_fault": {
+      "counterexample": [
+        {
+          "after": {
+            "age": "YOUNG",
+            "clear_count": 1,
+            "enabled": true,
+            "fault_latched": true,
+            "goal_completed": false,
+            "mode": "INIT"
+          },
+          "before": {
+            "age": "NONE",
+            "clear_count": 0,
+            "enabled": true,
+            "fault_latched": true,
+            "goal_completed": false,
+            "mode": "INIT"
+          },
+          "input": {
+            "fault": "CLEAR",
+            "goal_reached": false,
+            "have_goal": false,
+            "mature": false,
+            "new_goal": false,
+            "pose_valid": false,
+            "reset": false,
+            "route_valid": false
+          }
+        },
+        {
+          "after": {
+            "age": "YOUNG",
+            "clear_count": 2,
+            "enabled": true,
+            "fault_latched": true,
+            "goal_completed": false,
+            "mode": "INIT"
+          },
+          "before": {
+            "age": "YOUNG",
+            "clear_count": 1,
+            "enabled": true,
+            "fault_latched": true,
+            "goal_completed": false,
+            "mode": "INIT"
+          },
+          "input": {
+            "fault": "CLEAR",
+            "goal_reached": false,
+            "have_goal": false,
+            "mature": false,
+            "new_goal": false,
+            "pose_valid": false,
+            "reset": false,
+            "route_valid": false
+          }
+        },
+        {
+          "after": {
+            "age": "YOUNG",
+            "clear_count": 3,
+            "enabled": true,
+            "fault_latched": true,
+            "goal_completed": false,
+            "mode": "INIT"
+          },
+          "before": {
+            "age": "YOUNG",
+            "clear_count": 2,
+            "enabled": true,
+            "fault_latched": true,
+            "goal_completed": false,
+            "mode": "INIT"
+          },
+          "input": {
+            "fault": "CLEAR",
+            "goal_reached": false,
+            "have_goal": false,
+            "mature": false,
+            "new_goal": false,
+            "pose_valid": false,
+            "reset": false,
+            "route_valid": false
+          }
+        },
+        {
+          "after": {
+            "age": "YOUNG",
+            "clear_count": 4,
+            "enabled": true,
+            "fault_latched": true,
+            "goal_completed": false,
+            "mode": "INIT"
+          },
+          "before": {
+            "age": "YOUNG",
+            "clear_count": 3,
+            "enabled": true,
+            "fault_latched": true,
+            "goal_completed": false,
+            "mode": "INIT"
+          },
+          "input": {
+            "fault": "CLEAR",
+            "goal_reached": false,
+            "have_goal": false,
+            "mature": false,
+            "new_goal": false,
+            "pose_valid": false,
+            "reset": false,
+            "route_valid": false
+          }
+        },
+        {
+          "after": {
+            "age": "YOUNG",
+            "clear_count": 5,
+            "enabled": true,
+            "fault_latched": true,
+            "goal_completed": false,
+            "mode": "INIT"
+          },
+          "before": {
+            "age": "YOUNG",
+            "clear_count": 4,
+            "enabled": true,
+            "fault_latched": true,
+            "goal_completed": false,
+            "mode": "INIT"
+          },
+          "input": {
+            "fault": "CLEAR",
+            "goal_reached": false,
+            "have_goal": false,
+            "mature": false,
+            "new_goal": false,
+            "pose_valid": false,
+            "reset": false,
+            "route_valid": false
+          }
+        },
+        {
+          "after": {
+            "age": "YOUNG",
+            "clear_count": 6,
+            "enabled": true,
+            "fault_latched": true,
+            "goal_completed": false,
+            "mode": "INIT"
+          },
+          "before": {
+            "age": "YOUNG",
+            "clear_count": 5,
+            "enabled": true,
+            "fault_latched": true,
+            "goal_completed": false,
+            "mode": "INIT"
+          },
+          "input": {
+            "fault": "CLEAR",
+            "goal_reached": false,
+            "have_goal": false,
+            "mature": false,
+            "new_goal": false,
+            "pose_valid": false,
+            "reset": false,
+            "route_valid": false
+          }
+        },
+        {
+          "after": {
+            "age": "YOUNG",
+            "clear_count": 7,
+            "enabled": true,
+            "fault_latched": true,
+            "goal_completed": false,
+            "mode": "INIT"
+          },
+          "before": {
+            "age": "YOUNG",
+            "clear_count": 6,
+            "enabled": true,
+            "fault_latched": true,
+            "goal_completed": false,
+            "mode": "INIT"
+          },
+          "input": {
+            "fault": "CLEAR",
+            "goal_reached": false,
+            "have_goal": false,
+            "mature": false,
+            "new_goal": false,
+            "pose_valid": false,
+            "reset": false,
+            "route_valid": false
+          }
+        },
+        {
+          "after": {
+            "age": "YOUNG",
+            "clear_count": 8,
+            "enabled": true,
+            "fault_latched": true,
+            "goal_completed": false,
+            "mode": "INIT"
+          },
+          "before": {
+            "age": "YOUNG",
+            "clear_count": 7,
+            "enabled": true,
+            "fault_latched": true,
+            "goal_completed": false,
+            "mode": "INIT"
+          },
+          "input": {
+            "fault": "CLEAR",
+            "goal_reached": false,
+            "have_goal": false,
+            "mature": false,
+            "new_goal": false,
+            "pose_valid": false,
+            "reset": false,
+            "route_valid": false
+          }
+        },
+        {
+          "after": {
+            "age": "YOUNG",
+            "clear_count": 9,
+            "enabled": true,
+            "fault_latched": true,
+            "goal_completed": false,
+            "mode": "INIT"
+          },
+          "before": {
+            "age": "YOUNG",
+            "clear_count": 8,
+            "enabled": true,
+            "fault_latched": true,
+            "goal_completed": false,
+            "mode": "INIT"
+          },
+          "input": {
+            "fault": "CLEAR",
+            "goal_reached": false,
+            "have_goal": false,
+            "mature": false,
+            "new_goal": false,
+            "pose_valid": false,
+            "reset": false,
+            "route_valid": false
+          }
+        },
+        {
+          "after": {
+            "age": "MATURE",
+            "clear_count": 10,
+            "enabled": true,
+            "fault_latched": true,
+            "goal_completed": false,
+            "mode": "INIT"
+          },
+          "before": {
+            "age": "YOUNG",
+            "clear_count": 9,
+            "enabled": true,
+            "fault_latched": true,
+            "goal_completed": false,
+            "mode": "INIT"
+          },
+          "input": {
+            "fault": "CLEAR",
+            "goal_reached": false,
+            "have_goal": false,
+            "mature": true,
+            "new_goal": false,
+            "pose_valid": false,
+            "reset": false,
+            "route_valid": false
+          }
+        }
+      ],
+      "properties_failed": [
+        "S11_recovery_memory_integrity"
+      ],
+      "states": 45,
+      "status": "FAIL",
+      "transitions": 2928
+    },
+    "spurious_completion": {
+      "counterexample": [
+        {
+          "after": {
+            "age": "NONE",
+            "clear_count": 0,
+            "enabled": false,
+            "fault_latched": false,
+            "goal_completed": true,
+            "mode": "HOLD_GUARD"
+          },
+          "before": {
+            "age": "NONE",
+            "clear_count": 0,
+            "enabled": false,
+            "fault_latched": false,
+            "goal_completed": false,
+            "mode": "INIT"
+          },
+          "input": {
+            "fault": "NONE",
+            "goal_reached": false,
+            "have_goal": true,
+            "mature": false,
+            "new_goal": false,
+            "pose_valid": false,
+            "reset": false,
+            "route_valid": false
+          }
+        }
+      ],
+      "properties_failed": [
+        "S10_completion_integrity"
+      ],
+      "states": 2,
+      "status": "FAIL",
+      "transitions": 3
+    },
+    "spurious_hold": {
+      "counterexample": [
+        {
+          "after": {
+            "age": "NONE",
+            "clear_count": 0,
+            "enabled": false,
+            "fault_latched": false,
+            "goal_completed": false,
+            "mode": "HOLD_GUARD"
+          },
+          "before": {
+            "age": "NONE",
+            "clear_count": 0,
+            "enabled": false,
+            "fault_latched": false,
+            "goal_completed": false,
+            "mode": "INIT"
+          },
+          "input": {
+            "fault": "NONE",
+            "goal_reached": false,
+            "have_goal": true,
+            "mature": false,
+            "new_goal": false,
+            "pose_valid": true,
+            "reset": false,
+            "route_valid": true
+          }
+        }
+      ],
+      "properties_failed": [
+        "S7_ready_progress"
+      ],
+      "states": 4,
+      "status": "FAIL",
+      "transitions": 11
+    },
+    "unsafe_navigation": {
+      "counterexample": [
+        {
+          "after": {
+            "age": "NONE",
+            "clear_count": 0,
+            "enabled": false,
+            "fault_latched": false,
+            "goal_completed": false,
+            "mode": "NAVIGATE"
+          },
+          "before": {
+            "age": "NONE",
+            "clear_count": 0,
+            "enabled": false,
+            "fault_latched": false,
+            "goal_completed": false,
+            "mode": "INIT"
+          },
+          "input": {
+            "fault": "NONE",
+            "goal_reached": false,
+            "have_goal": true,
+            "mature": false,
+            "new_goal": false,
+            "pose_valid": false,
+            "reset": false,
+            "route_valid": false
+          }
+        }
+      ],
+      "properties_failed": [
+        "S1_navigation_authorization"
+      ],
+      "states": 2,
+      "status": "FAIL",
+      "transitions": 3
+    }
+  },
+  "policy_id": "navigation-supervisor-v1",
+  "policy_sha256": "7bc936680acc4199f0625ac2ed26280f19d3a91e4088851e4290da1b50b73be7",
+  "product_states": 92,
+  "properties": {
+    "S10_completion_integrity": "G(done_next <-> ((done & !new_goal) | eligible_completion))",
+    "S11_recovery_memory_integrity": "G(recovery_memory_next = specified_update(memory,input))",
+    "S1_navigation_authorization": "G(permit -> goal & pose_valid & route_valid & !fault & !done)",
+    "S2_alarm_hold": "G(enabled & (alarm | unavailable) -> X fault_latched)",
+    "S3_recovery_threshold": "G(fault_latched & !release_ready -> X fault_latched)",
+    "S4_distinct_windows": "G(no_new_clear & still_latched -> X count <= count)",
+    "S5_completed_goal_hold": "G(completed -> (!permit W new_valid_goal))",
+    "S6_completion_memory": "G(done & !new_valid_goal -> X done)",
+    "S7_ready_progress": "G(ready & !done -> X NAVIGATE)",
+    "S8_reset_hold": "G(reset -> X(INIT & count=0 & detector_unknown))",
+    "S9_memory_bounds": "G(count in [0,N] & (count=0 <-> age=NONE))"
+  },
+  "recovery": {
+    "clear_windows": 10,
+    "maximum_decision_age_ns": 1000000000,
+    "maximum_decision_gap_ns": 1000000000,
+    "minimum_clear_ns": 5000000000
+  },
+  "roots": 2,
+  "schema_version": 1,
+  "status": "PASS",
+  "transitions": 7120
+}

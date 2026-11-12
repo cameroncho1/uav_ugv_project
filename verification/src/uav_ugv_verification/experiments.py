@@ -25,11 +25,13 @@ def source_snapshot(repository: Path) -> dict:
     files = {}
     for tree in (
         "scripts",
+        "config",
         "ros2_ws/src",
         "verification/src",
         "verification/setups",
         "verification/profiles",
         "verification/experiments",
+        "verification/supervisor",
         "simulation",
     ):
         for path in sorted((repository / tree).rglob("*")):

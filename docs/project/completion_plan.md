@@ -4,7 +4,7 @@ Team: Sophie Siemsgluess, Rylan Wade, Ethan Palosh, Jeremy Yin, Cameron Cho.
 
 [Documentation index](../README.md) | [Project overview](project_overview.md) | [Technical plan](technical_plan.md) | [System diagram](../system_design.html)
 
-Status date: 2026-11-03. Course presentation: 2026-12-01 (from the course intro slide; confirm). Final report: 10 pages; due date to be confirmed.
+Plan baseline: 2026-11-03; W10 update: 2026-11-11. Final report: 10 pages in the supplied Fall 2025 course introduction. Applicable presentation/submission dates require the current course instructions; the supplied slides do not establish 2026 deadlines. See [course source provenance](../verification/supervisor_course_alignment.md).
 
 This plan defines the final demonstration, the requirements it is checked against, the verification methods, and the work remaining. Owners and dates are proposed and open for team confirmation (section 10).
 
@@ -123,7 +123,7 @@ The existing models, trainer and metrics are kept. The data source, window defin
 
 Windows: 100 samples at 20 Hz (5 s), stride 10 samples (0.5 s). Models take `(100, C)` input; the existing `input_dim` parameter and flattened autoencoder input already follow the channel count.
 
-**Output.** The `fault_detector` ROS node publishes `uav_ugv_msgs/FaultStatus` (new): stamp, per-class flag, score, and window validity. It uses acquisition timestamps and `/clock`. It consumes measurements only, never simulator truth.
+**Output.** W10 implements `uav_ugv_msgs/FaultStatus`: schema version, acquisition/window-end stamp, source-session identity, sequence, window validity, and four per-class flags. W9 supplies the future `fault_detector` producer using acquisition timestamps and `/clock`, consuming measurements only. Model scores can be separate diagnostics; the supervisor consumes the versioned decision contract.
 
 **Baseline.** A residual-threshold detector (per-channel CUSUM or fixed multiple of the nominal residual stddev) runs on the same data. The learned detector is selected over it only if it has equal or better detection and false-alarm results on the test runs.
 
@@ -144,17 +144,17 @@ A shared GPS/UAV position error is not detected by cross-sensor residuals. It is
 
 ### 4.4 Supervisor
 
-The supervisor is a finite-state machine over boolean inputs. It extends the existing `/ugv/cmd_vel` hold behavior and runs in the goal controller path.
+W10 implements the persistent supervisor in the goal controller. The [technical specification](../verification/supervisor.md) defines the shared priority policy, input validation, recovery memory, goal revisions, and clock-reset assumptions. The detector producer remains W9 work; detector participation defaults to disabled and is fixed at startup.
 
 | State | Entry |
 | --- | --- |
-| `INIT` | start; no valid pose or route |
+| `INIT` | no accepted active goal; clock reset |
 | `NAVIGATE` | pose valid, route valid, no hold flag |
 | `HOLD_GUARD` | stale pose, pose stddev above limit, stale route or grid, invalid route |
 | `HOLD_FAULT` | detector flag in {F2, F3}, or F1/F4 with the pose guard failing |
-| `GOAL` | within goal tolerance |
+| `GOAL` | completion latched from a valid estimated pose; persists until a new accepted goal revision |
 
-Inputs: `pose_fresh`, `sigma_ok`, `route_valid`, `fault_hold`, `goal_reached`. `HOLD_*` and `INIT` publish zero velocity every tick. `HOLD_FAULT` clears after 10 consecutive clear windows (5 s).
+Validated inputs include active/new goal, full pose/route validity, estimated goal attainment, distinct clear/alarm/unavailable detector events, recovery maturity, and clock reset. Only `NAVIGATE` permits motion; all other modes publish zero each command tick. Fault recovery requires ten distinct valid clear decisions **and** at least five simulation seconds from the first clear acquisition stamp. New goals clear completion and invalidate old routes without clearing fault recovery. Missing or invalid enabled-detector evidence holds. Completion is an estimated-distance decision; it does not establish R2 physical arrival/dwell.
 
 The deterministic guards (`HOLD_GUARD`) do not read the detector. R1 and R3 are evaluated with the detector enabled, disabled, and forced to miss.
 
@@ -188,10 +188,10 @@ R1 and R3 are the safety requirements. R2, R5 and R6 are performance requirement
 
 ### 6.2 Supervisor model check
 
-- The supervisor of section 4.4 is modeled as a finite-state machine. With five boolean inputs, the model has 32 input combinations per state and is enumerated exhaustively.
-- LTL properties checked on the model: `G (!pose_fresh -> X zero_cmd)`; `G (fault_hold -> X zero_cmd)`; `G (zero_cmd & !cleared -> X zero_cmd)` for the hold states; `G (route_valid & pose_fresh & sigma_ok & !fault_hold & !goal_reached -> X NAVIGATE)`; no transition from `GOAL` to `NAVIGATE` without a new goal revision.
-- A conformance test drives the C++ supervisor with every input combination and state, and compares the outputs with the model table. The model and the implementation share one transition table file.
-- The result is an exhaustive proof for the discrete logic only. The timing of R3 and R4 is covered by the trace monitors.
+- The reachable model includes mode, fault latch, clear count, recovery-age class, detector enablement, and completed-goal memory. An independent completion monitor extends exploration; five modes times 32 Boolean inputs is insufficient.
+- Eleven independent temporal safety/next-step obligations cover navigation authorization, alarm response, recovery thresholds/counting/memory, completion creation/persistence, ready response, reset, and bounds. Nine unsafe mutations produce shortest counterexamples.
+- The model and generated C++ priority table share a versioned policy. Every explored reachable context/input is compared with the compiled transition; source and binary hashes bind the result. Properties are independent of that table.
+- Recorded results cover 92 reachable states and 7,120 transitions. This is a finite decision-logic proof under the documented input/timer abstraction. R3/R4 scheduling and physical behavior remain trace-monitor claims. [W10 evidence](results/supervisor/README.md) and [paper material](results/supervisor/paper/paper_section.md) retain assumptions and quantitative results.
 
 ### 6.3 Falsification
 
@@ -222,7 +222,7 @@ R1 and R3 are the safety requirements. R2, R5 and R6 are performance requirement
 
 | Claim | Evidence |
 | --- | --- |
-| Discrete hold logic is correct | model-check result; conformance test over all 32 inputs and 5 states |
+| Discrete hold logic is correct | 11 independent obligations and compiled conformance over 92 reachable states / 7,120 transitions; source-bound W10 evidence |
 | UGV holds on guard failure within `tau_g` | R3 monitor over all trials; falsification counterexample table |
 | UGV does not collide in the envelope | R1 monitor over the covering-array set; falsification with detector enabled, disabled, forced-miss |
 | Hazards are avoided or stopped for | R5 monitor; hazard sweep over `t_h`, `d_h` |
@@ -244,7 +244,7 @@ The report states each claim with the search budget, the number of trials, the s
 | W7 | Feature extraction from bags; windowing; run-level splits | Jeremy | W6 | `(N, 100, C)` arrays with labels and run IDs |
 | W8 | Retrain RNN, BiLSTM, autoencoder; threshold baseline; select by validation | Jeremy | W7 | metrics JSON for all candidates |
 | W9 | `fault_detection` node, `FaultStatus` message | Jeremy, Ethan | W8 | flags published at 2 Hz in the full stack |
-| W10 | Supervisor transition table, FSM in controller, model check, conformance test | Rylan | none | model check and conformance test pass |
+| W10 | Implemented: persistent supervisor, finite model check, compiled conformance, controlled ROS tests, paper artifacts | Rylan | none | [Source-bound results](results/supervisor/README.md); online detector accuracy remains W9 |
 | W11 | Requirement monitors and monitor tests | Rylan | W5 | all R1-R8 evaluated from a bag |
 | W12 | Surrogate model and calibration | Rylan, Ethan | W3, W11 | surrogate reproduces Gazebo R1 and R5 outcomes on 10 calibration rows |
 | W13 | Falsification search and Gazebo replay | Rylan, Sophie | W9, W11, W12 | counterexample table complete |

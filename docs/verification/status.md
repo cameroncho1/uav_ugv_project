@@ -12,7 +12,11 @@ Date: 2026-11-11. M1-M4 implemented. Recorded requirement failures and unavailab
 - Frozen serial experiment plans, durable attempt accounting, bounded readiness/search, interruption recovery, source consistency checks, and owned-process cleanup.
 - Portable saved-result publication with evaluated bounds, assistance pairs, claim/evidence limits, eight static figures, and headless live/replay demonstration commands.
 
-## Validation
+## W10 supervisor
+
+The controller now retains fault recovery and completed-goal memory. The finite checker verifies 11 independent obligations over 92 reachable states and 7,120 transitions, compares the compiled C++ transition on every edge, and detects nine unsafe mutations. Controlled ROS tests exercise actual command gating; physical behavior remains separately measured. See [specification](supervisor.md) and [validation evidence](../project/results/supervisor/README.md).
+
+## Historical M1-M4 validation
 
 | Check | Result |
 | --- | --- |
@@ -40,6 +44,6 @@ Commands, frozen pilot bounds, individual result files, source checksums, unsucc
 - Camera R3 is optional and unexercised in the scoped missions. Earlier camera telemetry also lacks the separate command-publication timestamp. The final controlled fixture establishes R3 timing.
 - Calibrated profiles cover the recorded pilot conditions, not arbitrary loads or future setups. Sampling gaps, uncertainty, and scheduling overruns remain observable incomplete/failed outcomes.
 - M3 executes 45 fixed matrix attempts, four clearance-search trials, and two supplemental R2 replays. Dense/B arrival failures reproduce; incomplete starts and aborted guard trials remain in the ledger. See the [M3 evidence](../project/results/verification/m3/README.md).
-- M4 exports the final figures, claim/evidence table, and rehearsed live/recorded demo. [M4 evidence](../project/results/verification/m4/README.md) records timing, cleanup, package validation, and reproduction. No supervisor model checking is implemented.
+- M4 exports the final figures, claim/evidence table, and rehearsed live/recorded demo. [M4 evidence](../project/results/verification/m4/README.md) records timing, cleanup, package validation, and reproduction. W10 adds a separately source-bound supervisor proof and controlled ROS evidence; see [supervisor results](../project/results/supervisor/README.md). Historical M4 results remain unchanged.
 
 Measurement/filter behavior is unchanged. This change instruments and evaluates existing interfaces; paired localization trials are not required by the repository's measurement-change rule.

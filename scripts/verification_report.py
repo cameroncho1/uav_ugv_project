@@ -3,10 +3,10 @@
 
 import argparse
 import json
-import re
 import subprocess
 from pathlib import Path
 
+from uav_ugv_verification.reporting.latex import compile_pdf
 from uav_ugv_verification.reporting.publication import catalog, publish
 
 
@@ -33,32 +33,7 @@ def main():
 def generate(args):
     summary = publish(args.campaign.resolve(), args.output.resolve())
     if args.compile_pdf:
-        command = [
-            "pdflatex",
-            "-no-shell-escape",
-            "-interaction=nonstopmode",
-            "-halt-on-error",
-        ]
-        version = subprocess.check_output(["pdflatex", "--version"], text=True)
-        if "MiKTeX" in version:
-            command.append("--disable-installer")
-        with (args.output / "latex.log").open("w") as log:
-            subprocess.run(
-                [*command, "paper.tex"],
-                cwd=args.output,
-                stdout=log,
-                stderr=subprocess.STDOUT,
-                check=True,
-                timeout=120,
-            )
-        pages = re.search(
-            r"Output written on paper.pdf \((\d+) pages?",
-            (args.output / "paper.log").read_text(errors="replace"),
-        )
-        if pages and int(pages.group(1)) > 10:
-            raise RuntimeError(
-                "Generated verification report exceeds the ten-page limit"
-            )
+        compile_pdf(args.output)
         catalog(args.output)
     print(
         json.dumps(

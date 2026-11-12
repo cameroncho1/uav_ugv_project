@@ -1,0 +1,61 @@
+{
+  "date": "2026-11-11",
+  "environment": "Ubuntu 22.04 / WSL2; ROS 2 Humble; Gazebo Harmonic; Python 3.10; server-only simulations",
+  "offline_windows_tests": 139,
+  "registered_linux_checks": {
+    "tests": 254,
+    "errors": 0,
+    "failures": 0,
+    "static_analysis_skips": 8
+  },
+  "model": {
+    "controller_states": 92,
+    "product_states": 92,
+    "transitions": 7120,
+    "independent_properties": 11,
+    "unsafe_mutations_detected": 9,
+    "compiled_conformance": "PASS"
+  },
+  "controlled_ros_cases": 29,
+  "navigation_guard_cases": 23,
+  "actuator_loss_cases": 2,
+  "paper_pages": 2,
+  "latex_overfull_boxes": 0,
+  "live_demo": {
+    "attempt_counts": {
+      "passed": 3
+    },
+    "duration_wall_s": 112.466643252,
+    "exit_code": 0,
+    "mode": "live",
+    "new_simulation": true,
+    "process": {
+      "duration_wall_s": 108.83054195400001,
+      "returncode": 0,
+      "timed_out": false
+    },
+    "startup_to_first_drive_wall_s": 24.197742292
+  },
+  "interruption": {
+    "exit_code": 130,
+    "remaining_owned_processes": 0,
+    "cleanup_wall_s": 3.331814494000014,
+    "finalized_recordings": 1
+  },
+  "process_cleanup": "No owned controller, simulator, PX4, bridge, bag recorder, or demo processes remain after evaluation.",
+  "implementation_sources_match_recording": true,
+  "independent_scope_review": "Read-only scope and review; callback-ordering finding corrected through shared revision consumption and a composed C++ regression. No additional findings.",
+  "commands": [
+    "colcon build --parallel-workers 2 --packages-select uav_ugv_msgs ugv_control mission_manager simulation_support fault_management --symlink-install",
+    "colcon test --parallel-workers 2 --packages-select uav_ugv_msgs ugv_control mission_manager simulation_support fault_management",
+    "colcon test --packages-select fault_management  # includes added saved-report regressions",
+    "colcon test-result --all",
+    "python -m pytest verification/tests -q",
+    "python scripts/check_navigation_supervisor.py --probe ros2_ws/install/ugv_control/lib/ugv_control/supervisor_transition_probe --output evidence/w10_final/model.json",
+    "ROS_DOMAIN_ID=67 python scripts/test_navigation_supervisor.py evidence/w10_final/controlled",
+    "ROS_DOMAIN_ID=68 python scripts/test_navigation_guards.py evidence/w10_final/guards.json",
+    "ROS_DOMAIN_ID=69 python scripts/test_actuator_watchdog.py evidence/w10_final/watchdog",
+    "python scripts/verification_demo.py evidence/w10_final/demo",
+    "python scripts/test_verification_demo_cleanup.py evidence/w10_final/interruption"
+  ]
+}

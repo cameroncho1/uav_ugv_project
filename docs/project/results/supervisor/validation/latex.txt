@@ -1,0 +1,110 @@
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex.fmt)
+entering extended mode
+(paper_section.tex
+LaTeX2e <2025-11-01>
+L3 programming layer <2025-12-24>
+(C:\Users\Rylan Wade\AppData\Local\Programs\MiKTeX\tex/latex/base\article.cls
+Document Class: article 2025/01/22 v1.4n Standard LaTeX document class
+(C:\Users\Rylan Wade\AppData\Local\Programs\MiKTeX\tex/latex/base\size10.clo))
+(C:\Users\Rylan Wade\AppData\Local\Programs\MiKTeX\tex/latex/geometry\geometry.
+sty
+(C:\Users\Rylan Wade\AppData\Local\Programs\MiKTeX\tex/latex/graphics\keyval.st
+y)
+(C:\Users\Rylan Wade\AppData\Local\Programs\MiKTeX\tex/generic/iftex\ifvtex.sty
+(C:\Users\Rylan Wade\AppData\Local\Programs\MiKTeX\tex/generic/iftex\iftex.sty)
+)
+(C:\Users\Rylan Wade\AppData\Local\Programs\MiKTeX\tex/latex/geometry\geometry.
+cfg))
+(C:\Users\Rylan Wade\AppData\Local\Programs\MiKTeX\tex/latex/graphics\graphicx.
+sty
+(C:\Users\Rylan Wade\AppData\Local\Programs\MiKTeX\tex/latex/graphics\graphics.
+sty
+(C:\Users\Rylan Wade\AppData\Local\Programs\MiKTeX\tex/latex/graphics\trig.sty)
+
+(C:\Users\Rylan Wade\AppData\Local\Programs\MiKTeX\tex/latex/graphics-cfg\graph
+ics.cfg)
+(C:\Users\Rylan Wade\AppData\Local\Programs\MiKTeX\tex/latex/graphics-def\pdfte
+x.def)))
+(C:\Users\Rylan Wade\AppData\Local\Programs\MiKTeX\tex/latex/booktabs\booktabs.
+sty)
+(C:\Users\Rylan Wade\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\hyperref.
+sty
+(C:\Users\Rylan Wade\AppData\Local\Programs\MiKTeX\tex/latex/kvsetkeys\kvsetkey
+s.sty)
+(C:\Users\Rylan Wade\AppData\Local\Programs\MiKTeX\tex/generic/kvdefinekeys\kvd
+efinekeys.sty)
+(C:\Users\Rylan Wade\AppData\Local\Programs\MiKTeX\tex/generic/pdfescape\pdfesc
+ape.sty
+(C:\Users\Rylan Wade\AppData\Local\Programs\MiKTeX\tex/generic/ltxcmds\ltxcmds.
+sty)
+(C:\Users\Rylan Wade\AppData\Local\Programs\MiKTeX\tex/generic/pdftexcmds\pdfte
+xcmds.sty
+(C:\Users\Rylan Wade\AppData\Local\Programs\MiKTeX\tex/generic/infwarerr\infwar
+err.sty)))
+(C:\Users\Rylan Wade\AppData\Local\Programs\MiKTeX\tex/latex/hycolor\hycolor.st
+y)
+(C:\Users\Rylan Wade\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\nameref.s
+ty
+(C:\Users\Rylan Wade\AppData\Local\Programs\MiKTeX\tex/latex/refcount\refcount.
+sty)
+(C:\Users\Rylan Wade\AppData\Local\Programs\MiKTeX\tex/generic/gettitlestring\g
+ettitlestring.sty
+(C:\Users\Rylan Wade\AppData\Local\Programs\MiKTeX\tex/latex/kvoptions\kvoption
+s.sty)))
+(C:\Users\Rylan Wade\AppData\Local\Programs\MiKTeX\tex/latex/etoolbox\etoolbox.
+sty)
+(C:\Users\Rylan Wade\AppData\Local\Programs\MiKTeX\tex/generic/stringenc\string
+enc.sty)
+(C:\Users\Rylan Wade\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\pd1enc.de
+f)
+(C:\Users\Rylan Wade\AppData\Local\Programs\MiKTeX\tex/generic/intcalc\intcalc.
+sty)
+(C:\Users\Rylan Wade\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\puenc.def
+) (C:\Users\Rylan Wade\AppData\Local\Programs\MiKTeX\tex/latex/url\url.sty)
+(C:\Users\Rylan Wade\AppData\Local\Programs\MiKTeX\tex/generic/bitset\bitset.st
+y
+(C:\Users\Rylan Wade\AppData\Local\Programs\MiKTeX\tex/generic/bigintcalc\bigin
+tcalc.sty)))
+(C:\Users\Rylan Wade\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\hpdftex.d
+ef
+(C:\Users\Rylan Wade\AppData\Local\Programs\MiKTeX\tex/latex/rerunfilecheck\rer
+unfilecheck.sty
+(C:\Users\Rylan Wade\AppData\Local\Programs\MiKTeX\tex/generic/uniquecounter\un
+iquecounter.sty)))
+(C:\Users\Rylan Wade\AppData\Local\Programs\MiKTeX\tex/latex/l3backend\l3backen
+d-pdftex.def)
+No file paper_section.aux.
+*geometry* driver: auto-detecting
+*geometry* detected driver: pdftex
+
+(C:\Users\Rylan Wade\AppData\Local\Programs\MiKTeX\tex/context/base/mkii\supp-p
+df.mkii
+[Loading MPS to PDF converter (version 2006.09.02).]
+)
+(C:\Users\Rylan Wade\AppData\Local\Programs\MiKTeX\tex/latex/epstopdf-pkg\epsto
+pdf-base.sty
+
+Package epstopdf Warning: Shell escape feature is not enabled.
+
+
+(C:\Users\Rylan Wade\AppData\Local\Programs\MiKTeX\tex/latex/00miktex\epstopdf-
+sys.cfg)) [1{C:/Users/Rylan Wade/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.m
+ap}] [2 <./figures/recovery.pdf> <./figures/goal_memory.pdf>]
+(paper_section.aux)
+
+Package rerunfilecheck Warning: File `paper_section.out' has changed.
+(rerunfilecheck)                Rerun to get outlines right
+(rerunfilecheck)                or use package `bookmark'.
+
+ )<C:/Users/Rylan Wade/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfont
+s/cm/cmbx10.pfb><C:/Users/Rylan Wade/AppData/Local/Programs/MiKTeX/fonts/type1/
+public/amsfonts/cm/cmbx12.pfb><C:/Users/Rylan Wade/AppData/Local/Programs/MiKTe
+X/fonts/type1/public/amsfonts/cm/cmmi10.pfb><C:/Users/Rylan Wade/AppData/Local/
+Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Users/Rylan Wade/A
+ppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr17.pfb><C:/Users
+/Rylan Wade/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10
+.pfb><C:/Users/Rylan Wade/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsf
+onts/cm/cmtt10.pfb>
+Output written on paper_section.pdf (2 pages, 134538 bytes).
+Transcript written on paper_section.log.
+pdflatex: major issue: So far, you have not checked for MiKTeX updates.

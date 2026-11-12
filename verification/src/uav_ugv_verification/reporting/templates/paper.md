@@ -8,7 +8,7 @@ This report evaluates recorded behavior of the existing ROS 2 Humble/PX4/Gazebo 
 
 ## Requirements and method
 
-R1 checks sampled disk clearance; R2 checks bounded arrival with physical and estimated tolerances plus quiet dwell; R3 checks bounded response and sustained zero commands after an actual invalid guard; R4 separates actuator-output expiry from measured physical settling; R6 acquisition-matches pose error conditional on fresh UAV input and valid pose. Availability follows the exported profiles and capability table. Planned exclusions are ${exclusions_text}. No discrete supervisor proof is implemented.
+R1 checks sampled disk clearance; R2 checks bounded arrival with physical and estimated tolerances plus quiet dwell; R3 checks bounded response and sustained zero commands after an actual invalid guard; R4 separates actuator-output expiry from measured physical settling; R6 acquisition-matches pose error conditional on fresh UAV input and valid pose. Availability follows the exported profiles and capability table. Planned exclusions are ${exclusions_text}. This trace report does not assert a discrete supervisor proof.
 
 | Requirement | Recorded-trace condition |
 | --- | --- |

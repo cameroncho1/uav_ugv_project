@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "id": "navigation-supervisor-v1",
+  "recovery": {
+    "clear_windows": 10,
+    "minimum_clear_ns": 5000000000,
+    "maximum_decision_age_ns": 1000000000,
+    "maximum_decision_gap_ns": 1000000000
+  },
+  "decisions": [
+    {"when": "no_goal", "mode": "INIT"},
+    {"when": "fault_latched", "mode": "HOLD_FAULT"},
+    {"when": "invalid_pose", "mode": "HOLD_GUARD"},
+    {"when": "goal_completed", "mode": "GOAL"},
+    {"when": "invalid_route", "mode": "HOLD_GUARD"},
+    {"when": "always", "mode": "NAVIGATE"}
+  ]
+}

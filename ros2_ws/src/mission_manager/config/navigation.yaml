@@ -7,6 +7,8 @@
     max_heading_stddev: 0.2
 ugv_goal_controller:
   ros__parameters:
+    # No online detector is deployed. Enabling this input holds until fresh recovery evidence.
+    detector_enabled: false
     max_path_age: 1.0
     lookahead_distance: 0.6
     max_linear_speed: 0.5

@@ -15,12 +15,14 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class Recording:
-    def __init__(self, directory, setup="controlled_navigation", world=None):
+    def __init__(self, directory, setup="controlled_navigation", world=None, *, extra_topics=()):
         self.directory = Path(directory)
         self.directory.mkdir(parents=True, exist_ok=False)
         self.setup = ROOT / "verification/setups" / (setup + ".yaml")
         config = yaml.safe_load(self.setup.read_text())
-        topics = ["/clock", *config["topics"]]
+        if any(not isinstance(topic, str) or not topic.startswith("/") for topic in extra_topics):
+            raise ValueError("Extra recording topics must be absolute ROS topic names")
+        topics = list(dict.fromkeys(["/clock", *config["topics"], *extra_topics]))
         qos = {
             topic: {
                 "history": "keep_last",
@@ -66,8 +68,10 @@ class Recording:
         for tree in (
             "ros2_ws/src",
             "scripts",
+            "config",
             "verification/src",
             "verification/setups",
+            "verification/supervisor",
             "simulation",
         ):
             for path in sorted((ROOT / tree).rglob("*")):
@@ -75,7 +79,7 @@ class Recording:
                     path.is_file()
                     and "px4_msgs" not in path.parts
                     and path.suffix
-                    in (".py", ".cpp", ".hpp", ".msg", ".yaml", ".sdf", ".sh")
+                    in (".py", ".cpp", ".hpp", ".msg", ".yaml", ".json", ".xml", ".sdf", ".sh")
                 ):
                     source_hashes[str(path.relative_to(ROOT))] = hashlib.sha256(
                         path.read_bytes()
@@ -92,6 +96,8 @@ class Recording:
             else "runtime-mirror",
             "world": str(world) if world else None,
             "python": sys.version,
+            "recorded_topics": topics,
+            "transport_profile": os.environ.get("FASTRTPS_DEFAULT_PROFILES_FILE"),
             "declared_simulation_dependencies": json.loads(
                 (ROOT / "simulation/dependencies.json").read_text()
             ),
