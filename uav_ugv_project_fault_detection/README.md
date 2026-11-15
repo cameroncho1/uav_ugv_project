@@ -208,3 +208,46 @@ arguments, and the final validation precision / recall / F1 / accuracy.
 Use `--tensorboard-dir` to log elsewhere or `--no-tensorboard` to skip it.
 `runs/` is gitignored; per-epoch histories are also saved as
 `loss_history.json` in each weight folder.
+
+## Live detection in the simulation
+
+[`sensor_fault_detector.py`](../ros2_ws/src/fault_management/scripts/sensor_fault_detector.py)
+runs the paired time-domain BiLSTM (`bilstmWeights_ugv_paired`) on the prepared
+UGV measurements (`/ugv/sensors/{imu,wheel_odom,gps}`) and the drive command.
+It rebuilds each channel's last 100 samples with the training reference
+([`sensor_fault_model.py`](../ros2_ws/src/fault_management/scripts/sensor_fault_model.py),
+numpy only), scores every channel each 0.5 s of sim time, and publishes one
+`diagnostic_msgs/DiagnosticStatus` per channel (`ERROR` = fault) on
+`/ugv/sensor_faults`. The goal demo starts it (`fault_detection:=false` turns it
+off); `use_autoencoder:=true` also flags windows above the autoencoder threshold.
+
+The node loads `fault_management/models/ugv_sensor_fault_detector.npz`: the
+weights, the per-channel training statistics, and the autoencoder thresholds.
+Re-export it after retraining (needs torch):
+
+```
+python3 export_live_detector.py --verify
+```
+
+`--verify` rebuilds the validation and test windows through the live feature
+code and compares them with `ugv_dataset.py` and torch; on the current export
+all 16,960 BiLSTM decisions match.
+
+Live 120 s trials on the `ugv_dataset` world (seeded recorder maneuvers, unseen
+seeds, nominal `measurement_model.yaml` noise, one simulation at a time). Values
+are the fraction of 0.5 s evaluations the BiLSTM flags:
+
+| Trial | Seed | Odometry drift | Faulted channel | Other channels |
+| --- | --- | ---: | --- | --- |
+| Nominal | 2001 | 3.0 m | — | flag onsets only (fractions not recorded): `gps/latitude` 6, `imu/ay` 2, `imu/wz`, `wheel_odom/wz`, `gps/longitude` 1 each |
+| Nominal | 2002 | 9.9 m | — | `gps/longitude` 46%, `gps/latitude` 33%, `imu/ay` 1.7%, rest ≤ 0.4% |
+| `imu_yaw_bias_rate:=0.1` (10σ `wz` offset) | 2003 | 2.9 m | `imu/wz` 66% | run in parallel with two other simulations |
+| `wheel_speed_scale:=1.6` | 2004 | 3.2 m | `wheel_odom/vx` 68% | run in parallel with two other simulations |
+
+The GPS reference is wheel-odometry position. When simulated wheel slip moves
+odometry several meters from truth (seed 2002), GPS and its reference disagree
+and the BiLSTM flags GPS; the offline pipeline flags the same drive at the same
+rate. Three simulations in parallel on 5 cores also raised clean-channel flags
+in the nominal run, so the two fault rows bound detection, not false alarms.
+In the goal demo the command comes from the 10 Hz, unramped `/ugv/cmd_vel`
+rather than the training recorder; the trials above do not cover it.

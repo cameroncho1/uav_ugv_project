@@ -64,6 +64,8 @@ def generate_launch_description():
         DeclareLaunchArgument("initial_gps_enabled", default_value="true",
                               description="Enable prepared UGV GPS at startup."),
         DeclareLaunchArgument("seed", default_value="513"),
+        DeclareLaunchArgument("fault_detection", default_value="true",
+                              description="Flag UGV sensor-channel faults on /ugv/sensor_faults."),
         DeclareLaunchArgument("measurement_config",
                               default_value=str(fault_share / "config/measurement_model.yaml"),
                               description="UGV noise YAML path relative to the launch directory."),
@@ -135,6 +137,11 @@ def generate_launch_description():
             PythonLaunchDescriptionSource(
                 str(sensing_share / "launch/uav_camera_sensor.launch.py")),
             launch_arguments={"detect_ugv": LaunchConfiguration("uav_assistance")}.items()),
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource(
+                str(fault_share / "launch/sensor_fault_detector.launch.py")),
+            launch_arguments={"command_topic": "/ugv/cmd_vel"}.items(),
+            condition=IfCondition(LaunchConfiguration("fault_detection"))),
         Node(package="fault_management", executable="sim_anchor_fault.py",
              parameters=[{"random_seed": ParameterValue(
                  LaunchConfiguration("seed"), value_type=int),
