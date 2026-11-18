@@ -4,11 +4,15 @@
 Buffers the prepared UGV measurements (``/ugv/sensors/*``) and the drive
 command, rebuilds each channel's last ``window_len`` samples with its training
 reference (``sensor_fault_model.reference``), and publishes one
-``DiagnosticStatus`` per channel on ``/ugv/sensor_faults``. Inputs are the
-stated measurement interfaces only; simulator truth is not used.
+``DiagnosticStatus`` per channel on ``/ugv/sensor_faults``. Each evaluation
+also publishes one ``uav_ugv_msgs/FaultStatus`` class decision on
+``/fault_detection/status`` for the navigation supervisor
+(``sensor_fault_model.fault_decision``). Inputs are the stated measurement
+interfaces only; simulator truth is not used.
 """
 
 import math
+import uuid
 from collections import deque
 from pathlib import Path
 
@@ -18,12 +22,16 @@ from ament_index_python.packages import get_package_share_directory
 from diagnostic_msgs.msg import DiagnosticArray, DiagnosticStatus, KeyValue
 from geometry_msgs.msg import Twist
 from nav_msgs.msg import Odometry
+from rclpy._rclpy_pybind11 import RCLError
 from rclpy.executors import ExternalShutdownException
 from rclpy.node import Node
 from rclpy.qos import QoSProfile, ReliabilityPolicy
+from rclpy.time import Time
 from sensor_msgs.msg import Imu, NavSatFix, NavSatStatus
+from uav_ugv_msgs.msg import FaultStatus
 
-from sensor_fault_model import CHANNELS, SensorFaultModel, channel_name, reference
+from sensor_fault_model import (CHANNELS, SensorFaultModel, channel_name, fault_decision,
+                                reference)
 
 # Channels whose training windows had a reference; they wait until it exists.
 REFERENCED = {("imu", "wz"), ("imu", "ax"), ("imu", "ay"), ("wheel_odom", "vx"),
@@ -79,6 +87,8 @@ class SensorFaultDetector(Node):
         self.declare_parameter("model_path", str(default_model))
         self.declare_parameter("command_topic", "/ugv/cmd_vel")
         self.declare_parameter("output_topic", "/ugv/sensor_faults")
+        self.declare_parameter("status_topic", "/fault_detection/status")
+        self.declare_parameter("gps_timeout", 1.0)
         self.declare_parameter("command_rate", 20.0)
         self.declare_parameter("command_timeout", 0.5)
         self.declare_parameter("evaluation_period", 0.5)
@@ -99,6 +109,7 @@ class SensorFaultDetector(Node):
                             for i, value in enumerate(origin))
         self.command_timeout = parameter("command_timeout")
         self.stale_after = parameter("stale_after")
+        self.gps_timeout = parameter("gps_timeout")
         # GPS windows span about 20 s; their odometry reference must cover them.
         self.streams = {name: StreamBuffer(fields, 45.0) for name, fields in FIELDS.items()}
         self.command = (0.0, 0.0)
@@ -107,8 +118,11 @@ class SensorFaultDetector(Node):
         self.evaluated = {}
         self.state = {}
         self.faulted = set()
+        self.decisions = {}   # channel -> (fault, window_end) of its latest evaluation
+        self.start_session()
 
         self.publisher = self.create_publisher(DiagnosticArray, parameter("output_topic"), 10)
+        self.status_publisher = self.create_publisher(FaultStatus, parameter("status_topic"), 20)
         qos = QoSProfile(depth=50, reliability=ReliabilityPolicy.RELIABLE)
         self.create_subscription(Imu, "/ugv/sensors/imu", self.on_imu, qos)
         self.create_subscription(Odometry, "/ugv/sensors/wheel_odom", self.on_odom, qos)
@@ -122,6 +136,13 @@ class SensorFaultDetector(Node):
             + (f" + {meta['autoencoder']}" if self.use_autoencoder else "")
             + f" ({self.model.window_len}-sample windows); commands from "
             f"{parameter('command_topic')}")
+
+    def start_session(self):
+        # A new producer identity after a clock reset; sequence and stamps restart.
+        self.source_id = f"sensor_fault_detector/{uuid.uuid4().hex[:12]}"
+        self.sequence = 0
+        self.last_decision_stamp = 0.0
+        self.decision_valid = None
 
     def now_seconds(self):
         return self.get_clock().now().nanoseconds * 1e-9
@@ -159,7 +180,9 @@ class SensorFaultDetector(Node):
             for stream in self.streams.values():
                 stream.clear()
             self.evaluated.clear()
+            self.decisions.clear()
             self.command_time = None
+            self.start_session()
         self.last_now = now
         if now <= 0.0:
             return
@@ -195,6 +218,7 @@ class SensorFaultDetector(Node):
         for channel, result in self.model.evaluate(windows).items():
             self.evaluated[channel] = info[channel][1]
             fault = result["bilstm"] or (self.use_autoencoder and result.get("autoencoder", False))
+            self.decisions[channel] = (bool(fault), info[channel][1])
             values = [("fault_probability", f"{result['probability']:.4f}"),
                       ("window_start", f"{info[channel][0]:.3f}"),
                       ("window_end", f"{info[channel][1]:.3f}")]
@@ -209,6 +233,32 @@ class SensorFaultDetector(Node):
                 statuses[channel] = self.state.get(
                     channel, (DiagnosticStatus.STALE, "warming up", []))
         self.publish(statuses)
+        self.publish_decision(now, statuses)
+
+    def publish_decision(self, now, statuses):
+        if now <= 0.0:
+            return
+        current = {channel: self.decisions[channel] for channel in CHANNELS
+                   if channel in self.decisions and statuses[channel][0] != DiagnosticStatus.STALE}
+        gps_latest = self.streams["gps"].latest()
+        gps_available = gps_latest is not None and now - gps_latest <= self.gps_timeout
+        valid, stamp, flags = fault_decision(current, gps_available)
+        if not valid:
+            stamp = now
+        # Stamps strictly increase within a session; without newer evidence the
+        # supervisor's decision-age limit turns the silence into a hold.
+        if stamp <= self.last_decision_stamp:
+            return
+        if valid != self.decision_valid:
+            self.get_logger().info("Fault decisions " + ("valid" if valid else
+                                   "invalid: yaw-rate or wheel-odometry windows missing or stale"))
+            self.decision_valid = valid
+        self.sequence += 1
+        self.last_decision_stamp = stamp
+        message = FaultStatus(schema_version=1, source_id=self.source_id,
+                              sequence=self.sequence, window_valid=valid, **flags)
+        message.header.stamp = Time(nanoseconds=round(stamp * 1e9)).to_msg()
+        self.status_publisher.publish(message)
 
     def report_transition(self, channel, fault, result, window):
         name = channel_name(channel)
@@ -242,6 +292,10 @@ def main(args=None):
         rclpy.spin(node)
     except (KeyboardInterrupt, ExternalShutdownException):
         pass
+    except RCLError:
+        # A timer can publish after Ctrl-C has invalidated the context.
+        if node.context.ok():
+            raise
     finally:
         node.destroy_node()
         rclpy.try_shutdown()

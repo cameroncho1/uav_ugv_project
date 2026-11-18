@@ -31,7 +31,7 @@ The first matching row applies after memory updates:
 
 `NAVIGATE` permits the follower; the follower can still return zero. The existing pose guard remains authoritative for frames, covariance, quaternion, monotonic acquisition stamps, and acquisition/steady receipt ages. Existing path validation retains goal association, freshness, connected map geometry, and clearance checks.
 
-State includes detector enablement, mode, fault latch, count `0..10`, recovery age (`NONE`, `YOUNG`, `MATURE`), and completed-goal memory. Detector participation is fixed at startup. The supplied deployment has no online detector producer and uses `detector_enabled: false`.
+State includes detector enablement, mode, fault latch, count `0..10`, recovery age (`NONE`, `YOUNG`, `MATURE`), and completed-goal memory. Detector participation is fixed at startup. `fault_management`'s [`sensor_fault_detector`](../../uav_ugv_project_fault_detection/README.md#live-detection-in-the-simulation) publishes the decisions. The goal demo keeps `detector_enabled: false` unless launched with `fault_hold:=true`.
 
 ## Goal completion and revisions
 

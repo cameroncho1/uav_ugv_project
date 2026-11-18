@@ -64,8 +64,13 @@ def generate_launch_description():
         DeclareLaunchArgument("initial_gps_enabled", default_value="true",
                               description="Enable prepared UGV GPS at startup."),
         DeclareLaunchArgument("seed", default_value="513"),
-        DeclareLaunchArgument("fault_detection", default_value="true",
-                              description="Flag UGV sensor-channel faults on /ugv/sensor_faults."),
+        DeclareLaunchArgument("fault_detection", default_value="false",
+                              description="Flag UGV sensor-channel faults on /ugv/sensor_faults "
+                                          "and class decisions on /fault_detection/status."),
+        DeclareLaunchArgument("fault_hold", default_value="false",
+                              description="Supervisor consumes /fault_detection/status and holds "
+                                          "on wheel-scale or yaw-drift flags or missing "
+                                          "decisions; needs fault_detection:=true."),
         DeclareLaunchArgument("measurement_config",
                               default_value=str(fault_share / "config/measurement_model.yaml"),
                               description="UGV noise YAML path relative to the launch directory."),
@@ -179,6 +184,8 @@ def generate_launch_description():
             parameters=[str(package_share / "config/navigation.yaml"), {
                 "evaluation_trace": ParameterValue(
                     LaunchConfiguration("evaluation_trace"), value_type=bool),
+                "detector_enabled": ParameterValue(
+                    LaunchConfiguration("fault_hold"), value_type=bool),
             }],
             output="screen",
         ),

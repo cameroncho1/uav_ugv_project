@@ -25,8 +25,40 @@ CHANNELS = (
 )
 
 
+# FaultStatus classes (completion plan section 4.3) and the channels whose
+# BiLSTM flags set them. Other IMU channels and GPS altitude feed no class.
+FAULT_CLASSES = {
+    "odometry_scale": (("wheel_odom", "vx"), ("wheel_odom", "wz")),
+    "imu_drift": (("imu", "wz"),),
+    "gps_outage": (("gps", "latitude"), ("gps", "longitude")),
+}
+# Channels behind the hold-requesting classes. A decision is valid only when
+# each has a current evaluation; the oldest of their window ends stamps it.
+DECISION_CHANNELS = FAULT_CLASSES["odometry_scale"] + FAULT_CLASSES["imu_drift"]
+FAULT_FLAGS = ("gps_outage", "odometry_scale", "imu_drift", "uav_loss")
+
+
 def channel_name(channel):
     return f"{channel[0]}/{channel[1]}"
+
+
+def fault_decision(current, gps_available):
+    """Combine per-channel results into one class decision.
+
+    ``current`` maps a channel to ``(fault, window_end)`` for channels with a
+    current (not stale) evaluation. ``gps_available`` is whether a GPS fix
+    arrived recently; its absence is an outage. UAV measurements are not
+    monitored, so ``uav_loss`` is always false. Returns ``(valid, stamp, flags)``;
+    an invalid decision has no stamp and all flags false.
+    """
+    flags = dict.fromkeys(FAULT_FLAGS, False)
+    if any(channel not in current for channel in DECISION_CHANNELS):
+        return False, None, flags
+    for name, channels in FAULT_CLASSES.items():
+        flags[name] = any(current[channel][0] for channel in channels if channel in current)
+    flags["gps_outage"] = flags["gps_outage"] or not gps_available
+    stamp = min(current[channel][1] for channel in DECISION_CHANNELS)
+    return True, stamp, flags
 
 
 def command_acceleration(cmd):
