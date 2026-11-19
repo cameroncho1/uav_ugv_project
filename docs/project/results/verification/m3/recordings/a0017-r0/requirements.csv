@@ -1,0 +1,9 @@
+run_id,requirement,version,mandatory,verdict,reason,eligible_duration_ns,triggers,completed_obligations,missing_data_count
+normalized-9f347c81951f,R1,1,True,PASS,property_holds,87420000000,0,0,0
+normalized-9f347c81951f,R2,1,True,FAIL,witnessed_violation,87420000000,1,0,0
+normalized-9f347c81951f,R3,1,False,INCONCLUSIVE,incomplete_or_unexercised,101372595992,0,0,0
+normalized-9f347c81951f,R4,1,False,NOT_APPLICABLE,No controlled command loss in navigation trial.,0,0,0,0
+normalized-9f347c81951f,R5,1,False,NOT_APPLICABLE,No hazard event producer.,0,0,0,0
+normalized-9f347c81951f,R6,1,True,PASS,property_holds,87420000000,2590,0,0
+normalized-9f347c81951f,R7,1,False,NOT_APPLICABLE,No online detector decision producer.,0,0,0,0
+normalized-9f347c81951f,R8,1,False,NOT_APPLICABLE,No online detector decision producer.,0,0,0,0

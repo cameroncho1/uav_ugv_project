@@ -1,0 +1,11 @@
+{
+  "role": "post_hoc_diagnostic",
+  "requirement": "R2",
+  "selection": "earliest witnessed matrix failures by attempt ID",
+  "parent_attempts": [
+    16,
+    17
+  ],
+  "held_out_matrix": false,
+  "search_budget": false
+}

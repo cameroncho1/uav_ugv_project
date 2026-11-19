@@ -1,0 +1,10 @@
+mutation,verdict,detected_by,witness_transitions
+double_count,FAIL,S11_recovery_memory_integrity,1
+early_recovery,FAIL,S11_recovery_memory_integrity;S3_recovery_threshold,10
+forgot_completion,FAIL,S10_completion_integrity;S6_completion_memory,2
+forgot_creation,FAIL,S10_completion_integrity,1
+invented_maturity,FAIL,S11_recovery_memory_integrity,1
+permanent_fault,FAIL,S11_recovery_memory_integrity,10
+spurious_completion,FAIL,S10_completion_integrity,1
+spurious_hold,FAIL,S7_ready_progress,1
+unsafe_navigation,FAIL,S1_navigation_authorization,1

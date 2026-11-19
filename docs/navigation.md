@@ -10,7 +10,7 @@ Planning and control consume `/ugv/localization/pose` in ENU `map`. The shared p
 
 The planner requires a valid acquisition-stamped map with acquisition/receipt ages at most 2 s. It rejects blocked/out-of-bounds endpoints; it does not relocate them across obstacles. The configured 0.5 m robot radius plus 0.05 m clearance is inflated as a disk: a cell is blocked when the gap between its square and any non-free cell's square is at most that radius, so the robot center may lie anywhere in a free cell. Unknown cells and map boundaries are blocked. Only non-free cells that border free space stamp the disk. The default 0.1 m grid keeps cell quantization small; with 0.25 m cells the dense layout's 2 m gaps left a single free cell. These dimensions are simulation assumptions and need review for another robot.
 
-The eight-neighbor A* avoids diagonal corner cutting. Start/goal connections are checked against the clearance grid. The planner then replaces the cell staircase with the longest clear straight shortcuts. The follower chooses a visible lookahead along the forward route, turns in place when the heading error exceeds 0.6 rad, otherwise drives while turning with speed reduced in proportion to the error, and checks predicted motion segments over 0.4 s. It cannot shortcut a blocked connection merely because a farther path point is free. Commands are limited to 0.5 m/s and 1 rad/s; estimated goal tolerance is 0.5 m.
+The eight-neighbor A* avoids diagonal corner cutting. Start/goal connections are checked against the clearance grid. The planner then replaces the cell staircase with the longest clear straight shortcuts. The follower chooses a visible lookahead along the forward route, turns in place when the heading error exceeds 0.6 rad, otherwise drives while turning with speed reduced in proportion to the error, and checks predicted motion segments over 0.4 s. It cannot shortcut a blocked connection merely because a farther path point is free. Commands are limited to 0.5 m/s and 1 rad/s. The configured controller completes at an estimated distance of 0.35 m, leaving 0.15 m inside R2's 0.5 m estimated-arrival boundary for post-stop estimate variation. This margin is a simulation setting, not a bound on localization drift.
 
 Mapping remains a camera-luminance heuristic. It now uses ROS camera images/CameraInfo, a timestamp-matched independent map anchor, and calibrated optical/body extrinsics. Grid stamps retain image acquisition time. Missing anchor coverage produces no fresh map. A bounded-uncertainty, matched UGV pose masks its own visible body using a known 0.5 m radius / 0.5 m height cylinder projected through camera rays, with cell-coverage allowance. This removes the elevated roof's false ground obstacle; it does not feed the relative-observation producer. Flat-ground projection, known self-geometry masking and luminance classification do not establish semantic obstacle accuracy or detection behind the robot. The demo's visual-only goal ring stays above the dark-obstacle threshold.
 
@@ -23,6 +23,61 @@ The planner inflates two grids. The planning grid treats unknown cells as free a
 ## UAV following
 
 With `uav_follow:=true` (default) the offboard controller keeps its takeoff hold until PX4 reports Offboard, armed and at least 80% of the altitude setpoint. It then moves its horizontal setpoint toward the UGV fused pose, converted to PX4 NED with the same `map_origin` as the anchor adapter, at up to 1 m/s with a 0.15 m deadband. It holds whenever the fused pose is older than 0.5 s or its position standard deviation exceeds 0.5 m, so it never chases an unusable estimate. With GPS off at startup it holds until the camera's first UGV correction.
+
+## UAV coordination modes
+
+The `coordination_mode` launch argument selects one of two UAV behaviors:
+
+- `ugv_follow` preserves the baseline: the UAV follows the UGV's fused `map` pose.
+- `uav_scout` selects a lead point between the UGV and the global goal. The UAV advances toward a point `scout_lead_distance` meters ahead of the UGV, stops at the goal when the remaining distance is shorter, and is limited to `scout_max_speed`.
+
+Use this command for the original UAV-follow behavior on the small world:
+
+```bash
+source /opt/ros/humble/setup.bash
+source ~/ros_gz_harmonic_ws/install/setup.bash
+source ~/uav_ugv_project/ros2_ws/install/setup.bash
+
+cd ~/uav_ugv_project
+ros2 launch mission_manager simple_goal_demo.launch.py \
+  coordination_mode:=ugv_follow \
+  uav_follow:=true \
+  grid_resolution:=0.2 \
+  start_rviz:=false
+```
+
+Set `uav_follow:=false` instead to keep the UAV at its initial horizontal hold while the UGV operates:
+
+```bash
+ros2 launch mission_manager simple_goal_demo.launch.py \
+  coordination_mode:=ugv_follow \
+  uav_follow:=false \
+  grid_resolution:=0.2 \
+  start_rviz:=false
+```
+
+Use this command for UAV-led scouting on the large obstacle world:
+
+```bash
+source /opt/ros/humble/setup.bash
+source ~/ros_gz_harmonic_ws/install/setup.bash
+source ~/uav_ugv_project/ros2_ws/install/setup.bash
+
+cd ~/uav_ugv_project
+ros2 launch mission_manager simple_goal_demo.launch.py \
+  world_name:=simple_goal_demo_large \
+  goal_x:=24.0 \
+  goal_y:=14.0 \
+  map_bounds:=-30.0,-20.0,30.0,20.0 \
+  grid_resolution:=0.2 \
+  coordination_mode:=uav_scout \
+  uav_follow:=true \
+  start_rviz:=false
+```
+
+Both modes require PX4 Offboard/armed state and at least 80% of the configured cruise altitude before horizontal motion. Scout mode holds at the current setpoint when the goal is unavailable or the UGV pose fails the shared pose guard. The `uav_initial_settle_time` launch argument configures the anchor adapter's startup settling interval.
+
+The mapper receives `map_bounds` as a comma-separated `min_x,min_y,max_x,max_y` string and may publish known ground beyond the UGV camera footprint. It does not require a matched UGV pose for every scout frame, but it masks the UGV when a timestamp-matched pose is available and sufficiently certain. The UGV controller independently consumes `/ugv/localization/pose`, the clearance grid, and the associated route.
 
 ## Camera transport
 
@@ -59,3 +114,13 @@ The ROS guard harness includes blocked starts and delayed obsolete-goal routes i
 Closed-loop baseline/assisted tracking uses separate fresh worlds with identical configured seeds, map and goal. Trajectories and sensor sequences differ under feedback. The fixture supplies a declared free grid, fixed-observer synthetic observations, and the drift profile. GPS outage begins no earlier than 2 s after first motion and after at least 11 received fixes, preserving the GPS evidence threshold. This isolates tracking from camera-grid accuracy. Baseline holds/failures remain recorded.
 
 [Historical results](cooperative_localization/evaluation_results.md) identify the tested GPS-branch conditions. Uneven terrain, hardware camera calibration, unknown shared global bias and reliable semantic mapping remain outside these simulation claims.
+
+## Verified supervisor
+
+The path follower runs only when the persistent supervisor selects `NAVIGATE`. Other modes publish zero every timer tick. Completed-goal memory prevents estimated drift from restarting the same goal. Enabled detector holds require ten distinct clear decisions and five simulation seconds to recover; new goals do not bypass recovery. Detector enablement defaults to false until a producer is deployed.
+
+See the [supervisor specification](verification/supervisor.md), [finite proof and runtime evidence](project/results/supervisor/README.md), and [course/report mapping](verification/supervisor_course_alignment.md). The proof establishes discrete command permission under explicit input assumptions; the independent watchdog and recorded physical stopping checks remain necessary.
+
+## Dynamic obstacle example
+
+The [dynamic obstacle scenario](dynamic_obstacles/README.md) adds a scheduled box through Gazebo's world API. The UAV camera updates the existing map, the planner recomputes a route, and the controller follows it or holds. Scenario and truth geometry are evaluation inputs; navigation receives the same camera-map and measured-pose interfaces as before.

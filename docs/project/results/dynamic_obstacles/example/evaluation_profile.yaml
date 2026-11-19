@@ -1,0 +1,37 @@
+schema_version: 1
+id: dynamic-obstacle-example
+version: '1'
+calibration: provisional
+max_gap_ns: 500000000
+requirements:
+  R1:
+    applicable: true
+    mandatory: true
+  R2:
+    applicable: true
+    mandatory: true
+    parameters:
+      deadline_ns: 120000000000
+  R3:
+    applicable: true
+    mandatory: false
+    clock: steady:0d9c9138-f668-4a65-867a-99899eb58110
+    max_gap_ns: 250000000
+  R5:
+    applicable: true
+    mandatory: true
+  R6:
+    applicable: true
+    mandatory: true
+  R4:
+    applicable: false
+    mandatory: false
+    reason: No controlled command-loss injection.
+  R7:
+    applicable: false
+    mandatory: false
+    reason: No online detector producer.
+  R8:
+    applicable: false
+    mandatory: false
+    reason: No online detector producer.

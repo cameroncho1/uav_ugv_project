@@ -1,0 +1,6 @@
+requirement,parameters
+R1,"{""contact_tolerance_m"": 0.0, ""radius_m"": 0.5}"
+R2,"{""angular_epsilon_rps"": 0.001, ""deadline_ns"": 60000000000, ""dwell_ns"": 1000000000, ""goal_tolerance_m"": 0.5, ""linear_epsilon_mps"": 0.001, ""physical_tolerance_m"": 0.85}"
+R3,"{""angular_epsilon_rps"": 0.001, ""linear_epsilon_mps"": 0.001, ""response_ns"": 500000000}"
+R4,"{""angular_epsilon_rps"": 0.001, ""dwell_ns"": 200000000, ""expiry_ns"": 400000000, ""linear_epsilon_mps"": 0.001, ""settling_ns"": 750000000, ""speed_epsilon_mps"": 0.02, ""yaw_rate_epsilon_rps"": 0.02}"
+R6,"{""error_limit_m"": 0.5, ""uav_max_age_ns"": 500000000}"

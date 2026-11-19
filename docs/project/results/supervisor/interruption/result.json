@@ -1,0 +1,36 @@
+{
+  "attempt_statuses": [
+    "interrupted"
+  ],
+  "cleanup_wall_s": 3.331814494000014,
+  "command": [
+    "/home/rylanwwade/uav-supervisor-w10/.venv/bin/python",
+    "/home/rylanwwade/uav-supervisor-w10/scripts/verification_demo.py",
+    "/home/rylanwwade/uav-supervisor-w10/evidence/w10_final/interruption/demo"
+  ],
+  "demo_summary": {
+    "exit_code": 130,
+    "mode": "live",
+    "new_simulation": true,
+    "status": "interrupted"
+  },
+  "duration_wall_s": 11.111851910999974,
+  "finalized_recordings": 1,
+  "interruption": "SIGINT to demo coordinator after bag creation",
+  "owned_process_groups": [
+    3943,
+    3963,
+    3974,
+    4009,
+    4011,
+    4038,
+    4039,
+    4042,
+    4618,
+    4619,
+    4620,
+    4629
+  ],
+  "remaining_owned_processes": [],
+  "returncode": 130
+}

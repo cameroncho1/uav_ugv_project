@@ -1,0 +1,3778 @@
+{
+  "schema_version": 1,
+  "plan": {
+    "cases": [
+      {
+        "assistance": true,
+        "case_id": "empty-a-nominal-s631",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "empty-a-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 631,
+        "world": "simulation/worlds/simple_goal_demo.sdf",
+        "world_sha256": "0f12df287b4c55a6c71f139e1ff957d1330559762dc7a6aab814a8b72feb3bb3"
+      },
+      {
+        "assistance": true,
+        "case_id": "empty-a-nominal-s632",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "empty-a-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 632,
+        "world": "simulation/worlds/simple_goal_demo.sdf",
+        "world_sha256": "0f12df287b4c55a6c71f139e1ff957d1330559762dc7a6aab814a8b72feb3bb3"
+      },
+      {
+        "assistance": true,
+        "case_id": "empty-a-nominal-s633",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "empty-a-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 633,
+        "world": "simulation/worlds/simple_goal_demo.sdf",
+        "world_sha256": "0f12df287b4c55a6c71f139e1ff957d1330559762dc7a6aab814a8b72feb3bb3"
+      },
+      {
+        "assistance": true,
+        "case_id": "empty-b-nominal-s631",
+        "goal": [
+          3.0,
+          0.5
+        ],
+        "id": "empty-b-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 631,
+        "world": "simulation/worlds/simple_goal_demo.sdf",
+        "world_sha256": "0f12df287b4c55a6c71f139e1ff957d1330559762dc7a6aab814a8b72feb3bb3"
+      },
+      {
+        "assistance": true,
+        "case_id": "empty-b-nominal-s632",
+        "goal": [
+          3.0,
+          0.5
+        ],
+        "id": "empty-b-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 632,
+        "world": "simulation/worlds/simple_goal_demo.sdf",
+        "world_sha256": "0f12df287b4c55a6c71f139e1ff957d1330559762dc7a6aab814a8b72feb3bb3"
+      },
+      {
+        "assistance": true,
+        "case_id": "empty-b-nominal-s633",
+        "goal": [
+          3.0,
+          0.5
+        ],
+        "id": "empty-b-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 633,
+        "world": "simulation/worlds/simple_goal_demo.sdf",
+        "world_sha256": "0f12df287b4c55a6c71f139e1ff957d1330559762dc7a6aab814a8b72feb3bb3"
+      },
+      {
+        "assistance": true,
+        "case_id": "sparse-a-nominal-s631",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "sparse-a-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 631,
+        "world": "simulation/worlds/simple_goal_demo_sparse.sdf",
+        "world_sha256": "345e873cffc911fc7a13ce6e9a011ebedf076b2beaca466d7d779f5195d37391"
+      },
+      {
+        "assistance": true,
+        "case_id": "sparse-a-nominal-s632",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "sparse-a-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 632,
+        "world": "simulation/worlds/simple_goal_demo_sparse.sdf",
+        "world_sha256": "345e873cffc911fc7a13ce6e9a011ebedf076b2beaca466d7d779f5195d37391"
+      },
+      {
+        "assistance": true,
+        "case_id": "sparse-a-nominal-s633",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "sparse-a-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 633,
+        "world": "simulation/worlds/simple_goal_demo_sparse.sdf",
+        "world_sha256": "345e873cffc911fc7a13ce6e9a011ebedf076b2beaca466d7d779f5195d37391"
+      },
+      {
+        "assistance": true,
+        "case_id": "sparse-b-nominal-s631",
+        "goal": [
+          3.0,
+          0.5
+        ],
+        "id": "sparse-b-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 631,
+        "world": "simulation/worlds/simple_goal_demo_sparse.sdf",
+        "world_sha256": "345e873cffc911fc7a13ce6e9a011ebedf076b2beaca466d7d779f5195d37391"
+      },
+      {
+        "assistance": true,
+        "case_id": "sparse-b-nominal-s632",
+        "goal": [
+          3.0,
+          0.5
+        ],
+        "id": "sparse-b-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 632,
+        "world": "simulation/worlds/simple_goal_demo_sparse.sdf",
+        "world_sha256": "345e873cffc911fc7a13ce6e9a011ebedf076b2beaca466d7d779f5195d37391"
+      },
+      {
+        "assistance": true,
+        "case_id": "sparse-b-nominal-s633",
+        "goal": [
+          3.0,
+          0.5
+        ],
+        "id": "sparse-b-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 633,
+        "world": "simulation/worlds/simple_goal_demo_sparse.sdf",
+        "world_sha256": "345e873cffc911fc7a13ce6e9a011ebedf076b2beaca466d7d779f5195d37391"
+      },
+      {
+        "assistance": true,
+        "case_id": "dense-a-nominal-s631",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "dense-a-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 631,
+        "world": "simulation/worlds/simple_goal_demo_dense.sdf",
+        "world_sha256": "21bfa8b92d59c24f0c2afb1365832393b45c7b704ed036bd78c4438ce0a3a48f"
+      },
+      {
+        "assistance": true,
+        "case_id": "dense-a-nominal-s632",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "dense-a-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 632,
+        "world": "simulation/worlds/simple_goal_demo_dense.sdf",
+        "world_sha256": "21bfa8b92d59c24f0c2afb1365832393b45c7b704ed036bd78c4438ce0a3a48f"
+      },
+      {
+        "assistance": true,
+        "case_id": "dense-a-nominal-s633",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "dense-a-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 633,
+        "world": "simulation/worlds/simple_goal_demo_dense.sdf",
+        "world_sha256": "21bfa8b92d59c24f0c2afb1365832393b45c7b704ed036bd78c4438ce0a3a48f"
+      },
+      {
+        "assistance": true,
+        "case_id": "dense-b-nominal-s631",
+        "goal": [
+          3.0,
+          0.5
+        ],
+        "id": "dense-b-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 631,
+        "world": "simulation/worlds/simple_goal_demo_dense.sdf",
+        "world_sha256": "21bfa8b92d59c24f0c2afb1365832393b45c7b704ed036bd78c4438ce0a3a48f"
+      },
+      {
+        "assistance": true,
+        "case_id": "dense-b-nominal-s632",
+        "goal": [
+          3.0,
+          0.5
+        ],
+        "id": "dense-b-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 632,
+        "world": "simulation/worlds/simple_goal_demo_dense.sdf",
+        "world_sha256": "21bfa8b92d59c24f0c2afb1365832393b45c7b704ed036bd78c4438ce0a3a48f"
+      },
+      {
+        "assistance": true,
+        "case_id": "dense-b-nominal-s633",
+        "goal": [
+          3.0,
+          0.5
+        ],
+        "id": "dense-b-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 633,
+        "world": "simulation/worlds/simple_goal_demo_dense.sdf",
+        "world_sha256": "21bfa8b92d59c24f0c2afb1365832393b45c7b704ed036bd78c4438ce0a3a48f"
+      },
+      {
+        "assistance": true,
+        "case_id": "corridor-a-nominal-s631",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "corridor-a-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 631,
+        "world": "simulation/worlds/simple_goal_demo_corridor.sdf",
+        "world_sha256": "6fb6a38ea3b0fe599ff9f412ca421e44cb4cf5efcb0c25bdeb74d424474b6f34"
+      },
+      {
+        "assistance": true,
+        "case_id": "corridor-a-nominal-s632",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "corridor-a-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 632,
+        "world": "simulation/worlds/simple_goal_demo_corridor.sdf",
+        "world_sha256": "6fb6a38ea3b0fe599ff9f412ca421e44cb4cf5efcb0c25bdeb74d424474b6f34"
+      },
+      {
+        "assistance": true,
+        "case_id": "corridor-a-nominal-s633",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "corridor-a-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 633,
+        "world": "simulation/worlds/simple_goal_demo_corridor.sdf",
+        "world_sha256": "6fb6a38ea3b0fe599ff9f412ca421e44cb4cf5efcb0c25bdeb74d424474b6f34"
+      },
+      {
+        "assistance": true,
+        "case_id": "corridor-b-nominal-s631",
+        "goal": [
+          3.0,
+          0.5
+        ],
+        "id": "corridor-b-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 631,
+        "world": "simulation/worlds/simple_goal_demo_corridor.sdf",
+        "world_sha256": "6fb6a38ea3b0fe599ff9f412ca421e44cb4cf5efcb0c25bdeb74d424474b6f34"
+      },
+      {
+        "assistance": true,
+        "case_id": "corridor-b-nominal-s632",
+        "goal": [
+          3.0,
+          0.5
+        ],
+        "id": "corridor-b-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 632,
+        "world": "simulation/worlds/simple_goal_demo_corridor.sdf",
+        "world_sha256": "6fb6a38ea3b0fe599ff9f412ca421e44cb4cf5efcb0c25bdeb74d424474b6f34"
+      },
+      {
+        "assistance": true,
+        "case_id": "corridor-b-nominal-s633",
+        "goal": [
+          3.0,
+          0.5
+        ],
+        "id": "corridor-b-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 633,
+        "world": "simulation/worlds/simple_goal_demo_corridor.sdf",
+        "world_sha256": "6fb6a38ea3b0fe599ff9f412ca421e44cb4cf5efcb0c25bdeb74d424474b6f34"
+      },
+      {
+        "assistance": true,
+        "case_id": "empty-a-outage-s631",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "empty-a-outage",
+        "kind": "navigation",
+        "outage": true,
+        "seed": 631,
+        "world": "simulation/worlds/simple_goal_demo.sdf",
+        "world_sha256": "0f12df287b4c55a6c71f139e1ff957d1330559762dc7a6aab814a8b72feb3bb3"
+      },
+      {
+        "assistance": true,
+        "case_id": "empty-a-outage-s632",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "empty-a-outage",
+        "kind": "navigation",
+        "outage": true,
+        "seed": 632,
+        "world": "simulation/worlds/simple_goal_demo.sdf",
+        "world_sha256": "0f12df287b4c55a6c71f139e1ff957d1330559762dc7a6aab814a8b72feb3bb3"
+      },
+      {
+        "assistance": true,
+        "case_id": "empty-a-outage-s633",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "empty-a-outage",
+        "kind": "navigation",
+        "outage": true,
+        "seed": 633,
+        "world": "simulation/worlds/simple_goal_demo.sdf",
+        "world_sha256": "0f12df287b4c55a6c71f139e1ff957d1330559762dc7a6aab814a8b72feb3bb3"
+      },
+      {
+        "assistance": true,
+        "case_id": "sparse-a-outage-s631",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "sparse-a-outage",
+        "kind": "navigation",
+        "outage": true,
+        "seed": 631,
+        "world": "simulation/worlds/simple_goal_demo_sparse.sdf",
+        "world_sha256": "345e873cffc911fc7a13ce6e9a011ebedf076b2beaca466d7d779f5195d37391"
+      },
+      {
+        "assistance": true,
+        "case_id": "sparse-a-outage-s632",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "sparse-a-outage",
+        "kind": "navigation",
+        "outage": true,
+        "seed": 632,
+        "world": "simulation/worlds/simple_goal_demo_sparse.sdf",
+        "world_sha256": "345e873cffc911fc7a13ce6e9a011ebedf076b2beaca466d7d779f5195d37391"
+      },
+      {
+        "assistance": true,
+        "case_id": "sparse-a-outage-s633",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "sparse-a-outage",
+        "kind": "navigation",
+        "outage": true,
+        "seed": 633,
+        "world": "simulation/worlds/simple_goal_demo_sparse.sdf",
+        "world_sha256": "345e873cffc911fc7a13ce6e9a011ebedf076b2beaca466d7d779f5195d37391"
+      },
+      {
+        "assistance": true,
+        "case_id": "dense-b-outage-s631",
+        "goal": [
+          3.0,
+          0.5
+        ],
+        "id": "dense-b-outage",
+        "kind": "navigation",
+        "outage": true,
+        "seed": 631,
+        "world": "simulation/worlds/simple_goal_demo_dense.sdf",
+        "world_sha256": "21bfa8b92d59c24f0c2afb1365832393b45c7b704ed036bd78c4438ce0a3a48f"
+      },
+      {
+        "assistance": true,
+        "case_id": "dense-b-outage-s632",
+        "goal": [
+          3.0,
+          0.5
+        ],
+        "id": "dense-b-outage",
+        "kind": "navigation",
+        "outage": true,
+        "seed": 632,
+        "world": "simulation/worlds/simple_goal_demo_dense.sdf",
+        "world_sha256": "21bfa8b92d59c24f0c2afb1365832393b45c7b704ed036bd78c4438ce0a3a48f"
+      },
+      {
+        "assistance": true,
+        "case_id": "dense-b-outage-s633",
+        "goal": [
+          3.0,
+          0.5
+        ],
+        "id": "dense-b-outage",
+        "kind": "navigation",
+        "outage": true,
+        "seed": 633,
+        "world": "simulation/worlds/simple_goal_demo_dense.sdf",
+        "world_sha256": "21bfa8b92d59c24f0c2afb1365832393b45c7b704ed036bd78c4438ce0a3a48f"
+      },
+      {
+        "assistance": true,
+        "case_id": "corridor-b-outage-s631",
+        "goal": [
+          3.0,
+          0.5
+        ],
+        "id": "corridor-b-outage",
+        "kind": "navigation",
+        "outage": true,
+        "seed": 631,
+        "world": "simulation/worlds/simple_goal_demo_corridor.sdf",
+        "world_sha256": "6fb6a38ea3b0fe599ff9f412ca421e44cb4cf5efcb0c25bdeb74d424474b6f34"
+      },
+      {
+        "assistance": true,
+        "case_id": "corridor-b-outage-s632",
+        "goal": [
+          3.0,
+          0.5
+        ],
+        "id": "corridor-b-outage",
+        "kind": "navigation",
+        "outage": true,
+        "seed": 632,
+        "world": "simulation/worlds/simple_goal_demo_corridor.sdf",
+        "world_sha256": "6fb6a38ea3b0fe599ff9f412ca421e44cb4cf5efcb0c25bdeb74d424474b6f34"
+      },
+      {
+        "assistance": true,
+        "case_id": "corridor-b-outage-s633",
+        "goal": [
+          3.0,
+          0.5
+        ],
+        "id": "corridor-b-outage",
+        "kind": "navigation",
+        "outage": true,
+        "seed": 633,
+        "world": "simulation/worlds/simple_goal_demo_corridor.sdf",
+        "world_sha256": "6fb6a38ea3b0fe599ff9f412ca421e44cb4cf5efcb0c25bdeb74d424474b6f34"
+      },
+      {
+        "assistance": false,
+        "case_id": "empty-a-unassisted-s631",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "empty-a-unassisted",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 631,
+        "world": "simulation/worlds/simple_goal_demo.sdf",
+        "world_sha256": "0f12df287b4c55a6c71f139e1ff957d1330559762dc7a6aab814a8b72feb3bb3"
+      },
+      {
+        "assistance": false,
+        "case_id": "empty-a-unassisted-s632",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "empty-a-unassisted",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 632,
+        "world": "simulation/worlds/simple_goal_demo.sdf",
+        "world_sha256": "0f12df287b4c55a6c71f139e1ff957d1330559762dc7a6aab814a8b72feb3bb3"
+      },
+      {
+        "assistance": false,
+        "case_id": "empty-a-unassisted-s633",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "empty-a-unassisted",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 633,
+        "world": "simulation/worlds/simple_goal_demo.sdf",
+        "world_sha256": "0f12df287b4c55a6c71f139e1ff957d1330559762dc7a6aab814a8b72feb3bb3"
+      },
+      {
+        "case_id": "guard-s631",
+        "id": "guard",
+        "kind": "guard",
+        "seed": 631
+      },
+      {
+        "case_id": "guard-s632",
+        "id": "guard",
+        "kind": "guard",
+        "seed": 632
+      },
+      {
+        "case_id": "guard-s633",
+        "id": "guard",
+        "kind": "guard",
+        "seed": 633
+      },
+      {
+        "case_id": "watchdog-s631",
+        "id": "watchdog",
+        "kind": "watchdog",
+        "seed": 631
+      },
+      {
+        "case_id": "watchdog-s632",
+        "id": "watchdog",
+        "kind": "watchdog",
+        "seed": 632
+      },
+      {
+        "case_id": "watchdog-s633",
+        "id": "watchdog",
+        "kind": "watchdog",
+        "seed": 633
+      }
+    ],
+    "exclusions": {
+      "R5": "No hazard-event producer is available.",
+      "R7_R8": "No online detector exists; enabled/disabled/forced-miss comparisons are unavailable.",
+      "combinations": "Outage trials use goal A for empty/sparse and goal B for dense/corridor; both goals have nominal trials in every layout.",
+      "seeds": "Seeds configure synthetic sensor corruption; PX4/render scheduling is not deterministic."
+    },
+    "expanded_sha256": "d5a7bcb93b723b15d98d9a4e6c38a97e5ed9a27d0db6d1aac8df57cbbbdcb9b9",
+    "id": "verification-m3-v1",
+    "parameters": {
+      "attempt_timeout_s": 215,
+      "replay_limit": 2,
+      "search_seed": 20261110,
+      "search_trials": 4,
+      "search_wall_budget_s": 900,
+      "simulation_timeout_s": 100,
+      "wall_timeout_s": 160
+    },
+    "plan_sha256": "66e5a9efd323deeae758d396240233a55a479ef70f260df498dac225a8f7127a",
+    "profiles": {
+      "verification/profiles/m2_camera.yaml": "d49c612360ae5af3098513d51980b100b8bffdc6fc9658cb7cf0ad401bac45a1",
+      "verification/profiles/m2_guard.yaml": "7dfc52bd2a2a6054f703231a9b6f5a8c9841d0470adc55e011a0cf875ddcf3ad",
+      "verification/profiles/m2_watchdog.yaml": "21bcfa746906b6ccf527620135cc70f1881b44908e27363dad9a67ee0f4ae1e1"
+    },
+    "schema_version": 1
+  },
+  "source_sha256": "64524f665a1ad0cd576ef2ebf25bca7cad7e347cf5e08283f5c14ee5252e765a",
+  "attempts": [
+    {
+      "id": 1,
+      "case_id": "empty-a-nominal-s631",
+      "category": "matrix",
+      "configuration": {
+        "assistance": true,
+        "case_id": "empty-a-nominal-s631",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "empty-a-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 631,
+        "world": "simulation/worlds/simple_goal_demo.sdf",
+        "world_sha256": "0f12df287b4c55a6c71f139e1ff957d1330559762dc7a6aab814a8b72feb3bb3"
+      },
+      "started_ns": 1794384847753270177,
+      "ended_ns": 1794384940910150346,
+      "status": "inconclusive",
+      "detail": {
+        "command": [
+          "bash",
+          "/home/rylanwwade/uav-verification-m2/scripts/run_goal_navigation_trial.sh",
+          "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0001-empty-a-nominal-s631/run"
+        ],
+        "duration_wall_s": 88.46996898099997,
+        "environment": {
+          "GOAL_X": "4.0",
+          "GOAL_Y": "0.0",
+          "GPS_OUTAGE_AFTER_MOTION": "-1",
+          "GZ_PARTITION": "verification_490_1",
+          "ROS_DOMAIN_ID": "91",
+          "SEED": "631",
+          "TRIAL_TIMEOUT": "100",
+          "UAV_ASSISTANCE": "true",
+          "WALL_TIMEOUT": "160",
+          "WORLD_FILE": "/home/rylanwwade/uav-verification-m2/simulation/worlds/simple_goal_demo.sdf"
+        },
+        "evaluations": [
+          {
+            "execution_status": "aborted",
+            "exit_code": 2,
+            "objective_r1_m": null,
+            "result_path": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0001-empty-a-nominal-s631/run/verification/evaluation/result.json",
+            "verdicts": {
+              "R1": "INCONCLUSIVE",
+              "R2": "INCONCLUSIVE",
+              "R3": "INCONCLUSIVE",
+              "R4": "NOT_APPLICABLE",
+              "R5": "NOT_APPLICABLE",
+              "R6": "INCONCLUSIVE",
+              "R7": "NOT_APPLICABLE",
+              "R8": "NOT_APPLICABLE"
+            }
+          }
+        ],
+        "returncode": 2,
+        "timed_out": false
+      }
+    },
+    {
+      "id": 2,
+      "case_id": "empty-a-nominal-s632",
+      "category": "matrix",
+      "configuration": {
+        "assistance": true,
+        "case_id": "empty-a-nominal-s632",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "empty-a-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 632,
+        "world": "simulation/worlds/simple_goal_demo.sdf",
+        "world_sha256": "0f12df287b4c55a6c71f139e1ff957d1330559762dc7a6aab814a8b72feb3bb3"
+      },
+      "started_ns": 1794384941065860768,
+      "ended_ns": 1794385032598338348,
+      "status": "inconclusive",
+      "detail": {
+        "command": [
+          "bash",
+          "/home/rylanwwade/uav-verification-m2/scripts/run_goal_navigation_trial.sh",
+          "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0002-empty-a-nominal-s632/run"
+        ],
+        "duration_wall_s": 88.10774149599996,
+        "environment": {
+          "GOAL_X": "4.0",
+          "GOAL_Y": "0.0",
+          "GPS_OUTAGE_AFTER_MOTION": "-1",
+          "GZ_PARTITION": "verification_490_2",
+          "ROS_DOMAIN_ID": "92",
+          "SEED": "632",
+          "TRIAL_TIMEOUT": "100",
+          "UAV_ASSISTANCE": "true",
+          "WALL_TIMEOUT": "160",
+          "WORLD_FILE": "/home/rylanwwade/uav-verification-m2/simulation/worlds/simple_goal_demo.sdf"
+        },
+        "evaluations": [
+          {
+            "execution_status": "aborted",
+            "exit_code": 2,
+            "objective_r1_m": null,
+            "result_path": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0002-empty-a-nominal-s632/run/verification/evaluation/result.json",
+            "verdicts": {
+              "R1": "INCONCLUSIVE",
+              "R2": "INCONCLUSIVE",
+              "R3": "INCONCLUSIVE",
+              "R4": "NOT_APPLICABLE",
+              "R5": "NOT_APPLICABLE",
+              "R6": "INCONCLUSIVE",
+              "R7": "NOT_APPLICABLE",
+              "R8": "NOT_APPLICABLE"
+            }
+          }
+        ],
+        "returncode": 2,
+        "timed_out": false
+      }
+    },
+    {
+      "id": 3,
+      "case_id": "empty-a-nominal-s633",
+      "category": "matrix",
+      "configuration": {
+        "assistance": true,
+        "case_id": "empty-a-nominal-s633",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "empty-a-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 633,
+        "world": "simulation/worlds/simple_goal_demo.sdf",
+        "world_sha256": "0f12df287b4c55a6c71f139e1ff957d1330559762dc7a6aab814a8b72feb3bb3"
+      },
+      "started_ns": 1794385032766126118,
+      "ended_ns": 1794385109276158770,
+      "status": "inconclusive",
+      "detail": {
+        "command": [
+          "bash",
+          "/home/rylanwwade/uav-verification-m2/scripts/run_goal_navigation_trial.sh",
+          "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0003-empty-a-nominal-s633/run"
+        ],
+        "duration_wall_s": 74.08425547499996,
+        "environment": {
+          "GOAL_X": "4.0",
+          "GOAL_Y": "0.0",
+          "GPS_OUTAGE_AFTER_MOTION": "-1",
+          "GZ_PARTITION": "verification_490_3",
+          "ROS_DOMAIN_ID": "93",
+          "SEED": "633",
+          "TRIAL_TIMEOUT": "100",
+          "UAV_ASSISTANCE": "true",
+          "WALL_TIMEOUT": "160",
+          "WORLD_FILE": "/home/rylanwwade/uav-verification-m2/simulation/worlds/simple_goal_demo.sdf"
+        },
+        "evaluations": [
+          {
+            "execution_status": "aborted",
+            "exit_code": 2,
+            "objective_r1_m": null,
+            "result_path": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0003-empty-a-nominal-s633/run/verification/evaluation/result.json",
+            "verdicts": {
+              "R1": "PASS",
+              "R2": "INCONCLUSIVE",
+              "R3": "INCONCLUSIVE",
+              "R4": "NOT_APPLICABLE",
+              "R5": "NOT_APPLICABLE",
+              "R6": "INCONCLUSIVE",
+              "R7": "NOT_APPLICABLE",
+              "R8": "NOT_APPLICABLE"
+            }
+          }
+        ],
+        "returncode": 2,
+        "timed_out": false
+      }
+    },
+    {
+      "id": 4,
+      "case_id": "empty-b-nominal-s631",
+      "category": "matrix",
+      "configuration": {
+        "assistance": true,
+        "case_id": "empty-b-nominal-s631",
+        "goal": [
+          3.0,
+          0.5
+        ],
+        "id": "empty-b-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 631,
+        "world": "simulation/worlds/simple_goal_demo.sdf",
+        "world_sha256": "0f12df287b4c55a6c71f139e1ff957d1330559762dc7a6aab814a8b72feb3bb3"
+      },
+      "started_ns": 1794385109313818054,
+      "ended_ns": 1794385162936474433,
+      "status": "passed",
+      "detail": {
+        "command": [
+          "bash",
+          "/home/rylanwwade/uav-verification-m2/scripts/run_goal_navigation_trial.sh",
+          "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0004-empty-b-nominal-s631/run"
+        ],
+        "duration_wall_s": 50.97057103099996,
+        "environment": {
+          "GOAL_X": "3.0",
+          "GOAL_Y": "0.5",
+          "GPS_OUTAGE_AFTER_MOTION": "-1",
+          "GZ_PARTITION": "verification_490_4",
+          "ROS_DOMAIN_ID": "94",
+          "SEED": "631",
+          "TRIAL_TIMEOUT": "100",
+          "UAV_ASSISTANCE": "true",
+          "WALL_TIMEOUT": "160",
+          "WORLD_FILE": "/home/rylanwwade/uav-verification-m2/simulation/worlds/simple_goal_demo.sdf"
+        },
+        "evaluations": [
+          {
+            "execution_status": "completed",
+            "exit_code": 0,
+            "objective_r1_m": null,
+            "result_path": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0004-empty-b-nominal-s631/run/verification/evaluation/result.json",
+            "verdicts": {
+              "R1": "PASS",
+              "R2": "PASS",
+              "R3": "INCONCLUSIVE",
+              "R4": "NOT_APPLICABLE",
+              "R5": "NOT_APPLICABLE",
+              "R6": "PASS",
+              "R7": "NOT_APPLICABLE",
+              "R8": "NOT_APPLICABLE"
+            }
+          }
+        ],
+        "returncode": 0,
+        "timed_out": false
+      }
+    },
+    {
+      "id": 5,
+      "case_id": "empty-b-nominal-s632",
+      "category": "matrix",
+      "configuration": {
+        "assistance": true,
+        "case_id": "empty-b-nominal-s632",
+        "goal": [
+          3.0,
+          0.5
+        ],
+        "id": "empty-b-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 632,
+        "world": "simulation/worlds/simple_goal_demo.sdf",
+        "world_sha256": "0f12df287b4c55a6c71f139e1ff957d1330559762dc7a6aab814a8b72feb3bb3"
+      },
+      "started_ns": 1794385162961277069,
+      "ended_ns": 1794385220026113166,
+      "status": "passed",
+      "detail": {
+        "command": [
+          "bash",
+          "/home/rylanwwade/uav-verification-m2/scripts/run_goal_navigation_trial.sh",
+          "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0005-empty-b-nominal-s632/run"
+        ],
+        "duration_wall_s": 54.84148493600003,
+        "environment": {
+          "GOAL_X": "3.0",
+          "GOAL_Y": "0.5",
+          "GPS_OUTAGE_AFTER_MOTION": "-1",
+          "GZ_PARTITION": "verification_490_5",
+          "ROS_DOMAIN_ID": "95",
+          "SEED": "632",
+          "TRIAL_TIMEOUT": "100",
+          "UAV_ASSISTANCE": "true",
+          "WALL_TIMEOUT": "160",
+          "WORLD_FILE": "/home/rylanwwade/uav-verification-m2/simulation/worlds/simple_goal_demo.sdf"
+        },
+        "evaluations": [
+          {
+            "execution_status": "completed",
+            "exit_code": 0,
+            "objective_r1_m": null,
+            "result_path": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0005-empty-b-nominal-s632/run/verification/evaluation/result.json",
+            "verdicts": {
+              "R1": "PASS",
+              "R2": "PASS",
+              "R3": "INCONCLUSIVE",
+              "R4": "NOT_APPLICABLE",
+              "R5": "NOT_APPLICABLE",
+              "R6": "PASS",
+              "R7": "NOT_APPLICABLE",
+              "R8": "NOT_APPLICABLE"
+            }
+          }
+        ],
+        "returncode": 0,
+        "timed_out": false
+      }
+    },
+    {
+      "id": 6,
+      "case_id": "empty-b-nominal-s633",
+      "category": "matrix",
+      "configuration": {
+        "assistance": true,
+        "case_id": "empty-b-nominal-s633",
+        "goal": [
+          3.0,
+          0.5
+        ],
+        "id": "empty-b-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 633,
+        "world": "simulation/worlds/simple_goal_demo.sdf",
+        "world_sha256": "0f12df287b4c55a6c71f139e1ff957d1330559762dc7a6aab814a8b72feb3bb3"
+      },
+      "started_ns": 1794385220045825636,
+      "ended_ns": 1794385270928024790,
+      "status": "passed",
+      "detail": {
+        "command": [
+          "bash",
+          "/home/rylanwwade/uav-verification-m2/scripts/run_goal_navigation_trial.sh",
+          "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0006-empty-b-nominal-s633/run"
+        ],
+        "duration_wall_s": 48.03499305899993,
+        "environment": {
+          "GOAL_X": "3.0",
+          "GOAL_Y": "0.5",
+          "GPS_OUTAGE_AFTER_MOTION": "-1",
+          "GZ_PARTITION": "verification_490_6",
+          "ROS_DOMAIN_ID": "96",
+          "SEED": "633",
+          "TRIAL_TIMEOUT": "100",
+          "UAV_ASSISTANCE": "true",
+          "WALL_TIMEOUT": "160",
+          "WORLD_FILE": "/home/rylanwwade/uav-verification-m2/simulation/worlds/simple_goal_demo.sdf"
+        },
+        "evaluations": [
+          {
+            "execution_status": "completed",
+            "exit_code": 0,
+            "objective_r1_m": null,
+            "result_path": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0006-empty-b-nominal-s633/run/verification/evaluation/result.json",
+            "verdicts": {
+              "R1": "PASS",
+              "R2": "PASS",
+              "R3": "INCONCLUSIVE",
+              "R4": "NOT_APPLICABLE",
+              "R5": "NOT_APPLICABLE",
+              "R6": "PASS",
+              "R7": "NOT_APPLICABLE",
+              "R8": "NOT_APPLICABLE"
+            }
+          }
+        ],
+        "returncode": 0,
+        "timed_out": false
+      }
+    },
+    {
+      "id": 7,
+      "case_id": "sparse-a-nominal-s631",
+      "category": "matrix",
+      "configuration": {
+        "assistance": true,
+        "case_id": "sparse-a-nominal-s631",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "sparse-a-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 631,
+        "world": "simulation/worlds/simple_goal_demo_sparse.sdf",
+        "world_sha256": "345e873cffc911fc7a13ce6e9a011ebedf076b2beaca466d7d779f5195d37391"
+      },
+      "started_ns": 1794385270946978670,
+      "ended_ns": 1794385336423090660,
+      "status": "passed",
+      "detail": {
+        "command": [
+          "bash",
+          "/home/rylanwwade/uav-verification-m2/scripts/run_goal_navigation_trial.sh",
+          "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0007-sparse-a-nominal-s631/run"
+        ],
+        "duration_wall_s": 62.72857292000003,
+        "environment": {
+          "GOAL_X": "4.0",
+          "GOAL_Y": "0.0",
+          "GPS_OUTAGE_AFTER_MOTION": "-1",
+          "GZ_PARTITION": "verification_490_7",
+          "ROS_DOMAIN_ID": "97",
+          "SEED": "631",
+          "TRIAL_TIMEOUT": "100",
+          "UAV_ASSISTANCE": "true",
+          "WALL_TIMEOUT": "160",
+          "WORLD_FILE": "/home/rylanwwade/uav-verification-m2/simulation/worlds/simple_goal_demo_sparse.sdf"
+        },
+        "evaluations": [
+          {
+            "execution_status": "completed",
+            "exit_code": 0,
+            "objective_r1_m": 0.13655295483088403,
+            "result_path": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0007-sparse-a-nominal-s631/run/verification/evaluation/result.json",
+            "verdicts": {
+              "R1": "PASS",
+              "R2": "PASS",
+              "R3": "INCONCLUSIVE",
+              "R4": "NOT_APPLICABLE",
+              "R5": "NOT_APPLICABLE",
+              "R6": "PASS",
+              "R7": "NOT_APPLICABLE",
+              "R8": "NOT_APPLICABLE"
+            }
+          }
+        ],
+        "returncode": 0,
+        "timed_out": false
+      }
+    },
+    {
+      "id": 8,
+      "case_id": "sparse-a-nominal-s632",
+      "category": "matrix",
+      "configuration": {
+        "assistance": true,
+        "case_id": "sparse-a-nominal-s632",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "sparse-a-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 632,
+        "world": "simulation/worlds/simple_goal_demo_sparse.sdf",
+        "world_sha256": "345e873cffc911fc7a13ce6e9a011ebedf076b2beaca466d7d779f5195d37391"
+      },
+      "started_ns": 1794385336439742946,
+      "ended_ns": 1794385405678451917,
+      "status": "passed",
+      "detail": {
+        "command": [
+          "bash",
+          "/home/rylanwwade/uav-verification-m2/scripts/run_goal_navigation_trial.sh",
+          "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0008-sparse-a-nominal-s632/run"
+        ],
+        "duration_wall_s": 66.08604154800003,
+        "environment": {
+          "GOAL_X": "4.0",
+          "GOAL_Y": "0.0",
+          "GPS_OUTAGE_AFTER_MOTION": "-1",
+          "GZ_PARTITION": "verification_490_8",
+          "ROS_DOMAIN_ID": "98",
+          "SEED": "632",
+          "TRIAL_TIMEOUT": "100",
+          "UAV_ASSISTANCE": "true",
+          "WALL_TIMEOUT": "160",
+          "WORLD_FILE": "/home/rylanwwade/uav-verification-m2/simulation/worlds/simple_goal_demo_sparse.sdf"
+        },
+        "evaluations": [
+          {
+            "execution_status": "completed",
+            "exit_code": 0,
+            "objective_r1_m": 0.14641641928133942,
+            "result_path": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0008-sparse-a-nominal-s632/run/verification/evaluation/result.json",
+            "verdicts": {
+              "R1": "PASS",
+              "R2": "PASS",
+              "R3": "INCONCLUSIVE",
+              "R4": "NOT_APPLICABLE",
+              "R5": "NOT_APPLICABLE",
+              "R6": "PASS",
+              "R7": "NOT_APPLICABLE",
+              "R8": "NOT_APPLICABLE"
+            }
+          }
+        ],
+        "returncode": 0,
+        "timed_out": false
+      }
+    },
+    {
+      "id": 9,
+      "case_id": "sparse-a-nominal-s633",
+      "category": "matrix",
+      "configuration": {
+        "assistance": true,
+        "case_id": "sparse-a-nominal-s633",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "sparse-a-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 633,
+        "world": "simulation/worlds/simple_goal_demo_sparse.sdf",
+        "world_sha256": "345e873cffc911fc7a13ce6e9a011ebedf076b2beaca466d7d779f5195d37391"
+      },
+      "started_ns": 1794385405700125090,
+      "ended_ns": 1794385472546992596,
+      "status": "passed",
+      "detail": {
+        "command": [
+          "bash",
+          "/home/rylanwwade/uav-verification-m2/scripts/run_goal_navigation_trial.sh",
+          "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0009-sparse-a-nominal-s633/run"
+        ],
+        "duration_wall_s": 63.800551977000055,
+        "environment": {
+          "GOAL_X": "4.0",
+          "GOAL_Y": "0.0",
+          "GPS_OUTAGE_AFTER_MOTION": "-1",
+          "GZ_PARTITION": "verification_490_9",
+          "ROS_DOMAIN_ID": "99",
+          "SEED": "633",
+          "TRIAL_TIMEOUT": "100",
+          "UAV_ASSISTANCE": "true",
+          "WALL_TIMEOUT": "160",
+          "WORLD_FILE": "/home/rylanwwade/uav-verification-m2/simulation/worlds/simple_goal_demo_sparse.sdf"
+        },
+        "evaluations": [
+          {
+            "execution_status": "completed",
+            "exit_code": 0,
+            "objective_r1_m": 0.15974272156983216,
+            "result_path": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0009-sparse-a-nominal-s633/run/verification/evaluation/result.json",
+            "verdicts": {
+              "R1": "PASS",
+              "R2": "PASS",
+              "R3": "INCONCLUSIVE",
+              "R4": "NOT_APPLICABLE",
+              "R5": "NOT_APPLICABLE",
+              "R6": "PASS",
+              "R7": "NOT_APPLICABLE",
+              "R8": "NOT_APPLICABLE"
+            }
+          }
+        ],
+        "returncode": 0,
+        "timed_out": false
+      }
+    },
+    {
+      "id": 10,
+      "case_id": "sparse-b-nominal-s631",
+      "category": "matrix",
+      "configuration": {
+        "assistance": true,
+        "case_id": "sparse-b-nominal-s631",
+        "goal": [
+          3.0,
+          0.5
+        ],
+        "id": "sparse-b-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 631,
+        "world": "simulation/worlds/simple_goal_demo_sparse.sdf",
+        "world_sha256": "345e873cffc911fc7a13ce6e9a011ebedf076b2beaca466d7d779f5195d37391"
+      },
+      "started_ns": 1794385472575609769,
+      "ended_ns": 1794385536331532427,
+      "status": "passed",
+      "detail": {
+        "command": [
+          "bash",
+          "/home/rylanwwade/uav-verification-m2/scripts/run_goal_navigation_trial.sh",
+          "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0010-sparse-b-nominal-s631/run"
+        ],
+        "duration_wall_s": 61.06897250199995,
+        "environment": {
+          "GOAL_X": "3.0",
+          "GOAL_Y": "0.5",
+          "GPS_OUTAGE_AFTER_MOTION": "-1",
+          "GZ_PARTITION": "verification_490_10",
+          "ROS_DOMAIN_ID": "100",
+          "SEED": "631",
+          "TRIAL_TIMEOUT": "100",
+          "UAV_ASSISTANCE": "true",
+          "WALL_TIMEOUT": "160",
+          "WORLD_FILE": "/home/rylanwwade/uav-verification-m2/simulation/worlds/simple_goal_demo_sparse.sdf"
+        },
+        "evaluations": [
+          {
+            "execution_status": "completed",
+            "exit_code": 0,
+            "objective_r1_m": 0.13701485345708853,
+            "result_path": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0010-sparse-b-nominal-s631/run/verification/evaluation/result.json",
+            "verdicts": {
+              "R1": "PASS",
+              "R2": "PASS",
+              "R3": "INCONCLUSIVE",
+              "R4": "NOT_APPLICABLE",
+              "R5": "NOT_APPLICABLE",
+              "R6": "PASS",
+              "R7": "NOT_APPLICABLE",
+              "R8": "NOT_APPLICABLE"
+            }
+          }
+        ],
+        "returncode": 0,
+        "timed_out": false
+      }
+    },
+    {
+      "id": 11,
+      "case_id": "sparse-b-nominal-s632",
+      "category": "matrix",
+      "configuration": {
+        "assistance": true,
+        "case_id": "sparse-b-nominal-s632",
+        "goal": [
+          3.0,
+          0.5
+        ],
+        "id": "sparse-b-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 632,
+        "world": "simulation/worlds/simple_goal_demo_sparse.sdf",
+        "world_sha256": "345e873cffc911fc7a13ce6e9a011ebedf076b2beaca466d7d779f5195d37391"
+      },
+      "started_ns": 1794385536356091836,
+      "ended_ns": 1794385605821213720,
+      "status": "passed",
+      "detail": {
+        "command": [
+          "bash",
+          "/home/rylanwwade/uav-verification-m2/scripts/run_goal_navigation_trial.sh",
+          "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0011-sparse-b-nominal-s632/run"
+        ],
+        "duration_wall_s": 66.56383533300004,
+        "environment": {
+          "GOAL_X": "3.0",
+          "GOAL_Y": "0.5",
+          "GPS_OUTAGE_AFTER_MOTION": "-1",
+          "GZ_PARTITION": "verification_490_11",
+          "ROS_DOMAIN_ID": "101",
+          "SEED": "632",
+          "TRIAL_TIMEOUT": "100",
+          "UAV_ASSISTANCE": "true",
+          "WALL_TIMEOUT": "160",
+          "WORLD_FILE": "/home/rylanwwade/uav-verification-m2/simulation/worlds/simple_goal_demo_sparse.sdf"
+        },
+        "evaluations": [
+          {
+            "execution_status": "completed",
+            "exit_code": 0,
+            "objective_r1_m": 0.137977190780186,
+            "result_path": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0011-sparse-b-nominal-s632/run/verification/evaluation/result.json",
+            "verdicts": {
+              "R1": "PASS",
+              "R2": "PASS",
+              "R3": "INCONCLUSIVE",
+              "R4": "NOT_APPLICABLE",
+              "R5": "NOT_APPLICABLE",
+              "R6": "PASS",
+              "R7": "NOT_APPLICABLE",
+              "R8": "NOT_APPLICABLE"
+            }
+          }
+        ],
+        "returncode": 0,
+        "timed_out": false
+      }
+    },
+    {
+      "id": 12,
+      "case_id": "sparse-b-nominal-s633",
+      "category": "matrix",
+      "configuration": {
+        "assistance": true,
+        "case_id": "sparse-b-nominal-s633",
+        "goal": [
+          3.0,
+          0.5
+        ],
+        "id": "sparse-b-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 633,
+        "world": "simulation/worlds/simple_goal_demo_sparse.sdf",
+        "world_sha256": "345e873cffc911fc7a13ce6e9a011ebedf076b2beaca466d7d779f5195d37391"
+      },
+      "started_ns": 1794385605841464316,
+      "ended_ns": 1794385674242878660,
+      "status": "passed",
+      "detail": {
+        "command": [
+          "bash",
+          "/home/rylanwwade/uav-verification-m2/scripts/run_goal_navigation_trial.sh",
+          "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0012-sparse-b-nominal-s633/run"
+        ],
+        "duration_wall_s": 65.20081755199999,
+        "environment": {
+          "GOAL_X": "3.0",
+          "GOAL_Y": "0.5",
+          "GPS_OUTAGE_AFTER_MOTION": "-1",
+          "GZ_PARTITION": "verification_490_12",
+          "ROS_DOMAIN_ID": "102",
+          "SEED": "633",
+          "TRIAL_TIMEOUT": "100",
+          "UAV_ASSISTANCE": "true",
+          "WALL_TIMEOUT": "160",
+          "WORLD_FILE": "/home/rylanwwade/uav-verification-m2/simulation/worlds/simple_goal_demo_sparse.sdf"
+        },
+        "evaluations": [
+          {
+            "execution_status": "completed",
+            "exit_code": 0,
+            "objective_r1_m": 0.1358331590138987,
+            "result_path": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0012-sparse-b-nominal-s633/run/verification/evaluation/result.json",
+            "verdicts": {
+              "R1": "PASS",
+              "R2": "PASS",
+              "R3": "INCONCLUSIVE",
+              "R4": "NOT_APPLICABLE",
+              "R5": "NOT_APPLICABLE",
+              "R6": "PASS",
+              "R7": "NOT_APPLICABLE",
+              "R8": "NOT_APPLICABLE"
+            }
+          }
+        ],
+        "returncode": 0,
+        "timed_out": false
+      }
+    },
+    {
+      "id": 13,
+      "case_id": "dense-a-nominal-s631",
+      "category": "matrix",
+      "configuration": {
+        "assistance": true,
+        "case_id": "dense-a-nominal-s631",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "dense-a-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 631,
+        "world": "simulation/worlds/simple_goal_demo_dense.sdf",
+        "world_sha256": "21bfa8b92d59c24f0c2afb1365832393b45c7b704ed036bd78c4438ce0a3a48f"
+      },
+      "started_ns": 1794385674269400379,
+      "ended_ns": 1794385737427315871,
+      "status": "passed",
+      "detail": {
+        "command": [
+          "bash",
+          "/home/rylanwwade/uav-verification-m2/scripts/run_goal_navigation_trial.sh",
+          "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0013-dense-a-nominal-s631/run"
+        ],
+        "duration_wall_s": 60.27981015399996,
+        "environment": {
+          "GOAL_X": "4.0",
+          "GOAL_Y": "0.0",
+          "GPS_OUTAGE_AFTER_MOTION": "-1",
+          "GZ_PARTITION": "verification_490_13",
+          "ROS_DOMAIN_ID": "103",
+          "SEED": "631",
+          "TRIAL_TIMEOUT": "100",
+          "UAV_ASSISTANCE": "true",
+          "WALL_TIMEOUT": "160",
+          "WORLD_FILE": "/home/rylanwwade/uav-verification-m2/simulation/worlds/simple_goal_demo_dense.sdf"
+        },
+        "evaluations": [
+          {
+            "execution_status": "completed",
+            "exit_code": 0,
+            "objective_r1_m": 0.15504167237586886,
+            "result_path": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0013-dense-a-nominal-s631/run/verification/evaluation/result.json",
+            "verdicts": {
+              "R1": "PASS",
+              "R2": "PASS",
+              "R3": "INCONCLUSIVE",
+              "R4": "NOT_APPLICABLE",
+              "R5": "NOT_APPLICABLE",
+              "R6": "PASS",
+              "R7": "NOT_APPLICABLE",
+              "R8": "NOT_APPLICABLE"
+            }
+          }
+        ],
+        "returncode": 0,
+        "timed_out": false
+      }
+    },
+    {
+      "id": 14,
+      "case_id": "dense-a-nominal-s632",
+      "category": "matrix",
+      "configuration": {
+        "assistance": true,
+        "case_id": "dense-a-nominal-s632",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "dense-a-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 632,
+        "world": "simulation/worlds/simple_goal_demo_dense.sdf",
+        "world_sha256": "21bfa8b92d59c24f0c2afb1365832393b45c7b704ed036bd78c4438ce0a3a48f"
+      },
+      "started_ns": 1794385737448559709,
+      "ended_ns": 1794385811119454125,
+      "status": "passed",
+      "detail": {
+        "command": [
+          "bash",
+          "/home/rylanwwade/uav-verification-m2/scripts/run_goal_navigation_trial.sh",
+          "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0014-dense-a-nominal-s632/run"
+        ],
+        "duration_wall_s": 70.23260062899999,
+        "environment": {
+          "GOAL_X": "4.0",
+          "GOAL_Y": "0.0",
+          "GPS_OUTAGE_AFTER_MOTION": "-1",
+          "GZ_PARTITION": "verification_490_14",
+          "ROS_DOMAIN_ID": "104",
+          "SEED": "632",
+          "TRIAL_TIMEOUT": "100",
+          "UAV_ASSISTANCE": "true",
+          "WALL_TIMEOUT": "160",
+          "WORLD_FILE": "/home/rylanwwade/uav-verification-m2/simulation/worlds/simple_goal_demo_dense.sdf"
+        },
+        "evaluations": [
+          {
+            "execution_status": "completed",
+            "exit_code": 0,
+            "objective_r1_m": 0.1531961960269903,
+            "result_path": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0014-dense-a-nominal-s632/run/verification/evaluation/result.json",
+            "verdicts": {
+              "R1": "PASS",
+              "R2": "PASS",
+              "R3": "INCONCLUSIVE",
+              "R4": "NOT_APPLICABLE",
+              "R5": "NOT_APPLICABLE",
+              "R6": "PASS",
+              "R7": "NOT_APPLICABLE",
+              "R8": "NOT_APPLICABLE"
+            }
+          }
+        ],
+        "returncode": 0,
+        "timed_out": false
+      }
+    },
+    {
+      "id": 15,
+      "case_id": "dense-a-nominal-s633",
+      "category": "matrix",
+      "configuration": {
+        "assistance": true,
+        "case_id": "dense-a-nominal-s633",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "dense-a-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 633,
+        "world": "simulation/worlds/simple_goal_demo_dense.sdf",
+        "world_sha256": "21bfa8b92d59c24f0c2afb1365832393b45c7b704ed036bd78c4438ce0a3a48f"
+      },
+      "started_ns": 1794385811147618126,
+      "ended_ns": 1794385895340907789,
+      "status": "passed",
+      "detail": {
+        "command": [
+          "bash",
+          "/home/rylanwwade/uav-verification-m2/scripts/run_goal_navigation_trial.sh",
+          "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0015-dense-a-nominal-s633/run"
+        ],
+        "duration_wall_s": 79.65083255600007,
+        "environment": {
+          "GOAL_X": "4.0",
+          "GOAL_Y": "0.0",
+          "GPS_OUTAGE_AFTER_MOTION": "-1",
+          "GZ_PARTITION": "verification_490_15",
+          "ROS_DOMAIN_ID": "105",
+          "SEED": "633",
+          "TRIAL_TIMEOUT": "100",
+          "UAV_ASSISTANCE": "true",
+          "WALL_TIMEOUT": "160",
+          "WORLD_FILE": "/home/rylanwwade/uav-verification-m2/simulation/worlds/simple_goal_demo_dense.sdf"
+        },
+        "evaluations": [
+          {
+            "execution_status": "completed",
+            "exit_code": 0,
+            "objective_r1_m": 0.13825915057134364,
+            "result_path": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0015-dense-a-nominal-s633/run/verification/evaluation/result.json",
+            "verdicts": {
+              "R1": "PASS",
+              "R2": "PASS",
+              "R3": "INCONCLUSIVE",
+              "R4": "NOT_APPLICABLE",
+              "R5": "NOT_APPLICABLE",
+              "R6": "PASS",
+              "R7": "NOT_APPLICABLE",
+              "R8": "NOT_APPLICABLE"
+            }
+          }
+        ],
+        "returncode": 0,
+        "timed_out": false
+      }
+    },
+    {
+      "id": 16,
+      "case_id": "dense-b-nominal-s631",
+      "category": "matrix",
+      "configuration": {
+        "assistance": true,
+        "case_id": "dense-b-nominal-s631",
+        "goal": [
+          3.0,
+          0.5
+        ],
+        "id": "dense-b-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 631,
+        "world": "simulation/worlds/simple_goal_demo_dense.sdf",
+        "world_sha256": "21bfa8b92d59c24f0c2afb1365832393b45c7b704ed036bd78c4438ce0a3a48f"
+      },
+      "started_ns": 1794385895366066077,
+      "ended_ns": 1794386080050061845,
+      "status": "failed",
+      "detail": {
+        "command": [
+          "bash",
+          "/home/rylanwwade/uav-verification-m2/scripts/run_goal_navigation_trial.sh",
+          "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0016-dense-b-nominal-s631/run"
+        ],
+        "duration_wall_s": 173.33261334000008,
+        "environment": {
+          "GOAL_X": "3.0",
+          "GOAL_Y": "0.5",
+          "GPS_OUTAGE_AFTER_MOTION": "-1",
+          "GZ_PARTITION": "verification_490_16",
+          "ROS_DOMAIN_ID": "106",
+          "SEED": "631",
+          "TRIAL_TIMEOUT": "100",
+          "UAV_ASSISTANCE": "true",
+          "WALL_TIMEOUT": "160",
+          "WORLD_FILE": "/home/rylanwwade/uav-verification-m2/simulation/worlds/simple_goal_demo_dense.sdf"
+        },
+        "evaluations": [
+          {
+            "execution_status": "failed",
+            "exit_code": 1,
+            "objective_r1_m": 0.23962283046529254,
+            "result_path": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0016-dense-b-nominal-s631/run/verification/evaluation/result.json",
+            "verdicts": {
+              "R1": "PASS",
+              "R2": "FAIL",
+              "R3": "INCONCLUSIVE",
+              "R4": "NOT_APPLICABLE",
+              "R5": "NOT_APPLICABLE",
+              "R6": "PASS",
+              "R7": "NOT_APPLICABLE",
+              "R8": "NOT_APPLICABLE"
+            }
+          }
+        ],
+        "returncode": 1,
+        "timed_out": false
+      }
+    },
+    {
+      "id": 17,
+      "case_id": "dense-b-nominal-s632",
+      "category": "matrix",
+      "configuration": {
+        "assistance": true,
+        "case_id": "dense-b-nominal-s632",
+        "goal": [
+          3.0,
+          0.5
+        ],
+        "id": "dense-b-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 632,
+        "world": "simulation/worlds/simple_goal_demo_dense.sdf",
+        "world_sha256": "21bfa8b92d59c24f0c2afb1365832393b45c7b704ed036bd78c4438ce0a3a48f"
+      },
+      "started_ns": 1794386080107256966,
+      "ended_ns": 1794386281934828804,
+      "status": "failed",
+      "detail": {
+        "command": [
+          "bash",
+          "/home/rylanwwade/uav-verification-m2/scripts/run_goal_navigation_trial.sh",
+          "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0017-dense-b-nominal-s632/run"
+        ],
+        "duration_wall_s": 190.28743280899994,
+        "environment": {
+          "GOAL_X": "3.0",
+          "GOAL_Y": "0.5",
+          "GPS_OUTAGE_AFTER_MOTION": "-1",
+          "GZ_PARTITION": "verification_490_17",
+          "ROS_DOMAIN_ID": "107",
+          "SEED": "632",
+          "TRIAL_TIMEOUT": "100",
+          "UAV_ASSISTANCE": "true",
+          "WALL_TIMEOUT": "160",
+          "WORLD_FILE": "/home/rylanwwade/uav-verification-m2/simulation/worlds/simple_goal_demo_dense.sdf"
+        },
+        "evaluations": [
+          {
+            "execution_status": "failed",
+            "exit_code": 1,
+            "objective_r1_m": 0.19595130973114272,
+            "result_path": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0017-dense-b-nominal-s632/run/verification/evaluation/result.json",
+            "verdicts": {
+              "R1": "PASS",
+              "R2": "FAIL",
+              "R3": "INCONCLUSIVE",
+              "R4": "NOT_APPLICABLE",
+              "R5": "NOT_APPLICABLE",
+              "R6": "PASS",
+              "R7": "NOT_APPLICABLE",
+              "R8": "NOT_APPLICABLE"
+            }
+          }
+        ],
+        "returncode": 1,
+        "timed_out": false
+      }
+    },
+    {
+      "id": 18,
+      "case_id": "dense-b-nominal-s633",
+      "category": "matrix",
+      "configuration": {
+        "assistance": true,
+        "case_id": "dense-b-nominal-s633",
+        "goal": [
+          3.0,
+          0.5
+        ],
+        "id": "dense-b-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 633,
+        "world": "simulation/worlds/simple_goal_demo_dense.sdf",
+        "world_sha256": "21bfa8b92d59c24f0c2afb1365832393b45c7b704ed036bd78c4438ce0a3a48f"
+      },
+      "started_ns": 1794386281967267955,
+      "ended_ns": 1794386471910044215,
+      "status": "failed",
+      "detail": {
+        "command": [
+          "bash",
+          "/home/rylanwwade/uav-verification-m2/scripts/run_goal_navigation_trial.sh",
+          "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0018-dense-b-nominal-s633/run"
+        ],
+        "duration_wall_s": 178.55607550299987,
+        "environment": {
+          "GOAL_X": "3.0",
+          "GOAL_Y": "0.5",
+          "GPS_OUTAGE_AFTER_MOTION": "-1",
+          "GZ_PARTITION": "verification_490_18",
+          "ROS_DOMAIN_ID": "108",
+          "SEED": "633",
+          "TRIAL_TIMEOUT": "100",
+          "UAV_ASSISTANCE": "true",
+          "WALL_TIMEOUT": "160",
+          "WORLD_FILE": "/home/rylanwwade/uav-verification-m2/simulation/worlds/simple_goal_demo_dense.sdf"
+        },
+        "evaluations": [
+          {
+            "execution_status": "failed",
+            "exit_code": 1,
+            "objective_r1_m": 0.1262473745805911,
+            "result_path": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0018-dense-b-nominal-s633/run/verification/evaluation/result.json",
+            "verdicts": {
+              "R1": "PASS",
+              "R2": "FAIL",
+              "R3": "INCONCLUSIVE",
+              "R4": "NOT_APPLICABLE",
+              "R5": "NOT_APPLICABLE",
+              "R6": "PASS",
+              "R7": "NOT_APPLICABLE",
+              "R8": "NOT_APPLICABLE"
+            }
+          }
+        ],
+        "returncode": 1,
+        "timed_out": false
+      }
+    },
+    {
+      "id": 19,
+      "case_id": "corridor-a-nominal-s631",
+      "category": "matrix",
+      "configuration": {
+        "assistance": true,
+        "case_id": "corridor-a-nominal-s631",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "corridor-a-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 631,
+        "world": "simulation/worlds/simple_goal_demo_corridor.sdf",
+        "world_sha256": "6fb6a38ea3b0fe599ff9f412ca421e44cb4cf5efcb0c25bdeb74d424474b6f34"
+      },
+      "started_ns": 1794386471942517092,
+      "ended_ns": 1794386546837228766,
+      "status": "passed",
+      "detail": {
+        "command": [
+          "bash",
+          "/home/rylanwwade/uav-verification-m2/scripts/run_goal_navigation_trial.sh",
+          "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0019-corridor-a-nominal-s631/run"
+        ],
+        "duration_wall_s": 71.11007716099994,
+        "environment": {
+          "GOAL_X": "4.0",
+          "GOAL_Y": "0.0",
+          "GPS_OUTAGE_AFTER_MOTION": "-1",
+          "GZ_PARTITION": "verification_490_19",
+          "ROS_DOMAIN_ID": "109",
+          "SEED": "631",
+          "TRIAL_TIMEOUT": "100",
+          "UAV_ASSISTANCE": "true",
+          "WALL_TIMEOUT": "160",
+          "WORLD_FILE": "/home/rylanwwade/uav-verification-m2/simulation/worlds/simple_goal_demo_corridor.sdf"
+        },
+        "evaluations": [
+          {
+            "execution_status": "completed",
+            "exit_code": 0,
+            "objective_r1_m": 0.48035266787363173,
+            "result_path": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0019-corridor-a-nominal-s631/run/verification/evaluation/result.json",
+            "verdicts": {
+              "R1": "PASS",
+              "R2": "PASS",
+              "R3": "INCONCLUSIVE",
+              "R4": "NOT_APPLICABLE",
+              "R5": "NOT_APPLICABLE",
+              "R6": "PASS",
+              "R7": "NOT_APPLICABLE",
+              "R8": "NOT_APPLICABLE"
+            }
+          }
+        ],
+        "returncode": 0,
+        "timed_out": false
+      }
+    },
+    {
+      "id": 20,
+      "case_id": "corridor-a-nominal-s632",
+      "category": "matrix",
+      "configuration": {
+        "assistance": true,
+        "case_id": "corridor-a-nominal-s632",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "corridor-a-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 632,
+        "world": "simulation/worlds/simple_goal_demo_corridor.sdf",
+        "world_sha256": "6fb6a38ea3b0fe599ff9f412ca421e44cb4cf5efcb0c25bdeb74d424474b6f34"
+      },
+      "started_ns": 1794386546867198566,
+      "ended_ns": 1794386647611714108,
+      "status": "passed",
+      "detail": {
+        "command": [
+          "bash",
+          "/home/rylanwwade/uav-verification-m2/scripts/run_goal_navigation_trial.sh",
+          "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0020-corridor-a-nominal-s632/run"
+        ],
+        "duration_wall_s": 95.49205858899995,
+        "environment": {
+          "GOAL_X": "4.0",
+          "GOAL_Y": "0.0",
+          "GPS_OUTAGE_AFTER_MOTION": "-1",
+          "GZ_PARTITION": "verification_490_20",
+          "ROS_DOMAIN_ID": "110",
+          "SEED": "632",
+          "TRIAL_TIMEOUT": "100",
+          "UAV_ASSISTANCE": "true",
+          "WALL_TIMEOUT": "160",
+          "WORLD_FILE": "/home/rylanwwade/uav-verification-m2/simulation/worlds/simple_goal_demo_corridor.sdf"
+        },
+        "evaluations": [
+          {
+            "execution_status": "completed",
+            "exit_code": 0,
+            "objective_r1_m": 0.4466212318677154,
+            "result_path": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0020-corridor-a-nominal-s632/run/verification/evaluation/result.json",
+            "verdicts": {
+              "R1": "PASS",
+              "R2": "PASS",
+              "R3": "INCONCLUSIVE",
+              "R4": "NOT_APPLICABLE",
+              "R5": "NOT_APPLICABLE",
+              "R6": "PASS",
+              "R7": "NOT_APPLICABLE",
+              "R8": "NOT_APPLICABLE"
+            }
+          }
+        ],
+        "returncode": 0,
+        "timed_out": false
+      }
+    },
+    {
+      "id": 21,
+      "case_id": "corridor-a-nominal-s633",
+      "category": "matrix",
+      "configuration": {
+        "assistance": true,
+        "case_id": "corridor-a-nominal-s633",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "corridor-a-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 633,
+        "world": "simulation/worlds/simple_goal_demo_corridor.sdf",
+        "world_sha256": "6fb6a38ea3b0fe599ff9f412ca421e44cb4cf5efcb0c25bdeb74d424474b6f34"
+      },
+      "started_ns": 1794386647641976137,
+      "ended_ns": 1794386741451531079,
+      "status": "passed",
+      "detail": {
+        "command": [
+          "bash",
+          "/home/rylanwwade/uav-verification-m2/scripts/run_goal_navigation_trial.sh",
+          "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0021-corridor-a-nominal-s633/run"
+        ],
+        "duration_wall_s": 88.77466314599997,
+        "environment": {
+          "GOAL_X": "4.0",
+          "GOAL_Y": "0.0",
+          "GPS_OUTAGE_AFTER_MOTION": "-1",
+          "GZ_PARTITION": "verification_490_21",
+          "ROS_DOMAIN_ID": "111",
+          "SEED": "633",
+          "TRIAL_TIMEOUT": "100",
+          "UAV_ASSISTANCE": "true",
+          "WALL_TIMEOUT": "160",
+          "WORLD_FILE": "/home/rylanwwade/uav-verification-m2/simulation/worlds/simple_goal_demo_corridor.sdf"
+        },
+        "evaluations": [
+          {
+            "execution_status": "completed",
+            "exit_code": 0,
+            "objective_r1_m": 0.46395905819029437,
+            "result_path": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0021-corridor-a-nominal-s633/run/verification/evaluation/result.json",
+            "verdicts": {
+              "R1": "PASS",
+              "R2": "PASS",
+              "R3": "INCONCLUSIVE",
+              "R4": "NOT_APPLICABLE",
+              "R5": "NOT_APPLICABLE",
+              "R6": "PASS",
+              "R7": "NOT_APPLICABLE",
+              "R8": "NOT_APPLICABLE"
+            }
+          }
+        ],
+        "returncode": 0,
+        "timed_out": false
+      }
+    },
+    {
+      "id": 22,
+      "case_id": "corridor-b-nominal-s631",
+      "category": "matrix",
+      "configuration": {
+        "assistance": true,
+        "case_id": "corridor-b-nominal-s631",
+        "goal": [
+          3.0,
+          0.5
+        ],
+        "id": "corridor-b-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 631,
+        "world": "simulation/worlds/simple_goal_demo_corridor.sdf",
+        "world_sha256": "6fb6a38ea3b0fe599ff9f412ca421e44cb4cf5efcb0c25bdeb74d424474b6f34"
+      },
+      "started_ns": 1794386741481029487,
+      "ended_ns": 1794386829900994305,
+      "status": "passed",
+      "detail": {
+        "command": [
+          "bash",
+          "/home/rylanwwade/uav-verification-m2/scripts/run_goal_navigation_trial.sh",
+          "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0022-corridor-b-nominal-s631/run"
+        ],
+        "duration_wall_s": 82.97944148899978,
+        "environment": {
+          "GOAL_X": "3.0",
+          "GOAL_Y": "0.5",
+          "GPS_OUTAGE_AFTER_MOTION": "-1",
+          "GZ_PARTITION": "verification_490_22",
+          "ROS_DOMAIN_ID": "112",
+          "SEED": "631",
+          "TRIAL_TIMEOUT": "100",
+          "UAV_ASSISTANCE": "true",
+          "WALL_TIMEOUT": "160",
+          "WORLD_FILE": "/home/rylanwwade/uav-verification-m2/simulation/worlds/simple_goal_demo_corridor.sdf"
+        },
+        "evaluations": [
+          {
+            "execution_status": "completed",
+            "exit_code": 0,
+            "objective_r1_m": 0.2358277523578236,
+            "result_path": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0022-corridor-b-nominal-s631/run/verification/evaluation/result.json",
+            "verdicts": {
+              "R1": "PASS",
+              "R2": "PASS",
+              "R3": "INCONCLUSIVE",
+              "R4": "NOT_APPLICABLE",
+              "R5": "NOT_APPLICABLE",
+              "R6": "PASS",
+              "R7": "NOT_APPLICABLE",
+              "R8": "NOT_APPLICABLE"
+            }
+          }
+        ],
+        "returncode": 0,
+        "timed_out": false
+      }
+    },
+    {
+      "id": 23,
+      "case_id": "corridor-b-nominal-s632",
+      "category": "matrix",
+      "configuration": {
+        "assistance": true,
+        "case_id": "corridor-b-nominal-s632",
+        "goal": [
+          3.0,
+          0.5
+        ],
+        "id": "corridor-b-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 632,
+        "world": "simulation/worlds/simple_goal_demo_corridor.sdf",
+        "world_sha256": "6fb6a38ea3b0fe599ff9f412ca421e44cb4cf5efcb0c25bdeb74d424474b6f34"
+      },
+      "started_ns": 1794386829933908421,
+      "ended_ns": 1794386913408725553,
+      "status": "passed",
+      "detail": {
+        "command": [
+          "bash",
+          "/home/rylanwwade/uav-verification-m2/scripts/run_goal_navigation_trial.sh",
+          "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0023-corridor-b-nominal-s632/run"
+        ],
+        "duration_wall_s": 79.44463071400014,
+        "environment": {
+          "GOAL_X": "3.0",
+          "GOAL_Y": "0.5",
+          "GPS_OUTAGE_AFTER_MOTION": "-1",
+          "GZ_PARTITION": "verification_490_23",
+          "ROS_DOMAIN_ID": "113",
+          "SEED": "632",
+          "TRIAL_TIMEOUT": "100",
+          "UAV_ASSISTANCE": "true",
+          "WALL_TIMEOUT": "160",
+          "WORLD_FILE": "/home/rylanwwade/uav-verification-m2/simulation/worlds/simple_goal_demo_corridor.sdf"
+        },
+        "evaluations": [
+          {
+            "execution_status": "completed",
+            "exit_code": 0,
+            "objective_r1_m": 0.2190819253815055,
+            "result_path": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0023-corridor-b-nominal-s632/run/verification/evaluation/result.json",
+            "verdicts": {
+              "R1": "PASS",
+              "R2": "PASS",
+              "R3": "INCONCLUSIVE",
+              "R4": "NOT_APPLICABLE",
+              "R5": "NOT_APPLICABLE",
+              "R6": "PASS",
+              "R7": "NOT_APPLICABLE",
+              "R8": "NOT_APPLICABLE"
+            }
+          }
+        ],
+        "returncode": 0,
+        "timed_out": false
+      }
+    },
+    {
+      "id": 24,
+      "case_id": "corridor-b-nominal-s633",
+      "category": "matrix",
+      "configuration": {
+        "assistance": true,
+        "case_id": "corridor-b-nominal-s633",
+        "goal": [
+          3.0,
+          0.5
+        ],
+        "id": "corridor-b-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 633,
+        "world": "simulation/worlds/simple_goal_demo_corridor.sdf",
+        "world_sha256": "6fb6a38ea3b0fe599ff9f412ca421e44cb4cf5efcb0c25bdeb74d424474b6f34"
+      },
+      "started_ns": 1794386913443450311,
+      "ended_ns": 1794386993409895481,
+      "status": "passed",
+      "detail": {
+        "command": [
+          "bash",
+          "/home/rylanwwade/uav-verification-m2/scripts/run_goal_navigation_trial.sh",
+          "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0024-corridor-b-nominal-s633/run"
+        ],
+        "duration_wall_s": 75.02110441500008,
+        "environment": {
+          "GOAL_X": "3.0",
+          "GOAL_Y": "0.5",
+          "GPS_OUTAGE_AFTER_MOTION": "-1",
+          "GZ_PARTITION": "verification_490_24",
+          "ROS_DOMAIN_ID": "114",
+          "SEED": "633",
+          "TRIAL_TIMEOUT": "100",
+          "UAV_ASSISTANCE": "true",
+          "WALL_TIMEOUT": "160",
+          "WORLD_FILE": "/home/rylanwwade/uav-verification-m2/simulation/worlds/simple_goal_demo_corridor.sdf"
+        },
+        "evaluations": [
+          {
+            "execution_status": "completed",
+            "exit_code": 0,
+            "objective_r1_m": 0.23824356123292578,
+            "result_path": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0024-corridor-b-nominal-s633/run/verification/evaluation/result.json",
+            "verdicts": {
+              "R1": "PASS",
+              "R2": "PASS",
+              "R3": "INCONCLUSIVE",
+              "R4": "NOT_APPLICABLE",
+              "R5": "NOT_APPLICABLE",
+              "R6": "PASS",
+              "R7": "NOT_APPLICABLE",
+              "R8": "NOT_APPLICABLE"
+            }
+          }
+        ],
+        "returncode": 0,
+        "timed_out": false
+      }
+    },
+    {
+      "id": 25,
+      "case_id": "empty-a-outage-s631",
+      "category": "matrix",
+      "configuration": {
+        "assistance": true,
+        "case_id": "empty-a-outage-s631",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "empty-a-outage",
+        "kind": "navigation",
+        "outage": true,
+        "seed": 631,
+        "world": "simulation/worlds/simple_goal_demo.sdf",
+        "world_sha256": "0f12df287b4c55a6c71f139e1ff957d1330559762dc7a6aab814a8b72feb3bb3"
+      },
+      "started_ns": 1794386993444319514,
+      "ended_ns": 1794387073455119913,
+      "status": "passed",
+      "detail": {
+        "command": [
+          "bash",
+          "/home/rylanwwade/uav-verification-m2/scripts/run_goal_navigation_trial.sh",
+          "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0025-empty-a-outage-s631/run"
+        ],
+        "duration_wall_s": 75.9256789850001,
+        "environment": {
+          "GOAL_X": "4.0",
+          "GOAL_Y": "0.0",
+          "GPS_OUTAGE_AFTER_MOTION": "3",
+          "GZ_PARTITION": "verification_490_25",
+          "ROS_DOMAIN_ID": "115",
+          "SEED": "631",
+          "TRIAL_TIMEOUT": "100",
+          "UAV_ASSISTANCE": "true",
+          "WALL_TIMEOUT": "160",
+          "WORLD_FILE": "/home/rylanwwade/uav-verification-m2/simulation/worlds/simple_goal_demo.sdf"
+        },
+        "evaluations": [
+          {
+            "execution_status": "completed",
+            "exit_code": 0,
+            "objective_r1_m": null,
+            "result_path": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0025-empty-a-outage-s631/run/verification/evaluation/result.json",
+            "verdicts": {
+              "R1": "PASS",
+              "R2": "PASS",
+              "R3": "INCONCLUSIVE",
+              "R4": "NOT_APPLICABLE",
+              "R5": "NOT_APPLICABLE",
+              "R6": "PASS",
+              "R7": "NOT_APPLICABLE",
+              "R8": "NOT_APPLICABLE"
+            }
+          }
+        ],
+        "returncode": 0,
+        "timed_out": false
+      }
+    },
+    {
+      "id": 26,
+      "case_id": "empty-a-outage-s632",
+      "category": "matrix",
+      "configuration": {
+        "assistance": true,
+        "case_id": "empty-a-outage-s632",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "empty-a-outage",
+        "kind": "navigation",
+        "outage": true,
+        "seed": 632,
+        "world": "simulation/worlds/simple_goal_demo.sdf",
+        "world_sha256": "0f12df287b4c55a6c71f139e1ff957d1330559762dc7a6aab814a8b72feb3bb3"
+      },
+      "started_ns": 1794387073489587406,
+      "ended_ns": 1794387147953249497,
+      "status": "passed",
+      "detail": {
+        "command": [
+          "bash",
+          "/home/rylanwwade/uav-verification-m2/scripts/run_goal_navigation_trial.sh",
+          "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0026-empty-a-outage-s632/run"
+        ],
+        "duration_wall_s": 71.01733440600037,
+        "environment": {
+          "GOAL_X": "4.0",
+          "GOAL_Y": "0.0",
+          "GPS_OUTAGE_AFTER_MOTION": "3",
+          "GZ_PARTITION": "verification_490_26",
+          "ROS_DOMAIN_ID": "116",
+          "SEED": "632",
+          "TRIAL_TIMEOUT": "100",
+          "UAV_ASSISTANCE": "true",
+          "WALL_TIMEOUT": "160",
+          "WORLD_FILE": "/home/rylanwwade/uav-verification-m2/simulation/worlds/simple_goal_demo.sdf"
+        },
+        "evaluations": [
+          {
+            "execution_status": "completed",
+            "exit_code": 0,
+            "objective_r1_m": null,
+            "result_path": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0026-empty-a-outage-s632/run/verification/evaluation/result.json",
+            "verdicts": {
+              "R1": "PASS",
+              "R2": "PASS",
+              "R3": "INCONCLUSIVE",
+              "R4": "NOT_APPLICABLE",
+              "R5": "NOT_APPLICABLE",
+              "R6": "PASS",
+              "R7": "NOT_APPLICABLE",
+              "R8": "NOT_APPLICABLE"
+            }
+          }
+        ],
+        "returncode": 0,
+        "timed_out": false
+      }
+    },
+    {
+      "id": 27,
+      "case_id": "empty-a-outage-s633",
+      "category": "matrix",
+      "configuration": {
+        "assistance": true,
+        "case_id": "empty-a-outage-s633",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "empty-a-outage",
+        "kind": "navigation",
+        "outage": true,
+        "seed": 633,
+        "world": "simulation/worlds/simple_goal_demo.sdf",
+        "world_sha256": "0f12df287b4c55a6c71f139e1ff957d1330559762dc7a6aab814a8b72feb3bb3"
+      },
+      "started_ns": 1794387147984343348,
+      "ended_ns": 1794387230879319389,
+      "status": "passed",
+      "detail": {
+        "command": [
+          "bash",
+          "/home/rylanwwade/uav-verification-m2/scripts/run_goal_navigation_trial.sh",
+          "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0027-empty-a-outage-s633/run"
+        ],
+        "duration_wall_s": 78.16715277499998,
+        "environment": {
+          "GOAL_X": "4.0",
+          "GOAL_Y": "0.0",
+          "GPS_OUTAGE_AFTER_MOTION": "3",
+          "GZ_PARTITION": "verification_490_27",
+          "ROS_DOMAIN_ID": "117",
+          "SEED": "633",
+          "TRIAL_TIMEOUT": "100",
+          "UAV_ASSISTANCE": "true",
+          "WALL_TIMEOUT": "160",
+          "WORLD_FILE": "/home/rylanwwade/uav-verification-m2/simulation/worlds/simple_goal_demo.sdf"
+        },
+        "evaluations": [
+          {
+            "execution_status": "completed",
+            "exit_code": 0,
+            "objective_r1_m": null,
+            "result_path": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0027-empty-a-outage-s633/run/verification/evaluation/result.json",
+            "verdicts": {
+              "R1": "PASS",
+              "R2": "PASS",
+              "R3": "INCONCLUSIVE",
+              "R4": "NOT_APPLICABLE",
+              "R5": "NOT_APPLICABLE",
+              "R6": "PASS",
+              "R7": "NOT_APPLICABLE",
+              "R8": "NOT_APPLICABLE"
+            }
+          }
+        ],
+        "returncode": 0,
+        "timed_out": false
+      }
+    },
+    {
+      "id": 28,
+      "case_id": "sparse-a-outage-s631",
+      "category": "matrix",
+      "configuration": {
+        "assistance": true,
+        "case_id": "sparse-a-outage-s631",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "sparse-a-outage",
+        "kind": "navigation",
+        "outage": true,
+        "seed": 631,
+        "world": "simulation/worlds/simple_goal_demo_sparse.sdf",
+        "world_sha256": "345e873cffc911fc7a13ce6e9a011ebedf076b2beaca466d7d779f5195d37391"
+      },
+      "started_ns": 1794387230907211515,
+      "ended_ns": 1794387323438059176,
+      "status": "passed",
+      "detail": {
+        "command": [
+          "bash",
+          "/home/rylanwwade/uav-verification-m2/scripts/run_goal_navigation_trial.sh",
+          "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0028-sparse-a-outage-s631/run"
+        ],
+        "duration_wall_s": 87.63146951499994,
+        "environment": {
+          "GOAL_X": "4.0",
+          "GOAL_Y": "0.0",
+          "GPS_OUTAGE_AFTER_MOTION": "3",
+          "GZ_PARTITION": "verification_490_28",
+          "ROS_DOMAIN_ID": "118",
+          "SEED": "631",
+          "TRIAL_TIMEOUT": "100",
+          "UAV_ASSISTANCE": "true",
+          "WALL_TIMEOUT": "160",
+          "WORLD_FILE": "/home/rylanwwade/uav-verification-m2/simulation/worlds/simple_goal_demo_sparse.sdf"
+        },
+        "evaluations": [
+          {
+            "execution_status": "completed",
+            "exit_code": 0,
+            "objective_r1_m": 0.13553654656860525,
+            "result_path": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0028-sparse-a-outage-s631/run/verification/evaluation/result.json",
+            "verdicts": {
+              "R1": "PASS",
+              "R2": "PASS",
+              "R3": "INCONCLUSIVE",
+              "R4": "NOT_APPLICABLE",
+              "R5": "NOT_APPLICABLE",
+              "R6": "PASS",
+              "R7": "NOT_APPLICABLE",
+              "R8": "NOT_APPLICABLE"
+            }
+          }
+        ],
+        "returncode": 0,
+        "timed_out": false
+      }
+    },
+    {
+      "id": 29,
+      "case_id": "sparse-a-outage-s632",
+      "category": "matrix",
+      "configuration": {
+        "assistance": true,
+        "case_id": "sparse-a-outage-s632",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "sparse-a-outage",
+        "kind": "navigation",
+        "outage": true,
+        "seed": 632,
+        "world": "simulation/worlds/simple_goal_demo_sparse.sdf",
+        "world_sha256": "345e873cffc911fc7a13ce6e9a011ebedf076b2beaca466d7d779f5195d37391"
+      },
+      "started_ns": 1794387323466944027,
+      "ended_ns": 1794387412490261414,
+      "status": "passed",
+      "detail": {
+        "command": [
+          "bash",
+          "/home/rylanwwade/uav-verification-m2/scripts/run_goal_navigation_trial.sh",
+          "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0029-sparse-a-outage-s632/run"
+        ],
+        "duration_wall_s": 84.90752527199993,
+        "environment": {
+          "GOAL_X": "4.0",
+          "GOAL_Y": "0.0",
+          "GPS_OUTAGE_AFTER_MOTION": "3",
+          "GZ_PARTITION": "verification_490_29",
+          "ROS_DOMAIN_ID": "119",
+          "SEED": "632",
+          "TRIAL_TIMEOUT": "100",
+          "UAV_ASSISTANCE": "true",
+          "WALL_TIMEOUT": "160",
+          "WORLD_FILE": "/home/rylanwwade/uav-verification-m2/simulation/worlds/simple_goal_demo_sparse.sdf"
+        },
+        "evaluations": [
+          {
+            "execution_status": "completed",
+            "exit_code": 0,
+            "objective_r1_m": 0.1518190982454668,
+            "result_path": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0029-sparse-a-outage-s632/run/verification/evaluation/result.json",
+            "verdicts": {
+              "R1": "PASS",
+              "R2": "PASS",
+              "R3": "INCONCLUSIVE",
+              "R4": "NOT_APPLICABLE",
+              "R5": "NOT_APPLICABLE",
+              "R6": "PASS",
+              "R7": "NOT_APPLICABLE",
+              "R8": "NOT_APPLICABLE"
+            }
+          }
+        ],
+        "returncode": 0,
+        "timed_out": false
+      }
+    },
+    {
+      "id": 30,
+      "case_id": "sparse-a-outage-s633",
+      "category": "matrix",
+      "configuration": {
+        "assistance": true,
+        "case_id": "sparse-a-outage-s633",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "sparse-a-outage",
+        "kind": "navigation",
+        "outage": true,
+        "seed": 633,
+        "world": "simulation/worlds/simple_goal_demo_sparse.sdf",
+        "world_sha256": "345e873cffc911fc7a13ce6e9a011ebedf076b2beaca466d7d779f5195d37391"
+      },
+      "started_ns": 1794387412523388058,
+      "ended_ns": 1794387504499770488,
+      "status": "passed",
+      "detail": {
+        "command": [
+          "bash",
+          "/home/rylanwwade/uav-verification-m2/scripts/run_goal_navigation_trial.sh",
+          "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0030-sparse-a-outage-s633/run"
+        ],
+        "duration_wall_s": 87.02363762999994,
+        "environment": {
+          "GOAL_X": "4.0",
+          "GOAL_Y": "0.0",
+          "GPS_OUTAGE_AFTER_MOTION": "3",
+          "GZ_PARTITION": "verification_490_30",
+          "ROS_DOMAIN_ID": "120",
+          "SEED": "633",
+          "TRIAL_TIMEOUT": "100",
+          "UAV_ASSISTANCE": "true",
+          "WALL_TIMEOUT": "160",
+          "WORLD_FILE": "/home/rylanwwade/uav-verification-m2/simulation/worlds/simple_goal_demo_sparse.sdf"
+        },
+        "evaluations": [
+          {
+            "execution_status": "completed",
+            "exit_code": 0,
+            "objective_r1_m": 0.12095733477290038,
+            "result_path": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0030-sparse-a-outage-s633/run/verification/evaluation/result.json",
+            "verdicts": {
+              "R1": "PASS",
+              "R2": "PASS",
+              "R3": "INCONCLUSIVE",
+              "R4": "NOT_APPLICABLE",
+              "R5": "NOT_APPLICABLE",
+              "R6": "PASS",
+              "R7": "NOT_APPLICABLE",
+              "R8": "NOT_APPLICABLE"
+            }
+          }
+        ],
+        "returncode": 0,
+        "timed_out": false
+      }
+    },
+    {
+      "id": 31,
+      "case_id": "dense-b-outage-s631",
+      "category": "matrix",
+      "configuration": {
+        "assistance": true,
+        "case_id": "dense-b-outage-s631",
+        "goal": [
+          3.0,
+          0.5
+        ],
+        "id": "dense-b-outage",
+        "kind": "navigation",
+        "outage": true,
+        "seed": 631,
+        "world": "simulation/worlds/simple_goal_demo_dense.sdf",
+        "world_sha256": "21bfa8b92d59c24f0c2afb1365832393b45c7b704ed036bd78c4438ce0a3a48f"
+      },
+      "started_ns": 1794387504541333391,
+      "ended_ns": 1794387686572346215,
+      "status": "failed",
+      "detail": {
+        "command": [
+          "bash",
+          "/home/rylanwwade/uav-verification-m2/scripts/run_goal_navigation_trial.sh",
+          "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0031-dense-b-outage-s631/run"
+        ],
+        "duration_wall_s": 170.6558391149997,
+        "environment": {
+          "GOAL_X": "3.0",
+          "GOAL_Y": "0.5",
+          "GPS_OUTAGE_AFTER_MOTION": "3",
+          "GZ_PARTITION": "verification_490_31",
+          "ROS_DOMAIN_ID": "121",
+          "SEED": "631",
+          "TRIAL_TIMEOUT": "100",
+          "UAV_ASSISTANCE": "true",
+          "WALL_TIMEOUT": "160",
+          "WORLD_FILE": "/home/rylanwwade/uav-verification-m2/simulation/worlds/simple_goal_demo_dense.sdf"
+        },
+        "evaluations": [
+          {
+            "execution_status": "failed",
+            "exit_code": 1,
+            "objective_r1_m": 0.2520204727793234,
+            "result_path": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0031-dense-b-outage-s631/run/verification/evaluation/result.json",
+            "verdicts": {
+              "R1": "PASS",
+              "R2": "FAIL",
+              "R3": "INCONCLUSIVE",
+              "R4": "NOT_APPLICABLE",
+              "R5": "NOT_APPLICABLE",
+              "R6": "PASS",
+              "R7": "NOT_APPLICABLE",
+              "R8": "NOT_APPLICABLE"
+            }
+          }
+        ],
+        "returncode": 1,
+        "timed_out": false
+      }
+    },
+    {
+      "id": 32,
+      "case_id": "dense-b-outage-s632",
+      "category": "matrix",
+      "configuration": {
+        "assistance": true,
+        "case_id": "dense-b-outage-s632",
+        "goal": [
+          3.0,
+          0.5
+        ],
+        "id": "dense-b-outage",
+        "kind": "navigation",
+        "outage": true,
+        "seed": 632,
+        "world": "simulation/worlds/simple_goal_demo_dense.sdf",
+        "world_sha256": "21bfa8b92d59c24f0c2afb1365832393b45c7b704ed036bd78c4438ce0a3a48f"
+      },
+      "started_ns": 1794387686614897314,
+      "ended_ns": 1794387875668209063,
+      "status": "failed",
+      "detail": {
+        "command": [
+          "bash",
+          "/home/rylanwwade/uav-verification-m2/scripts/run_goal_navigation_trial.sh",
+          "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0032-dense-b-outage-s632/run"
+        ],
+        "duration_wall_s": 178.17384945899994,
+        "environment": {
+          "GOAL_X": "3.0",
+          "GOAL_Y": "0.5",
+          "GPS_OUTAGE_AFTER_MOTION": "3",
+          "GZ_PARTITION": "verification_490_32",
+          "ROS_DOMAIN_ID": "122",
+          "SEED": "632",
+          "TRIAL_TIMEOUT": "100",
+          "UAV_ASSISTANCE": "true",
+          "WALL_TIMEOUT": "160",
+          "WORLD_FILE": "/home/rylanwwade/uav-verification-m2/simulation/worlds/simple_goal_demo_dense.sdf"
+        },
+        "evaluations": [
+          {
+            "execution_status": "failed",
+            "exit_code": 1,
+            "objective_r1_m": 0.2268048567838481,
+            "result_path": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0032-dense-b-outage-s632/run/verification/evaluation/result.json",
+            "verdicts": {
+              "R1": "PASS",
+              "R2": "FAIL",
+              "R3": "INCONCLUSIVE",
+              "R4": "NOT_APPLICABLE",
+              "R5": "NOT_APPLICABLE",
+              "R6": "PASS",
+              "R7": "NOT_APPLICABLE",
+              "R8": "NOT_APPLICABLE"
+            }
+          }
+        ],
+        "returncode": 1,
+        "timed_out": false
+      }
+    },
+    {
+      "id": 33,
+      "case_id": "dense-b-outage-s633",
+      "category": "matrix",
+      "configuration": {
+        "assistance": true,
+        "case_id": "dense-b-outage-s633",
+        "goal": [
+          3.0,
+          0.5
+        ],
+        "id": "dense-b-outage",
+        "kind": "navigation",
+        "outage": true,
+        "seed": 633,
+        "world": "simulation/worlds/simple_goal_demo_dense.sdf",
+        "world_sha256": "21bfa8b92d59c24f0c2afb1365832393b45c7b704ed036bd78c4438ce0a3a48f"
+      },
+      "started_ns": 1794387875699913145,
+      "ended_ns": 1794388079128352199,
+      "status": "failed",
+      "detail": {
+        "command": [
+          "bash",
+          "/home/rylanwwade/uav-verification-m2/scripts/run_goal_navigation_trial.sh",
+          "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0033-dense-b-outage-s633/run"
+        ],
+        "duration_wall_s": 192.29159218699988,
+        "environment": {
+          "GOAL_X": "3.0",
+          "GOAL_Y": "0.5",
+          "GPS_OUTAGE_AFTER_MOTION": "3",
+          "GZ_PARTITION": "verification_490_33",
+          "ROS_DOMAIN_ID": "123",
+          "SEED": "633",
+          "TRIAL_TIMEOUT": "100",
+          "UAV_ASSISTANCE": "true",
+          "WALL_TIMEOUT": "160",
+          "WORLD_FILE": "/home/rylanwwade/uav-verification-m2/simulation/worlds/simple_goal_demo_dense.sdf"
+        },
+        "evaluations": [
+          {
+            "execution_status": "failed",
+            "exit_code": 1,
+            "objective_r1_m": 0.2522105962111856,
+            "result_path": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0033-dense-b-outage-s633/run/verification/evaluation/result.json",
+            "verdicts": {
+              "R1": "PASS",
+              "R2": "FAIL",
+              "R3": "INCONCLUSIVE",
+              "R4": "NOT_APPLICABLE",
+              "R5": "NOT_APPLICABLE",
+              "R6": "PASS",
+              "R7": "NOT_APPLICABLE",
+              "R8": "NOT_APPLICABLE"
+            }
+          }
+        ],
+        "returncode": 1,
+        "timed_out": false
+      }
+    },
+    {
+      "id": 34,
+      "case_id": "corridor-b-outage-s631",
+      "category": "matrix",
+      "configuration": {
+        "assistance": true,
+        "case_id": "corridor-b-outage-s631",
+        "goal": [
+          3.0,
+          0.5
+        ],
+        "id": "corridor-b-outage",
+        "kind": "navigation",
+        "outage": true,
+        "seed": 631,
+        "world": "simulation/worlds/simple_goal_demo_corridor.sdf",
+        "world_sha256": "6fb6a38ea3b0fe599ff9f412ca421e44cb4cf5efcb0c25bdeb74d424474b6f34"
+      },
+      "started_ns": 1794388079160786763,
+      "ended_ns": 1794388164425251130,
+      "status": "passed",
+      "detail": {
+        "command": [
+          "bash",
+          "/home/rylanwwade/uav-verification-m2/scripts/run_goal_navigation_trial.sh",
+          "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0034-corridor-b-outage-s631/run"
+        ],
+        "duration_wall_s": 80.96158204899984,
+        "environment": {
+          "GOAL_X": "3.0",
+          "GOAL_Y": "0.5",
+          "GPS_OUTAGE_AFTER_MOTION": "3",
+          "GZ_PARTITION": "verification_490_34",
+          "ROS_DOMAIN_ID": "124",
+          "SEED": "631",
+          "TRIAL_TIMEOUT": "100",
+          "UAV_ASSISTANCE": "true",
+          "WALL_TIMEOUT": "160",
+          "WORLD_FILE": "/home/rylanwwade/uav-verification-m2/simulation/worlds/simple_goal_demo_corridor.sdf"
+        },
+        "evaluations": [
+          {
+            "execution_status": "completed",
+            "exit_code": 0,
+            "objective_r1_m": 0.25049164965816517,
+            "result_path": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0034-corridor-b-outage-s631/run/verification/evaluation/result.json",
+            "verdicts": {
+              "R1": "PASS",
+              "R2": "PASS",
+              "R3": "INCONCLUSIVE",
+              "R4": "NOT_APPLICABLE",
+              "R5": "NOT_APPLICABLE",
+              "R6": "PASS",
+              "R7": "NOT_APPLICABLE",
+              "R8": "NOT_APPLICABLE"
+            }
+          }
+        ],
+        "returncode": 0,
+        "timed_out": false
+      }
+    },
+    {
+      "id": 35,
+      "case_id": "corridor-b-outage-s632",
+      "category": "matrix",
+      "configuration": {
+        "assistance": true,
+        "case_id": "corridor-b-outage-s632",
+        "goal": [
+          3.0,
+          0.5
+        ],
+        "id": "corridor-b-outage",
+        "kind": "navigation",
+        "outage": true,
+        "seed": 632,
+        "world": "simulation/worlds/simple_goal_demo_corridor.sdf",
+        "world_sha256": "6fb6a38ea3b0fe599ff9f412ca421e44cb4cf5efcb0c25bdeb74d424474b6f34"
+      },
+      "started_ns": 1794388164451890287,
+      "ended_ns": 1794388226125457650,
+      "status": "passed",
+      "detail": {
+        "command": [
+          "bash",
+          "/home/rylanwwade/uav-verification-m2/scripts/run_goal_navigation_trial.sh",
+          "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0035-corridor-b-outage-s632/run"
+        ],
+        "duration_wall_s": 58.7669473130004,
+        "environment": {
+          "GOAL_X": "3.0",
+          "GOAL_Y": "0.5",
+          "GPS_OUTAGE_AFTER_MOTION": "3",
+          "GZ_PARTITION": "verification_490_35",
+          "ROS_DOMAIN_ID": "125",
+          "SEED": "632",
+          "TRIAL_TIMEOUT": "100",
+          "UAV_ASSISTANCE": "true",
+          "WALL_TIMEOUT": "160",
+          "WORLD_FILE": "/home/rylanwwade/uav-verification-m2/simulation/worlds/simple_goal_demo_corridor.sdf"
+        },
+        "evaluations": [
+          {
+            "execution_status": "completed",
+            "exit_code": 0,
+            "objective_r1_m": 0.24861849976246875,
+            "result_path": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0035-corridor-b-outage-s632/run/verification/evaluation/result.json",
+            "verdicts": {
+              "R1": "PASS",
+              "R2": "PASS",
+              "R3": "INCONCLUSIVE",
+              "R4": "NOT_APPLICABLE",
+              "R5": "NOT_APPLICABLE",
+              "R6": "PASS",
+              "R7": "NOT_APPLICABLE",
+              "R8": "NOT_APPLICABLE"
+            }
+          }
+        ],
+        "returncode": 0,
+        "timed_out": false
+      }
+    },
+    {
+      "id": 36,
+      "case_id": "corridor-b-outage-s633",
+      "category": "matrix",
+      "configuration": {
+        "assistance": true,
+        "case_id": "corridor-b-outage-s633",
+        "goal": [
+          3.0,
+          0.5
+        ],
+        "id": "corridor-b-outage",
+        "kind": "navigation",
+        "outage": true,
+        "seed": 633,
+        "world": "simulation/worlds/simple_goal_demo_corridor.sdf",
+        "world_sha256": "6fb6a38ea3b0fe599ff9f412ca421e44cb4cf5efcb0c25bdeb74d424474b6f34"
+      },
+      "started_ns": 1794388226156940564,
+      "ended_ns": 1794388287604772594,
+      "status": "passed",
+      "detail": {
+        "command": [
+          "bash",
+          "/home/rylanwwade/uav-verification-m2/scripts/run_goal_navigation_trial.sh",
+          "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0036-corridor-b-outage-s633/run"
+        ],
+        "duration_wall_s": 57.10408726000014,
+        "environment": {
+          "GOAL_X": "3.0",
+          "GOAL_Y": "0.5",
+          "GPS_OUTAGE_AFTER_MOTION": "3",
+          "GZ_PARTITION": "verification_490_36",
+          "ROS_DOMAIN_ID": "126",
+          "SEED": "633",
+          "TRIAL_TIMEOUT": "100",
+          "UAV_ASSISTANCE": "true",
+          "WALL_TIMEOUT": "160",
+          "WORLD_FILE": "/home/rylanwwade/uav-verification-m2/simulation/worlds/simple_goal_demo_corridor.sdf"
+        },
+        "evaluations": [
+          {
+            "execution_status": "completed",
+            "exit_code": 0,
+            "objective_r1_m": 0.2500952671037858,
+            "result_path": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0036-corridor-b-outage-s633/run/verification/evaluation/result.json",
+            "verdicts": {
+              "R1": "PASS",
+              "R2": "PASS",
+              "R3": "INCONCLUSIVE",
+              "R4": "NOT_APPLICABLE",
+              "R5": "NOT_APPLICABLE",
+              "R6": "PASS",
+              "R7": "NOT_APPLICABLE",
+              "R8": "NOT_APPLICABLE"
+            }
+          }
+        ],
+        "returncode": 0,
+        "timed_out": false
+      }
+    },
+    {
+      "id": 37,
+      "case_id": "empty-a-unassisted-s631",
+      "category": "matrix",
+      "configuration": {
+        "assistance": false,
+        "case_id": "empty-a-unassisted-s631",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "empty-a-unassisted",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 631,
+        "world": "simulation/worlds/simple_goal_demo.sdf",
+        "world_sha256": "0f12df287b4c55a6c71f139e1ff957d1330559762dc7a6aab814a8b72feb3bb3"
+      },
+      "started_ns": 1794388287645385382,
+      "ended_ns": 1794388396193566893,
+      "status": "passed",
+      "detail": {
+        "command": [
+          "bash",
+          "/home/rylanwwade/uav-verification-m2/scripts/run_goal_navigation_trial.sh",
+          "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0037-empty-a-unassisted-s631/run"
+        ],
+        "duration_wall_s": 103.65060131300015,
+        "environment": {
+          "GOAL_X": "4.0",
+          "GOAL_Y": "0.0",
+          "GPS_OUTAGE_AFTER_MOTION": "-1",
+          "GZ_PARTITION": "verification_490_37",
+          "ROS_DOMAIN_ID": "127",
+          "SEED": "631",
+          "TRIAL_TIMEOUT": "100",
+          "UAV_ASSISTANCE": "false",
+          "WALL_TIMEOUT": "160",
+          "WORLD_FILE": "/home/rylanwwade/uav-verification-m2/simulation/worlds/simple_goal_demo.sdf"
+        },
+        "evaluations": [
+          {
+            "execution_status": "completed",
+            "exit_code": 0,
+            "objective_r1_m": null,
+            "result_path": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0037-empty-a-unassisted-s631/run/verification/evaluation/result.json",
+            "verdicts": {
+              "R1": "PASS",
+              "R2": "PASS",
+              "R3": "INCONCLUSIVE",
+              "R4": "NOT_APPLICABLE",
+              "R5": "NOT_APPLICABLE",
+              "R6": "NOT_APPLICABLE",
+              "R7": "NOT_APPLICABLE",
+              "R8": "NOT_APPLICABLE"
+            }
+          }
+        ],
+        "returncode": 0,
+        "timed_out": false
+      }
+    },
+    {
+      "id": 38,
+      "case_id": "empty-a-unassisted-s632",
+      "category": "matrix",
+      "configuration": {
+        "assistance": false,
+        "case_id": "empty-a-unassisted-s632",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "empty-a-unassisted",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 632,
+        "world": "simulation/worlds/simple_goal_demo.sdf",
+        "world_sha256": "0f12df287b4c55a6c71f139e1ff957d1330559762dc7a6aab814a8b72feb3bb3"
+      },
+      "started_ns": 1794388396226636240,
+      "ended_ns": 1794388488571102929,
+      "status": "passed",
+      "detail": {
+        "command": [
+          "bash",
+          "/home/rylanwwade/uav-verification-m2/scripts/run_goal_navigation_trial.sh",
+          "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0038-empty-a-unassisted-s632/run"
+        ],
+        "duration_wall_s": 87.97393630200031,
+        "environment": {
+          "GOAL_X": "4.0",
+          "GOAL_Y": "0.0",
+          "GPS_OUTAGE_AFTER_MOTION": "-1",
+          "GZ_PARTITION": "verification_490_38",
+          "ROS_DOMAIN_ID": "128",
+          "SEED": "632",
+          "TRIAL_TIMEOUT": "100",
+          "UAV_ASSISTANCE": "false",
+          "WALL_TIMEOUT": "160",
+          "WORLD_FILE": "/home/rylanwwade/uav-verification-m2/simulation/worlds/simple_goal_demo.sdf"
+        },
+        "evaluations": [
+          {
+            "execution_status": "completed",
+            "exit_code": 0,
+            "objective_r1_m": null,
+            "result_path": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0038-empty-a-unassisted-s632/run/verification/evaluation/result.json",
+            "verdicts": {
+              "R1": "PASS",
+              "R2": "PASS",
+              "R3": "INCONCLUSIVE",
+              "R4": "NOT_APPLICABLE",
+              "R5": "NOT_APPLICABLE",
+              "R6": "NOT_APPLICABLE",
+              "R7": "NOT_APPLICABLE",
+              "R8": "NOT_APPLICABLE"
+            }
+          }
+        ],
+        "returncode": 0,
+        "timed_out": false
+      }
+    },
+    {
+      "id": 39,
+      "case_id": "empty-a-unassisted-s633",
+      "category": "matrix",
+      "configuration": {
+        "assistance": false,
+        "case_id": "empty-a-unassisted-s633",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "empty-a-unassisted",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 633,
+        "world": "simulation/worlds/simple_goal_demo.sdf",
+        "world_sha256": "0f12df287b4c55a6c71f139e1ff957d1330559762dc7a6aab814a8b72feb3bb3"
+      },
+      "started_ns": 1794388488601670773,
+      "ended_ns": 1794388572974345201,
+      "status": "passed",
+      "detail": {
+        "command": [
+          "bash",
+          "/home/rylanwwade/uav-verification-m2/scripts/run_goal_navigation_trial.sh",
+          "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0039-empty-a-unassisted-s633/run"
+        ],
+        "duration_wall_s": 80.94480827299958,
+        "environment": {
+          "GOAL_X": "4.0",
+          "GOAL_Y": "0.0",
+          "GPS_OUTAGE_AFTER_MOTION": "-1",
+          "GZ_PARTITION": "verification_490_39",
+          "ROS_DOMAIN_ID": "129",
+          "SEED": "633",
+          "TRIAL_TIMEOUT": "100",
+          "UAV_ASSISTANCE": "false",
+          "WALL_TIMEOUT": "160",
+          "WORLD_FILE": "/home/rylanwwade/uav-verification-m2/simulation/worlds/simple_goal_demo.sdf"
+        },
+        "evaluations": [
+          {
+            "execution_status": "completed",
+            "exit_code": 0,
+            "objective_r1_m": null,
+            "result_path": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0039-empty-a-unassisted-s633/run/verification/evaluation/result.json",
+            "verdicts": {
+              "R1": "PASS",
+              "R2": "PASS",
+              "R3": "INCONCLUSIVE",
+              "R4": "NOT_APPLICABLE",
+              "R5": "NOT_APPLICABLE",
+              "R6": "NOT_APPLICABLE",
+              "R7": "NOT_APPLICABLE",
+              "R8": "NOT_APPLICABLE"
+            }
+          }
+        ],
+        "returncode": 0,
+        "timed_out": false
+      }
+    },
+    {
+      "id": 40,
+      "case_id": "guard-s631",
+      "category": "matrix",
+      "configuration": {
+        "case_id": "guard-s631",
+        "id": "guard",
+        "kind": "guard",
+        "seed": 631
+      },
+      "started_ns": 1794388573001726998,
+      "ended_ns": 1794388576468848470,
+      "status": "startup_failed",
+      "detail": {
+        "command": [
+          "/home/rylanwwade/uav-verification-m2/.venv/bin/python",
+          "/home/rylanwwade/uav-verification-m2/scripts/test_navigation_guards.py",
+          "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0040-guard-s631/run/result.json"
+        ],
+        "duration_wall_s": 3.319074364000244,
+        "environment": {
+          "GZ_PARTITION": "verification_490_40",
+          "ROS_DOMAIN_ID": "130",
+          "SEED": "631"
+        },
+        "evaluation_errors": [
+          "mission interval needs positive duration"
+        ],
+        "evaluations": [],
+        "returncode": 1,
+        "timed_out": false
+      }
+    },
+    {
+      "id": 41,
+      "case_id": "guard-s632",
+      "category": "matrix",
+      "configuration": {
+        "case_id": "guard-s632",
+        "id": "guard",
+        "kind": "guard",
+        "seed": 632
+      },
+      "started_ns": 1794388576490331289,
+      "ended_ns": 1794388581078645930,
+      "status": "startup_failed",
+      "detail": {
+        "command": [
+          "/home/rylanwwade/uav-verification-m2/.venv/bin/python",
+          "/home/rylanwwade/uav-verification-m2/scripts/test_navigation_guards.py",
+          "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0041-guard-s632/run/result.json"
+        ],
+        "duration_wall_s": 3.314427180000166,
+        "environment": {
+          "GZ_PARTITION": "verification_490_41",
+          "ROS_DOMAIN_ID": "131",
+          "SEED": "632"
+        },
+        "evaluation_errors": [
+          "mission interval needs positive duration"
+        ],
+        "evaluations": [],
+        "returncode": 1,
+        "timed_out": false
+      }
+    },
+    {
+      "id": 42,
+      "case_id": "guard-s633",
+      "category": "matrix",
+      "configuration": {
+        "case_id": "guard-s633",
+        "id": "guard",
+        "kind": "guard",
+        "seed": 633
+      },
+      "started_ns": 1794388581099574493,
+      "ended_ns": 1794388632199673152,
+      "status": "passed",
+      "detail": {
+        "command": [
+          "/home/rylanwwade/uav-verification-m2/.venv/bin/python",
+          "/home/rylanwwade/uav-verification-m2/scripts/test_navigation_guards.py",
+          "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0042-guard-s633/run/result.json"
+        ],
+        "duration_wall_s": 49.71058780300018,
+        "environment": {
+          "GZ_PARTITION": "verification_490_42",
+          "ROS_DOMAIN_ID": "132",
+          "SEED": "633"
+        },
+        "evaluations": [
+          {
+            "execution_status": "completed",
+            "exit_code": 0,
+            "objective_r1_m": null,
+            "result_path": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0042-guard-s633/run/verification/evaluation/result.json",
+            "verdicts": {
+              "R1": "NOT_APPLICABLE",
+              "R2": "NOT_APPLICABLE",
+              "R3": "PASS",
+              "R4": "NOT_APPLICABLE",
+              "R5": "NOT_APPLICABLE",
+              "R6": "NOT_APPLICABLE",
+              "R7": "NOT_APPLICABLE",
+              "R8": "NOT_APPLICABLE"
+            }
+          }
+        ],
+        "returncode": 0,
+        "timed_out": false
+      }
+    },
+    {
+      "id": 43,
+      "case_id": "watchdog-s631",
+      "category": "matrix",
+      "configuration": {
+        "case_id": "watchdog-s631",
+        "id": "watchdog",
+        "kind": "watchdog",
+        "seed": 631
+      },
+      "started_ns": 1794388632232688579,
+      "ended_ns": 1794388646197556876,
+      "status": "passed",
+      "detail": {
+        "command": [
+          "/home/rylanwwade/uav-verification-m2/.venv/bin/python",
+          "/home/rylanwwade/uav-verification-m2/scripts/test_actuator_watchdog.py",
+          "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0043-watchdog-s631/run"
+        ],
+        "duration_wall_s": 12.53346830800001,
+        "environment": {
+          "GZ_PARTITION": "verification_490_43",
+          "ROS_DOMAIN_ID": "133",
+          "SEED": "631"
+        },
+        "evaluations": [
+          {
+            "execution_status": "completed",
+            "exit_code": 0,
+            "objective_r1_m": null,
+            "result_path": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0043-watchdog-s631/run/controller_death/verification/evaluation/result.json",
+            "verdicts": {
+              "R1": "NOT_APPLICABLE",
+              "R2": "NOT_APPLICABLE",
+              "R3": "NOT_APPLICABLE",
+              "R4": "PASS",
+              "R5": "NOT_APPLICABLE",
+              "R6": "NOT_APPLICABLE",
+              "R7": "NOT_APPLICABLE",
+              "R8": "NOT_APPLICABLE"
+            }
+          },
+          {
+            "execution_status": "completed",
+            "exit_code": 0,
+            "objective_r1_m": null,
+            "result_path": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0043-watchdog-s631/run/command_transport_loss/verification/evaluation/result.json",
+            "verdicts": {
+              "R1": "NOT_APPLICABLE",
+              "R2": "NOT_APPLICABLE",
+              "R3": "NOT_APPLICABLE",
+              "R4": "PASS",
+              "R5": "NOT_APPLICABLE",
+              "R6": "NOT_APPLICABLE",
+              "R7": "NOT_APPLICABLE",
+              "R8": "NOT_APPLICABLE"
+            }
+          }
+        ],
+        "returncode": 0,
+        "timed_out": false
+      }
+    },
+    {
+      "id": 44,
+      "case_id": "watchdog-s632",
+      "category": "matrix",
+      "configuration": {
+        "case_id": "watchdog-s632",
+        "id": "watchdog",
+        "kind": "watchdog",
+        "seed": 632
+      },
+      "started_ns": 1794388646229794783,
+      "ended_ns": 1794388658883297917,
+      "status": "passed",
+      "detail": {
+        "command": [
+          "/home/rylanwwade/uav-verification-m2/.venv/bin/python",
+          "/home/rylanwwade/uav-verification-m2/scripts/test_actuator_watchdog.py",
+          "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0044-watchdog-s632/run"
+        ],
+        "duration_wall_s": 12.278271971999857,
+        "environment": {
+          "GZ_PARTITION": "verification_490_44",
+          "ROS_DOMAIN_ID": "134",
+          "SEED": "632"
+        },
+        "evaluations": [
+          {
+            "execution_status": "completed",
+            "exit_code": 0,
+            "objective_r1_m": null,
+            "result_path": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0044-watchdog-s632/run/controller_death/verification/evaluation/result.json",
+            "verdicts": {
+              "R1": "NOT_APPLICABLE",
+              "R2": "NOT_APPLICABLE",
+              "R3": "NOT_APPLICABLE",
+              "R4": "PASS",
+              "R5": "NOT_APPLICABLE",
+              "R6": "NOT_APPLICABLE",
+              "R7": "NOT_APPLICABLE",
+              "R8": "NOT_APPLICABLE"
+            }
+          },
+          {
+            "execution_status": "completed",
+            "exit_code": 0,
+            "objective_r1_m": null,
+            "result_path": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0044-watchdog-s632/run/command_transport_loss/verification/evaluation/result.json",
+            "verdicts": {
+              "R1": "NOT_APPLICABLE",
+              "R2": "NOT_APPLICABLE",
+              "R3": "NOT_APPLICABLE",
+              "R4": "PASS",
+              "R5": "NOT_APPLICABLE",
+              "R6": "NOT_APPLICABLE",
+              "R7": "NOT_APPLICABLE",
+              "R8": "NOT_APPLICABLE"
+            }
+          }
+        ],
+        "returncode": 0,
+        "timed_out": false
+      }
+    },
+    {
+      "id": 45,
+      "case_id": "watchdog-s633",
+      "category": "matrix",
+      "configuration": {
+        "case_id": "watchdog-s633",
+        "id": "watchdog",
+        "kind": "watchdog",
+        "seed": 633
+      },
+      "started_ns": 1794388658912674537,
+      "ended_ns": 1794388671498403521,
+      "status": "passed",
+      "detail": {
+        "command": [
+          "/home/rylanwwade/uav-verification-m2/.venv/bin/python",
+          "/home/rylanwwade/uav-verification-m2/scripts/test_actuator_watchdog.py",
+          "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0045-watchdog-s633/run"
+        ],
+        "duration_wall_s": 12.259079791999739,
+        "environment": {
+          "GZ_PARTITION": "verification_490_45",
+          "ROS_DOMAIN_ID": "135",
+          "SEED": "633"
+        },
+        "evaluations": [
+          {
+            "execution_status": "completed",
+            "exit_code": 0,
+            "objective_r1_m": null,
+            "result_path": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0045-watchdog-s633/run/controller_death/verification/evaluation/result.json",
+            "verdicts": {
+              "R1": "NOT_APPLICABLE",
+              "R2": "NOT_APPLICABLE",
+              "R3": "NOT_APPLICABLE",
+              "R4": "PASS",
+              "R5": "NOT_APPLICABLE",
+              "R6": "NOT_APPLICABLE",
+              "R7": "NOT_APPLICABLE",
+              "R8": "NOT_APPLICABLE"
+            }
+          },
+          {
+            "execution_status": "completed",
+            "exit_code": 0,
+            "objective_r1_m": null,
+            "result_path": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0045-watchdog-s633/run/command_transport_loss/verification/evaluation/result.json",
+            "verdicts": {
+              "R1": "NOT_APPLICABLE",
+              "R2": "NOT_APPLICABLE",
+              "R3": "NOT_APPLICABLE",
+              "R4": "PASS",
+              "R5": "NOT_APPLICABLE",
+              "R6": "NOT_APPLICABLE",
+              "R7": "NOT_APPLICABLE",
+              "R8": "NOT_APPLICABLE"
+            }
+          }
+        ],
+        "returncode": 0,
+        "timed_out": false
+      }
+    },
+    {
+      "id": 46,
+      "case_id": "search-00",
+      "category": "search",
+      "configuration": {
+        "assistance": true,
+        "case_id": "search-00",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "kind": "navigation",
+        "layout": "sparse",
+        "offsets": {
+          "obstacle_1": [
+            -0.10041581599179072,
+            -0.16295068500077614
+          ],
+          "obstacle_2": [
+            0.16948526620045595,
+            0.11209706765128113
+          ],
+          "obstacle_3": [
+            0.11369133986990526,
+            -0.06343126178104991
+          ]
+        },
+        "outage": false,
+        "seed": 700,
+        "world_absolute": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/search_worlds/search-00.sdf",
+        "world_sha256": "05b23b4bd381883403454fb0482d39dd4490efcf8158fb2bb8a6e4cedd88b5ab"
+      },
+      "started_ns": 1794388671523218246,
+      "ended_ns": 1794388747864981069,
+      "status": "passed",
+      "detail": {
+        "command": [
+          "bash",
+          "/home/rylanwwade/uav-verification-m2/scripts/run_goal_navigation_trial.sh",
+          "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0046-search-00/run"
+        ],
+        "duration_wall_s": 70.87018866599965,
+        "environment": {
+          "GOAL_X": "4.0",
+          "GOAL_Y": "0.0",
+          "GPS_OUTAGE_AFTER_MOTION": "-1",
+          "GZ_PARTITION": "verification_490_46",
+          "ROS_DOMAIN_ID": "136",
+          "SEED": "700",
+          "TRIAL_TIMEOUT": "100",
+          "UAV_ASSISTANCE": "true",
+          "WALL_TIMEOUT": "160",
+          "WORLD_FILE": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/search_worlds/search-00.sdf"
+        },
+        "evaluations": [
+          {
+            "execution_status": "completed",
+            "exit_code": 0,
+            "objective_r1_m": 0.13021124670544748,
+            "result_path": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0046-search-00/run/verification/evaluation/result.json",
+            "verdicts": {
+              "R1": "PASS",
+              "R2": "PASS",
+              "R3": "INCONCLUSIVE",
+              "R4": "NOT_APPLICABLE",
+              "R5": "NOT_APPLICABLE",
+              "R6": "PASS",
+              "R7": "NOT_APPLICABLE",
+              "R8": "NOT_APPLICABLE"
+            }
+          }
+        ],
+        "returncode": 0,
+        "timed_out": false
+      }
+    },
+    {
+      "id": 47,
+      "case_id": "search-01",
+      "category": "search",
+      "configuration": {
+        "assistance": true,
+        "case_id": "search-01",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "kind": "navigation",
+        "layout": "dense",
+        "offsets": {
+          "obstacle_1": [
+            -0.15999152675395523,
+            -0.08640129876270758
+          ],
+          "obstacle_2": [
+            -0.13566240368124777,
+            -0.08605552639214903
+          ],
+          "obstacle_3": [
+            0.022679073373096603,
+            0.016620975511102143
+          ],
+          "obstacle_4": [
+            0.22348002698580088,
+            -0.07403728477660237
+          ],
+          "obstacle_5": [
+            0.046702815025267075,
+            0.11496279165414497
+          ],
+          "obstacle_6": [
+            0.15626290712031482,
+            -0.13858504900852975
+          ],
+          "obstacle_7": [
+            0.03235634671366655,
+            -0.0015587861032999029
+          ]
+        },
+        "outage": false,
+        "seed": 701,
+        "world_absolute": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/search_worlds/search-01.sdf",
+        "world_sha256": "f26474f3c593ca23ec802af29313970d33549708cdb93d6017229c13bdf9a487"
+      },
+      "started_ns": 1794388747885512300,
+      "ended_ns": 1794388827613541298,
+      "status": "passed",
+      "detail": {
+        "command": [
+          "bash",
+          "/home/rylanwwade/uav-verification-m2/scripts/run_goal_navigation_trial.sh",
+          "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0047-search-01/run"
+        ],
+        "duration_wall_s": 75.86652384800072,
+        "environment": {
+          "GOAL_X": "4.0",
+          "GOAL_Y": "0.0",
+          "GPS_OUTAGE_AFTER_MOTION": "-1",
+          "GZ_PARTITION": "verification_490_47",
+          "ROS_DOMAIN_ID": "137",
+          "SEED": "701",
+          "TRIAL_TIMEOUT": "100",
+          "UAV_ASSISTANCE": "true",
+          "WALL_TIMEOUT": "160",
+          "WORLD_FILE": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/search_worlds/search-01.sdf"
+        },
+        "evaluations": [
+          {
+            "execution_status": "completed",
+            "exit_code": 0,
+            "objective_r1_m": 0.16692701034159507,
+            "result_path": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0047-search-01/run/verification/evaluation/result.json",
+            "verdicts": {
+              "R1": "PASS",
+              "R2": "PASS",
+              "R3": "INCONCLUSIVE",
+              "R4": "NOT_APPLICABLE",
+              "R5": "NOT_APPLICABLE",
+              "R6": "PASS",
+              "R7": "NOT_APPLICABLE",
+              "R8": "NOT_APPLICABLE"
+            }
+          }
+        ],
+        "returncode": 0,
+        "timed_out": false
+      }
+    },
+    {
+      "id": 48,
+      "case_id": "search-02",
+      "category": "search",
+      "configuration": {
+        "assistance": true,
+        "case_id": "search-02",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "kind": "navigation",
+        "layout": "corridor",
+        "offsets": {
+          "obstacle_1": [
+            -0.14713582711744183,
+            0.22503615976244606
+          ],
+          "obstacle_2": [
+            -0.1468318094887328,
+            0.12077120317931062
+          ]
+        },
+        "outage": false,
+        "seed": 702,
+        "world_absolute": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/search_worlds/search-02.sdf",
+        "world_sha256": "dfa43aff23854f90ded01e366a5e0ba493f6d31c19bf9d5bd7803e1e0c2d0cc1"
+      },
+      "started_ns": 1794388827630905908,
+      "ended_ns": 1794388887906925288,
+      "status": "passed",
+      "detail": {
+        "command": [
+          "bash",
+          "/home/rylanwwade/uav-verification-m2/scripts/run_goal_navigation_trial.sh",
+          "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0048-search-02/run"
+        ],
+        "duration_wall_s": 56.953330059999644,
+        "environment": {
+          "GOAL_X": "4.0",
+          "GOAL_Y": "0.0",
+          "GPS_OUTAGE_AFTER_MOTION": "-1",
+          "GZ_PARTITION": "verification_490_48",
+          "ROS_DOMAIN_ID": "138",
+          "SEED": "702",
+          "TRIAL_TIMEOUT": "100",
+          "UAV_ASSISTANCE": "true",
+          "WALL_TIMEOUT": "160",
+          "WORLD_FILE": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/search_worlds/search-02.sdf"
+        },
+        "evaluations": [
+          {
+            "execution_status": "completed",
+            "exit_code": 0,
+            "objective_r1_m": 0.22408476797329535,
+            "result_path": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0048-search-02/run/verification/evaluation/result.json",
+            "verdicts": {
+              "R1": "PASS",
+              "R2": "PASS",
+              "R3": "INCONCLUSIVE",
+              "R4": "NOT_APPLICABLE",
+              "R5": "NOT_APPLICABLE",
+              "R6": "PASS",
+              "R7": "NOT_APPLICABLE",
+              "R8": "NOT_APPLICABLE"
+            }
+          }
+        ],
+        "returncode": 0,
+        "timed_out": false
+      }
+    },
+    {
+      "id": 49,
+      "case_id": "search-03",
+      "category": "search",
+      "configuration": {
+        "assistance": true,
+        "case_id": "search-03",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "kind": "navigation",
+        "layout": "narrow",
+        "offsets": {
+          "obstacle_1": [
+            -0.21688636365429326,
+            0.24821845183715302
+          ],
+          "obstacle_2": [
+            0.2171498182493211,
+            -0.22447970106532955
+          ]
+        },
+        "outage": false,
+        "seed": 703,
+        "world_absolute": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/search_worlds/search-03.sdf",
+        "world_sha256": "397dfc1d4e04b63495d988e7dc6fc41766c30a6ceae14be0caff3cfbd1ce6ae9"
+      },
+      "started_ns": 1794388887924665429,
+      "ended_ns": 1794388962878563519,
+      "status": "passed",
+      "detail": {
+        "command": [
+          "bash",
+          "/home/rylanwwade/uav-verification-m2/scripts/run_goal_navigation_trial.sh",
+          "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0049-search-03/run"
+        ],
+        "duration_wall_s": 71.13421201900019,
+        "environment": {
+          "GOAL_X": "4.0",
+          "GOAL_Y": "0.0",
+          "GPS_OUTAGE_AFTER_MOTION": "-1",
+          "GZ_PARTITION": "verification_490_49",
+          "ROS_DOMAIN_ID": "139",
+          "SEED": "703",
+          "TRIAL_TIMEOUT": "100",
+          "UAV_ASSISTANCE": "true",
+          "WALL_TIMEOUT": "160",
+          "WORLD_FILE": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/search_worlds/search-03.sdf"
+        },
+        "evaluations": [
+          {
+            "execution_status": "completed",
+            "exit_code": 0,
+            "objective_r1_m": 0.15792712153931987,
+            "result_path": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0049-search-03/run/verification/evaluation/result.json",
+            "verdicts": {
+              "R1": "PASS",
+              "R2": "PASS",
+              "R3": "INCONCLUSIVE",
+              "R4": "NOT_APPLICABLE",
+              "R5": "NOT_APPLICABLE",
+              "R6": "PASS",
+              "R7": "NOT_APPLICABLE",
+              "R8": "NOT_APPLICABLE"
+            }
+          }
+        ],
+        "returncode": 0,
+        "timed_out": false
+      }
+    },
+    {
+      "id": 50,
+      "case_id": "diagnostic-R2-a16",
+      "category": "diagnostic_replay",
+      "configuration": {
+        "assistance": true,
+        "case_id": "diagnostic-R2-a16",
+        "goal": [
+          3.0,
+          0.5
+        ],
+        "id": "dense-b-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "parent_attempt": 16,
+        "replay_requirement": "R2",
+        "seed": 631,
+        "selection_role": "post_hoc_diagnostic",
+        "world": "simulation/worlds/simple_goal_demo_dense.sdf",
+        "world_sha256": "21bfa8b92d59c24f0c2afb1365832393b45c7b704ed036bd78c4438ce0a3a48f"
+      },
+      "started_ns": 1794388967529187883,
+      "ended_ns": 1794389109216732165,
+      "status": "failed",
+      "detail": {
+        "command": [
+          "bash",
+          "/home/rylanwwade/uav-verification-m2/scripts/run_goal_navigation_trial.sh",
+          "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0050-diagnostic-R2-a16/run"
+        ],
+        "duration_wall_s": 133.6675793989998,
+        "environment": {
+          "GOAL_X": "3.0",
+          "GOAL_Y": "0.5",
+          "GPS_OUTAGE_AFTER_MOTION": "-1",
+          "GZ_PARTITION": "verification_60978_50",
+          "ROS_DOMAIN_ID": "140",
+          "SEED": "631",
+          "TRIAL_TIMEOUT": "100",
+          "UAV_ASSISTANCE": "true",
+          "WALL_TIMEOUT": "160",
+          "WORLD_FILE": "/home/rylanwwade/uav-verification-m2/simulation/worlds/simple_goal_demo_dense.sdf"
+        },
+        "evaluations": [
+          {
+            "execution_status": "failed",
+            "exit_code": 1,
+            "objective_r1_m": 0.24512517365916264,
+            "result_path": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0050-diagnostic-R2-a16/run/verification/evaluation/result.json",
+            "verdicts": {
+              "R1": "PASS",
+              "R2": "FAIL",
+              "R3": "INCONCLUSIVE",
+              "R4": "NOT_APPLICABLE",
+              "R5": "NOT_APPLICABLE",
+              "R6": "PASS",
+              "R7": "NOT_APPLICABLE",
+              "R8": "NOT_APPLICABLE"
+            }
+          }
+        ],
+        "returncode": 1,
+        "timed_out": false
+      }
+    },
+    {
+      "id": 51,
+      "case_id": "diagnostic-R2-a17",
+      "category": "diagnostic_replay",
+      "configuration": {
+        "assistance": true,
+        "case_id": "diagnostic-R2-a17",
+        "goal": [
+          3.0,
+          0.5
+        ],
+        "id": "dense-b-nominal",
+        "kind": "navigation",
+        "outage": false,
+        "parent_attempt": 17,
+        "replay_requirement": "R2",
+        "seed": 632,
+        "selection_role": "post_hoc_diagnostic",
+        "world": "simulation/worlds/simple_goal_demo_dense.sdf",
+        "world_sha256": "21bfa8b92d59c24f0c2afb1365832393b45c7b704ed036bd78c4438ce0a3a48f"
+      },
+      "started_ns": 1794389109236614637,
+      "ended_ns": 1794389248692940214,
+      "status": "failed",
+      "detail": {
+        "command": [
+          "bash",
+          "/home/rylanwwade/uav-verification-m2/scripts/run_goal_navigation_trial.sh",
+          "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0051-diagnostic-R2-a17/run"
+        ],
+        "duration_wall_s": 130.131469465,
+        "environment": {
+          "GOAL_X": "3.0",
+          "GOAL_Y": "0.5",
+          "GPS_OUTAGE_AFTER_MOTION": "-1",
+          "GZ_PARTITION": "verification_60978_51",
+          "ROS_DOMAIN_ID": "141",
+          "SEED": "632",
+          "TRIAL_TIMEOUT": "100",
+          "UAV_ASSISTANCE": "true",
+          "WALL_TIMEOUT": "160",
+          "WORLD_FILE": "/home/rylanwwade/uav-verification-m2/simulation/worlds/simple_goal_demo_dense.sdf"
+        },
+        "evaluations": [
+          {
+            "execution_status": "failed",
+            "exit_code": 1,
+            "objective_r1_m": 0.18649534257476497,
+            "result_path": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/attempts/0051-diagnostic-R2-a17/run/verification/evaluation/result.json",
+            "verdicts": {
+              "R1": "PASS",
+              "R2": "FAIL",
+              "R3": "INCONCLUSIVE",
+              "R4": "NOT_APPLICABLE",
+              "R5": "NOT_APPLICABLE",
+              "R6": "PASS",
+              "R7": "NOT_APPLICABLE",
+              "R8": "NOT_APPLICABLE"
+            }
+          }
+        ],
+        "returncode": 1,
+        "timed_out": false
+      }
+    }
+  ]
+}

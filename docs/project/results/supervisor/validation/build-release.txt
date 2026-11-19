@@ -1,0 +1,53 @@
+[1.356s] WARNING:colcon.colcon_core.package_selection:Some selected packages are already built in one or more underlay workspaces:
+	'uav_ugv_msgs' is in: /home/rylanwwade/uav-supervisor-w10/ros2_ws/install/uav_ugv_msgs, /home/rylanwwade/uav-verification-m2/ros2_ws/install/uav_ugv_msgs, /home/rylanwwade/uav_ugv_main/ros2_ws/install/uav_ugv_msgs
+If a package in a merged underlay workspace is overridden and it installs headers, then all packages in the overlay must sort their include directories by workspace order. Failure to do so may result in build failures or undefined behavior at run time.
+If the overridden package is used by another package in any underlay, then the overriding package in the overlay must be API and ABI compatible or undefined behavior at run time may occur.
+
+If you understand the risks and want to override a package anyways, add the following to the command line:
+	--allow-overriding uav_ugv_msgs
+
+This may be promoted to an error in a future release of colcon-override-check.
+Starting >>> uav_ugv_msgs
+Finished <<< uav_ugv_msgs [0.73s]
+Starting >>> simulation_support
+Starting >>> ugv_control
+Finished <<< simulation_support [0.54s]
+Starting >>> fault_management
+[2.633s] WARNING:colcon.colcon_core.shell:The following packages are in the workspace but haven't been built:
+- localization_common
+- px4_msgs
+- cooperative_localization
+- uav_control
+- uav_sensing
+They are being used from the following locations instead:
+- /home/rylanwwade/uav_ugv_main/ros2_ws/install/localization_common
+- /home/rylanwwade/uav_ugv_main/ros2_ws/install/px4_msgs
+- /home/rylanwwade/uav_ugv_main/ros2_ws/install/cooperative_localization
+- /home/rylanwwade/uav_ugv_main/ros2_ws/install/uav_control
+- /home/rylanwwade/uav_ugv_main/ros2_ws/install/uav_sensing
+To suppress this warning ignore these packages in the workspace:
+--packages-ignore localization_common px4_msgs cooperative_localization uav_control uav_sensing
+Finished <<< fault_management [1.04s]
+Finished <<< ugv_control [15.5s]
+Starting >>> mission_manager
+[17.587s] WARNING:colcon.colcon_core.shell:The following packages are in the workspace but haven't been built:
+- localization_common
+- px4_msgs
+- cooperative_localization
+- route_planning
+- traversability_mapping
+- uav_control
+- uav_sensing
+They are being used from the following locations instead:
+- /home/rylanwwade/uav_ugv_main/ros2_ws/install/localization_common
+- /home/rylanwwade/uav_ugv_main/ros2_ws/install/px4_msgs
+- /home/rylanwwade/uav_ugv_main/ros2_ws/install/cooperative_localization
+- /home/rylanwwade/uav_ugv_main/ros2_ws/install/route_planning
+- /home/rylanwwade/uav_ugv_main/ros2_ws/install/traversability_mapping
+- /home/rylanwwade/uav_ugv_main/ros2_ws/install/uav_control
+- /home/rylanwwade/uav_ugv_main/ros2_ws/install/uav_sensing
+To suppress this warning ignore these packages in the workspace:
+--packages-ignore localization_common px4_msgs cooperative_localization route_planning traversability_mapping uav_control uav_sensing
+Finished <<< mission_manager [1.12s]
+
+Summary: 5 packages finished [18.0s]

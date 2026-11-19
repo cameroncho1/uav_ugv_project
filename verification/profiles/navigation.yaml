@@ -1,0 +1,10 @@
+schema_version: 1
+id: navigation
+version: '1'
+calibration: provisional
+max_gap_ns: 500000000
+requirements:
+  R1: {applicable: true, mandatory: true}
+  R2: {applicable: true, mandatory: true}
+  R3: {applicable: true, mandatory: false}
+  R6: {applicable: true, mandatory: true}

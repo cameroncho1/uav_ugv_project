@@ -1,0 +1,14 @@
+schema_version: 1
+id: m2-watchdog
+version: '1'
+calibration: calibrated
+max_gap_ns: 100000000
+requirements:
+  R4:
+    applicable: true
+    mandatory: true
+    clock: steady:16206692-7ae9-4424-9299-af1f1ade6d89
+    parameters:
+      expiry_ns: 400000000
+      settling_ns: 750000000
+      dwell_ns: 200000000

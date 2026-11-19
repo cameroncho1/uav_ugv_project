@@ -1,0 +1,4 @@
+{"clock": "sim", "data": {"x": 0.1, "y": 0}, "epoch": 0, "frame": "map", "sequence": 0, "source": "truth_pose", "time_ns": 0}
+{"clock": "sim", "data": {"x": 0.1, "y": 0}, "epoch": 0, "frame": "map", "sequence": 1, "source": "truth_pose", "time_ns": 1000000000}
+{"clock": "sim", "data": {"x": 0.1, "y": 0}, "epoch": 0, "frame": "map", "sequence": 2, "source": "truth_pose", "time_ns": 2000000000}
+{"clock": "sim", "data": {"x": 0.1, "y": 0}, "epoch": 0, "frame": "map", "sequence": 3, "source": "truth_pose", "time_ns": 3000000000}

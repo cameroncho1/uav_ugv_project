@@ -1,0 +1,20 @@
+[INFO] [1794426543.781838638] [ugv_goal_controller]: Waiting for a map goal
+[INFO] [1794426545.798300381] [ugv_goal_controller]: Fault hold: waiting for fresh clear detector decisions
+[INFO] [1794426551.571996342] [ugv_goal_controller]: Following path using the fused pose
+[INFO] [1794426552.066927167] [ugv_goal_controller]: Fault hold: waiting for fresh clear detector decisions
+[INFO] [1794426560.049232607] [ugv_goal_controller]: Following path using the fused pose
+[INFO] [1794426561.623395872] [ugv_goal_controller]: Fault hold: waiting for fresh clear detector decisions
+[INFO] [1794426567.223160905] [ugv_goal_controller]: Following path using the fused pose
+[INFO] [1794426567.723185547] [ugv_goal_controller]: UGV reached global goal tolerance
+[INFO] [1794426568.623379343] [ugv_goal_controller]: Fault hold: waiting for fresh clear detector decisions
+[INFO] [1794426574.146327163] [ugv_goal_controller]: UGV reached global goal tolerance
+[INFO] [1794426574.605337248] [ugv_goal_controller]: Fused pose must use map
+[INFO] [1794426575.064399749] [ugv_goal_controller]: UGV reached global goal tolerance
+[INFO] [1794426575.523313280] [ugv_goal_controller]: Following path using the fused pose
+[INFO] [1794426575.982258376] [ugv_goal_controller]: Waiting for a fresh map path
+[INFO] [1794426576.436903353] [ugv_goal_controller]: Following path using the fused pose
+[INFO] [1794426576.895479077] [ugv_goal_controller]: Fault hold: waiting for fresh clear detector decisions
+[INFO] [1794426579.003939298] [ugv_goal_controller]: Waiting for a map goal
+[INFO] [1794426579.462827683] [ugv_goal_controller]: Fault hold: waiting for fresh clear detector decisions
+[INFO] [1794426585.054890057] [ugv_goal_controller]: Following path using the fused pose
+[INFO] [1794426585.494768815] [rclcpp]: signal_handler(SIGINT/SIGTERM)

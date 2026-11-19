@@ -1,0 +1,21 @@
+{
+  "guard_state": {
+    "sim": {
+      "positive_intervals": 470,
+      "max_gap_ns": 2097677143,
+      "median_gap_ns": 94879979.0
+    },
+    "steady:f81d473e-065e-45a0-92e0-4d8d7416a2d8": {
+      "positive_intervals": 491,
+      "max_gap_ns": 97304426,
+      "median_gap_ns": 96408594
+    }
+  },
+  "estimated_pose": {
+    "sim": {
+      "positive_intervals": 1068,
+      "max_gap_ns": 4038263265,
+      "median_gap_ns": 38328642.0
+    }
+  }
+}

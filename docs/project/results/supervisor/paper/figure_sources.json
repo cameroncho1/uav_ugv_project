@@ -1,0 +1,17 @@
+{
+  "goal_memory": {
+    "epoch": 0,
+    "origin_ns": 32950000000,
+    "records": 91,
+    "source": "control.jsonl"
+  },
+  "recovery": {
+    "epoch": 0,
+    "origin_ns": 12900000000,
+    "records": 61,
+    "source": "control.jsonl"
+  },
+  "supervisor": {
+    "source": "versioned policy decision table"
+  }
+}

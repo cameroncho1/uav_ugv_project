@@ -1,0 +1,20 @@
+{
+  "interruption_exit_code": 130,
+  "interruption_remaining_owned_processes": 0,
+  "latex_overfull_boxes": 0,
+  "live_demo_exit_code": 0,
+  "new_replay_simulation": false,
+  "numerical_tables_reproduced": 8,
+  "offline_tests": 122,
+  "paper_pages": 6,
+  "registered_linux_checks": {
+    "cppcheck_skips": 8,
+    "errors": 0,
+    "failures": 0,
+    "total": 219
+  },
+  "ros_required_for_replay": false,
+  "source_distribution": "Built with python -m build.",
+  "static_figures": 8,
+  "wheel_install": "Fresh isolated CPython 3.10 environment; package resources and saved-result publication pass."
+}

@@ -1,0 +1,20 @@
+{
+  "python": "3.10.12",
+  "platform": "Linux-6.18.58.1-microsoft-standard-WSL2-x86_64-with-glibc2.35",
+  "ros": "Humble",
+  "gazebo": "8.15.0",
+  "numpy": "1.26.4",
+  "scipy": "1.15.3",
+  "matplotlib": "3.10.9",
+  "PyYAML": "6.0.3",
+  "pytest": "8.4.2",
+  "colcon_checks": 197,
+  "colcon_errors": 0,
+  "colcon_failures": 0,
+  "cppcheck_skips": 8,
+  "offline_tests": 102,
+  "controlled_navigation_cases": 23,
+  "functional_test_skips": 0,
+  "raw_evidence_size": "89 MiB",
+  "worktree_branch": "feat/requirements-verification-plan"
+}

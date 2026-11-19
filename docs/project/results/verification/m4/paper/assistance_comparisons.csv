@@ -1,0 +1,4 @@
+world,goal_x,goal_y,outage,seed,unassisted_attempt,unassisted_status,unassisted_R2,unassisted_arrival_s,assisted_attempt,assisted_status,assisted_R2,assisted_arrival_s
+simulation/worlds/simple_goal_demo.sdf,4.0,0.0,False,631,37,passed,PASS,41.78,1,inconclusive,INCONCLUSIVE,
+simulation/worlds/simple_goal_demo.sdf,4.0,0.0,False,632,38,passed,PASS,38.188,2,inconclusive,INCONCLUSIVE,
+simulation/worlds/simple_goal_demo.sdf,4.0,0.0,False,633,39,passed,PASS,40.668,3,inconclusive,INCONCLUSIVE,

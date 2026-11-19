@@ -1,0 +1,240 @@
+{
+  "schema_version": 1,
+  "plan": {
+    "cases": [
+      {
+        "assistance": true,
+        "case_id": "assisted-arrival-s641",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "assisted-arrival",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 641,
+        "world": "simulation/worlds/simple_goal_demo.sdf",
+        "world_sha256": "0f12df287b4c55a6c71f139e1ff957d1330559762dc7a6aab814a8b72feb3bb3"
+      },
+      {
+        "case_id": "guard-response-s641",
+        "id": "guard-response",
+        "kind": "guard",
+        "seed": 641
+      },
+      {
+        "case_id": "watchdog-response-s641",
+        "id": "watchdog-response",
+        "kind": "watchdog",
+        "seed": 641
+      }
+    ],
+    "exclusions": {
+      "R5": "No actual hazard producer.",
+      "R7_R8": "No online detector producer."
+    },
+    "expanded_sha256": "9e07fc5bd2df7014d36a44fa89d67d18e190535170638ca2198f763aa869fdc1",
+    "id": "verification-live-demo-v1",
+    "parameters": {
+      "attempt_timeout_s": 240,
+      "replay_limit": 0,
+      "search_seed": 0,
+      "search_trials": 0,
+      "search_wall_budget_s": 0,
+      "simulation_timeout_s": 100,
+      "wall_timeout_s": 160
+    },
+    "plan_sha256": "c3ebe15d0006e4a7d2c27b4473e622a6f5cd026d6541dff12dfff2abc078ea99",
+    "profiles": {
+      "verification/profiles/m2_camera.yaml": "d49c612360ae5af3098513d51980b100b8bffdc6fc9658cb7cf0ad401bac45a1",
+      "verification/profiles/m2_guard.yaml": "7dfc52bd2a2a6054f703231a9b6f5a8c9841d0470adc55e011a0cf875ddcf3ad",
+      "verification/profiles/m2_watchdog.yaml": "21bcfa746906b6ccf527620135cc70f1881b44908e27363dad9a67ee0f4ae1e1"
+    },
+    "schema_version": 1
+  },
+  "source_sha256": "bdeadf424519604ebd82634908ff233f6c9d2e8b01a9c9164c8ab5abda58075e",
+  "attempts": [
+    {
+      "id": 1,
+      "case_id": "assisted-arrival-s641",
+      "category": "matrix",
+      "configuration": {
+        "assistance": true,
+        "case_id": "assisted-arrival-s641",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "assisted-arrival",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 641,
+        "world": "simulation/worlds/simple_goal_demo.sdf",
+        "world_sha256": "0f12df287b4c55a6c71f139e1ff957d1330559762dc7a6aab814a8b72feb3bb3"
+      },
+      "started_ns": 1794426649416297677,
+      "ended_ns": 1794426698744675587,
+      "status": "passed",
+      "detail": {
+        "command": [
+          "bash",
+          "/home/rylanwwade/uav-supervisor-w10/scripts/run_goal_navigation_trial.sh",
+          "/home/rylanwwade/uav-supervisor-w10/evidence/w10_final/demo/raw/attempts/0001-assisted-arrival-s641/run"
+        ],
+        "duration_wall_s": 46.58526176800001,
+        "environment": {
+          "GOAL_X": "4.0",
+          "GOAL_Y": "0.0",
+          "GPS_OUTAGE_AFTER_MOTION": "-1",
+          "GZ_PARTITION": "verification_1620_1",
+          "ROS_DOMAIN_ID": "21",
+          "SEED": "641",
+          "TRIAL_TIMEOUT": "100",
+          "UAV_ASSISTANCE": "true",
+          "WALL_TIMEOUT": "160",
+          "WORLD_FILE": "/home/rylanwwade/uav-supervisor-w10/simulation/worlds/simple_goal_demo.sdf"
+        },
+        "evaluations": [
+          {
+            "execution_status": "completed",
+            "exit_code": 0,
+            "objective_r1_m": null,
+            "result_path": "/home/rylanwwade/uav-supervisor-w10/evidence/w10_final/demo/raw/attempts/0001-assisted-arrival-s641/run/verification/evaluation/result.json",
+            "verdicts": {
+              "R1": "PASS",
+              "R2": "PASS",
+              "R3": "INCONCLUSIVE",
+              "R4": "NOT_APPLICABLE",
+              "R5": "NOT_APPLICABLE",
+              "R6": "PASS",
+              "R7": "NOT_APPLICABLE",
+              "R8": "NOT_APPLICABLE"
+            }
+          }
+        ],
+        "readiness": {
+          "duration_wall_s": 1.9252851580000083,
+          "observed": [
+            "/clock",
+            "/evaluation/control",
+            "/evaluation/ugv_truth",
+            "/fmu/out/vehicle_odometry"
+          ],
+          "ready": true
+        },
+        "returncode": 0,
+        "timed_out": false
+      }
+    },
+    {
+      "id": 2,
+      "case_id": "guard-response-s641",
+      "category": "matrix",
+      "configuration": {
+        "case_id": "guard-response-s641",
+        "id": "guard-response",
+        "kind": "guard",
+        "seed": 641
+      },
+      "started_ns": 1794426698771293136,
+      "ended_ns": 1794426749360030802,
+      "status": "passed",
+      "detail": {
+        "command": [
+          "/home/rylanwwade/uav-supervisor-w10/.venv/bin/python",
+          "/home/rylanwwade/uav-supervisor-w10/scripts/test_navigation_guards.py",
+          "/home/rylanwwade/uav-supervisor-w10/evidence/w10_final/demo/raw/attempts/0002-guard-response-s641/run/result.json"
+        ],
+        "duration_wall_s": 49.329614565000014,
+        "environment": {
+          "GZ_PARTITION": "verification_1620_2",
+          "ROS_DOMAIN_ID": "22",
+          "SEED": "641"
+        },
+        "evaluations": [
+          {
+            "execution_status": "completed",
+            "exit_code": 0,
+            "objective_r1_m": null,
+            "result_path": "/home/rylanwwade/uav-supervisor-w10/evidence/w10_final/demo/raw/attempts/0002-guard-response-s641/run/verification/evaluation/result.json",
+            "verdicts": {
+              "R1": "NOT_APPLICABLE",
+              "R2": "NOT_APPLICABLE",
+              "R3": "PASS",
+              "R4": "NOT_APPLICABLE",
+              "R5": "NOT_APPLICABLE",
+              "R6": "NOT_APPLICABLE",
+              "R7": "NOT_APPLICABLE",
+              "R8": "NOT_APPLICABLE"
+            }
+          }
+        ],
+        "returncode": 0,
+        "timed_out": false
+      }
+    },
+    {
+      "id": 3,
+      "case_id": "watchdog-response-s641",
+      "category": "matrix",
+      "configuration": {
+        "case_id": "watchdog-response-s641",
+        "id": "watchdog-response",
+        "kind": "watchdog",
+        "seed": 641
+      },
+      "started_ns": 1794426749385226193,
+      "ended_ns": 1794426760799828520,
+      "status": "passed",
+      "detail": {
+        "command": [
+          "/home/rylanwwade/uav-supervisor-w10/.venv/bin/python",
+          "/home/rylanwwade/uav-supervisor-w10/scripts/test_actuator_watchdog.py",
+          "/home/rylanwwade/uav-supervisor-w10/evidence/w10_final/demo/raw/attempts/0003-watchdog-response-s641/run"
+        ],
+        "duration_wall_s": 11.16982133900001,
+        "environment": {
+          "GZ_PARTITION": "verification_1620_3",
+          "ROS_DOMAIN_ID": "23",
+          "SEED": "641"
+        },
+        "evaluations": [
+          {
+            "execution_status": "completed",
+            "exit_code": 0,
+            "objective_r1_m": null,
+            "result_path": "/home/rylanwwade/uav-supervisor-w10/evidence/w10_final/demo/raw/attempts/0003-watchdog-response-s641/run/controller_death/verification/evaluation/result.json",
+            "verdicts": {
+              "R1": "NOT_APPLICABLE",
+              "R2": "NOT_APPLICABLE",
+              "R3": "NOT_APPLICABLE",
+              "R4": "PASS",
+              "R5": "NOT_APPLICABLE",
+              "R6": "NOT_APPLICABLE",
+              "R7": "NOT_APPLICABLE",
+              "R8": "NOT_APPLICABLE"
+            }
+          },
+          {
+            "execution_status": "completed",
+            "exit_code": 0,
+            "objective_r1_m": null,
+            "result_path": "/home/rylanwwade/uav-supervisor-w10/evidence/w10_final/demo/raw/attempts/0003-watchdog-response-s641/run/command_transport_loss/verification/evaluation/result.json",
+            "verdicts": {
+              "R1": "NOT_APPLICABLE",
+              "R2": "NOT_APPLICABLE",
+              "R3": "NOT_APPLICABLE",
+              "R4": "PASS",
+              "R5": "NOT_APPLICABLE",
+              "R6": "NOT_APPLICABLE",
+              "R7": "NOT_APPLICABLE",
+              "R8": "NOT_APPLICABLE"
+            }
+          }
+        ],
+        "returncode": 0,
+        "timed_out": false
+      }
+    }
+  ]
+}

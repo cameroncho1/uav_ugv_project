@@ -1,0 +1,6 @@
+Traceback (most recent call last):
+  File "/home/rylanwwade/uav-dynamic-obstacles/scripts/test_navigation_guards.py", line 203, in <module>
+    main()
+  File "/home/rylanwwade/uav-dynamic-obstacles/scripts/test_navigation_guards.py", line 157, in main
+    assert time.monotonic() < deadline, 'Planner/controller command readiness timed out'
+AssertionError: Planner/controller command readiness timed out

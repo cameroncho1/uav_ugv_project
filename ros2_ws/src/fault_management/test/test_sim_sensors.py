@@ -3,11 +3,14 @@
 import numpy as np
 import pytest
 import rclpy
+import json
+from types import SimpleNamespace
 from px4_msgs.msg import VehicleOdometry
 from geometry_msgs.msg import Pose, PoseArray
 from sim_anchor_fault import biased_anchor
 from simulation_faults import common_position_bias
 from sim_uav_sensor import SimUavSensor
+from sim_ugv_sensors import SimUgvSensors
 
 
 class Capture:
@@ -16,6 +19,29 @@ class Capture:
 
     def publish(self, message):
         self.messages.append(message)
+
+
+def test_gps_event_is_emitted_on_applied_transition_once():
+    rclpy.init()
+    sensor = SimUgvSensors()
+    try:
+        sensor.trace_pub = Capture()
+        sensor.trace_initial = False
+        sensor.trace_host = 'test-boot'
+        sensor.set_gps_enabled(SimpleNamespace(data=False), SimpleNamespace())
+        sensor.set_gps_enabled(SimpleNamespace(data=False), SimpleNamespace())
+        assert len(sensor.trace_pub.messages) == 1
+        onset = json.loads(sensor.trace_pub.messages[0].data)
+        assert not sensor.gps_enabled
+        assert onset['event']['kind'] == 'fault_start'
+        sensor.set_gps_enabled(SimpleNamespace(data=True), SimpleNamespace())
+        end = json.loads(sensor.trace_pub.messages[-1].data)
+        assert end['event']['kind'] == 'fault_end'
+        assert end['event']['event_id'] == onset['event']['event_id']
+        assert end['steady_ns'] >= onset['steady_ns']
+    finally:
+        sensor.destroy_node()
+        rclpy.try_shutdown()
 
 
 def test_shared_fault_preserves_time_and_converts_enu_bias_to_ned():

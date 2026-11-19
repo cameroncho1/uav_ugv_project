@@ -1,0 +1,139 @@
+{
+  "attempt_counts": {
+    "passed": 3
+  },
+  "diagnostics": [
+    {
+      "attempt": 1,
+      "path": "diagnostics/a0001-readiness.json",
+      "sha256": "ff1bf630c45814813be7d1ca6561357d50e53e2d35ecec2663a0de0020adfd08"
+    }
+  ],
+  "matrix_cases_attempted": 3,
+  "matrix_cases_planned": 3,
+  "missing_artifacts": [],
+  "plan": {
+    "cases": [
+      {
+        "assistance": true,
+        "case_id": "assisted-arrival-s641",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "assisted-arrival",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 641,
+        "world": "simulation/worlds/simple_goal_demo.sdf",
+        "world_sha256": "0f12df287b4c55a6c71f139e1ff957d1330559762dc7a6aab814a8b72feb3bb3"
+      },
+      {
+        "case_id": "guard-response-s641",
+        "id": "guard-response",
+        "kind": "guard",
+        "seed": 641
+      },
+      {
+        "case_id": "watchdog-response-s641",
+        "id": "watchdog-response",
+        "kind": "watchdog",
+        "seed": 641
+      }
+    ],
+    "exclusions": {
+      "R5": "No actual hazard producer.",
+      "R7_R8": "No online detector producer."
+    },
+    "expanded_sha256": "9e07fc5bd2df7014d36a44fa89d67d18e190535170638ca2198f763aa869fdc1",
+    "id": "verification-live-demo-v1",
+    "parameters": {
+      "attempt_timeout_s": 240,
+      "replay_limit": 0,
+      "search_seed": 0,
+      "search_trials": 0,
+      "search_wall_budget_s": 0,
+      "simulation_timeout_s": 100,
+      "wall_timeout_s": 160
+    },
+    "plan_sha256": "c3ebe15d0006e4a7d2c27b4473e622a6f5cd026d6541dff12dfff2abc078ea99",
+    "profiles": {
+      "verification/profiles/m2_camera.yaml": "d49c612360ae5af3098513d51980b100b8bffdc6fc9658cb7cf0ad401bac45a1",
+      "verification/profiles/m2_guard.yaml": "7dfc52bd2a2a6054f703231a9b6f5a8c9841d0470adc55e011a0cf875ddcf3ad",
+      "verification/profiles/m2_watchdog.yaml": "21bcfa746906b6ccf527620135cc70f1881b44908e27363dad9a67ee0f4ae1e1"
+    },
+    "schema_version": 1
+  },
+  "raw_archive": "/home/rylanwwade/uav-verification-m2/evidence/m4_rehearsal_1/raw",
+  "raw_archive_committed": false,
+  "recordings": [
+    {
+      "attempt": 1,
+      "case_id": "assisted-arrival-s641",
+      "category": "matrix",
+      "configuration": {
+        "assistance": true,
+        "case_id": "assisted-arrival-s641",
+        "goal": [
+          4.0,
+          0.0
+        ],
+        "id": "assisted-arrival",
+        "kind": "navigation",
+        "outage": false,
+        "seed": 641,
+        "world": "simulation/worlds/simple_goal_demo.sdf",
+        "world_sha256": "0f12df287b4c55a6c71f139e1ff957d1330559762dc7a6aab814a8b72feb3bb3"
+      },
+      "directory": "recordings/a0001-r0",
+      "result_sha256": "b7cb11803e7cdc69f0d584581764248dd32749a1c569962f5a459161c4b6a522",
+      "series_sha256": "cca8ef704a876e0a27a336040dae9e1d61755f70c64c37d5ca5952b161aa885a"
+    },
+    {
+      "attempt": 2,
+      "case_id": "guard-response-s641",
+      "category": "matrix",
+      "configuration": {
+        "case_id": "guard-response-s641",
+        "id": "guard-response",
+        "kind": "guard",
+        "seed": 641
+      },
+      "directory": "recordings/a0002-r0",
+      "result_sha256": "3d7ec89808ce9c14cc229fda5edd4fc1649ef4dc1ee80bd55b9b94c320d399c1",
+      "series_sha256": "1e1064891e8062df23df2d1cfce468a365be2163851feb5774a6be97bf9d0ce6"
+    },
+    {
+      "attempt": 3,
+      "case_id": "watchdog-response-s641",
+      "category": "matrix",
+      "configuration": {
+        "case_id": "watchdog-response-s641",
+        "id": "watchdog-response",
+        "kind": "watchdog",
+        "seed": 641
+      },
+      "directory": "recordings/a0003-r0",
+      "result_sha256": "b58bdd6702c575d9e08f2335b00a137c07db5213e7d8f7a1f84d565cb192d879",
+      "series_sha256": "0855b778722e7ce165cd031de803039d225e27c30b40a4dc1caf9dd185aa0055"
+    },
+    {
+      "attempt": 3,
+      "case_id": "watchdog-response-s641",
+      "category": "matrix",
+      "configuration": {
+        "case_id": "watchdog-response-s641",
+        "id": "watchdog-response",
+        "kind": "watchdog",
+        "seed": 641
+      },
+      "directory": "recordings/a0003-r1",
+      "result_sha256": "e351714d624ef90b4c81db9b7fe5e809709aabffaf8d86663d7ac8f3f507fc42",
+      "series_sha256": "b8db0f85fb1e5a8dba5a3bf2437cddbd25e93c015b4fde9da9400ff4cfb735f4"
+    }
+  ],
+  "schema_version": 1,
+  "search_attempts": 0,
+  "search_wall_s": 0,
+  "source_sha256": "0e6b230f427b9b9d31491e2ebf003975e969a6af6adc5aa96239bfb99872f264"
+}

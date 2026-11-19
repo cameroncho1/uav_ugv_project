@@ -1,0 +1,291 @@
+{
+  "files": [
+    {
+      "bytes": 11997184,
+      "path": "evidence/accepted/demo/raw/attempts/0001-assisted-arrival-s641/run/verification/bag/bag_0.db3",
+      "sha256": "8c0efafa655cdd96e7859923f8a82fdd342b305b123aa112f39198e44a2aaa37"
+    },
+    {
+      "bytes": 5881,
+      "path": "evidence/accepted/demo/raw/attempts/0001-assisted-arrival-s641/run/verification/bag/metadata.yaml",
+      "sha256": "3c3c6a15f824a90b4000bcec33ae39d3d8b4441c2c53fb875ccc0ec23d8407c1"
+    },
+    {
+      "bytes": 2506752,
+      "path": "evidence/accepted/demo/raw/attempts/0002-guard-response-s641/run/verification/bag/bag_0.db3",
+      "sha256": "577c4aeeacc837b704e13fbdd91e1defad5290ee9a7ef9b5f130e70ab3e6bcc2"
+    },
+    {
+      "bytes": 3429,
+      "path": "evidence/accepted/demo/raw/attempts/0002-guard-response-s641/run/verification/bag/metadata.yaml",
+      "sha256": "e56cf7bb171b9a9b8cec736a0b7e1360841855b4562590a831b56a2a535ded48"
+    },
+    {
+      "bytes": 4644864,
+      "path": "evidence/accepted/demo/raw/attempts/0003-watchdog-response-s641/run/command_transport_loss/verification/bag/bag_0.db3",
+      "sha256": "22d1e82e94b98826d467d4e3035196e26a210fff51a2d11708350192ca6da6e4"
+    },
+    {
+      "bytes": 3924,
+      "path": "evidence/accepted/demo/raw/attempts/0003-watchdog-response-s641/run/command_transport_loss/verification/bag/metadata.yaml",
+      "sha256": "7532670010742c0663f65161ea3ee9c3713fbf592fa3be369ffea58ca4be3cd0"
+    },
+    {
+      "bytes": 4648960,
+      "path": "evidence/accepted/demo/raw/attempts/0003-watchdog-response-s641/run/controller_death/verification/bag/bag_0.db3",
+      "sha256": "226d2cf1c6a79eac06bef165dda320d0a6b9caa96ab063fdbda3c80dcf43d05e"
+    },
+    {
+      "bytes": 4397,
+      "path": "evidence/accepted/demo/raw/attempts/0003-watchdog-response-s641/run/controller_death/verification/bag/metadata.yaml",
+      "sha256": "8775fb91a51c79e5c9733464d6e268ceaaf7e43ba0fc1802d717819961c701e6"
+    },
+    {
+      "bytes": 15699968,
+      "path": "evidence/accepted/dynamic/run/verification/bag/bag_0.db3",
+      "sha256": "2eef841ca36c927cdcb2865e6f724814c2a96d2a8e4c20d0a45f768f57a68122"
+    },
+    {
+      "bytes": 6856,
+      "path": "evidence/accepted/dynamic/run/verification/bag/metadata.yaml",
+      "sha256": "c5ac4041ce690c5809786f6081e556b69b1ef7127bd343a7661bde56fbf33f40"
+    },
+    {
+      "bytes": 2027520,
+      "path": "evidence/accepted/interruption/trial/run/verification/bag/bag_0.db3",
+      "sha256": "2411bace3e2f96b641c229f8c9551332b78c8d8123dd2fa6ebb4598d8fa9dd4d"
+    },
+    {
+      "bytes": 6846,
+      "path": "evidence/accepted/interruption/trial/run/verification/bag/metadata.yaml",
+      "sha256": "9fd38be64a243a033e52981858df4b785750c7f5af55d43004cfbdaa2dce8c61"
+    },
+    {
+      "bytes": 2420736,
+      "path": "evidence/final/controlled/verification/bag/bag_0.db3",
+      "sha256": "d59e724c807876ec885c6fa46c52da0ec6de1be83be7e0fe1e3a740987bf729c"
+    },
+    {
+      "bytes": 3439,
+      "path": "evidence/final/controlled/verification/bag/metadata.yaml",
+      "sha256": "6896987351d8abd301fdc1ba4f57bbda3f522d8af911c2962ec7bd8ef26b2eed"
+    },
+    {
+      "bytes": 11280384,
+      "path": "evidence/final/demo/raw/attempts/0001-assisted-arrival-s641/run/verification/bag/bag_0.db3",
+      "sha256": "b6f303f7fa56e6bbe67e7ee1005e28994fd2ac3690124d981c14d81f4eb8c80a"
+    },
+    {
+      "bytes": 5881,
+      "path": "evidence/final/demo/raw/attempts/0001-assisted-arrival-s641/run/verification/bag/metadata.yaml",
+      "sha256": "d5f08091ce3a11294e7bfdd4ac81b9c8f4b593bd129181b315badaa2923788b4"
+    },
+    {
+      "bytes": 7589888,
+      "path": "evidence/final/demo/raw/attempts/0002-guard-response-s641/run/verification/bag/bag_0.db3",
+      "sha256": "e181d0a76c910acd1de9b2a78e2b110e767a391e334177e71594c96277828701"
+    },
+    {
+      "bytes": 3731,
+      "path": "evidence/final/demo/raw/attempts/0002-guard-response-s641/run/verification/bag/metadata.yaml",
+      "sha256": "dae33889299dc8635c0c4cd490ed9b8ddd000c7eec2cdb150feb5461eb61d514"
+    },
+    {
+      "bytes": 4755456,
+      "path": "evidence/final/demo/raw/attempts/0003-watchdog-response-s641/run/command_transport_loss/verification/bag/bag_0.db3",
+      "sha256": "70c110b63778965f36821e10a4f342ceb7bdfd42c0d6be189f78544a5fb3e567"
+    },
+    {
+      "bytes": 4397,
+      "path": "evidence/final/demo/raw/attempts/0003-watchdog-response-s641/run/command_transport_loss/verification/bag/metadata.yaml",
+      "sha256": "22d6ff863bd0d4b934e22b00b795643490002c3f0736a90cd6f34f45445f1e71"
+    },
+    {
+      "bytes": 4694016,
+      "path": "evidence/final/demo/raw/attempts/0003-watchdog-response-s641/run/controller_death/verification/bag/bag_0.db3",
+      "sha256": "ec463908b70cac952789b164146c46bfbf2c2ffeeafd991e0455abde4a7faef1"
+    },
+    {
+      "bytes": 4397,
+      "path": "evidence/final/demo/raw/attempts/0003-watchdog-response-s641/run/controller_death/verification/bag/metadata.yaml",
+      "sha256": "17063a0a81add7d8b6a66cb72a93125a2d3ad0269079d9fe9e0f397f1547e900"
+    },
+    {
+      "bytes": 2502656,
+      "path": "evidence/guard-early-udp/verification/bag/bag_0.db3",
+      "sha256": "32a34d3001ad876bc1001a4ebe7740dea65f78f6526a0081c2c9a4f5e0390169"
+    },
+    {
+      "bytes": 3429,
+      "path": "evidence/guard-early-udp/verification/bag/metadata.yaml",
+      "sha256": "ce3daa03566f2d72abcacecdf370aabc55c76fcd131f8fd8185588f632e49c90"
+    },
+    {
+      "bytes": 118784,
+      "path": "evidence/guard-transport/verification/bag/bag_0.db3",
+      "sha256": "70d5acea7a30a16c79b69d11075f5c0740714e31d751572ad838e6a2e60a8810"
+    },
+    {
+      "bytes": 3416,
+      "path": "evidence/guard-transport/verification/bag/metadata.yaml",
+      "sha256": "f7c599ec6f31a8085536fc905fbc5e39c8a5ec18eba4aa4fbc460fca50da1e3e"
+    },
+    {
+      "bytes": 237568,
+      "path": "evidence/guard-transport-compact/verification/bag/bag_0.db3",
+      "sha256": "a00d64c4c1f42eb4d7f9b58825af9e904bcc0d0e252865b977c973ebb7c068e4"
+    },
+    {
+      "bytes": 1470,
+      "path": "evidence/guard-transport-compact/verification/bag/metadata.yaml",
+      "sha256": "026acf7d645b655685d3df1e2456f96920e732fc7b9d2333fa01ea44dc804073"
+    },
+    {
+      "bytes": 11464704,
+      "path": "evidence/integrated/demo/raw/attempts/0001-assisted-arrival-s641/run/verification/bag/bag_0.db3",
+      "sha256": "96bde906f344a8907ae6e8d9535b4ad8680861e42acbee3ac364ad8d9538131f"
+    },
+    {
+      "bytes": 5881,
+      "path": "evidence/integrated/demo/raw/attempts/0001-assisted-arrival-s641/run/verification/bag/metadata.yaml",
+      "sha256": "b9e1b12fc8a1550463396dde037b7d6c08fca53b33f5059307cc7c3a76dc018d"
+    },
+    {
+      "bytes": 245760,
+      "path": "evidence/integrated/demo/raw/attempts/0002-guard-response-s641/run/verification/bag/bag_0.db3",
+      "sha256": "0a4da9673c468c439f2282724513df2e6a0bbf3a259ad29d3883df75ddf05083"
+    },
+    {
+      "bytes": 1469,
+      "path": "evidence/integrated/demo/raw/attempts/0002-guard-response-s641/run/verification/bag/metadata.yaml",
+      "sha256": "b5c88140b9083ce74ac5bec002c562dfa50cebf7a93171dc99a3f50d1046787f"
+    },
+    {
+      "bytes": 4628480,
+      "path": "evidence/integrated/demo/raw/attempts/0003-watchdog-response-s641/run/command_transport_loss/verification/bag/bag_0.db3",
+      "sha256": "559ca87b7b1dd3df8d641cc56522caf1cd9bf52300e849b2d6fc0f940ec913cc"
+    },
+    {
+      "bytes": 4397,
+      "path": "evidence/integrated/demo/raw/attempts/0003-watchdog-response-s641/run/command_transport_loss/verification/bag/metadata.yaml",
+      "sha256": "e66938157f29871f860cad413d832ef9920689bc15f8849fa40bbd8a142b1fbf"
+    },
+    {
+      "bytes": 4734976,
+      "path": "evidence/integrated/demo/raw/attempts/0003-watchdog-response-s641/run/controller_death/verification/bag/bag_0.db3",
+      "sha256": "c3a46023d1ad1c0dbd3cd42fea53b06f572498f957c129405e46c043f2da43f1"
+    },
+    {
+      "bytes": 4397,
+      "path": "evidence/integrated/demo/raw/attempts/0003-watchdog-response-s641/run/controller_death/verification/bag/metadata.yaml",
+      "sha256": "95f6c1adabcbc90a5abe359f2dfd63195a5d48a736a0b23f71f64d01dcfc3d98"
+    },
+    {
+      "bytes": 7737344,
+      "path": "evidence/premerge/demo/raw/attempts/0001-assisted-arrival-s641/run/verification/bag/bag_0.db3",
+      "sha256": "e618d2663244f0fe924d1466d6f089f9ba63003c6a42548ec0631d3caae6ff4b"
+    },
+    {
+      "bytes": 5408,
+      "path": "evidence/premerge/demo/raw/attempts/0001-assisted-arrival-s641/run/verification/bag/metadata.yaml",
+      "sha256": "2975e95f4c30e8016fc5469518c134d07b7f7b6f221f256289169edb7dca7bbf"
+    },
+    {
+      "bytes": 7778304,
+      "path": "evidence/premerge/demo/raw/attempts/0002-guard-response-s641/run/verification/bag/bag_0.db3",
+      "sha256": "b6c0ccb3ca281db5f29df817c3f4c62164788de21313ea89da3f1b478b18d9f2"
+    },
+    {
+      "bytes": 3429,
+      "path": "evidence/premerge/demo/raw/attempts/0002-guard-response-s641/run/verification/bag/metadata.yaml",
+      "sha256": "698e307907f58b86f8de0738311483c3b03c6466f3377d878989768d01a76192"
+    },
+    {
+      "bytes": 4775936,
+      "path": "evidence/premerge/demo/raw/attempts/0003-watchdog-response-s641/run/command_transport_loss/verification/bag/bag_0.db3",
+      "sha256": "8ff3fa1dec872942b72f7a54473578a82a2d64d0ab97c9fbcedc83a38a2cc9bf"
+    },
+    {
+      "bytes": 4397,
+      "path": "evidence/premerge/demo/raw/attempts/0003-watchdog-response-s641/run/command_transport_loss/verification/bag/metadata.yaml",
+      "sha256": "6cf7e0ac7f846a1d63c399f40e9977f98ce2ec69094d2414bcd7ce475dabd68b"
+    },
+    {
+      "bytes": 4734976,
+      "path": "evidence/premerge/demo/raw/attempts/0003-watchdog-response-s641/run/controller_death/verification/bag/bag_0.db3",
+      "sha256": "ace5e24953bdf7e461e5c5a1e35087b4fa75b294439c94aba28a1702f9a29bb9"
+    },
+    {
+      "bytes": 4397,
+      "path": "evidence/premerge/demo/raw/attempts/0003-watchdog-response-s641/run/controller_death/verification/bag/metadata.yaml",
+      "sha256": "e83b027f4f86f9f9a8e7f1db30bcefa5a749d50cbbe6c0735b0f56d417297ee8"
+    },
+    {
+      "bytes": 2097152,
+      "path": "evidence/release/controlled/verification/bag/bag_0.db3",
+      "sha256": "a2101860a0c5fd1eae0f6e6ff0b2b05ca1a9e20fd049d778e1238476d689c16e"
+    },
+    {
+      "bytes": 3439,
+      "path": "evidence/release/controlled/verification/bag/metadata.yaml",
+      "sha256": "a876f672559fd5e972551bf0879ecad2522ec6b4e57597b677fc945f67047225"
+    },
+    {
+      "bytes": 11284480,
+      "path": "evidence/release/demo/raw/attempts/0001-assisted-arrival-s641/run/verification/bag/bag_0.db3",
+      "sha256": "7c9bcccf1f0d4d1381a0f4023343385f840ae7476792dd206606952d143019ff"
+    },
+    {
+      "bytes": 5881,
+      "path": "evidence/release/demo/raw/attempts/0001-assisted-arrival-s641/run/verification/bag/metadata.yaml",
+      "sha256": "769bd1312016080c449e6af3aa282474877e01b4dea3b3ed7d557eefa906a22d"
+    },
+    {
+      "bytes": 2080768,
+      "path": "evidence/release/demo/raw/attempts/0002-guard-response-s641/run/verification/bag/bag_0.db3",
+      "sha256": "688569782ed0b108a55b5162e465663e52aabd1bf4eb880c9b2ece77146c568f"
+    },
+    {
+      "bytes": 3427,
+      "path": "evidence/release/demo/raw/attempts/0002-guard-response-s641/run/verification/bag/metadata.yaml",
+      "sha256": "34354bf407c727de14e4d93bb667a4b95c1781f02a8efaec72efb1a4a48850d2"
+    },
+    {
+      "bytes": 4648960,
+      "path": "evidence/release/demo/raw/attempts/0003-watchdog-response-s641/run/command_transport_loss/verification/bag/bag_0.db3",
+      "sha256": "9f2030c6fe7f3fb86ff2b08ca6c2cdbb27efb0dbe008aa324d3143d244c63a69"
+    },
+    {
+      "bytes": 4397,
+      "path": "evidence/release/demo/raw/attempts/0003-watchdog-response-s641/run/command_transport_loss/verification/bag/metadata.yaml",
+      "sha256": "976d8626c6a90f7e5e43e9d457bfae7492ec0f469f32e099862c92e3dcbb7903"
+    },
+    {
+      "bytes": 4739072,
+      "path": "evidence/release/demo/raw/attempts/0003-watchdog-response-s641/run/controller_death/verification/bag/bag_0.db3",
+      "sha256": "5452c2cbb83bb9e4498a0e04501c4c2df6d5b81a99c8de028241bfe83f39a980"
+    },
+    {
+      "bytes": 4397,
+      "path": "evidence/release/demo/raw/attempts/0003-watchdog-response-s641/run/controller_death/verification/bag/metadata.yaml",
+      "sha256": "5b1779f53ede636bb8fff1108c1b8c71ee095c53fa5287311ed0964b657952bf"
+    },
+    {
+      "bytes": 67506176,
+      "path": "evidence/release/dynamic/run/verification/bag/bag_0.db3",
+      "sha256": "8c5cf7c428d7b8026040938e065dfdd24100ea1d2d37a2da6c9a5d3a974d2b38"
+    },
+    {
+      "bytes": 6862,
+      "path": "evidence/release/dynamic/run/verification/bag/metadata.yaml",
+      "sha256": "20ba08fe4108538c634f6a7dab2b716b122e2b48df041a7af5013cc7bf9dbf32"
+    },
+    {
+      "bytes": 1341440,
+      "path": "accepted-source.tar",
+      "sha256": "a0873534fd578302fcb9f55142118dd308a32c1cf571532a267d45413dc36b4d"
+    }
+  ],
+  "location": "Ubuntu-22.04:/home/rylanwwade/uav-integration",
+  "raw_bags_committed": false
+}

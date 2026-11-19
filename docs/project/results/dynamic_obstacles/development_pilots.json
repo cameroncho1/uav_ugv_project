@@ -1,0 +1,176 @@
+{
+  "pilots": [
+    {
+      "directory": "evidence/lifecycle_pilot",
+      "summary": null,
+      "notes": "Aborted: SceneBroadcaster static flag is not a usable confirmation field; identity/pose verification replaces it."
+    },
+    {
+      "directory": "evidence/lifecycle_pilot_2",
+      "summary": null,
+      "notes": "Same static-flag diagnosis, with actual/expected pose logged."
+    },
+    {
+      "directory": "evidence/lifecycle_pilot_3",
+      "summary": {
+        "passed": true,
+        "cases": [
+          {
+            "entity_name": "scenario_first",
+            "entity_id": 4,
+            "confirmation": "scene_present"
+          },
+          {
+            "entity_name": "scenario_second",
+            "entity_id": 8,
+            "confirmation": "scene_present"
+          },
+          {
+            "case": "duplicate_rejected",
+            "passed": true
+          },
+          {
+            "entity_name": "scenario_first",
+            "confirmation": "scene_absent"
+          },
+          {
+            "entity_name": "scenario_first",
+            "entity_id": 12,
+            "confirmation": "scene_present"
+          }
+        ]
+      },
+      "notes": "Successful create/remove/respawn development check, superseded by final lifecycle result."
+    },
+    {
+      "directory": "evidence/camera_pilot_1",
+      "summary": null,
+      "notes": "Configuration serialization failed before simulation startup; tuple goal corrected to a JSON list."
+    },
+    {
+      "directory": "evidence/camera_pilot_2",
+      "summary": {
+        "exercised_hazards": [],
+        "exit_code": 2,
+        "expected_hazards": [
+          "add_route_box"
+        ],
+        "process": {
+          "duration_wall_s": 58.74860143899997,
+          "returncode": 0,
+          "timed_out": false
+        },
+        "scenario_id": "single_box_v1",
+        "seed": 741,
+        "source_unchanged": true,
+        "status": "incomplete",
+        "verdicts": {
+          "R1": "PASS",
+          "R2": "PASS",
+          "R3": "INCONCLUSIVE",
+          "R4": "NOT_APPLICABLE",
+          "R5": "INCONCLUSIVE",
+          "R6": "PASS",
+          "R7": "NOT_APPLICABLE",
+          "R8": "NOT_APPLICABLE"
+        }
+      },
+      "notes": "Avoidance/arrival pass; hazard observation is too close for declared minimum distance, so R5 is inconclusive."
+    },
+    {
+      "directory": "evidence/camera_pilot_3",
+      "summary": {
+        "exercised_hazards": [
+          "add_route_box"
+        ],
+        "exit_code": 0,
+        "expected_hazards": [
+          "add_route_box"
+        ],
+        "process": {
+          "duration_wall_s": 56.024191102,
+          "returncode": 0,
+          "timed_out": false
+        },
+        "scenario_id": "single_box_v1",
+        "seed": 741,
+        "source_unchanged": true,
+        "status": "completed",
+        "verdicts": {
+          "R1": "PASS",
+          "R2": "PASS",
+          "R3": "INCONCLUSIVE",
+          "R4": "NOT_APPLICABLE",
+          "R5": "PASS",
+          "R6": "PASS",
+          "R7": "NOT_APPLICABLE",
+          "R8": "NOT_APPLICABLE"
+        }
+      },
+      "notes": "Successful development example with earlier appearance; separate source cohort."
+    },
+    {
+      "directory": "evidence/camera_final",
+      "summary": {
+        "exercised_hazards": [
+          "add_route_box"
+        ],
+        "exit_code": 0,
+        "expected_hazards": [
+          "add_route_box"
+        ],
+        "process": {
+          "duration_wall_s": 62.291689168000005,
+          "returncode": 0,
+          "timed_out": false
+        },
+        "scenario_id": "single_box_v1",
+        "seed": 742,
+        "source_unchanged": true,
+        "status": "completed",
+        "verdicts": {
+          "R1": "PASS",
+          "R2": "PASS",
+          "R3": "INCONCLUSIVE",
+          "R4": "NOT_APPLICABLE",
+          "R5": "PASS",
+          "R6": "PASS",
+          "R7": "NOT_APPLICABLE",
+          "R8": "NOT_APPLICABLE"
+        }
+      },
+      "notes": "Successful seed-742 cohort before dependency-rule and acceptance refinements."
+    },
+    {
+      "directory": "evidence/camera_final_2",
+      "summary": {
+        "exercised_hazards": [],
+        "exit_code": 2,
+        "expected_hazards": [
+          "add_route_box"
+        ],
+        "process": {
+          "duration_wall_s": 65.93127778999997,
+          "returncode": 0,
+          "timed_out": false
+        },
+        "scenario_id": "single_box_v1",
+        "seed": 744,
+        "source_unchanged": true,
+        "status": "incomplete",
+        "verdicts": {
+          "R1": "PASS",
+          "R2": "PASS",
+          "R3": "INCONCLUSIVE",
+          "R4": "NOT_APPLICABLE",
+          "R5": "INCONCLUSIVE",
+          "R6": "PASS",
+          "R7": "NOT_APPLICABLE",
+          "R8": "NOT_APPLICABLE"
+        }
+      },
+      "notes": "Seed 744 avoids/reaches goal; conservative observation-distance condition is not met. Retained as inconclusive."
+    }
+  ],
+  "pooled_with_final_example": false
+}

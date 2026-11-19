@@ -1,0 +1,178 @@
+#!/usr/bin/env python3
+"""Apply a validated scenario to Gazebo; publish lifecycle evidence, never navigation inputs."""
+
+import json
+from concurrent.futures import ThreadPoolExecutor
+from dataclasses import asdict
+from pathlib import Path
+
+import rclpy
+from rcl_interfaces.msg import ParameterDescriptor
+from rclpy.node import Node
+from rclpy.qos import DurabilityPolicy, QoSProfile
+from simulation_support.obstacle_scenarios import Schedule, load_scenario
+from simulation_support.obstacle_world import GazeboWorld
+from std_msgs.msg import String
+
+
+class ObstacleScenario(Node):
+    def __init__(self):
+        super().__init__("obstacle_scenario")
+        self.scenario = load_scenario(Path(self.startup_parameter("scenario_file", "").value))
+        output = Path(self.startup_parameter("output_directory", "").value)
+        output.mkdir(parents=True, exist_ok=True)
+        self.events = (output / "operations.jsonl").open("x")
+        self.result_path = output / "scenario_result.json"
+        self.schedule = Schedule(self.scenario)
+        self.world = GazeboWorld(self.scenario.world)
+        self.worker_pool = ThreadPoolExecutor(max_workers=1, thread_name_prefix="obstacle_mutation")
+        self.future = None
+        self.history = []
+        self.active = {}
+        self.applied = {}
+        self.requested_ns = None
+        self.failure = None
+        self.sequence = 0
+        self.lifecycle = self.create_publisher(
+            String,
+            "/simulation/obstacle_scenario",
+            QoSProfile(depth=50, durability=DurabilityPolicy.TRANSIENT_LOCAL),
+        )
+        self.create_subscription(String, "/evaluation/control", self.on_control, 50)
+        # ROS /clock controls dispatch; the wall timer still notices reset and shutdown.
+        from rclpy.clock import Clock, ClockType
+
+        self.create_timer(0.05, self.tick, clock=Clock(clock_type=ClockType.STEADY_TIME))
+        self.publish()
+
+    def startup_parameter(self, name, default):
+        return self.declare_parameter(name, default, descriptor=ParameterDescriptor(read_only=True))
+
+    def on_control(self, message):
+        value = json.loads(message.data)
+        now = self.get_clock().now().nanoseconds
+        sample = value["sim_ns"]
+        if (
+            self.schedule.started_ns is None
+            and 0 < sample <= now
+            and now - sample <= 500_000_000
+            and (abs(value["linear"]) > 0.001 or abs(value["angular"]) > 0.001)
+        ):
+            self.schedule.observe(now)
+            self.schedule.started_ns = sample
+            self.get_logger().info(f"Scenario origin: first drive command at {sample} ns")
+
+    def append(self, value):
+        self.history.append(value)
+        self.events.write(json.dumps(value, sort_keys=True) + "\n")
+        self.events.flush()
+
+    def publish(self):
+        now = self.get_clock().now().nanoseconds
+        pending = self.schedule.pending
+        # Pending creation is included conservatively before acknowledgement; removal
+        # keeps its geometry until confirmed. This bounds physical-scoring uncertainty.
+        envelope = dict(self.active)
+        if pending and pending.action == "spawn":
+            envelope[pending.obstacle] = self.scenario.boxes[pending.obstacle].shape()
+        value = dict(
+            schema_version=1,
+            scenario_id=self.scenario.id,
+            sequence=self.sequence,
+            sim_ns=now,
+            started_ns=self.schedule.started_ns,
+            pending=asdict(pending) if pending else None,
+            requested_ns=self.requested_ns,
+            active=list(self.active.values()),
+            envelope=list(envelope.values()),
+            applied=list(self.applied.values()),
+            complete=self.schedule.complete,
+            error=self.failure,
+        )
+        self.lifecycle.publish(String(data=json.dumps(value)))
+        self.sequence += 1
+
+    def tick(self):
+        if self.failure:
+            self.publish()
+            return
+        now = self.get_clock().now().nanoseconds
+        try:
+            self.schedule.observe(now)
+            if self.future is not None and self.future.done():
+                confirmation = self.future.result()
+                operation = self.schedule.pending
+                box = self.scenario.boxes[operation.obstacle]
+                evidence = dict(
+                    kind="obstacle_applied",
+                    operation=asdict(operation),
+                    obstacle=box.shape(),
+                    requested_ns=self.requested_ns,
+                    confirmed_ns=now,
+                    **confirmation,
+                )
+                if operation.action == "spawn":
+                    self.active[box.id] = box.shape()
+                    self.applied[box.id] = evidence
+                else:
+                    self.active.pop(box.id)
+                    self.applied.pop(box.id)
+                self.append(evidence)
+                self.schedule.confirm(operation.id)
+                self.future = None
+            operation = self.schedule.next_due(now)
+            if operation:
+                self.requested_ns = now
+                self.append(
+                    dict(kind="obstacle_requested", operation=asdict(operation), requested_ns=now)
+                )
+                self.publish()  # Advertise the conservative envelope before mutation.
+                self.future = self.worker_pool.submit(
+                    self.world.apply, operation, self.scenario.boxes[operation.obstacle]
+                )
+            self.publish()
+        except Exception as exc:
+            self.failure = f"{type(exc).__name__}: {exc}"
+            self.append(dict(kind="scenario_failed", sim_ns=now, error=self.failure))
+            self.get_logger().error(self.failure)
+            self.publish()
+
+    def close(self):
+        self.worker_pool.shutdown(wait=True, cancel_futures=True)
+        self.result_path.write_text(
+            json.dumps(
+                dict(
+                    scenario_id=self.scenario.id,
+                    status="failed"
+                    if self.failure
+                    else "completed"
+                    if self.schedule.complete
+                    else "interrupted",
+                    error=self.failure,
+                    started_ns=self.schedule.started_ns,
+                    history=self.history,
+                ),
+                indent=2,
+            )
+            + "\n"
+        )
+        self.events.close()
+
+
+def main():
+    rclpy.init()
+    node = None
+    try:
+        node = ObstacleScenario()
+        rclpy.spin(node)
+    except (KeyboardInterrupt, rclpy.executors.ExternalShutdownException):
+        pass
+    finally:
+        if node:
+            node.close()
+            node.destroy_node()
+        rclpy.try_shutdown()
+
+
+if __name__ == "__main__":
+    main()

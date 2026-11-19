@@ -1,0 +1,6 @@
+5:     assert self.commands, f'{name}: controller did not publish commands'
+6: AssertionError: raw_only: controller did not publish commands
+20:     raise ValidationError(message)
+6: AssertionError: raw_only: controller did not publish commands
+20:     raise ValidationError(message)
+21: uav_ugv_verification.validation.ValidationError: mission interval needs positive duration

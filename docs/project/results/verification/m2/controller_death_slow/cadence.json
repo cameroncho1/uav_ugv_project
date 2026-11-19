@@ -1,0 +1,42 @@
+{
+  "guard_state": {
+    "sim": {
+      "positive_intervals": 27,
+      "max_gap_ns": 20000000,
+      "median_gap_ns": 20000000
+    },
+    "steady:f81d473e-065e-45a0-92e0-4d8d7416a2d8": {
+      "positive_intervals": 41,
+      "max_gap_ns": 98787434,
+      "median_gap_ns": 96796280
+    }
+  },
+  "actuator_input": {
+    "steady:f81d473e-065e-45a0-92e0-4d8d7416a2d8": {
+      "positive_intervals": 32,
+      "max_gap_ns": 98263072,
+      "median_gap_ns": 96812220.5
+    }
+  },
+  "actuator_output": {
+    "steady:f81d473e-065e-45a0-92e0-4d8d7416a2d8": {
+      "positive_intervals": 95,
+      "max_gap_ns": 50474714,
+      "median_gap_ns": 50231449
+    }
+  },
+  "measured_motion": {
+    "steady:f81d473e-065e-45a0-92e0-4d8d7416a2d8": {
+      "positive_intervals": 214,
+      "max_gap_ns": 21487028,
+      "median_gap_ns": 19978904.5
+    }
+  },
+  "estimated_pose": {
+    "sim": {
+      "positive_intervals": 214,
+      "max_gap_ns": 4000000,
+      "median_gap_ns": 4000000.0
+    }
+  }
+}

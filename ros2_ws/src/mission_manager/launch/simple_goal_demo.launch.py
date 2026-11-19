@@ -20,14 +20,16 @@ def generate_launch_description():
     localization_share = Path(get_package_share_directory("cooperative_localization"))
     start_simulation = LaunchConfiguration("start_simulation")
     start_rviz = LaunchConfiguration("start_rviz")
+    world_name = LaunchConfiguration("world_name")
     # Map position of PX4's local origin; shared by the anchor adapter and UAV follower.
-    map_origin = [0.0, 0.0, 0.3]
+    map_origin = [-4.0, 0.0, 0.3]
 
     world = ExecuteProcess(
         cmd=["bash", str(project_root / "scripts/world_goal_demo.sh")],
         cwd=str(project_root),
         output="screen",
         name="gazebo_world",
+        additional_env={"WORLD_FILE": LaunchConfiguration("world_file")},
         condition=IfCondition(start_simulation),
     )
     agent = ExecuteProcess(
@@ -49,9 +51,16 @@ def generate_launch_description():
             "start_simulation", default_value="true",
             description="Start Gazebo, PX4 SITL, and Micro XRCE-DDS Agent.",
         ),
+        DeclareLaunchArgument("world_file", default_value=str(
+            project_root / "simulation/worlds/simple_goal_demo.sdf")),
+        DeclareLaunchArgument("evaluation_trace", default_value="false"),
         DeclareLaunchArgument(
             "start_rviz", default_value="true",
             description="Start RViz with the simple goal demo configuration.",
+        ),
+        DeclareLaunchArgument(
+            "world_name", default_value="simple_goal_demo",
+            description="SDF world stem selected by world_goal_demo.sh.",
         ),
         DeclareLaunchArgument("uav_assistance", default_value="true",
                               description="Fuse UAV-assisted position measurements."),
@@ -60,6 +69,13 @@ def generate_launch_description():
         DeclareLaunchArgument("initial_gps_enabled", default_value="true",
                               description="Enable prepared UGV GPS at startup."),
         DeclareLaunchArgument("seed", default_value="513"),
+        DeclareLaunchArgument("fault_detection", default_value="false",
+                              description="Flag UGV sensor-channel faults on /ugv/sensor_faults "
+                                          "and class decisions on /fault_detection/status."),
+        DeclareLaunchArgument("fault_hold", default_value="false",
+                              description="Supervisor consumes /fault_detection/status and holds "
+                                          "on wheel-scale or yaw-drift flags or missing "
+                                          "decisions; needs fault_detection:=true."),
         DeclareLaunchArgument("measurement_config",
                               default_value=str(fault_share / "config/measurement_model.yaml"),
                               description="UGV noise YAML path relative to the launch directory."),
@@ -73,6 +89,19 @@ def generate_launch_description():
         DeclareLaunchArgument("uav_follow", default_value="true",
                               description="Fly the camera UAV over the UGV's fused pose; "
                                           "false keeps it hovering at its takeoff point."),
+        DeclareLaunchArgument(
+            "coordination_mode", default_value="ugv_follow",
+            choices=["ugv_follow", "uav_scout"],
+            description="UGV-follow baseline or UAV-led goal scouting.",
+        ),
+        DeclareLaunchArgument(
+            "scout_lead_distance", default_value="3.0",
+            description="Distance in meters for the UAV to remain ahead of the UGV.",
+        ),
+        DeclareLaunchArgument(
+            "scout_max_speed", default_value="1.0",
+            description="Maximum UAV horizontal speed in scout mode.",
+        ),
         DeclareLaunchArgument("goal_x", default_value="4.0",
                               description="Goal east coordinate in meters."),
         DeclareLaunchArgument("goal_y", default_value="0.0",
@@ -80,8 +109,17 @@ def generate_launch_description():
         DeclareLaunchArgument("uav_altitude", default_value="4.5",
                               description="UAV target altitude in meters."),
         DeclareLaunchArgument(
+            "uav_initial_settle_time", default_value="2.0",
+            description="Seconds to wait after the UAV reference becomes valid before publishing "
+                        "its localization anchor.",
+        ),
+        DeclareLaunchArgument(
             "grid_resolution", default_value="0.1",
             description="Camera occupancy-grid cell size in meters.",
+        ),
+        DeclareLaunchArgument(
+            "map_bounds", default_value="-12.0,-10.0,12.0,10.0",
+            description="Mapper bounds as min_x,min_y,max_x,max_y.",
         ),
         DeclareLaunchArgument(
             "obstacle_luminance_threshold", default_value="32.0",
@@ -90,6 +128,7 @@ def generate_launch_description():
         SetEnvironmentVariable("GZ_PARTITION",
                                EnvironmentVariable("GZ_PARTITION", default_value="uav_ugv_sim")),
         SetEnvironmentVariable("GZ_IP", "127.0.0.1"),
+        SetEnvironmentVariable("WORLD_NAME", world_name),
         # Whole camera images over shared memory; UDP fragments overflow the default
         # Linux receive buffer and drop most frames. An existing setting wins.
         SetEnvironmentVariable(
@@ -104,6 +143,7 @@ def generate_launch_description():
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(str(fault_share / "launch/sim_ugv_sensors.launch.py")),
             launch_arguments={"world": "simple_goal_demo", "seed": LaunchConfiguration("seed"),
+                              "evaluation_trace": LaunchConfiguration("evaluation_trace"),
                               "measurement_config": LaunchConfiguration("measurement_config"),
                               "measurement_profile": LaunchConfiguration("measurement_profile"),
                               "shared_position_stddev":
@@ -125,11 +165,18 @@ def generate_launch_description():
                                   "'/simulation/biased_uav_odometry' if float('",
                                   LaunchConfiguration("shared_position_stddev"),
                                   "') > 0 else '/fmu/out/vehicle_odometry'"]),
-                              "require_airborne": "true", "initial_settle_time": "10.0"}.items()),
+                              "require_airborne": "true",
+                              "initial_settle_time": LaunchConfiguration(
+                                  "uav_initial_settle_time")}.items()),
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(
                 str(sensing_share / "launch/uav_camera_sensor.launch.py")),
             launch_arguments={"detect_ugv": LaunchConfiguration("uav_assistance")}.items()),
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource(
+                str(fault_share / "launch/sensor_fault_detector.launch.py")),
+            launch_arguments={"command_topic": "/ugv/cmd_vel"}.items(),
+            condition=IfCondition(LaunchConfiguration("fault_detection"))),
         Node(package="fault_management", executable="sim_anchor_fault.py",
              parameters=[{"random_seed": ParameterValue(
                  LaunchConfiguration("seed"), value_type=int),
@@ -155,6 +202,11 @@ def generate_launch_description():
             parameters=[{
                 "uav_altitude": ParameterValue(
                     LaunchConfiguration("uav_altitude"), value_type=float),
+                "coordination_mode": LaunchConfiguration("coordination_mode"),
+                "scout_lead_distance": ParameterValue(
+                    LaunchConfiguration("scout_lead_distance"), value_type=float),
+                "scout_max_speed": ParameterValue(
+                    LaunchConfiguration("scout_max_speed"), value_type=float),
                 "follow_ugv": ParameterValue(LaunchConfiguration("uav_follow"), value_type=bool),
                 "map_origin": map_origin,
             }],
@@ -164,7 +216,12 @@ def generate_launch_description():
             package="ugv_control",
             executable="goal_controller",
             name="ugv_goal_controller",
-            parameters=[str(package_share / "config/navigation.yaml")],
+            parameters=[str(package_share / "config/navigation.yaml"), {
+                "evaluation_trace": ParameterValue(
+                    LaunchConfiguration("evaluation_trace"), value_type=bool),
+                "detector_enabled": ParameterValue(
+                    LaunchConfiguration("fault_hold"), value_type=bool),
+            }],
             output="screen",
         ),
         Node(
@@ -174,6 +231,8 @@ def generate_launch_description():
             parameters=[{
                 "grid_resolution": ParameterValue(
                     LaunchConfiguration("grid_resolution"), value_type=float),
+                "map_bounds": ParameterValue(
+                    LaunchConfiguration("map_bounds"), value_type=str),
                 "obstacle_luminance_threshold": ParameterValue(
                     LaunchConfiguration("obstacle_luminance_threshold"), value_type=float),
             }],
@@ -200,4 +259,9 @@ def generate_launch_description():
             condition=IfCondition(start_rviz),
         ),
         TimerAction(period=2.0, actions=[px4]),
+        Node(package="ros_gz_bridge", executable="parameter_bridge",
+             name="evaluation_watchdog_bridge",
+             parameters=[{"config_file": str(
+                 package_share / "config/evaluation_watchdog_bridge.yaml")}],
+             condition=IfCondition(LaunchConfiguration("evaluation_trace"))),
     ])

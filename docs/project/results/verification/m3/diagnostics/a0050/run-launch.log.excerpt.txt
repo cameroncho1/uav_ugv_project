@@ -1,0 +1,6 @@
+48: [local_astar_planner-15] [WARN] [1794389002.156157148] [local_astar_planner]: No local A-star path: UGV (-2.21, 0.31) cell (97, 103) free; goal (3.00, 0.50) cell (149, 104) blocked; grid x=[-12.00, 12.00), y=[-10.00, 10.00)
+50: [local_astar_planner-15] [WARN] [1794389004.482416542] [local_astar_planner]: No local A-star path: UGV (-2.09, 0.32) cell (99, 103) free; goal (3.00, 0.50) cell (149, 104) blocked; grid x=[-12.00, 12.00), y=[-10.00, 10.00)
+51: [local_astar_planner-15] [WARN] [1794389006.792010361] [local_astar_planner]: No local A-star path: UGV (-2.14, 0.33) cell (98, 103) free; goal (3.00, 0.50) cell (149, 104) blocked; grid x=[-12.00, 12.00), y=[-10.00, 10.00)
+92: [local_astar_planner-15] [WARN] [1794389097.566575623] [local_astar_planner]: No local A-star path: UGV (-2.14, 0.34) cell (98, 103) free; goal (3.00, 0.50) cell (149, 104) blocked; grid x=[-12.00, 12.00), y=[-10.00, 10.00)
+93: [local_astar_planner-15] [WARN] [1794389099.601171534] [local_astar_planner]: No local A-star path: UGV (-2.11, 0.34) cell (98, 103) free; goal (3.00, 0.50) cell (149, 104) blocked; grid x=[-12.00, 12.00), y=[-10.00, 10.00)
+94: [local_astar_planner-15] [WARN] [1794389101.734489788] [local_astar_planner]: No local A-star path: UGV (-2.12, 0.36) cell (98, 103) free; goal (3.00, 0.50) cell (149, 104) blocked; grid x=[-12.00, 12.00), y=[-10.00, 10.00)

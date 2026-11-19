@@ -1,0 +1,91 @@
+{
+  "date": "2026-11-11",
+  "environment": "Ubuntu 22.04 / WSL2, ROS 2 Humble, Gazebo Harmonic 8.15.0, Python 3.10; server-only simulation",
+  "offline_windows_tests": 142,
+  "registered_linux_checks": {
+    "tests": 283,
+    "errors": 0,
+    "failures": 0,
+    "static_analysis_skips": 8
+  },
+  "lifecycle_cases": 5,
+  "navigation_guard_replay_cases": 23,
+  "release_seed": 744,
+  "release_status": "completed",
+  "release_exit_code": 0,
+  "release_verdicts": {
+    "R1": "PASS",
+    "R2": "PASS",
+    "R3": "INCONCLUSIVE",
+    "R4": "NOT_APPLICABLE",
+    "R5": "PASS",
+    "R6": "PASS",
+    "R7": "NOT_APPLICABLE",
+    "R8": "NOT_APPLICABLE"
+  },
+  "metrics": {
+    "R1": {
+      "checks": 2141,
+      "clock": "sim",
+      "end_ns": 58464000000,
+      "epoch": 0,
+      "minimum_clearance_m": 0.09795702608006374,
+      "scope": "sampled_disk_proxy",
+      "start_ns": 18704000000,
+      "violations": 0
+    },
+    "R2": {
+      "arrival_latency_ns": 39480000000,
+      "checks": 1,
+      "clock": "sim",
+      "end_ns": 58464000000,
+      "epoch": 0,
+      "estimated_min_distance_m": 0.46039431540737624,
+      "physical_min_distance_m": 0.48104893905374096,
+      "start_ns": 18704000000,
+      "violations": 0
+    },
+    "R5": {
+      "checks": 1,
+      "clock": "sim",
+      "end_ns": 58464000000,
+      "epoch": 0,
+      "maximum_response_latency_ns": 140000000,
+      "minimum_response_slack_ns": 1860000000,
+      "start_ns": 18704000000,
+      "violations": 0
+    },
+    "R6": {
+      "checks": 1190,
+      "clock": "sim",
+      "conditional_rmse_m": 0.035209411305122874,
+      "eligible_samples": 1190,
+      "end_ns": 58464000000,
+      "epoch": 0,
+      "full_run_matched_samples": 1190,
+      "full_run_rmse_m": 0.035209411305122874,
+      "maximum_error_m": 0.07864074139749255,
+      "minimum_margin_m": 0.42135925860250745,
+      "start_ns": 18704000000,
+      "violations": 0
+    }
+  },
+  "raw_bags_committed": false,
+  "all_owned_processes_stopped": true,
+  "rosdep_rules": {
+    "keys": [
+      "python3-gz-msgs10",
+      "python3-gz-transport13"
+    ],
+    "platform": "Ubuntu Jammy",
+    "resolution": "Project definitions resolve to their installed OSRF apt packages.",
+    "host_configuration_changed": false
+  },
+  "saved_report_reproduction": {
+    "without_ros": true,
+    "numerical_files_byte_identical": [
+      "evidence.json",
+      "timeline.csv"
+    ]
+  }
+}

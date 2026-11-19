@@ -8,6 +8,7 @@ from pathlib import Path
 import signal
 import subprocess
 import time
+from verification_recording import Recording
 
 import rclpy
 from rclpy.node import Node
@@ -15,6 +16,7 @@ from rclpy.qos import QoSProfile, DurabilityPolicy, qos_profile_sensor_data
 from geometry_msgs.msg import PoseStamped, PoseWithCovarianceStamped
 from nav_msgs.msg import OccupancyGrid
 from rosgraph_msgs.msg import Clock
+from std_msgs.msg import String
 from uav_ugv_msgs.msg import PlannedRoute
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -27,6 +29,7 @@ class Fixture(Node):
         self.truth = []
         self.goal_revision = None
         self.last_fixture_stamp = None
+        self.watchdog_output = None
         latched = QoSProfile(depth=1, durability=DurabilityPolicy.TRANSIENT_LOCAL)
         self.pose_pub = self.create_publisher(PoseWithCovarianceStamped, "/ugv/localization/pose", 10)
         self.goal_pub = self.create_publisher(PoseStamped, "/global_goal_pose", latched)
@@ -34,12 +37,34 @@ class Fixture(Node):
         self.create_subscription(Clock, "/clock", self.on_clock, qos_profile_sensor_data)
         self.create_subscription(PoseStamped, "/evaluation/ugv_truth", self.on_truth,
                                  qos_profile_sensor_data)
+        self.create_subscription(String, "/evaluation/watchdog", self.on_watchdog, 10)
 
     def on_clock(self, message):
         self.clock = message.clock
 
     def on_truth(self, message):
-        self.truth.append((time.monotonic(), message.pose.position.x, message.pose.position.y))
+        stamp = message.header.stamp.sec * 10**9 + message.header.stamp.nanosec
+        self.truth.append((time.monotonic(), message.pose.position.x, message.pose.position.y, stamp))
+
+    def on_watchdog(self, message):
+        trace = json.loads(message.data)
+        if trace["kind"] == "watchdog_output":
+            self.watchdog_output = trace
+
+    def confirm_input_loss(self, killed_at_ns):
+        # Killing a producer does not drain commands already in transport. Observe
+        # silence at the actuator while its last nonzero input is still unexpired.
+        deadline = time.monotonic() + 1.0
+        while time.monotonic() < deadline:
+            self.tick()
+            trace = self.watchdog_output
+            if (trace is not None and trace["steady_ns"] >= killed_at_ns
+                    and time.monotonic_ns() - trace["steady_ns"] <= 100_000_000
+                    and 100_000_000 <= trace["input_age_ns"] <= 250_000_000
+                    and not trace["expired"] and trace["queued"]
+                    and abs(trace["linear"]) + abs(trace["angular"]) > 0.05):
+                return
+        raise AssertionError("Actuator did not confirm nonzero input loss before expiry")
 
     def tick(self):
         stamp = ((self.clock.sec, self.clock.nanosec) if self.clock is not None else None)
@@ -97,12 +122,19 @@ def stop(processes):
         if p.poll() is not None: p.wait()
 
 
-def case(output, mode):
-    directory = output / mode
+def case(output, mode, clock_mode="normal"):
+    directory = output / (mode if clock_mode == "normal" else mode + "_" + clock_mode)
     directory.mkdir(parents=True, exist_ok=True)
-    os.environ["GZ_PARTITION"] = "watchdog_" + mode + "_" + str(os.getpid())
+    os.environ["GZ_PARTITION"] = "watchdog_" + directory.name + "_" + str(os.getpid())
     os.environ["GZ_IP"] = "127.0.0.1"
     processes, logs = [], []
+    world = ROOT / "simulation/worlds/uav_ugv.sdf"
+    if clock_mode == "slow":
+        slow_world = directory / "world.sdf"
+        slow_world.write_text(world.read_text().replace('<real_time_factor>1.0</real_time_factor>',
+                                                        '<real_time_factor>0.2</real_time_factor>'))
+        world = slow_world.resolve()
+    os.environ["WORLD_FILE"] = str(world)
 
     def launch(label, command):
         log = (directory / (label + ".log")).open("w")
@@ -114,15 +146,19 @@ def case(output, mode):
 
     rclpy.init()
     node = Fixture()
+    recording = Recording(directory / "verification", world=world)
+    status = "aborted"
     try:
         launch("world", ["bash", str(ROOT / "scripts/world.sh")])
         launch("sensors", ["ros2", "launch", "simulation_support", "ugv_sensors.launch.py"])
         launch("truth", ["ros2", "run", "simulation_support", "ugv_truth", "--ros-args",
-                         "-p", "world:=uav_ugv", "-p", "use_sim_time:=true"])
+                         "-p", "world:=uav_ugv", "-p", "use_sim_time:=true", "-p", "evaluation_trace:=true"])
         bridge = launch("command_bridge", ["ros2", "run", "ros_gz_bridge", "parameter_bridge",
             "--ros-args", "-p", "config_file:=" + str(ROOT / "ros2_ws/src/mission_manager/config/ugv_command_bridge.yaml")])
+        launch("diagnostics_bridge", ["ros2", "run", "ros_gz_bridge", "parameter_bridge", "--ros-args", "-p",
+            "config_file:=" + str(ROOT / "ros2_ws/src/mission_manager/config/evaluation_watchdog_bridge.yaml")])
         controller = launch("controller", ["ros2", "run", "ugv_control", "goal_controller",
-                                           "--ros-args", "-p", "use_sim_time:=true"])
+                                           "--ros-args", "-p", "use_sim_time:=true", "-p", "evaluation_trace:=true"])
         deadline = time.monotonic() + 35
         initial = None
         while time.monotonic() < deadline:
@@ -132,34 +168,57 @@ def case(output, mode):
                 if node.truth[-1][1] - initial[1] >= .15:
                     break
         assert initial is not None and node.truth[-1][1] - initial[1] >= .15, "No physical pre-fault motion"
+        if clock_mode == "frozen":
+            paused = subprocess.run(["gz", "service", "-s", "/world/uav_ugv/control", "--reqtype",
+                "gz.msgs.WorldControl", "--reptype", "gz.msgs.Boolean", "--timeout", "3000",
+                "--req", "pause: true"], capture_output=True, text=True, check=True)
+            assert "data: true" in paused.stdout, "World did not acknowledge pause"
         killed = controller if mode == "controller_death" else bridge
         lost_at = time.monotonic()
+        killed_at_ns = time.monotonic_ns()
         os.killpg(killed.pid, signal.SIGKILL)
+        killed.wait(timeout=5)
+        node.confirm_input_loss(killed_at_ns)
+        recording.command_loss(mode)
         while time.monotonic() - lost_at < 1.6:
             node.tick()
         late = [row for row in node.truth if row[0] >= lost_at + .75]
-        assert len(late) >= 5, "Missing physical truth after command loss"
-        distance = max(((row[1] - late[0][1])**2 + (row[2] - late[0][2])**2)**.5 for row in late)
-        result = {"case": mode, "pre_fault_motion_m": node.truth[-1][1] - initial[1],
+        if clock_mode != "frozen":
+            assert len(late) >= 5, "Missing physical truth after command loss"
+        distance = (max(((row[1] - late[0][1])**2 + (row[2] - late[0][2])**2)**.5 for row in late)
+                    if late else None)
+        result = {"case": mode, "clock_mode": clock_mode, "pre_fault_motion_m": node.truth[-1][1] - initial[1],
                   "watchdog_timeout_wall_s": .35, "maximum_additional_delivery_period_wall_s": .05,
                   "settled_check_after_wall_s": .75, "late_truth_samples": len(late),
-                  "maximum_late_displacement_m": distance, "passed": distance < .02}
+                  "maximum_late_displacement_m": distance,
+                  "physical_settling_available": clock_mode != "frozen",
+                  "passed": (distance < .02 if clock_mode != "frozen" else
+                             bool(late) and len({row[3] for row in late}) == 1)}
         (directory / "result.json").write_text(json.dumps(result, indent=2) + "\n")
         assert result["passed"], "Actuator kept moving after controller/transport loss"
+        status = "completed"
         return result
     finally:
         stop(processes)
-        node.destroy_node()
-        rclpy.try_shutdown()
-        for log in logs: log.close()
+        try:
+            recording.close(status)
+        finally:
+            node.destroy_node()
+            rclpy.try_shutdown()
+            for log in logs:
+                log.close()
+        if status == "completed":
+            recording.normalize()
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("output", type=Path)
+    parser.add_argument("--clock-mode", choices=("normal", "slow", "frozen"), default="normal")
     args = parser.parse_args()
     args.output.mkdir(parents=True, exist_ok=True)
-    results = [case(args.output, mode) for mode in ("controller_death", "command_transport_loss")]
+    results = [case(args.output, mode, args.clock_mode)
+               for mode in ("controller_death", "command_transport_loss")]
     (args.output / "summary.json").write_text(json.dumps(results, indent=2) + "\n")
     print(json.dumps(results))
 

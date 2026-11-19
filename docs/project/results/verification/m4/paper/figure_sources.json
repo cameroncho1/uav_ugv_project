@@ -1,0 +1,205 @@
+{
+  "architecture": {
+    "scope": "implemented capture/evaluate/report pipeline"
+  },
+  "arrival": {
+    "cohort_set": "c7113a606e7034f4",
+    "cohorts": [
+      "6d3ee663d48b5df8",
+      "84c56082ed298d86"
+    ],
+    "counts_of_all_outcomes": "outcomes.svg",
+    "included_runs": [
+      "normalized-e76649cd79d5",
+      "normalized-d648f83a8d5d",
+      "normalized-8e86ca43e79b",
+      "normalized-3a9f70d408da",
+      "normalized-f06b748f6d05",
+      "normalized-a1d4b4217299",
+      "normalized-79863b16aa51",
+      "normalized-1fdb0285a07d",
+      "normalized-b852832153c6",
+      "normalized-665bdb6428a2",
+      "normalized-5b8c71ff65d6",
+      "normalized-3c9c21114bd3",
+      "normalized-b1478ff52d3b",
+      "normalized-10c965ff5528",
+      "normalized-402bbee67214",
+      "normalized-9ade807f8658",
+      "normalized-70720575ffa1",
+      "normalized-6813dc18c4cd",
+      "normalized-50c83514eddd",
+      "normalized-7c093b0fb676",
+      "normalized-d6c8f1fe68f4",
+      "normalized-53501be25364",
+      "normalized-90858f235301",
+      "normalized-af7f953903a8",
+      "normalized-820a9ee27734",
+      "normalized-d6e90a2228ee",
+      "normalized-758b479c0457",
+      "normalized-4d7fb2f9d2c1",
+      "normalized-9651b94bd22e",
+      "normalized-c20cf15b075e",
+      "normalized-3aeeeda3681f",
+      "normalized-e3fa00ec9e19",
+      "normalized-703874348ff4",
+      "normalized-8bb3d711aee7"
+    ],
+    "omitted_records": 18,
+    "profiles": [
+      "m2-camera/v1",
+      "m3-camera-unassisted/v1"
+    ],
+    "source": "metrics.csv"
+  },
+  "clearance": {
+    "cohort_set": "eb225c8fab610e83",
+    "cohorts": [
+      "6d3ee663d48b5df8"
+    ],
+    "counts_of_all_outcomes": "outcomes.svg",
+    "included_runs": [
+      "normalized-3a9f70d408da",
+      "normalized-f06b748f6d05",
+      "normalized-a1d4b4217299",
+      "normalized-79863b16aa51",
+      "normalized-1fdb0285a07d",
+      "normalized-b852832153c6",
+      "normalized-665bdb6428a2",
+      "normalized-5b8c71ff65d6",
+      "normalized-3c9c21114bd3",
+      "normalized-81abd4bba52b",
+      "normalized-9f347c81951f",
+      "normalized-324a02d384cc",
+      "normalized-b1478ff52d3b",
+      "normalized-10c965ff5528",
+      "normalized-402bbee67214",
+      "normalized-9ade807f8658",
+      "normalized-70720575ffa1",
+      "normalized-6813dc18c4cd",
+      "normalized-53501be25364",
+      "normalized-90858f235301",
+      "normalized-af7f953903a8",
+      "normalized-a60ea9ba65e5",
+      "normalized-0378a1ad143b",
+      "normalized-45257f8acb88",
+      "normalized-820a9ee27734",
+      "normalized-d6e90a2228ee",
+      "normalized-758b479c0457",
+      "normalized-3aeeeda3681f",
+      "normalized-e3fa00ec9e19",
+      "normalized-703874348ff4",
+      "normalized-8bb3d711aee7",
+      "normalized-97f0d2c181b3",
+      "normalized-3832962e339b"
+    ],
+    "omitted_records": 19,
+    "profiles": [
+      "m2-camera/v1"
+    ],
+    "source": "metrics.csv"
+  },
+  "guard": {
+    "cohort_set": "2bcf52c6aa8d7898",
+    "cohorts": [
+      "51605416c6f588d2"
+    ],
+    "latencies": "authoritative values in metrics.csv",
+    "profiles": [
+      "m2-guard/v1"
+    ],
+    "recording": "recordings/a0042-r0"
+  },
+  "localization": {
+    "cohort_set": "eb225c8fab610e83",
+    "cohorts": [
+      "6d3ee663d48b5df8"
+    ],
+    "counts_of_all_outcomes": "outcomes.svg",
+    "included_runs": [
+      "normalized-e76649cd79d5",
+      "normalized-d648f83a8d5d",
+      "normalized-8e86ca43e79b",
+      "normalized-3a9f70d408da",
+      "normalized-f06b748f6d05",
+      "normalized-a1d4b4217299",
+      "normalized-79863b16aa51",
+      "normalized-1fdb0285a07d",
+      "normalized-b852832153c6",
+      "normalized-665bdb6428a2",
+      "normalized-5b8c71ff65d6",
+      "normalized-3c9c21114bd3",
+      "normalized-81abd4bba52b",
+      "normalized-9f347c81951f",
+      "normalized-324a02d384cc",
+      "normalized-b1478ff52d3b",
+      "normalized-10c965ff5528",
+      "normalized-402bbee67214",
+      "normalized-9ade807f8658",
+      "normalized-70720575ffa1",
+      "normalized-6813dc18c4cd",
+      "normalized-50c83514eddd",
+      "normalized-7c093b0fb676",
+      "normalized-d6c8f1fe68f4",
+      "normalized-53501be25364",
+      "normalized-90858f235301",
+      "normalized-af7f953903a8",
+      "normalized-a60ea9ba65e5",
+      "normalized-0378a1ad143b",
+      "normalized-45257f8acb88",
+      "normalized-820a9ee27734",
+      "normalized-d6e90a2228ee",
+      "normalized-758b479c0457",
+      "normalized-3aeeeda3681f",
+      "normalized-e3fa00ec9e19",
+      "normalized-703874348ff4",
+      "normalized-8bb3d711aee7",
+      "normalized-97f0d2c181b3",
+      "normalized-3832962e339b"
+    ],
+    "omitted_records": 13,
+    "profiles": [
+      "m2-camera/v1"
+    ],
+    "source": "metrics.csv"
+  },
+  "navigation": {
+    "cohort_set": "eb225c8fab610e83",
+    "cohorts": [
+      "6d3ee663d48b5df8"
+    ],
+    "display": "downsampled; no verdict recomputation",
+    "profiles": [
+      "m2-camera/v1"
+    ],
+    "recording": "recordings/a0016-r0"
+  },
+  "outcomes": {
+    "cohort_set": "36ac8227d77abd42",
+    "cohorts": [
+      "258a8d4a8823282f",
+      "51605416c6f588d2",
+      "6d3ee663d48b5df8",
+      "84c56082ed298d86"
+    ],
+    "denominator": "attempts, not only available recordings",
+    "profiles": [
+      "m2-camera/v1",
+      "m2-guard/v1",
+      "m2-watchdog/v1",
+      "m3-camera-unassisted/v1"
+    ],
+    "source": "ledger.json"
+  },
+  "watchdog": {
+    "cohort_set": "27460f6288a7d030",
+    "cohorts": [
+      "258a8d4a8823282f"
+    ],
+    "latencies": "authoritative values in metrics.csv",
+    "profiles": [
+      "m2-watchdog/v1"
+    ],
+    "recording": "recordings/a0043-r0"
+  }
+}

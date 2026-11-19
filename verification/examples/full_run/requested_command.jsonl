@@ -1,0 +1,2 @@
+{"clock": "sim", "data": {"angular": 0, "linear": 0.5}, "epoch": 0, "sequence": 0, "source": "requested_command", "time_ns": 0}
+{"clock": "sim", "data": {"angular": 0, "linear": 0}, "epoch": 0, "sequence": 1, "source": "requested_command", "time_ns": 1500000000}

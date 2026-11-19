@@ -1,0 +1,209 @@
+{
+  "availability": "Machine-local WSL archives; not committed or uploaded.",
+  "attempts": [
+    {
+      "directory": "/home/rylanwwade/uav-verification-m2/evidence/m3_preflight",
+      "role": "readiness_development_pilot",
+      "matrix": false,
+      "demo": false,
+      "calibration_thresholds_changed": false,
+      "seed": null,
+      "legacy_passed": null,
+      "outcome": "readiness_not_established",
+      "files": {
+        "world.log": {
+          "bytes": 640,
+          "sha256": "bdb99c9c1a39dcfe59cf3888e46d519a94e31063219c5ec0bcb69b3b5f030dd8"
+        }
+      }
+    },
+    {
+      "directory": "/home/rylanwwade/uav-verification-m2/evidence/m3_preflight_2",
+      "role": "readiness_development_pilot",
+      "matrix": false,
+      "demo": false,
+      "calibration_thresholds_changed": false,
+      "seed": null,
+      "legacy_passed": null,
+      "outcome": "readiness_not_established",
+      "files": {
+        "px4_ready.log": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "world.log": {
+          "bytes": 2424,
+          "sha256": "0df1e4695726120323718d559953e8c2c6dbcf88c35cc94bec44519c73aa3f0d"
+        },
+        "dds.log": {
+          "bytes": 44051,
+          "sha256": "28fa68622cf266f925b3c0271cc009ad9dd499ebab9edaee8767362d7ceb5630"
+        },
+        "px4.log": {
+          "bytes": 6753,
+          "sha256": "ff1f7f6af1ae361e8c12cd3d27e66b30a6a68ca9354d6fcde4325e94fc44d640"
+        }
+      }
+    },
+    {
+      "directory": "/home/rylanwwade/uav-verification-m2/evidence/m3_preflight_3",
+      "role": "readiness_development_pilot",
+      "matrix": false,
+      "demo": false,
+      "calibration_thresholds_changed": false,
+      "seed": null,
+      "legacy_passed": null,
+      "outcome": "readiness_not_established",
+      "files": {
+        "px4_ready.log": {
+          "bytes": 71,
+          "sha256": "968fdecf86632e60d5d2e7f2ad9329b456e92a6960a82fc24bbf79902db7c95e"
+        },
+        "world.log": {
+          "bytes": 2424,
+          "sha256": "0df1e4695726120323718d559953e8c2c6dbcf88c35cc94bec44519c73aa3f0d"
+        },
+        "dds.log": {
+          "bytes": 44051,
+          "sha256": "51793b6f1fee81dbc690b5c678518de343c8ebd9bc6d5ad58f770fc021975e84"
+        },
+        "px4.log": {
+          "bytes": 6598,
+          "sha256": "b7f46d75b4bd3a37c4ce59127764a4d6154fa962311e066bc42063b10301177d"
+        }
+      }
+    },
+    {
+      "directory": "/home/rylanwwade/uav-verification-m2/evidence/m3_preflight_4",
+      "role": "readiness_development_pilot",
+      "matrix": false,
+      "demo": false,
+      "calibration_thresholds_changed": false,
+      "seed": 513,
+      "legacy_passed": true,
+      "outcome": "completed_score",
+      "files": {
+        "world.log": {
+          "bytes": 2424,
+          "sha256": "0df1e4695726120323718d559953e8c2c6dbcf88c35cc94bec44519c73aa3f0d"
+        },
+        "results.tracking.csv": {
+          "bytes": 113660,
+          "sha256": "fac35b715fcf6a058e459ec6cfc1b5b5358441f4b4b5f456268e7d2cf1169358"
+        },
+        "dds.log": {
+          "bytes": 44051,
+          "sha256": "b890ba7ad7b781d33d0c83118ccbe33fbc5a669584f9e42b7afecfd588118591"
+        },
+        "px4.log": {
+          "bytes": 7111,
+          "sha256": "687fed04c4a089258a9ee1f21cb72489ab3a0715985f80530333fdfc770d38f5"
+        },
+        "launch.log": {
+          "bytes": 10814,
+          "sha256": "6bd366ebf98eec6d1a354507300136e9a365f4d7c02be60331e76c59ef0194bf"
+        },
+        "readiness.json": {
+          "bytes": 156,
+          "sha256": "cb449a3eaa19402ac0648b264c9b56ee25bc24a2f7f7bc1c0400d3ac4de24629"
+        },
+        "results.routes.json": {
+          "bytes": 34254,
+          "sha256": "bcd6c755b169f5e17ad63cfb929e4455ff914978852eef33ebdbf72752444056"
+        },
+        "results.json": {
+          "bytes": 2118,
+          "sha256": "5cb98be96bcae40eba4f4fd08f58e139255a8a8fbbd2915c191258bb189f47bd"
+        },
+        "truth.log": {
+          "bytes": 71,
+          "sha256": "2409559aec644ec41ddada19dbf6ec6f5f974e958811d59a132674121b45eaef"
+        },
+        "verification/events.jsonl": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "verification/preflight_profile.yaml": {
+          "bytes": 769,
+          "sha256": "82ca5d3db35813bbd417770fc67396255e52001b8d3b7bcc9936ed9ce43d4b5b"
+        },
+        "verification/recording.json": {
+          "bytes": 20158,
+          "sha256": "d58b9c5cb4d3a6764e1593ef20503d022178b5e2cd9d2f290724072df39538ff"
+        },
+        "verification/recorder_qos.yaml": {
+          "bytes": 1400,
+          "sha256": "4f17b65d167f887aa32799aadafd03e51e091aa9c0eac88a61c07d238a767857"
+        },
+        "verification/recorder.log": {
+          "bytes": 2962,
+          "sha256": "265ebdaf0bb99ac970d7e885b6292cddcae00f55b990184ba40cff19d2df0602"
+        },
+        "verification/bag/bag_0.db3": {
+          "bytes": 17911808,
+          "sha256": "6dc6f26f216e56d9b40276465b92766e9d5f9ad8165eaa312f50f09b6c3b6105"
+        },
+        "verification/bag/metadata.yaml": {
+          "bytes": 5885,
+          "sha256": "35d90cf0d83844196913c61f9b0deba076aa638915810db8ba7d00f31efa6cf2"
+        },
+        "verification/normalized/goal.jsonl": {
+          "bytes": 21981,
+          "sha256": "1cbbb88ec0eb7dcfffe69eea664ba2858918f5bbf50da17f85d4a3cea02e69dc"
+        },
+        "verification/normalized/events.jsonl": {
+          "bytes": 330,
+          "sha256": "6d40ff80524c46baeaaef0d4f8b3a931c1665c61d830b0d91025dc3639f9fb94"
+        },
+        "verification/normalized/manifest.json": {
+          "bytes": 23754,
+          "sha256": "44c05090504c470ff6b04f33c0902f5a25db86332258a5391950f315e3a73089"
+        },
+        "verification/normalized/uav_observation.jsonl": {
+          "bytes": 28231,
+          "sha256": "7a60720d1c77d6e5a70d7c879cc9f94a37a844c5b1a8b69fd63fff960ac97522"
+        },
+        "verification/normalized/truth_pose.jsonl": {
+          "bytes": 1059382,
+          "sha256": "3168e3227e099cb885260ab6d6bf155efd1381b20b63038491eedcb1241ff4dc"
+        },
+        "verification/normalized/guard_state.jsonl": {
+          "bytes": 555614,
+          "sha256": "a6dfe5dd63ac81f4570704898186616d3497d7d17f17e216191c517d5906fb49"
+        },
+        "verification/normalized/actuator_input.jsonl": {
+          "bytes": 241676,
+          "sha256": "941522aa2fe73e4554ba967064c727210470250bccdc2bf414d2f297f3f5d553"
+        },
+        "verification/normalized/route.jsonl": {
+          "bytes": 149811,
+          "sha256": "3c5cd016ee7c676bdb0733ab3295ae6796e038d8e9d5f516029c320e1fa2a599"
+        },
+        "verification/normalized/actuator_output.jsonl": {
+          "bytes": 547187,
+          "sha256": "b4d889e67908f33eb3f7aaba75fe15a57566f64c47b55217bcb11e23c91fc26b"
+        },
+        "verification/normalized/obstacles.jsonl": {
+          "bytes": 167,
+          "sha256": "8e17b13a9394b1742d27438ebd39fd4d590369ec8979a426258b2e20c39aa22f"
+        },
+        "verification/normalized/measured_motion.jsonl": {
+          "bytes": 1003961,
+          "sha256": "411832e77eab78301e2d3e9fb6f21001ea12447f083157fd554f0194e6ecebdc"
+        },
+        "verification/normalized/requested_command.jsonl": {
+          "bytes": 478856,
+          "sha256": "64a888525eb6a85a96954d64ca4c1db8558a10babed269b01c6b712c8dc78402"
+        },
+        "verification/normalized/estimated_pose.jsonl": {
+          "bytes": 323308,
+          "sha256": "e3bb052ab658f8b2b0e1858d18746911298c9e053d127a2defeb370f5e0fe5db"
+        },
+        "verification/normalized/grid.jsonl": {
+          "bytes": 19182,
+          "sha256": "b6621f37e9eeea559d9a809a00e86fca399d1f0aac8e29aa3f60296ab6843cbd"
+        }
+      }
+    }
+  ]
+}

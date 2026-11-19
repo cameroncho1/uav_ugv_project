@@ -10,6 +10,14 @@ gz-transport13:
   ubuntu:
     jammy:
     - libgz-transport13-dev
+python3-gz-msgs10:
+  ubuntu:
+    jammy:
+    - python3-gz-msgs10
+python3-gz-transport13:
+  ubuntu:
+    jammy:
+    - python3-gz-transport13
 gz-plugin2:
   ubuntu:
     jammy:

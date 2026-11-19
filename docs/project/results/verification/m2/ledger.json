@@ -1,0 +1,193 @@
+[
+  {
+    "id": "camera-nominal",
+    "source_run_id": "rosbag2:fabb4c4037d067dd20f98b3a23326174dcb4ab3b04dc45a1684e2009f00d9e38",
+    "raw_directory": "/home/rylanwwade/uav-verification-m2/evidence/camera_2/verification",
+    "execution_status": "completed",
+    "evaluation_exit_code": 0,
+    "verdicts": {
+      "R1": "PASS",
+      "R2": "PASS",
+      "R3": "INCONCLUSIVE",
+      "R4": "NOT_APPLICABLE",
+      "R5": "NOT_APPLICABLE",
+      "R6": "PASS",
+      "R7": "NOT_APPLICABLE",
+      "R8": "NOT_APPLICABLE"
+    },
+    "profile_sha256": "281f8d8a57e827ece9e15886c9bd40b7da7fa076402a67648d8c5ab01dba0308",
+    "evaluator_sha256": "511205faa9b4fa176bc2e4b4cf7da17e049ab24ba77274459b92dca8a372bdab"
+  },
+  {
+    "id": "camera-gps-outage",
+    "source_run_id": "rosbag2:96833ae221702087512a3fbfe030905e65ad7532434bf7c7afb25a8d241ecf6c",
+    "raw_directory": "/home/rylanwwade/uav-verification-m2/evidence/camera_outage/verification",
+    "execution_status": "completed",
+    "evaluation_exit_code": 0,
+    "verdicts": {
+      "R1": "PASS",
+      "R2": "PASS",
+      "R3": "INCONCLUSIVE",
+      "R4": "NOT_APPLICABLE",
+      "R5": "NOT_APPLICABLE",
+      "R6": "PASS",
+      "R7": "NOT_APPLICABLE",
+      "R8": "NOT_APPLICABLE"
+    },
+    "profile_sha256": "281f8d8a57e827ece9e15886c9bd40b7da7fa076402a67648d8c5ab01dba0308",
+    "evaluator_sha256": "511205faa9b4fa176bc2e4b4cf7da17e049ab24ba77274459b92dca8a372bdab"
+  },
+  {
+    "id": "guard",
+    "source_run_id": "rosbag2:9a8e5e637905af54d8afdc490e6f273b9f124e78bc7a474726c10c02f89c7ccb",
+    "raw_directory": "/home/rylanwwade/uav-verification-m2/evidence/guards_final/verification",
+    "execution_status": "completed",
+    "evaluation_exit_code": 0,
+    "verdicts": {
+      "R1": "NOT_APPLICABLE",
+      "R2": "NOT_APPLICABLE",
+      "R3": "PASS",
+      "R4": "NOT_APPLICABLE",
+      "R5": "NOT_APPLICABLE",
+      "R6": "NOT_APPLICABLE",
+      "R7": "NOT_APPLICABLE",
+      "R8": "NOT_APPLICABLE"
+    },
+    "profile_sha256": "7fcdfa2c368ee91d7c51742bee21085e9d43662d4c4c205537163693fa3b5be0",
+    "evaluator_sha256": "511205faa9b4fa176bc2e4b4cf7da17e049ab24ba77274459b92dca8a372bdab"
+  },
+  {
+    "id": "controller_death",
+    "source_run_id": "rosbag2:3389e266b8f5df42c0a67c5e84b9052255c55cd22028bb4a8d48831acbe6bb46",
+    "raw_directory": "/home/rylanwwade/uav-verification-m2/evidence/watchdog_final/controller_death/verification",
+    "execution_status": "completed",
+    "evaluation_exit_code": 0,
+    "verdicts": {
+      "R1": "NOT_APPLICABLE",
+      "R2": "NOT_APPLICABLE",
+      "R3": "NOT_APPLICABLE",
+      "R4": "PASS",
+      "R5": "NOT_APPLICABLE",
+      "R6": "NOT_APPLICABLE",
+      "R7": "NOT_APPLICABLE",
+      "R8": "NOT_APPLICABLE"
+    },
+    "profile_sha256": "ec0bccac2dd02d3a303ce9696ca89251518c4f6e8fc98be304a905ec22d06677",
+    "evaluator_sha256": "511205faa9b4fa176bc2e4b4cf7da17e049ab24ba77274459b92dca8a372bdab"
+  },
+  {
+    "id": "command_transport_loss",
+    "source_run_id": "rosbag2:e66adc43f3fee6b80a73dd6898341073b7de4af2a30370a693a2edb5511a95ba",
+    "raw_directory": "/home/rylanwwade/uav-verification-m2/evidence/watchdog_final/command_transport_loss/verification",
+    "execution_status": "completed",
+    "evaluation_exit_code": 0,
+    "verdicts": {
+      "R1": "NOT_APPLICABLE",
+      "R2": "NOT_APPLICABLE",
+      "R3": "NOT_APPLICABLE",
+      "R4": "PASS",
+      "R5": "NOT_APPLICABLE",
+      "R6": "NOT_APPLICABLE",
+      "R7": "NOT_APPLICABLE",
+      "R8": "NOT_APPLICABLE"
+    },
+    "profile_sha256": "ec0bccac2dd02d3a303ce9696ca89251518c4f6e8fc98be304a905ec22d06677",
+    "evaluator_sha256": "511205faa9b4fa176bc2e4b4cf7da17e049ab24ba77274459b92dca8a372bdab"
+  },
+  {
+    "id": "controller_death_slow",
+    "source_run_id": "rosbag2:9397c70da9f1367c4e6776dfe7e9f042bf311118139b6a748eb3840a47de6e72",
+    "raw_directory": "/home/rylanwwade/uav-verification-m2/evidence/watchdog_slow/controller_death_slow/verification",
+    "execution_status": "completed",
+    "evaluation_exit_code": 0,
+    "verdicts": {
+      "R1": "NOT_APPLICABLE",
+      "R2": "NOT_APPLICABLE",
+      "R3": "NOT_APPLICABLE",
+      "R4": "PASS",
+      "R5": "NOT_APPLICABLE",
+      "R6": "NOT_APPLICABLE",
+      "R7": "NOT_APPLICABLE",
+      "R8": "NOT_APPLICABLE"
+    },
+    "profile_sha256": "ec0bccac2dd02d3a303ce9696ca89251518c4f6e8fc98be304a905ec22d06677",
+    "evaluator_sha256": "511205faa9b4fa176bc2e4b4cf7da17e049ab24ba77274459b92dca8a372bdab"
+  },
+  {
+    "id": "command_transport_loss_slow",
+    "source_run_id": "rosbag2:9a13f121020d95d0080b0ce49883b41247c9201bdd43ba436e779748a5573a72",
+    "raw_directory": "/home/rylanwwade/uav-verification-m2/evidence/watchdog_slow/command_transport_loss_slow/verification",
+    "execution_status": "completed",
+    "evaluation_exit_code": 0,
+    "verdicts": {
+      "R1": "NOT_APPLICABLE",
+      "R2": "NOT_APPLICABLE",
+      "R3": "NOT_APPLICABLE",
+      "R4": "PASS",
+      "R5": "NOT_APPLICABLE",
+      "R6": "NOT_APPLICABLE",
+      "R7": "NOT_APPLICABLE",
+      "R8": "NOT_APPLICABLE"
+    },
+    "profile_sha256": "ec0bccac2dd02d3a303ce9696ca89251518c4f6e8fc98be304a905ec22d06677",
+    "evaluator_sha256": "511205faa9b4fa176bc2e4b4cf7da17e049ab24ba77274459b92dca8a372bdab"
+  },
+  {
+    "id": "controller_death_frozen",
+    "source_run_id": "rosbag2:1b53ced6d92fa1ae69bc95ee6844414f52de65c4404dd29c1965e41e13f81683",
+    "raw_directory": "/home/rylanwwade/uav-verification-m2/evidence/watchdog_frozen_2/controller_death_frozen/verification",
+    "execution_status": "completed",
+    "evaluation_exit_code": 2,
+    "verdicts": {
+      "R1": "NOT_APPLICABLE",
+      "R2": "NOT_APPLICABLE",
+      "R3": "NOT_APPLICABLE",
+      "R4": "INCONCLUSIVE",
+      "R5": "NOT_APPLICABLE",
+      "R6": "NOT_APPLICABLE",
+      "R7": "NOT_APPLICABLE",
+      "R8": "NOT_APPLICABLE"
+    },
+    "profile_sha256": "ec0bccac2dd02d3a303ce9696ca89251518c4f6e8fc98be304a905ec22d06677",
+    "evaluator_sha256": "511205faa9b4fa176bc2e4b4cf7da17e049ab24ba77274459b92dca8a372bdab"
+  },
+  {
+    "id": "command_transport_loss_frozen",
+    "source_run_id": "rosbag2:74130c8e49e89ae3d959df8042efcaa4876eeaa9fc68147122d2ce734b332654",
+    "raw_directory": "/home/rylanwwade/uav-verification-m2/evidence/watchdog_frozen_2/command_transport_loss_frozen/verification",
+    "execution_status": "completed",
+    "evaluation_exit_code": 2,
+    "verdicts": {
+      "R1": "NOT_APPLICABLE",
+      "R2": "NOT_APPLICABLE",
+      "R3": "NOT_APPLICABLE",
+      "R4": "INCONCLUSIVE",
+      "R5": "NOT_APPLICABLE",
+      "R6": "NOT_APPLICABLE",
+      "R7": "NOT_APPLICABLE",
+      "R8": "NOT_APPLICABLE"
+    },
+    "profile_sha256": "ec0bccac2dd02d3a303ce9696ca89251518c4f6e8fc98be304a905ec22d06677",
+    "evaluator_sha256": "511205faa9b4fa176bc2e4b4cf7da17e049ab24ba77274459b92dca8a372bdab"
+  },
+  {
+    "id": "camera-startup-failure",
+    "outcome": "failed_pilot",
+    "reason": "CRLF Python shebang prevented sensor startup",
+    "raw_directory": "/home/rylanwwade/uav-verification-m2/evidence/camera"
+  },
+  {
+    "id": "frozen-fixture-failure",
+    "outcome": "failed_pilot",
+    "reason": "Fixture incorrectly assumed paused world stops publishing truth; stamps remain frozen",
+    "raw_directory": "/home/rylanwwade/uav-verification-m2/evidence/watchdog_frozen/controller_death_frozen"
+  },
+  {
+    "id": "guard-initial-tick-pilot",
+    "outcome": "evaluator_regression_reproduced",
+    "raw_directory": "/home/rylanwwade/uav-verification-m2/evidence/guards/verification",
+    "original_evaluator_sha256": "6eee12ebcd58dbd5309db61f9e9ef9de4242066e1268f56f9c5b734d158544d1",
+    "original_verdict": "FAIL",
+    "diagnosis": "Repeated zero commands after deadline incorrectly classified as resumed motion; original diagnostic transcribed from evaluation output. Superseded by final publication-timestamp guard recording and sustained-hold regressions."
+  }
+]

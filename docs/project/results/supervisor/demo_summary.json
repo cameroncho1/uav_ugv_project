@@ -1,0 +1,15 @@
+{
+  "attempt_counts": {
+    "passed": 3
+  },
+  "duration_wall_s": 112.466643252,
+  "exit_code": 0,
+  "mode": "live",
+  "new_simulation": true,
+  "process": {
+    "duration_wall_s": 108.83054195400001,
+    "returncode": 0,
+    "timed_out": false
+  },
+  "startup_to_first_drive_wall_s": 24.197742292
+}

@@ -1,0 +1,12 @@
+property,formula,verdict
+S10_completion_integrity,G(done_next <-> ((done & !new_goal) | eligible_completion)),PASS
+S11_recovery_memory_integrity,"G(recovery_memory_next = specified_update(memory,input))",PASS
+S1_navigation_authorization,G(permit -> goal & pose_valid & route_valid & !fault & !done),PASS
+S2_alarm_hold,G(enabled & (alarm | unavailable) -> X fault_latched),PASS
+S3_recovery_threshold,G(fault_latched & !release_ready -> X fault_latched),PASS
+S4_distinct_windows,G(no_new_clear & still_latched -> X count <= count),PASS
+S5_completed_goal_hold,G(completed -> (!permit W new_valid_goal)),PASS
+S6_completion_memory,G(done & !new_valid_goal -> X done),PASS
+S7_ready_progress,G(ready & !done -> X NAVIGATE),PASS
+S8_reset_hold,G(reset -> X(INIT & count=0 & detector_unknown)),PASS
+S9_memory_bounds,"G(count in [0,N] & (count=0 <-> age=NONE))",PASS

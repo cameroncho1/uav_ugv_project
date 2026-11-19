@@ -1,0 +1,17 @@
+{
+  "controlled_cases": 29,
+  "controller_states": 92,
+  "detected_mutations": 9,
+  "implementation_sha256": "bd4b7647792d83fc602279acfd518b8f4396aaa28f4ad50e0555a1b9ebe7544e",
+  "input_sha256": {
+    "control.jsonl": "a955de8aaa8119cb0fc5a06754c6421736e7fcb93d08a2db753f6d78d1a1ab10",
+    "controlled_result.json": "d38f5eff80c16da587c50d108471a7c075a03310963b9c02790c18aa2f54a329",
+    "model.json": "bcc7d963dd23823e2a1adf00c511029d3aebc754b4f693ec2da78f621a54f7a9"
+  },
+  "pdf_pages": 2,
+  "policy_sha256": "7bc936680acc4199f0625ac2ed26280f19d3a91e4088851e4290da1b50b73be7",
+  "product_states": 92,
+  "properties": 11,
+  "scope": "Finite decision logic and controlled ROS gating; excludes physical safety.",
+  "transitions": 7120
+}

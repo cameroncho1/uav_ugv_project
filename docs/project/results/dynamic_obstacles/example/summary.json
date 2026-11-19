@@ -1,0 +1,31 @@
+{
+  "exercised_hazards": [
+    "add_route_box"
+  ],
+  "exit_code": 0,
+  "expected_hazards": [
+    "add_route_box"
+  ],
+  "process": {
+    "duration_wall_s": 78.79831539399993,
+    "returncode": 0,
+    "timed_out": false
+  },
+  "recorded_hazards": [
+    "add_route_box"
+  ],
+  "scenario_id": "single_box_v1",
+  "seed": 744,
+  "source_unchanged": true,
+  "status": "completed",
+  "verdicts": {
+    "R1": "PASS",
+    "R2": "PASS",
+    "R3": "INCONCLUSIVE",
+    "R4": "NOT_APPLICABLE",
+    "R5": "PASS",
+    "R6": "PASS",
+    "R7": "NOT_APPLICABLE",
+    "R8": "NOT_APPLICABLE"
+  }
+}

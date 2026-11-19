@@ -1,0 +1,9 @@
+run_id,requirement,version,mandatory,verdict,reason,eligible_duration_ns,triggers,completed_obligations,missing_data_count
+synthetic-full-run,R1,1,True,PASS,property_holds,3000000000,0,0,0
+synthetic-full-run,R2,1,True,PASS,property_holds,2500000000,1,1,0
+synthetic-full-run,R3,1,True,PASS,property_holds,3000000000,1,1,0
+synthetic-full-run,R4,1,True,PASS,property_holds,500000000,1,1,0
+synthetic-full-run,R5,1,True,PASS,property_holds,0,1,1,0
+synthetic-full-run,R6,1,True,PASS,property_holds,2000000000,4,0,0
+synthetic-full-run,R7,1.class,True,PASS,property_holds,0,1,1,0
+synthetic-full-run,R8,1,True,PASS,property_holds,1900000000,0,0,0

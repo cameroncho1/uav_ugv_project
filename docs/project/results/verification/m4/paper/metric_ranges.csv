@@ -1,0 +1,8 @@
+metric,recordings,minimum,maximum,unit
+minimum_clearance_m,33,0.12095733477290038,0.48035266787363173,m
+arrival_s,34,14.868,41.78,simulation s
+conditional_rmse_m,39,0.024097572120591305,0.08591904857080564,m
+maximum_position_error_m,39,0.06743223898618,0.1585582967672871,m
+guard_response_ms,1,0.138375,0.138375,steady ms
+watchdog_expiry_ms,6,366.105877,381.620019,steady ms
+physical_settling_ms,6,426.636094,454.561283,steady ms

@@ -1,0 +1,152 @@
+[
+  {
+    "cohort": "premerge",
+    "kind": "demo",
+    "summary": {
+      "attempt_counts": {
+        "failed": 1,
+        "passed": 2
+      },
+      "duration_wall_s": 193.055844357,
+      "exit_code": 1,
+      "mode": "live",
+      "new_simulation": true,
+      "process": {
+        "duration_wall_s": 190.62064598600045,
+        "returncode": 0,
+        "timed_out": false
+      },
+      "startup_to_first_drive_wall_s": 9.474800965
+    }
+  },
+  {
+    "cohort": "final",
+    "kind": "demo",
+    "summary": {
+      "attempt_counts": {
+        "inconclusive": 1,
+        "passed": 2
+      },
+      "duration_wall_s": 110.471324377,
+      "exit_code": 2,
+      "mode": "live",
+      "new_simulation": true,
+      "process": {
+        "duration_wall_s": 109.49141063099887,
+        "returncode": 0,
+        "timed_out": false
+      },
+      "startup_to_first_drive_wall_s": 24.73589892
+    }
+  },
+  {
+    "cohort": "integrated",
+    "kind": "demo",
+    "summary": {
+      "attempt_counts": {
+        "passed": 2,
+        "startup_failed": 1
+      },
+      "duration_wall_s": 84.121953487,
+      "exit_code": 2,
+      "mode": "live",
+      "new_simulation": true,
+      "process": {
+        "duration_wall_s": 83.41749185199842,
+        "returncode": 0,
+        "timed_out": false
+      },
+      "startup_to_first_drive_wall_s": 24.724798101
+    }
+  },
+  {
+    "cohort": "release",
+    "kind": "demo",
+    "summary": {
+      "attempt_counts": {
+        "passed": 3
+      },
+      "duration_wall_s": 115.065265425,
+      "exit_code": 0,
+      "mode": "live",
+      "new_simulation": true,
+      "process": {
+        "duration_wall_s": 110.76784024800145,
+        "returncode": 0,
+        "timed_out": false
+      },
+      "startup_to_first_drive_wall_s": 26.111988103
+    }
+  },
+  {
+    "cohort": "release",
+    "kind": "dynamic",
+    "summary": {
+      "exercised_hazards": [
+        "add_route_box"
+      ],
+      "exit_code": 2,
+      "expected_hazards": [
+        "add_route_box"
+      ],
+      "process": {
+        "duration_wall_s": 153.90406433099997,
+        "returncode": 1,
+        "timed_out": false
+      },
+      "recorded_hazards": [
+        "add_route_box"
+      ],
+      "scenario_id": "single_box_v1",
+      "seed": 744,
+      "source_unchanged": true,
+      "status": "incomplete",
+      "verdicts": {
+        "R1": "PASS",
+        "R2": "INCONCLUSIVE",
+        "R3": "INCONCLUSIVE",
+        "R4": "NOT_APPLICABLE",
+        "R5": "PASS",
+        "R6": "PASS",
+        "R7": "NOT_APPLICABLE",
+        "R8": "NOT_APPLICABLE"
+      }
+    }
+  },
+  {
+    "cohort": "guard-transport",
+    "kind": "guard_fixture",
+    "log": "guard-transport.log",
+    "tail": [
+      "Traceback (most recent call last):",
+      "  File \"/home/rylanwwade/uav-integration/scripts/test_navigation_guards.py\", line 209, in <module>",
+      "    main()",
+      "  File \"/home/rylanwwade/uav-integration/scripts/test_navigation_guards.py\", line 178, in main",
+      "    results.append(node.phase(name, moving, 3.0 if name == 'missing_grid' else 2.0))",
+      "  File \"/home/rylanwwade/uav-integration/scripts/test_navigation_guards.py\", line 128, in phase",
+      "    assert max(speeds) > 0.05, f'{name}: expected motion'",
+      "AssertionError: valid: expected motion"
+    ]
+  },
+  {
+    "cohort": "guard-transport-compact",
+    "kind": "guard_fixture",
+    "log": "guard-transport-compact.log",
+    "tail": [
+      "Traceback (most recent call last):",
+      "  File \"/home/rylanwwade/uav-integration/scripts/test_navigation_guards.py\", line 214, in <module>",
+      "    main()",
+      "  File \"/home/rylanwwade/uav-integration/scripts/test_navigation_guards.py\", line 168, in main",
+      "    assert time.monotonic() < deadline, 'Planner/controller command readiness timed out'",
+      "AssertionError: Planner/controller command readiness timed out"
+    ]
+  },
+  {
+    "cohort": "guard-early-udp",
+    "kind": "guard_fixture",
+    "log": "guard-early-udp.log",
+    "tail": [
+      "23 navigation cases passed"
+    ]
+  }
+]

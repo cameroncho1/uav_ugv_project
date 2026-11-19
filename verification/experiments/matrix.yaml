@@ -1,0 +1,32 @@
+schema_version: 1
+id: verification-m3-v1
+seeds: [631, 632, 633]
+parameters:
+  simulation_timeout_s: 100
+  wall_timeout_s: 160
+  attempt_timeout_s: 215
+  search_seed: 20261110
+  search_trials: 4
+  search_wall_budget_s: 900
+  replay_limit: 2
+exclusions:
+  R5: No hazard-event producer is available.
+  R7_R8: No online detector exists; enabled/disabled/forced-miss comparisons are unavailable.
+  combinations: Outage trials use goal A for empty/sparse and goal B for dense/corridor; both goals have nominal trials in every layout.
+  seeds: Seeds configure synthetic sensor corruption; PX4/render scheduling is not deterministic.
+rows:
+  - {id: empty-a-nominal, kind: navigation, world: simulation/worlds/simple_goal_demo.sdf, goal: [4.0, 0.0], outage: false, assistance: true}
+  - {id: empty-b-nominal, kind: navigation, world: simulation/worlds/simple_goal_demo.sdf, goal: [3.0, 0.5], outage: false, assistance: true}
+  - {id: sparse-a-nominal, kind: navigation, world: simulation/worlds/simple_goal_demo_sparse.sdf, goal: [4.0, 0.0], outage: false, assistance: true}
+  - {id: sparse-b-nominal, kind: navigation, world: simulation/worlds/simple_goal_demo_sparse.sdf, goal: [3.0, 0.5], outage: false, assistance: true}
+  - {id: dense-a-nominal, kind: navigation, world: simulation/worlds/simple_goal_demo_dense.sdf, goal: [4.0, 0.0], outage: false, assistance: true}
+  - {id: dense-b-nominal, kind: navigation, world: simulation/worlds/simple_goal_demo_dense.sdf, goal: [3.0, 0.5], outage: false, assistance: true}
+  - {id: corridor-a-nominal, kind: navigation, world: simulation/worlds/simple_goal_demo_corridor.sdf, goal: [4.0, 0.0], outage: false, assistance: true}
+  - {id: corridor-b-nominal, kind: navigation, world: simulation/worlds/simple_goal_demo_corridor.sdf, goal: [3.0, 0.5], outage: false, assistance: true}
+  - {id: empty-a-outage, kind: navigation, world: simulation/worlds/simple_goal_demo.sdf, goal: [4.0, 0.0], outage: true, assistance: true}
+  - {id: sparse-a-outage, kind: navigation, world: simulation/worlds/simple_goal_demo_sparse.sdf, goal: [4.0, 0.0], outage: true, assistance: true}
+  - {id: dense-b-outage, kind: navigation, world: simulation/worlds/simple_goal_demo_dense.sdf, goal: [3.0, 0.5], outage: true, assistance: true}
+  - {id: corridor-b-outage, kind: navigation, world: simulation/worlds/simple_goal_demo_corridor.sdf, goal: [3.0, 0.5], outage: true, assistance: true}
+  - {id: empty-a-unassisted, kind: navigation, world: simulation/worlds/simple_goal_demo.sdf, goal: [4.0, 0.0], outage: false, assistance: false}
+  - {id: guard, kind: guard}
+  - {id: watchdog, kind: watchdog}

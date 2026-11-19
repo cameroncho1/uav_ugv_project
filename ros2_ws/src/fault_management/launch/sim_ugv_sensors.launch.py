@@ -21,6 +21,7 @@ def generate_launch_description():
                               default_value=str(share / "config/measurement_model.yaml"),
                               description="UGV noise YAML path relative to the launch directory."),
         DeclareLaunchArgument("initial_gps_enabled", default_value="true"),
+        DeclareLaunchArgument("evaluation_trace", default_value="false"),
         DeclareLaunchArgument("shared_position_stddev", default_value="0.0"),
         DeclareLaunchArgument("measurement_profile", default_value="nominal",
                               choices=["nominal", "drift"]),
@@ -33,6 +34,7 @@ def generate_launch_description():
                          PathJoinSubstitution([str(sim), "config",
                                                [LaunchConfiguration("world"), ".yaml"]]),
                          {"random_seed": ParameterValue(LaunchConfiguration("seed"), value_type=int),
+                          "evaluation_trace": ParameterValue(LaunchConfiguration("evaluation_trace"), value_type=bool),
                           "initial_gps_enabled": ParameterValue(
                               LaunchConfiguration("initial_gps_enabled"), value_type=bool),
                           "shared_position_stddev": ParameterValue(

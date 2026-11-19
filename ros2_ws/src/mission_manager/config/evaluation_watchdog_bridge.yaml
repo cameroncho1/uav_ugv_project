@@ -1,0 +1,5 @@
+- ros_topic_name: /evaluation/watchdog
+  gz_topic_name: /simple_ugv/drive_cmd_vel/evaluation
+  ros_type_name: std_msgs/msg/String
+  gz_type_name: gz.msgs.StringMsg
+  direction: GZ_TO_ROS

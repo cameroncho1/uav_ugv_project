@@ -1,0 +1,4 @@
+include README.md requirements-tested.txt
+recursive-include profiles *.yaml
+recursive-include examples *.yaml *.json *.jsonl *.md
+recursive-include tests *.py

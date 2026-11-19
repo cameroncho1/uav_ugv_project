@@ -265,3 +265,84 @@ arguments, and the final validation precision / recall / F1 / accuracy.
 Use `--tensorboard-dir` to log elsewhere or `--no-tensorboard` to skip it.
 `runs/` is gitignored; per-epoch histories are also saved as
 `loss_history.json` in each weight folder.
+
+## Live detection in the simulation
+
+[`sensor_fault_detector.py`](../ros2_ws/src/fault_management/scripts/sensor_fault_detector.py)
+runs the paired time-domain BiLSTM (`bilstmWeights_ugv_paired`) on the prepared
+UGV measurements (`/ugv/sensors/{imu,wheel_odom,gps}`) and the drive command.
+It rebuilds each channel's last 100 samples with the training reference
+([`sensor_fault_model.py`](../ros2_ws/src/fault_management/scripts/sensor_fault_model.py),
+numpy only), scores every channel each 0.5 s of sim time, and publishes one
+`diagnostic_msgs/DiagnosticStatus` per channel (`ERROR` = fault) on
+`/ugv/sensor_faults`. The goal demo starts it with `fault_detection:=true` (default
+`false`); `use_autoencoder:=true` also flags windows above the autoencoder threshold.
+
+Each evaluation also publishes one `uav_ugv_msgs/FaultStatus` class decision on
+`/fault_detection/status` for the navigation supervisor
+([`fault_decision`](../ros2_ws/src/fault_management/scripts/sensor_fault_model.py)):
+
+| Flag | Set by | Supervisor response |
+| --- | --- | --- |
+| `odometry_scale` | BiLSTM flag on `wheel_odom/vx` or `wheel_odom/wz` | hold |
+| `imu_drift` | BiLSTM flag on `imu/wz` | hold |
+| `gps_outage` | no GPS fix for `gps_timeout` (1 s), or a flag on `gps/latitude` or `gps/longitude` | hold only if the pose guard fails |
+| `uav_loss` | always false; UAV measurements are not monitored | — |
+
+`imu/{wx,wy,ax,ay,az}` and `gps/altitude` set no flag. A decision is valid
+when `imu/wz`, `wheel_odom/vx`, and `wheel_odom/wz` each have a current
+evaluation, and is stamped with the oldest of their window ends. Before that it
+is published with `window_valid: false`. If no newer window exists, nothing is
+published, and the supervisor's 1 s decision-age limit holds. A clock reset
+starts a new `source_id` and sequence. `fault_hold:=true` sets the goal
+controller's `detector_enabled`, so the supervisor holds on wheel-scale or
+yaw-drift flags and on missing or invalid decisions. It defaults to `false`
+and needs `fault_detection:=true`; without decisions the supervisor holds.
+
+Closed-loop goal-demo trials with `fault_detection:=true fault_hold:=true` (seed 513, goal (4, 0),
+150 s recorded, one simulation at a time, 2026-11-18). Counts are decisions with
+the flag set out of all decisions:
+
+| Trial | `odometry_scale` | `imu_drift` | `gps_outage` | Fault holds while driving | Goal |
+| --- | ---: | ---: | ---: | --- | --- |
+| Nominal | 2 / 288 | 1 / 288 | 0 / 288 | one, `wheel_odom/wz` at 23.5 s, released after 5.7 s | reached |
+| `measurement_profile:=drift` (wheel scale 1.15, yaw bias 0.002 rad/s, from start) | 4 / 282 | 2 / 282 | 10 / 282 | two, `wheel_odom/wz` at 25 s and `wheel_odom/vx` at 31 s, each released after 5–9 s | reached |
+
+Both runs start in a fault hold until ten clear decisions span 5 s. Each flag
+holds the UGV and recovery releases it, as the supervisor specifies. At the
+envelope fault sizes the BiLSTM flags only isolated windows, and the nominal
+run shows the same pattern, so these trials show that the hold path works.
+They do not show detection of the drift faults. The drift run's `gps_outage`
+flags and 1–3 s decision gaps near 101–112 s sim time come from sensor windows
+that stopped advancing; the supervisor held on the missing decisions.
+
+The node loads `fault_management/models/ugv_sensor_fault_detector.npz`: the
+weights, the per-channel training statistics, and the autoencoder thresholds.
+Re-export it after retraining (needs torch):
+
+```
+python3 export_live_detector.py --verify
+```
+
+`--verify` rebuilds the validation and test windows through the live feature
+code and compares them with `ugv_dataset.py` and torch; on the current export
+all 16,960 BiLSTM decisions match.
+
+Live 120 s trials on the `ugv_dataset` world (seeded recorder maneuvers, unseen
+seeds, nominal `measurement_model.yaml` noise, one simulation at a time). Values
+are the fraction of 0.5 s evaluations the BiLSTM flags:
+
+| Trial | Seed | Odometry drift | Faulted channel | Other channels |
+| --- | --- | ---: | --- | --- |
+| Nominal | 2001 | 3.0 m | — | flag onsets only (fractions not recorded): `gps/latitude` 6, `imu/ay` 2, `imu/wz`, `wheel_odom/wz`, `gps/longitude` 1 each |
+| Nominal | 2002 | 9.9 m | — | `gps/longitude` 46%, `gps/latitude` 33%, `imu/ay` 1.7%, rest ≤ 0.4% |
+| `imu_yaw_bias_rate:=0.1` (10σ `wz` offset) | 2003 | 2.9 m | `imu/wz` 66% | run in parallel with two other simulations |
+| `wheel_speed_scale:=1.6` | 2004 | 3.2 m | `wheel_odom/vx` 68% | run in parallel with two other simulations |
+
+The GPS reference is wheel-odometry position. When simulated wheel slip moves
+odometry several meters from truth (seed 2002), GPS and its reference disagree
+and the BiLSTM flags GPS; the offline pipeline flags the same drive at the same
+rate. Three simulations in parallel on 5 cores also raised clean-channel flags
+in the nominal run, so the two fault rows bound detection, not false alarms.
+In the goal demo the command comes from the 10 Hz, unramped `/ugv/cmd_vel`
+rather than the training recorder; the trials above do not cover it.

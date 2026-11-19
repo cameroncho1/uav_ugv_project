@@ -1,0 +1,8 @@
+{"clock": "sim", "data": {"alarm": false, "scope": "binary"}, "epoch": 0, "sequence": 0, "source": "detector_decision", "time_ns": 0}
+{"clock": "sim", "data": {"alarm": false, "channel": "wz", "fault_class": "noise", "scope": "class", "sensor": "imu"}, "epoch": 0, "sequence": 1, "source": "detector_decision", "time_ns": 0}
+{"clock": "sim", "data": {"alarm": true, "scope": "binary"}, "epoch": 0, "sequence": 2, "source": "detector_decision", "time_ns": 1400000000}
+{"clock": "sim", "data": {"alarm": true, "channel": "wz", "fault_class": "noise", "scope": "class", "sensor": "imu"}, "epoch": 0, "sequence": 3, "source": "detector_decision", "time_ns": 1400000000}
+{"clock": "sim", "data": {"alarm": false, "scope": "binary"}, "epoch": 0, "sequence": 4, "source": "detector_decision", "time_ns": 2000000000}
+{"clock": "sim", "data": {"alarm": false, "channel": "wz", "fault_class": "noise", "scope": "class", "sensor": "imu"}, "epoch": 0, "sequence": 5, "source": "detector_decision", "time_ns": 2000000000}
+{"clock": "sim", "data": {"alarm": false, "scope": "binary"}, "epoch": 0, "sequence": 6, "source": "detector_decision", "time_ns": 3000000000}
+{"clock": "sim", "data": {"alarm": false, "channel": "wz", "fault_class": "noise", "scope": "class", "sensor": "imu"}, "epoch": 0, "sequence": 7, "source": "detector_decision", "time_ns": 3000000000}

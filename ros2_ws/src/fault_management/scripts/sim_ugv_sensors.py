@@ -3,6 +3,9 @@
 
 import math
 import random
+import json
+import time
+from pathlib import Path
 from copy import deepcopy
 
 import rclpy
@@ -10,9 +13,10 @@ from geometry_msgs.msg import PoseWithCovarianceStamped, Quaternion
 from nav_msgs.msg import Odometry
 from rclpy.executors import ExternalShutdownException
 from rclpy.node import Node
-from rclpy.qos import QoSProfile, ReliabilityPolicy, qos_profile_sensor_data
+from rclpy.qos import QoSProfile, ReliabilityPolicy, DurabilityPolicy, qos_profile_sensor_data
 from sensor_msgs.msg import Imu, NavSatFix, NavSatStatus
 from std_srvs.srv import SetBool
+from std_msgs.msg import String
 from simulation_faults import common_position_bias
 from localization_common.frames import covariance, rotation
 from localization_common.geodesy import (diagonal_covariance, enu_to_geodetic,
@@ -48,6 +52,7 @@ class SimUgvSensors(Node):
         self.declare_parameter("initial_gps_enabled", True)
         self.declare_parameter("wheel_speed_scale", 1.0)
         self.declare_parameter("imu_yaw_bias_rate", 0.0)
+        self.declare_parameter("evaluation_trace", False)
 
         def parameter(name):
             return self.get_parameter(name).value
@@ -78,6 +83,15 @@ class SimUgvSensors(Node):
         self.imu_yaw_bias_rate = parameter("imu_yaw_bias_rate")
         self.imu_start = None
         self.last_odom = None
+        self.trace_sequence = 0
+        self.active_gps_event = "gps-initial" if not self.gps_enabled else None
+        trace_qos = QoSProfile(depth=1000, durability=DurabilityPolicy.TRANSIENT_LOCAL)
+        self.trace_pub = (self.create_publisher(String, "/evaluation/faults", trace_qos)
+                          if parameter("evaluation_trace") else None)
+        self.trace_initial = True
+        self.trace_host = Path("/proc/sys/kernel/random/boot_id").read_text().strip() if self.trace_pub else ""
+        if self.trace_pub:
+            self.create_timer(0.1, self.publish_initial_fault_state)
         self.dead_reckoned_x = self.spawn_x
         self.dead_reckoned_y = self.spawn_y
         self.dead_reckoned_yaw = self.spawn_yaw
@@ -108,10 +122,36 @@ class SimUgvSensors(Node):
         self.create_service(SetBool, "/evaluation/set_gps_enabled", self.set_gps_enabled)
 
     def set_gps_enabled(self, request, response):
+        self.publish_initial_fault_state()
+        changed = self.gps_enabled != request.data
         self.gps_enabled = request.data
+        if changed:
+            if not request.data:
+                self.active_gps_event = f"gps-{self.trace_sequence}"
+            self.publish_fault_state("fault_end" if request.data else "fault_start")
+            if request.data:
+                self.active_gps_event = None
         response.success = True
         response.message = "GPS enabled" if self.gps_enabled else "GPS disabled"
         return response
+
+    def publish_initial_fault_state(self):
+        if self.trace_pub and self.trace_initial and self.get_clock().now().nanoseconds > 0:
+            self.publish_fault_state("state" if self.gps_enabled else "fault_start")
+            self.trace_initial = False
+
+    def publish_fault_state(self, kind):
+        if self.trace_pub is None:
+            return
+        message = String()
+        message.data = json.dumps({"schema_version": 1, "kind": "fault_event",
+            "sequence": self.trace_sequence, "host_id": self.trace_host,
+            "sim_ns": self.get_clock().now().nanoseconds, "steady_ns": time.monotonic_ns(),
+            "event": {"kind": kind, "event_id": self.active_gps_event or "gps-nominal",
+                      "sensor": "gps", "channel": "position", "fault_class": "gps_outage",
+                      "enabled": self.gps_enabled}}, allow_nan=False)
+        self.trace_sequence += 1
+        self.trace_pub.publish(message)
 
     @staticmethod
     def noise(standard_deviation, generator):

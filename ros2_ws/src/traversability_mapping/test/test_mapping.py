@@ -37,7 +37,7 @@ def test_own_roof_projection_is_removed_without_masking_unrelated_ground():
     assert mask.tolist() == [[True, False, False]]
 
 
-def test_grid_waits_for_matching_anchor_and_preserves_image_time():
+def test_scout_grid_does_not_wait_for_ugv_and_preserves_image_time():
     rclpy.init()
     node = mapper.TraversabilityMapper()
     try:
@@ -65,7 +65,7 @@ def test_grid_waits_for_matching_anchor_and_preserves_image_time():
         vehicle.pose.covariance = (np.eye(6) * .01).ravel().tolist()
         node.on_ugv(vehicle)
         node.on_image(image)
-        assert not out
+        assert not out  # The UAV anchor is still missing.
         anchor = PoseWithCovarianceStamped()
         anchor.header.frame_id = "map"
         anchor.header.stamp.sec = 10
@@ -73,11 +73,11 @@ def test_grid_waits_for_matching_anchor_and_preserves_image_time():
         anchor.pose.pose.orientation.w = 1.
         anchor.pose.covariance = np.eye(6).ravel().tolist()
         node.on_anchor(anchor)
-        assert not out  # Self masking also waits for acquisition-time coverage.
+        assert len(out) == 1  # Unmatched UGV pose does not block a scout frame.
         vehicle.header.stamp.sec = 10
         vehicle.header.stamp.nanosec = 0
         node.on_ugv(vehicle)
-        assert len(out) == 1 and out[0].header.stamp == image.header.stamp
+        assert out[0].header.stamp == image.header.stamp
         clock.nanoseconds += 1_000_000_000
         image.header.stamp.sec = 11
         node.on_image(image)

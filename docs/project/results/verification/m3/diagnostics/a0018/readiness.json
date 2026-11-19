@@ -1,0 +1,1 @@
+{"ready": true, "duration_wall_s": 18.690047663000087, "observed": ["/clock", "/evaluation/control", "/evaluation/ugv_truth", "/fmu/out/vehicle_odometry"]}

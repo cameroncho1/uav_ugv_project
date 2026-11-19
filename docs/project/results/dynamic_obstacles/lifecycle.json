@@ -1,0 +1,28 @@
+{
+  "passed": true,
+  "cases": [
+    {
+      "entity_name": "scenario_first",
+      "entity_id": 4,
+      "confirmation": "scene_present"
+    },
+    {
+      "entity_name": "scenario_second",
+      "entity_id": 8,
+      "confirmation": "scene_present"
+    },
+    {
+      "case": "duplicate_rejected",
+      "passed": true
+    },
+    {
+      "entity_name": "scenario_first",
+      "confirmation": "scene_absent"
+    },
+    {
+      "entity_name": "scenario_first",
+      "entity_id": 12,
+      "confirmation": "scene_present"
+    }
+  ]
+}

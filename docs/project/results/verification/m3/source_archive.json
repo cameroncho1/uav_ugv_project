@@ -1,0 +1,8 @@
+{
+  "path": "/home/rylanwwade/uav-verification-m2/evidence/m3_v1/source.tar.gz",
+  "sha256": "49c5e02e33604dd9bdc9dd1d66219fd635d1d07aed56cac2ff702c9b2b7ed90a",
+  "files": 197,
+  "frozen_source_sha256": "64524f665a1ad0cd576ef2ebf25bca7cad7e347cf5e08283f5c14ee5252e765a",
+  "availability": "Machine-local WSL archive; not committed or uploaded.",
+  "source_commit_before_campaign": "95695f9"
+}

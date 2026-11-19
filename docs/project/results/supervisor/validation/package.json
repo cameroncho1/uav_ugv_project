@@ -1,0 +1,15 @@
+{
+  "wheel_sha256": "54781f1c693d6b90d110e4caa9a8841bba2ac31da3fb7caba88144d17b6182e0",
+  "sdist_sha256": "fce9eb78b2870bb102c8ca6646b7ba86fbde58342757a76d2e18cac2b3ac787e",
+  "fresh_target_install": true,
+  "import_location_checked": true,
+  "reproduced_byte_for_byte": [
+    "properties.csv",
+    "mutations.csv",
+    "cases.csv",
+    "paper_section.md",
+    "paper_section.tex"
+  ],
+  "templates_packaged": true,
+  "model_sha256": "bcc7d963dd23823e2a1adf00c511029d3aebc754b4f693ec2da78f621a54f7a9"
+}

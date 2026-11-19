@@ -1,0 +1,2 @@
+{"kind": "obstacle_requested", "operation": {"action": "spawn", "at_ns": 500000000, "id": "add_route_box", "obstacle": "route_box"}, "requested_ns": 19240000000}
+{"confirmation": "scene_present", "confirmed_ns": 20396000000, "entity_id": 132, "entity_name": "scenario_route_box", "kind": "obstacle_applied", "obstacle": {"half_x": 0.3, "half_y": 0.3, "id": "scenario_route_box", "kind": "box", "x": 0.5, "y": 0.0, "yaw": 0.0}, "operation": {"action": "spawn", "at_ns": 500000000, "id": "add_route_box", "obstacle": "route_box"}, "requested_ns": 19240000000}

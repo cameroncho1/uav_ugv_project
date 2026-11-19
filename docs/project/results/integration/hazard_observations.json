@@ -1,0 +1,27 @@
+{
+  "scenario_id": "single_box_v1",
+  "error": null,
+  "observations": [
+    {
+      "kind": "hazard_observed",
+      "event_id": "add_route_box",
+      "obstacle_id": "scenario_route_box",
+      "goal_revision": "6368000000",
+      "qualifying": true,
+      "occupied_cells": 20,
+      "baseline_cells": 36,
+      "baseline_free": true,
+      "preappearance_route_blocked": true,
+      "same_goal": true,
+      "truth_fresh": true,
+      "distance_lower_bound_m": 3.531206580562777,
+      "minimum_distance_m": 2.022,
+      "request_to_observation_upper_bound_s": 0.944,
+      "requested_ns": 20056000000,
+      "confirmed_ns": 20644000000,
+      "grid_stamp_ns": 21000000000
+    }
+  ],
+  "retired_operations": {},
+  "unobserved_operations": []
+}

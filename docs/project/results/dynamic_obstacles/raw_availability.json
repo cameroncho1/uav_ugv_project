@@ -1,0 +1,16 @@
+{
+  "location": "Ubuntu-22.04:/home/rylanwwade/uav-dynamic-obstacles",
+  "files": [
+    {
+      "path": "evidence/source_release.tar.gz",
+      "bytes": 229625,
+      "sha256": "f15a9f95c20d078ee35cffea4a9e32f61f4365713b086a80482798916571020a"
+    },
+    {
+      "path": "evidence/release/run/verification/bag/bag_0.db3",
+      "bytes": 25960448,
+      "sha256": "6bfe0b0c394c5761266e2208652add2e572270d3aad98ac19ae6e069936d7e13"
+    }
+  ],
+  "raw_bags_committed": false
+}

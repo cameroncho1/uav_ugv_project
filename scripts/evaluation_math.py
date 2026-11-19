@@ -4,6 +4,15 @@ import math
 import numpy as np
 
 
+def navigation_evidence(*, assisted, wheel_count, relative_count, correction_count,
+                        gps_count, initial_gps_enabled, outage_applied=False):
+    """Configuration checks are separate from the physical arrival verdict."""
+    return {"wheel": wheel_count > 100,
+            "uav": (relative_count > 20 and correction_count > 20) if assisted else True,
+            "gps": (gps_count > 10 if initial_gps_enabled else gps_count == 0),
+            "outage_applied": outage_applied}
+
+
 class ArrivalDwell:
     def __init__(self, seconds=1.0):
         if not math.isfinite(seconds) or seconds <= 0:

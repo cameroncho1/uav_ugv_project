@@ -29,5 +29,18 @@ inline NorthEast step_toward(
   const auto scale = std::min(1.0, max_step / distance);
   return {current.north + dn * scale, current.east + de * scale};
 }
+
+// Return a point lead meters from the current position toward the target, stopping at the target.
+inline NorthEast lead_toward_goal(
+  const NorthEast & current, const NorthEast & target, double lead)
+{
+  const auto dn = target.north - current.north, de = target.east - current.east;
+  const auto distance = std::hypot(dn, de);
+  if (!std::isfinite(distance) || !std::isfinite(lead) || lead < 0.0 || distance <= lead) {
+    return target;
+  }
+  const auto scale = lead / distance;
+  return {current.north + dn * scale, current.east + de * scale};
+}
 }  // namespace uav_control
 #endif  // UAV_CONTROL__FOLLOW_SETPOINT_HPP_

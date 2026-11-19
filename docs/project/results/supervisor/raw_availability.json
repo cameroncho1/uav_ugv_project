@@ -1,0 +1,101 @@
+{
+  "location": "Ubuntu-22.04:/home/rylanwwade/uav-supervisor-w10",
+  "files": [
+    {
+      "path": "evidence/w10_final/controlled/verification/bag/bag_0.db3",
+      "bytes": 2035712,
+      "sha256": "0aa9b1c057bb909ea2b4a3a45e0171f88bd25eb31bb9f7be08a03483809a9761"
+    },
+    {
+      "path": "evidence/w10_final/controlled/verification/bag/metadata.yaml",
+      "bytes": 3439,
+      "sha256": "7c327bdbda0a29f723e50b642338a30164afb94e14c1772c30f63044cd93d24b"
+    },
+    {
+      "path": "evidence/w10_final/demo/raw/attempts/0001-assisted-arrival-s641/run/verification/bag/bag_0.db3",
+      "bytes": 11333632,
+      "sha256": "02baa8268a9fb9a3fb0fe6697da6f4a16c91c818b40ebcb9dbc575ee8bff3fd3"
+    },
+    {
+      "path": "evidence/w10_final/demo/raw/attempts/0001-assisted-arrival-s641/run/verification/bag/metadata.yaml",
+      "bytes": 5881,
+      "sha256": "567cd3a0457026f6d39c066424183be3fa997e1a09931c657c75df0a1f137b82"
+    },
+    {
+      "path": "evidence/w10_final/demo/raw/attempts/0002-guard-response-s641/run/verification/bag/bag_0.db3",
+      "bytes": 7217152,
+      "sha256": "920a05353ac77e4385148bbf666ebf3a386cd1e0c9e5f010f6e4a8352a5eff78"
+    },
+    {
+      "path": "evidence/w10_final/demo/raw/attempts/0002-guard-response-s641/run/verification/bag/metadata.yaml",
+      "bytes": 3730,
+      "sha256": "5aeb89fdac185eb51d301cba1598ad217bb57e8be9cbb4fdd65eb068691c1ee0"
+    },
+    {
+      "path": "evidence/w10_final/demo/raw/attempts/0003-watchdog-response-s641/run/command_transport_loss/verification/bag/bag_0.db3",
+      "bytes": 4616192,
+      "sha256": "c2d7e7da4f20327ff0e0551bb552b41c9a5b4b13853b36215e9b3e3494c4dbd9"
+    },
+    {
+      "path": "evidence/w10_final/demo/raw/attempts/0003-watchdog-response-s641/run/command_transport_loss/verification/bag/metadata.yaml",
+      "bytes": 4397,
+      "sha256": "55f7fcba9c4be45679df2eb7ad5dfbbf03082983ff6f4c369c33655fa22c2bf0"
+    },
+    {
+      "path": "evidence/w10_final/demo/raw/attempts/0003-watchdog-response-s641/run/controller_death/verification/bag/bag_0.db3",
+      "bytes": 4526080,
+      "sha256": "4e2a2838afb8c8e2ae131de0b4a63a9f3fd573f77644f5dab02db081681f414d"
+    },
+    {
+      "path": "evidence/w10_final/demo/raw/attempts/0003-watchdog-response-s641/run/controller_death/verification/bag/metadata.yaml",
+      "bytes": 4397,
+      "sha256": "dcd8aad9864f95afb64b8b12270cc1ed8edc943547cdf7007388db3b8c48eb54"
+    },
+    {
+      "path": "evidence/w10_final/interruption/demo/raw/attempts/0001-assisted-arrival-s641/run/verification/bag/bag_0.db3",
+      "bytes": 24576,
+      "sha256": "21fb2f068366300b2b9e340394660d52aa7a489ac21736fd8634719fa9e33715"
+    },
+    {
+      "path": "evidence/w10_final/interruption/demo/raw/attempts/0001-assisted-arrival-s641/run/verification/bag/metadata.yaml",
+      "bytes": 1944,
+      "sha256": "e89b6335ce7aef36b695f9ecf36be97139235f17d19c04448e059628729b087e"
+    },
+    {
+      "path": "evidence/w10_final/source.tar.gz",
+      "bytes": 215450,
+      "sha256": "dd59d00b4a847dee9489fae6470df09efbf250de0af23649f8e2c81103a63ed3"
+    },
+    {
+      "path": "evidence/w10_final/verification/bag/bag_0.db3",
+      "bytes": 7495680,
+      "sha256": "2780b36dacfb7a75ff6c198a47d2907a377a40ab863498d3b03c5265d838097f"
+    },
+    {
+      "path": "evidence/w10_final/verification/bag/metadata.yaml",
+      "bytes": 3429,
+      "sha256": "94777d2f9171184735db080276991bcddda5ff3d3a093f53a8eebaaead55c3b4"
+    },
+    {
+      "path": "evidence/w10_final/watchdog/command_transport_loss/verification/bag/bag_0.db3",
+      "bytes": 4612096,
+      "sha256": "bf1eb20e801c87e28c677495f99eb697ec0c599d3eb794049d8a244cc29f9387"
+    },
+    {
+      "path": "evidence/w10_final/watchdog/command_transport_loss/verification/bag/metadata.yaml",
+      "bytes": 4397,
+      "sha256": "dc1c4d03f1efb6552af653e7dbfd5a959d03d3f05ebf23d956f4c162b5bac1e3"
+    },
+    {
+      "path": "evidence/w10_final/watchdog/controller_death/verification/bag/bag_0.db3",
+      "bytes": 4579328,
+      "sha256": "db23e7cdc652e18b68d8958c0a3859945c975b16e668271397f51cc15d124084"
+    },
+    {
+      "path": "evidence/w10_final/watchdog/controller_death/verification/bag/metadata.yaml",
+      "bytes": 4397,
+      "sha256": "3dec9b26e6fa7e07904d58f4832aa0db85373f693879ee874b0a4aff2facb210"
+    }
+  ],
+  "raw_bags_committed": false
+}

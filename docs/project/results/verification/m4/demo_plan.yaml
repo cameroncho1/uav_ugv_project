@@ -1,0 +1,28 @@
+exclusions:
+  R5: No actual hazard producer.
+  R7_R8: No online detector producer.
+id: verification-live-demo-v1
+parameters:
+  attempt_timeout_s: 240
+  replay_limit: 0
+  search_seed: 0
+  search_trials: 0
+  search_wall_budget_s: 0
+  simulation_timeout_s: 100
+  wall_timeout_s: 160
+rows:
+- assistance: true
+  goal:
+  - 4.0
+  - 0.0
+  id: assisted-arrival
+  kind: navigation
+  outage: false
+  world: simulation/worlds/simple_goal_demo.sdf
+- id: guard-response
+  kind: guard
+- id: watchdog-response
+  kind: watchdog
+schema_version: 1
+seeds:
+- 641

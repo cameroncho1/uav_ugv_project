@@ -1,0 +1,17 @@
+{
+  "exit_code": 130,
+  "cleanup_wall_s": 5.558287720999942,
+  "remaining_owned_process_groups": [],
+  "summary": {
+    "exit_code": 130,
+    "scenario_id": "single_box_v1",
+    "seed": 743,
+    "status": "interrupted"
+  },
+  "recorder_status": "aborted",
+  "recorder_finalized": true,
+  "scenario_closed": true,
+  "observer_closed": true,
+  "method": "SIGINT to coordinator after confirmed obstacle application",
+  "duration_wall_s": 32.865110388999994
+}

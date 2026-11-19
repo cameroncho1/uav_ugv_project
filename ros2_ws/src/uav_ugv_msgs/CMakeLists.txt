@@ -11,18 +11,21 @@ find_package(geometry_msgs REQUIRED)
 find_package(nav_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
-rosidl_generate_interfaces(${PROJECT_NAME} "msg/PlannedRoute.msg"
+rosidl_generate_interfaces(${PROJECT_NAME} "msg/PlannedRoute.msg" "msg/FaultStatus.msg"
   DEPENDENCIES geometry_msgs nav_msgs std_msgs)
 
 install(DIRECTORY include/ DESTINATION include/${PROJECT_NAME})
 ament_export_include_directories(include/${PROJECT_NAME})
-ament_export_dependencies(geometry_msgs nav_msgs rosidl_default_runtime)
+ament_export_dependencies(geometry_msgs nav_msgs std_msgs rosidl_default_runtime)
 # uncomment the following section in order to fill in
 # further dependencies manually.
 # find_package(<dependency> REQUIRED)
 
 if(BUILD_TESTING)
   find_package(ament_cmake_gtest REQUIRED)
+  ament_add_gtest(evaluation_trace_test test/test_evaluation_trace.cpp)
+  target_include_directories(evaluation_trace_test PRIVATE include)
+  target_compile_features(evaluation_trace_test PRIVATE cxx_std_17)
   ament_add_gtest(pose_guard_test test/test_pose_guard.cpp)
   target_include_directories(pose_guard_test PRIVATE include)
   target_compile_features(pose_guard_test PRIVATE cxx_std_17)

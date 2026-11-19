@@ -1,0 +1,40 @@
+Starting >>> simulation_support
+Finished <<< simulation_support [18.6s]
+Starting >>> fault_management
+[20.006s] WARNING:colcon.colcon_core.shell:The following packages are in the workspace but haven't been built:
+- localization_common
+- px4_msgs
+- cooperative_localization
+- uav_control
+- uav_sensing
+They are being used from the following locations instead:
+- /home/rylanwwade/uav_ugv_main/ros2_ws/install/localization_common
+- /home/rylanwwade/uav_ugv_main/ros2_ws/install/px4_msgs
+- /home/rylanwwade/uav_ugv_main/ros2_ws/install/cooperative_localization
+- /home/rylanwwade/uav_ugv_main/ros2_ws/install/uav_control
+- /home/rylanwwade/uav_ugv_main/ros2_ws/install/uav_sensing
+To suppress this warning ignore these packages in the workspace:
+--packages-ignore localization_common px4_msgs cooperative_localization uav_control uav_sensing
+Finished <<< fault_management [4.90s]
+Starting >>> mission_manager
+[24.908s] WARNING:colcon.colcon_core.shell:The following packages are in the workspace but haven't been built:
+- localization_common
+- px4_msgs
+- cooperative_localization
+- route_planning
+- traversability_mapping
+- uav_control
+- uav_sensing
+They are being used from the following locations instead:
+- /home/rylanwwade/uav_ugv_main/ros2_ws/install/localization_common
+- /home/rylanwwade/uav_ugv_main/ros2_ws/install/px4_msgs
+- /home/rylanwwade/uav_ugv_main/ros2_ws/install/cooperative_localization
+- /home/rylanwwade/uav_ugv_main/ros2_ws/install/route_planning
+- /home/rylanwwade/uav_ugv_main/ros2_ws/install/traversability_mapping
+- /home/rylanwwade/uav_ugv_main/ros2_ws/install/uav_control
+- /home/rylanwwade/uav_ugv_main/ros2_ws/install/uav_sensing
+To suppress this warning ignore these packages in the workspace:
+--packages-ignore localization_common px4_msgs cooperative_localization route_planning traversability_mapping uav_control uav_sensing
+Finished <<< mission_manager [1.24s]
+
+Summary: 3 packages finished [25.4s]
