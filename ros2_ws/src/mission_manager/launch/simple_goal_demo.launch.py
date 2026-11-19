@@ -20,8 +20,9 @@ def generate_launch_description():
     localization_share = Path(get_package_share_directory("cooperative_localization"))
     start_simulation = LaunchConfiguration("start_simulation")
     start_rviz = LaunchConfiguration("start_rviz")
+    world_name = LaunchConfiguration("world_name")
     # Map position of PX4's local origin; shared by the anchor adapter and UAV follower.
-    map_origin = [0.0, 0.0, 0.3]
+    map_origin = [-4.0, 0.0, 0.3]
 
     world = ExecuteProcess(
         cmd=["bash", str(project_root / "scripts/world_goal_demo.sh")],
@@ -57,6 +58,10 @@ def generate_launch_description():
             "start_rviz", default_value="true",
             description="Start RViz with the simple goal demo configuration.",
         ),
+        DeclareLaunchArgument(
+            "world_name", default_value="simple_goal_demo",
+            description="SDF world stem selected by world_goal_demo.sh.",
+        ),
         DeclareLaunchArgument("uav_assistance", default_value="true",
                               description="Fuse UAV-assisted position measurements."),
         DeclareLaunchArgument("uav_heading", default_value="true",
@@ -84,6 +89,19 @@ def generate_launch_description():
         DeclareLaunchArgument("uav_follow", default_value="true",
                               description="Fly the camera UAV over the UGV's fused pose; "
                                           "false keeps it hovering at its takeoff point."),
+        DeclareLaunchArgument(
+            "coordination_mode", default_value="ugv_follow",
+            choices=["ugv_follow", "uav_scout"],
+            description="UGV-follow baseline or UAV-led goal scouting.",
+        ),
+        DeclareLaunchArgument(
+            "scout_lead_distance", default_value="3.0",
+            description="Distance in meters for the UAV to remain ahead of the UGV.",
+        ),
+        DeclareLaunchArgument(
+            "scout_max_speed", default_value="1.0",
+            description="Maximum UAV horizontal speed in scout mode.",
+        ),
         DeclareLaunchArgument("goal_x", default_value="4.0",
                               description="Goal east coordinate in meters."),
         DeclareLaunchArgument("goal_y", default_value="0.0",
@@ -91,8 +109,17 @@ def generate_launch_description():
         DeclareLaunchArgument("uav_altitude", default_value="4.5",
                               description="UAV target altitude in meters."),
         DeclareLaunchArgument(
+            "uav_initial_settle_time", default_value="2.0",
+            description="Seconds to wait after the UAV reference becomes valid before publishing "
+                        "its localization anchor.",
+        ),
+        DeclareLaunchArgument(
             "grid_resolution", default_value="0.1",
             description="Camera occupancy-grid cell size in meters.",
+        ),
+        DeclareLaunchArgument(
+            "map_bounds", default_value="-12.0,-10.0,12.0,10.0",
+            description="Mapper bounds as min_x,min_y,max_x,max_y.",
         ),
         DeclareLaunchArgument(
             "obstacle_luminance_threshold", default_value="32.0",
@@ -101,6 +128,7 @@ def generate_launch_description():
         SetEnvironmentVariable("GZ_PARTITION",
                                EnvironmentVariable("GZ_PARTITION", default_value="uav_ugv_sim")),
         SetEnvironmentVariable("GZ_IP", "127.0.0.1"),
+        SetEnvironmentVariable("WORLD_NAME", world_name),
         # Whole camera images over shared memory; UDP fragments overflow the default
         # Linux receive buffer and drop most frames. An existing setting wins.
         SetEnvironmentVariable(
@@ -137,7 +165,9 @@ def generate_launch_description():
                                   "'/simulation/biased_uav_odometry' if float('",
                                   LaunchConfiguration("shared_position_stddev"),
                                   "') > 0 else '/fmu/out/vehicle_odometry'"]),
-                              "require_airborne": "true", "initial_settle_time": "10.0"}.items()),
+                              "require_airborne": "true",
+                              "initial_settle_time": LaunchConfiguration(
+                                  "uav_initial_settle_time")}.items()),
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(
                 str(sensing_share / "launch/uav_camera_sensor.launch.py")),
@@ -172,6 +202,11 @@ def generate_launch_description():
             parameters=[{
                 "uav_altitude": ParameterValue(
                     LaunchConfiguration("uav_altitude"), value_type=float),
+                "coordination_mode": LaunchConfiguration("coordination_mode"),
+                "scout_lead_distance": ParameterValue(
+                    LaunchConfiguration("scout_lead_distance"), value_type=float),
+                "scout_max_speed": ParameterValue(
+                    LaunchConfiguration("scout_max_speed"), value_type=float),
                 "follow_ugv": ParameterValue(LaunchConfiguration("uav_follow"), value_type=bool),
                 "map_origin": map_origin,
             }],
@@ -196,6 +231,8 @@ def generate_launch_description():
             parameters=[{
                 "grid_resolution": ParameterValue(
                     LaunchConfiguration("grid_resolution"), value_type=float),
+                "map_bounds": ParameterValue(
+                    LaunchConfiguration("map_bounds"), value_type=str),
                 "obstacle_luminance_threshold": ParameterValue(
                     LaunchConfiguration("obstacle_luminance_threshold"), value_type=float),
             }],

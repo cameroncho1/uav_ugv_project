@@ -22,3 +22,17 @@ TEST(FollowSetpoint, StepIsRateLimitedAndIgnoresJitter)
   EXPECT_DOUBLE_EQ(next.north, 0.12);
   EXPECT_DOUBLE_EQ(next.east, 0.16);
 }
+
+TEST(FollowSetpoint, ScoutTargetStaysLeadDistanceFromUgv)
+{
+  const auto target = uav_control::lead_toward_goal({0.0, 0.0}, {0.0, 10.0}, 3.0);
+  EXPECT_DOUBLE_EQ(target.north, 0.0);
+  EXPECT_DOUBLE_EQ(target.east, 3.0);
+}
+
+TEST(FollowSetpoint, ScoutTargetStopsAtGoalWhenCloserThanLead)
+{
+  const auto target = uav_control::lead_toward_goal({1.0, 2.0}, {1.0, 4.0}, 3.0);
+  EXPECT_DOUBLE_EQ(target.north, 1.0);
+  EXPECT_DOUBLE_EQ(target.east, 4.0);
+}

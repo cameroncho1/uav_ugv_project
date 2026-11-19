@@ -26,7 +26,7 @@ for _ in $(seq 1 60); do
     --reqtype gz.msgs.EntityFactory --reptype gz.msgs.Boolean --timeout 2000 \
     --req "name: 'cooperative_camera_uav_0', allow_renaming: false, \
       sdf_filename: '$ROOT/simulation/models/cooperative_camera_uav/model.sdf', \
-      pose: {position: {x: 0, y: 0, z: 0.3}}" | grep -q 'data: true'; then
+      pose: {position: {x: -4, y: 0, z: 0.3}}" | grep -q 'data: true'; then
     created=true
     break
   fi

@@ -129,6 +129,24 @@ private:
     return point;
   }
 
+  void clear_ugv_footprint(const geometry_msgs::msg::Point & pose)
+  {
+    const auto radius = robot_radius_ + clearance_ + grid_.info.resolution;
+    const auto radius_squared = radius * radius;
+    for (int y = 0; y < static_cast<int>(grid_.info.height); ++y) {
+      for (int x = 0; x < static_cast<int>(grid_.info.width); ++x) {
+        const Cell cell{x, y};
+        const auto center = cell_center(cell);
+        const auto dx = center.x - pose.x;
+        const auto dy = center.y - pose.y;
+        if (dx * dx + dy * dy <= radius_squared) {
+          planning_grid_.data[index_of(cell)] = 0;
+          safety_grid_.data[index_of(cell)] = 0;
+        }
+      }
+    }
+  }
+
   double heuristic(const Cell & from, const Cell & to) const
   {
     const double dx = std::abs(from.x - to.x);
@@ -244,6 +262,9 @@ private:
     }
     const Cell start = world_to_cell(ugv_pose_.position.x, ugv_pose_.position.y);
     const Cell goal = world_to_cell(goal_.pose.position.x, goal_.pose.position.y);
+    // The inflated grid includes the UGV's own footprint. Clear only that known
+    // footprint so the vehicle can leave it; all other obstacle checks remain.
+    clear_ugv_footprint(ugv_pose_.position);
     const auto cells = find_path(start, goal);
     for (const auto & cell : cells) {
       geometry_msgs::msg::PoseStamped pose;

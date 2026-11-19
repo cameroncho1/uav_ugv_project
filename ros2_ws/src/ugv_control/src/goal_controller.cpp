@@ -1,4 +1,5 @@
 #include <cmath>
+#include <algorithm>
 #include <memory>
 #include <stdexcept>
 #include <string>
@@ -28,6 +29,7 @@ public:
     follower_.lookahead = positive_parameter("lookahead_distance", 0.6);
     follower_.speed = positive_parameter("max_linear_speed", 0.5);
     follower_.turn_rate = positive_parameter("max_angular_speed", 1.0);
+    max_linear_acceleration_ = positive_parameter("max_linear_acceleration", 0.4);
     goal_tolerance_ = positive_parameter("goal_tolerance", 0.5);
     max_path_age_ = positive_parameter("max_path_age", 1.0);
     rcl_interfaces::msg::ParameterDescriptor startup_only;
@@ -193,10 +195,23 @@ private:
       case ugv_control::Mode::HoldGuard:
         status = guard_valid ? "Waiting for a fresh map path" : guard_reason; break;
       case ugv_control::Mode::Goal: status = "UGV reached global goal tolerance"; break;
-      case ugv_control::Mode::Navigate:
+      case ugv_control::Mode::Navigate: {
         status = "Following path using the fused pose";
         command = ugv_control::follow_path(pose_guard_.pose(), path_, follower_, route_.clearance_grid);
+        const auto elapsed = last_follow_time_ == 0 ? 0.1 :
+          std::clamp((steady_now - last_follow_time_) * 1e-9, 0.0, 0.5);
+        const auto maximum_change = max_linear_acceleration_ * elapsed;
+        command.linear.x = std::clamp(
+          command.linear.x, previous_linear_speed_ - maximum_change,
+          previous_linear_speed_ + maximum_change);
+        previous_linear_speed_ = command.linear.x;
+        last_follow_time_ = steady_now;
         break;
+      }
+    }
+    if (supervisor_.mode != ugv_control::Mode::Navigate) {
+      previous_linear_speed_ = 0.0;
+      last_follow_time_ = 0;
     }
     // Publish zero every tick during a hold, including when /clock stops.
     command_pub_->publish(command);
@@ -243,13 +258,15 @@ private:
 
   uav_ugv_msgs::PoseGuard pose_guard_;
   ugv_control::FollowerLimits follower_;
-  double goal_tolerance_{0.5}, max_path_age_{1.0};
+  double goal_tolerance_{0.5}, max_path_age_{1.0}, max_linear_acceleration_{0.4};
   int64_t path_receipt_{0};
   int64_t pose_receipt_{0}, pose_stamp_{0}, last_trace_sim_{0}, trace_epoch_{0}, trace_sequence_{0};
   int64_t last_ros_clock_{0};
   ugv_control::SupervisorState supervisor_;
   ugv_control::FaultInput fault_input_;
   ugv_control::GoalHistory goals_;
+  int64_t last_follow_time_{0};
+  double previous_linear_speed_{0.0};
   std::string status_;
   nav_msgs::msg::Path path_;
   uav_ugv_msgs::msg::PlannedRoute route_;

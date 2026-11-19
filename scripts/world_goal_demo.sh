@@ -3,7 +3,7 @@ set -e
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 PX4="$ROOT/external/PX4-Autopilot"
-WORLD="${WORLD_FILE:-$ROOT/simulation/worlds/simple_goal_demo.sdf}"
+WORLD="$ROOT/simulation/worlds/${WORLD_NAME:-simple_goal_demo}.sdf"
 test -f "$WORLD" || { echo "World file not found: $WORLD" >&2; exit 2; }
 
 python3 "$ROOT/scripts/check_sim_dependencies.py"
