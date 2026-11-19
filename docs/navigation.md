@@ -31,6 +31,50 @@ The `coordination_mode` launch argument selects one of two UAV behaviors:
 - `ugv_follow` preserves the baseline: the UAV follows the UGV's fused `map` pose.
 - `uav_scout` selects a lead point between the UGV and the global goal. The UAV advances toward a point `scout_lead_distance` meters ahead of the UGV, stops at the goal when the remaining distance is shorter, and is limited to `scout_max_speed`.
 
+Use this command for the original UAV-follow behavior on the small world:
+
+```bash
+source /opt/ros/humble/setup.bash
+source ~/ros_gz_harmonic_ws/install/setup.bash
+source ~/uav_ugv_project/ros2_ws/install/setup.bash
+
+cd ~/uav_ugv_project
+ros2 launch mission_manager simple_goal_demo.launch.py \
+  coordination_mode:=ugv_follow \
+  uav_follow:=true \
+  grid_resolution:=0.2 \
+  start_rviz:=false
+```
+
+Set `uav_follow:=false` instead to keep the UAV at its initial horizontal hold while the UGV operates:
+
+```bash
+ros2 launch mission_manager simple_goal_demo.launch.py \
+  coordination_mode:=ugv_follow \
+  uav_follow:=false \
+  grid_resolution:=0.2 \
+  start_rviz:=false
+```
+
+Use this command for UAV-led scouting on the large obstacle world:
+
+```bash
+source /opt/ros/humble/setup.bash
+source ~/ros_gz_harmonic_ws/install/setup.bash
+source ~/uav_ugv_project/ros2_ws/install/setup.bash
+
+cd ~/uav_ugv_project
+ros2 launch mission_manager simple_goal_demo.launch.py \
+  world_name:=simple_goal_demo_large \
+  goal_x:=24.0 \
+  goal_y:=14.0 \
+  map_bounds:=-30.0,-20.0,30.0,20.0 \
+  grid_resolution:=0.2 \
+  coordination_mode:=uav_scout \
+  uav_follow:=true \
+  start_rviz:=false
+```
+
 Both modes require PX4 Offboard/armed state and at least 80% of the configured cruise altitude before horizontal motion. Scout mode holds at the current setpoint when the goal is unavailable or the UGV pose fails the shared pose guard. The `uav_initial_settle_time` launch argument configures the anchor adapter's startup settling interval.
 
 The mapper receives `map_bounds` as a comma-separated `min_x,min_y,max_x,max_y` string and may publish known ground beyond the UGV camera footprint. It does not require a matched UGV pose for every scout frame, but it masks the UGV when a timestamp-matched pose is available and sufficiently certain. The UGV controller independently consumes `/ugv/localization/pose`, the clearance grid, and the associated route.
