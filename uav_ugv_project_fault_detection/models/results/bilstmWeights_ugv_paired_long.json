@@ -1,0 +1,365 @@
+{
+  "val": {
+    "windows": {
+      "precision": 0.8089887640449438,
+      "recall": 0.8181818181818182,
+      "f1": 0.8135593220338984,
+      "accuracy": 0.9922169811320755,
+      "tp": 144,
+      "fp": 34,
+      "tn": 8270,
+      "fn": 32
+    },
+    "window_recall": {
+      "short": 0.3,
+      "noise": 0.6521739130434783,
+      "constant": 0.8811188811188811
+    },
+    "clean_fpr": 0.004094412331406551,
+    "events": 15,
+    "event_recall": 0.7333333333333333,
+    "event_recall_by_type": {
+      "short": 0.4,
+      "noise": 0.8,
+      "constant": 1.0
+    },
+    "events_by_type": {
+      "short": 5,
+      "noise": 5,
+      "constant": 5
+    },
+    "clean_time_flagged": 0.004873318199406545,
+    "per_channel": {
+      "gps/altitude": {
+        "f1": 0.6666666666666666,
+        "precision": 0.5,
+        "recall": 1.0,
+        "events": 1,
+        "event_recall": 1.0,
+        "clean_time_flagged": 0.008403361344537813
+      },
+      "gps/latitude": {
+        "f1": 0.0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "events": 0,
+        "event_recall": NaN,
+        "clean_time_flagged": 0.008333333333333331
+      },
+      "gps/longitude": {
+        "f1": 0.0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "events": 1,
+        "event_recall": 0.0,
+        "clean_time_flagged": 0.0
+      },
+      "imu/ax": {
+        "f1": 0.8604651162790699,
+        "precision": 0.9135802469135802,
+        "recall": 0.8131868131868132,
+        "events": 3,
+        "event_recall": 1.0,
+        "clean_time_flagged": 0.006311992786293955
+      },
+      "imu/ay": {
+        "f1": 0.9662921348314608,
+        "precision": 0.9772727272727273,
+        "recall": 0.9555555555555556,
+        "events": 2,
+        "event_recall": 0.5,
+        "clean_time_flagged": 0.0008658008658008606
+      },
+      "imu/az": {
+        "f1": 0.0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "events": 0,
+        "event_recall": NaN,
+        "clean_time_flagged": 0.0008333333333333344
+      },
+      "imu/wx": {
+        "f1": 0.56,
+        "precision": 0.4117647058823529,
+        "recall": 0.875,
+        "events": 1,
+        "event_recall": 1.0,
+        "clean_time_flagged": 0.008389261744966441
+      },
+      "imu/wy": {
+        "f1": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "events": 1,
+        "event_recall": 1.0,
+        "clean_time_flagged": 0.0
+      },
+      "imu/wz": {
+        "f1": 0.0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "events": 0,
+        "event_recall": NaN,
+        "clean_time_flagged": 0.005000000000000005
+      },
+      "wheel_odom/vx": {
+        "f1": 0.6153846153846153,
+        "precision": 0.4444444444444444,
+        "recall": 1.0,
+        "events": 1,
+        "event_recall": 1.0,
+        "clean_time_flagged": 0.01096491228070175
+      },
+      "wheel_odom/wz": {
+        "f1": 0.5,
+        "precision": 0.75,
+        "recall": 0.375,
+        "events": 5,
+        "event_recall": 0.6,
+        "clean_time_flagged": 0.0045045045045045045
+      }
+    }
+  },
+  "test": {
+    "windows": {
+      "precision": 0.5254237288135594,
+      "recall": 0.6813186813186813,
+      "f1": 0.5933014354066986,
+      "accuracy": 0.9899764150943396,
+      "tp": 62,
+      "fp": 56,
+      "tn": 8333,
+      "fn": 29
+    },
+    "window_recall": {
+      "short": 0.6,
+      "noise": 0.3793103448275862,
+      "constant": 0.8653846153846154
+    },
+    "clean_fpr": 0.00667540827273811,
+    "events": 15,
+    "event_recall": 0.8666666666666667,
+    "event_recall_by_type": {
+      "short": 0.8,
+      "noise": 0.8,
+      "constant": 1.0
+    },
+    "events_by_type": {
+      "short": 5,
+      "noise": 5,
+      "constant": 5
+    },
+    "clean_time_flagged": 0.011766159664445651,
+    "per_channel": {
+      "gps/altitude": {
+        "f1": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "events": 2,
+        "event_recall": 1.0,
+        "clean_time_flagged": 0.0
+      },
+      "gps/latitude": {
+        "f1": 0.2,
+        "precision": 0.16666666666666666,
+        "recall": 0.25,
+        "events": 1,
+        "event_recall": 1.0,
+        "clean_time_flagged": 0.04310344827586207
+      },
+      "gps/longitude": {
+        "f1": 0.5714285714285714,
+        "precision": 0.4444444444444444,
+        "recall": 0.8,
+        "events": 3,
+        "event_recall": 1.0,
+        "clean_time_flagged": 0.04347826086956522
+      },
+      "imu/ax": {
+        "f1": 0.0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "events": 0,
+        "event_recall": NaN,
+        "clean_time_flagged": 0.010000000000000005
+      },
+      "imu/ay": {
+        "f1": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "events": 1,
+        "event_recall": 1.0,
+        "clean_time_flagged": 0.0
+      },
+      "imu/az": {
+        "f1": 0.0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "events": 0,
+        "event_recall": NaN,
+        "clean_time_flagged": 0.0
+      },
+      "imu/wx": {
+        "f1": 0.0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "events": 0,
+        "event_recall": NaN,
+        "clean_time_flagged": 0.010833333333333335
+      },
+      "imu/wy": {
+        "f1": 0.5555555555555556,
+        "precision": 0.5555555555555556,
+        "recall": 0.5555555555555556,
+        "events": 2,
+        "event_recall": 0.5,
+        "clean_time_flagged": 0.003358522250209905
+      },
+      "imu/wz": {
+        "f1": 0.24390243902439024,
+        "precision": 0.2631578947368421,
+        "recall": 0.22727272727272727,
+        "events": 3,
+        "event_recall": 0.6666666666666666,
+        "clean_time_flagged": 0.011884550084889648
+      },
+      "wheel_odom/vx": {
+        "f1": 0.9130434782608695,
+        "precision": 0.9130434782608695,
+        "recall": 0.9130434782608695,
+        "events": 2,
+        "event_recall": 1.0,
+        "clean_time_flagged": 0.0045766590389016044
+      },
+      "wheel_odom/wz": {
+        "f1": 0.5714285714285715,
+        "precision": 0.6666666666666666,
+        "recall": 0.5,
+        "events": 1,
+        "event_recall": 1.0,
+        "clean_time_flagged": 0.0021929824561403495
+      }
+    }
+  },
+  "test_extra": {
+    "windows": {
+      "precision": 0.7599039615846338,
+      "recall": 0.8058561425843411,
+      "f1": 0.7822057460611678,
+      "accuracy": 0.9899228130360206,
+      "tp": 1266,
+      "fp": 400,
+      "tn": 67989,
+      "fn": 305
+    },
+    "window_recall": {
+      "short": 0.24183006535947713,
+      "noise": 0.782051282051282,
+      "constant": 0.8988326848249028
+    },
+    "clean_fpr": 0.005848893827954788,
+    "events": 165,
+    "event_recall": 0.7696969696969697,
+    "event_recall_by_type": {
+      "short": 0.4727272727272727,
+      "noise": 0.9454545454545454,
+      "constant": 0.8909090909090909
+    },
+    "events_by_type": {
+      "short": 55,
+      "noise": 55,
+      "constant": 55
+    },
+    "clean_time_flagged": 0.009884109922317022,
+    "per_channel": {
+      "gps/altitude": {
+        "f1": 0.8636363636363636,
+        "precision": 0.8260869565217391,
+        "recall": 0.9047619047619048,
+        "events": 15,
+        "event_recall": 1.0,
+        "clean_time_flagged": 0.008438818565400845
+      },
+      "gps/latitude": {
+        "f1": 0.5405405405405406,
+        "precision": 0.4878048780487805,
+        "recall": 0.6060606060606061,
+        "events": 15,
+        "event_recall": 0.6,
+        "clean_time_flagged": 0.0219435736677116
+      },
+      "gps/longitude": {
+        "f1": 0.3170731707317074,
+        "precision": 0.2653061224489796,
+        "recall": 0.3939393939393939,
+        "events": 15,
+        "event_recall": 0.5333333333333333,
+        "clean_time_flagged": 0.03761755485893417
+      },
+      "imu/ax": {
+        "f1": 0.550185873605948,
+        "precision": 0.5481481481481482,
+        "recall": 0.5522388059701493,
+        "events": 15,
+        "event_recall": 0.6666666666666666,
+        "clean_time_flagged": 0.00624616014745034
+      },
+      "imu/ay": {
+        "f1": 0.8933333333333332,
+        "precision": 0.9054054054054054,
+        "recall": 0.881578947368421,
+        "events": 15,
+        "event_recall": 0.6666666666666666,
+        "clean_time_flagged": 0.0021712158808933012
+      },
+      "imu/az": {
+        "f1": 0.9444444444444445,
+        "precision": 0.9951219512195122,
+        "recall": 0.8986784140969163,
+        "events": 15,
+        "event_recall": 0.6666666666666666,
+        "clean_time_flagged": 0.00010338054378166034
+      },
+      "imu/wx": {
+        "f1": 0.8624161073825504,
+        "precision": 0.7835365853658537,
+        "recall": 0.9589552238805971,
+        "events": 15,
+        "event_recall": 1.0,
+        "clean_time_flagged": 0.007371262458471761
+      },
+      "imu/wy": {
+        "f1": 0.895397489539749,
+        "precision": 0.8806584362139918,
+        "recall": 0.9106382978723404,
+        "events": 15,
+        "event_recall": 0.6666666666666666,
+        "clean_time_flagged": 0.0030005173305742367
+      },
+      "imu/wz": {
+        "f1": 0.5228426395939086,
+        "precision": 0.4724770642201835,
+        "recall": 0.5852272727272727,
+        "events": 15,
+        "event_recall": 0.9333333333333333,
+        "clean_time_flagged": 0.011826408885232419
+      },
+      "wheel_odom/vx": {
+        "f1": 0.7356321839080461,
+        "precision": 0.7710843373493976,
+        "recall": 0.7032967032967034,
+        "events": 15,
+        "event_recall": 0.8,
+        "clean_time_flagged": 0.005129589632829373
+      },
+      "wheel_odom/wz": {
+        "f1": 0.78,
+        "precision": 0.8125,
+        "recall": 0.75,
+        "events": 15,
+        "event_recall": 0.9333333333333333,
+        "clean_time_flagged": 0.004876727174207531
+      }
+    }
+  }
+}

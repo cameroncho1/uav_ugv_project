@@ -1,0 +1,236 @@
+Loading UGV fault variants from "/Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/datasets/ugv_faulty" (layout=multivariate, domain=time, seq_len=100, paired=True) ...
+    train: 281920 windows -> 66302 faulty (window, channel) pairs
+    val: 10915 windows -> 2634 faulty (window, channel) pairs
+    test: 1180 windows -> 195 faulty (window, channel) pairs
+    test_extra: 9735 windows -> 2463 faulty (window, channel) pairs
+Train: 281920 windows, Val: 10915 windows, feat_dim=15
+
+=== Training BiLSTM ===
+   Positive weights (clean / faulty windows per channel): imu/wx=63, imu/wy=74, imu/wz=47, imu/ax=48, imu/ay=45, imu/az=53, wheel_odom/vx=28, wheel_odom/wz=42, gps/latitude=38, gps/longitude=41, gps/altitude=57
+TensorBoard run: /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/runs/ugv_mv_balanced_bilstm_time_20261118-170531
+Epoch [1/200], Train Loss: 0.7543, Validation Loss: 0.6569, Validation F1: 0.2098
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/bilstmWeights_ugv_mv_balanced/best_model.pt
+Epoch [2/200], Train Loss: 0.5515, Validation Loss: 0.4784, Validation F1: 0.2342
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/bilstmWeights_ugv_mv_balanced/best_model.pt
+Epoch [3/200], Train Loss: 0.4140, Validation Loss: 0.4132, Validation F1: 0.5283
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/bilstmWeights_ugv_mv_balanced/best_model.pt
+Epoch [4/200], Train Loss: 0.3621, Validation Loss: 0.3806, Validation F1: 0.2701
+Epoch [5/200], Train Loss: 0.3339, Validation Loss: 0.3896, Validation F1: 0.3192
+Epoch [6/200], Train Loss: 0.3140, Validation Loss: 0.3875, Validation F1: 0.3581
+Epoch [7/200], Train Loss: 0.3008, Validation Loss: 0.3751, Validation F1: 0.3314
+Epoch [8/200], Train Loss: 0.2667, Validation Loss: 0.3432, Validation F1: 0.6348
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/bilstmWeights_ugv_mv_balanced/best_model.pt
+Epoch [9/200], Train Loss: 0.2168, Validation Loss: 0.2770, Validation F1: 0.6733
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/bilstmWeights_ugv_mv_balanced/best_model.pt
+Epoch [10/200], Train Loss: 0.1804, Validation Loss: 0.2525, Validation F1: 0.7319
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/bilstmWeights_ugv_mv_balanced/best_model.pt
+Epoch [11/200], Train Loss: 0.1592, Validation Loss: 0.2516, Validation F1: 0.6610
+Epoch [12/200], Train Loss: 0.1439, Validation Loss: 0.2568, Validation F1: 0.7597
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/bilstmWeights_ugv_mv_balanced/best_model.pt
+Epoch [13/200], Train Loss: 0.1301, Validation Loss: 0.2618, Validation F1: 0.7378
+Epoch [14/200], Train Loss: 0.1182, Validation Loss: 0.2505, Validation F1: 0.8009
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/bilstmWeights_ugv_mv_balanced/best_model.pt
+Epoch [15/200], Train Loss: 0.1069, Validation Loss: 0.2691, Validation F1: 0.8016
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/bilstmWeights_ugv_mv_balanced/best_model.pt
+Epoch [16/200], Train Loss: 0.0983, Validation Loss: 0.3141, Validation F1: 0.8225
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/bilstmWeights_ugv_mv_balanced/best_model.pt
+Epoch [17/200], Train Loss: 0.0914, Validation Loss: 0.2836, Validation F1: 0.8093
+Epoch [18/200], Train Loss: 0.0835, Validation Loss: 0.2758, Validation F1: 0.7362
+Epoch [19/200], Train Loss: 0.0757, Validation Loss: 0.3280, Validation F1: 0.7883
+Epoch [20/200], Train Loss: 0.0697, Validation Loss: 0.3436, Validation F1: 0.8495
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/bilstmWeights_ugv_mv_balanced/best_model.pt
+Epoch [21/200], Train Loss: 0.0635, Validation Loss: 0.3610, Validation F1: 0.8226
+Epoch [22/200], Train Loss: 0.0590, Validation Loss: 0.3603, Validation F1: 0.8066
+Epoch [23/200], Train Loss: 0.0532, Validation Loss: 0.3329, Validation F1: 0.8464
+Epoch [24/200], Train Loss: 0.0499, Validation Loss: 0.3694, Validation F1: 0.8330
+Epoch [25/200], Train Loss: 0.0456, Validation Loss: 0.3965, Validation F1: 0.8382
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/bilstmWeights_ugv_mv_balanced/model_epoch_0025.pt
+Epoch [26/200], Train Loss: 0.0426, Validation Loss: 0.4493, Validation F1: 0.8730
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/bilstmWeights_ugv_mv_balanced/best_model.pt
+Epoch [27/200], Train Loss: 0.0395, Validation Loss: 0.4351, Validation F1: 0.8368
+Epoch [28/200], Train Loss: 0.0354, Validation Loss: 0.4589, Validation F1: 0.8894
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/bilstmWeights_ugv_mv_balanced/best_model.pt
+Epoch [29/200], Train Loss: 0.0326, Validation Loss: 0.4483, Validation F1: 0.8814
+Epoch [30/200], Train Loss: 0.0316, Validation Loss: 0.4426, Validation F1: 0.8637
+Epoch [31/200], Train Loss: 0.0283, Validation Loss: 0.4679, Validation F1: 0.8542
+Epoch [32/200], Train Loss: 0.0283, Validation Loss: 0.4545, Validation F1: 0.8526
+Epoch [33/200], Train Loss: 0.0254, Validation Loss: 0.4992, Validation F1: 0.8784
+Epoch [34/200], Train Loss: 0.0243, Validation Loss: 0.5162, Validation F1: 0.9083
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/bilstmWeights_ugv_mv_balanced/best_model.pt
+Epoch [35/200], Train Loss: 0.0231, Validation Loss: 0.5344, Validation F1: 0.8792
+Epoch [36/200], Train Loss: 0.0220, Validation Loss: 0.5343, Validation F1: 0.8722
+Epoch [37/200], Train Loss: 0.0215, Validation Loss: 0.5239, Validation F1: 0.8863
+Epoch [38/200], Train Loss: 0.0195, Validation Loss: 0.5435, Validation F1: 0.8973
+Epoch [39/200], Train Loss: 0.0185, Validation Loss: 0.5436, Validation F1: 0.8787
+Epoch [40/200], Train Loss: 0.0191, Validation Loss: 0.5457, Validation F1: 0.8846
+Epoch [41/200], Train Loss: 0.0170, Validation Loss: 0.5697, Validation F1: 0.8981
+Epoch [42/200], Train Loss: 0.0150, Validation Loss: 0.6019, Validation F1: 0.9057
+Epoch [43/200], Train Loss: 0.0165, Validation Loss: 0.6189, Validation F1: 0.9014
+Epoch [44/200], Train Loss: 0.0156, Validation Loss: 0.5714, Validation F1: 0.9059
+Epoch [45/200], Train Loss: 0.0145, Validation Loss: 0.6301, Validation F1: 0.8897
+Epoch [46/200], Train Loss: 0.0147, Validation Loss: 0.6322, Validation F1: 0.8927
+Epoch [47/200], Train Loss: 0.0141, Validation Loss: 0.5489, Validation F1: 0.8685
+Epoch [48/200], Train Loss: 0.0130, Validation Loss: 0.6425, Validation F1: 0.8953
+Epoch [49/200], Train Loss: 0.0137, Validation Loss: 0.6171, Validation F1: 0.8974
+Epoch [50/200], Train Loss: 0.0121, Validation Loss: 0.5845, Validation F1: 0.8612
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/bilstmWeights_ugv_mv_balanced/model_epoch_0050.pt
+Epoch [51/200], Train Loss: 0.0124, Validation Loss: 0.6874, Validation F1: 0.8941
+Epoch [52/200], Train Loss: 0.0116, Validation Loss: 0.6590, Validation F1: 0.8983
+Epoch [53/200], Train Loss: 0.0120, Validation Loss: 0.6246, Validation F1: 0.8834
+Epoch [54/200], Train Loss: 0.0108, Validation Loss: 0.6131, Validation F1: 0.8989
+Epoch [55/200], Train Loss: 0.0093, Validation Loss: 0.5993, Validation F1: 0.8812
+Epoch [56/200], Train Loss: 0.0107, Validation Loss: 0.6601, Validation F1: 0.9066
+Epoch [57/200], Train Loss: 0.0100, Validation Loss: 0.6810, Validation F1: 0.9042
+Epoch [58/200], Train Loss: 0.0098, Validation Loss: 0.6973, Validation F1: 0.9107
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/bilstmWeights_ugv_mv_balanced/best_model.pt
+Epoch [59/200], Train Loss: 0.0100, Validation Loss: 0.6820, Validation F1: 0.8963
+Epoch [60/200], Train Loss: 0.0102, Validation Loss: 0.7053, Validation F1: 0.9042
+Epoch [61/200], Train Loss: 0.0089, Validation Loss: 0.7260, Validation F1: 0.9116
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/bilstmWeights_ugv_mv_balanced/best_model.pt
+Epoch [62/200], Train Loss: 0.0082, Validation Loss: 0.7811, Validation F1: 0.9132
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/bilstmWeights_ugv_mv_balanced/best_model.pt
+Epoch [63/200], Train Loss: 0.0073, Validation Loss: 0.7431, Validation F1: 0.9202
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/bilstmWeights_ugv_mv_balanced/best_model.pt
+Epoch [64/200], Train Loss: 0.0101, Validation Loss: 0.6678, Validation F1: 0.9132
+Epoch [65/200], Train Loss: 0.0080, Validation Loss: 0.7119, Validation F1: 0.9091
+Epoch [66/200], Train Loss: 0.0071, Validation Loss: 0.8303, Validation F1: 0.9182
+Epoch [67/200], Train Loss: 0.0093, Validation Loss: 0.6932, Validation F1: 0.8984
+Epoch [68/200], Train Loss: 0.0073, Validation Loss: 0.7690, Validation F1: 0.9105
+Epoch [69/200], Train Loss: 0.0091, Validation Loss: 0.6729, Validation F1: 0.8986
+Epoch [70/200], Train Loss: 0.0076, Validation Loss: 0.7534, Validation F1: 0.9061
+Epoch [71/200], Train Loss: 0.0079, Validation Loss: 0.7636, Validation F1: 0.9019
+Epoch [72/200], Train Loss: 0.0075, Validation Loss: 0.6900, Validation F1: 0.9221
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/bilstmWeights_ugv_mv_balanced/best_model.pt
+Epoch [73/200], Train Loss: 0.0068, Validation Loss: 0.7098, Validation F1: 0.9181
+Epoch [74/200], Train Loss: 0.0077, Validation Loss: 0.7403, Validation F1: 0.9184
+Epoch [75/200], Train Loss: 0.0079, Validation Loss: 0.7257, Validation F1: 0.9224
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/bilstmWeights_ugv_mv_balanced/model_epoch_0075.pt
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/bilstmWeights_ugv_mv_balanced/best_model.pt
+Epoch [76/200], Train Loss: 0.0067, Validation Loss: 0.7319, Validation F1: 0.9085
+Epoch [77/200], Train Loss: 0.0075, Validation Loss: 0.7253, Validation F1: 0.9180
+Epoch [78/200], Train Loss: 0.0057, Validation Loss: 0.7285, Validation F1: 0.9058
+Epoch [79/200], Train Loss: 0.0068, Validation Loss: 0.7655, Validation F1: 0.9037
+Epoch [80/200], Train Loss: 0.0062, Validation Loss: 0.7257, Validation F1: 0.9140
+Epoch [81/200], Train Loss: 0.0068, Validation Loss: 0.6835, Validation F1: 0.8991
+Epoch [82/200], Train Loss: 0.0056, Validation Loss: 0.7519, Validation F1: 0.9234
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/bilstmWeights_ugv_mv_balanced/best_model.pt
+Epoch [83/200], Train Loss: 0.0070, Validation Loss: 0.7063, Validation F1: 0.9181
+Epoch [84/200], Train Loss: 0.0051, Validation Loss: 0.8360, Validation F1: 0.9212
+Epoch [85/200], Train Loss: 0.0062, Validation Loss: 0.7890, Validation F1: 0.9143
+Epoch [86/200], Train Loss: 0.0063, Validation Loss: 0.7537, Validation F1: 0.9159
+Epoch [87/200], Train Loss: 0.0065, Validation Loss: 0.8345, Validation F1: 0.9020
+Epoch [88/200], Train Loss: 0.0051, Validation Loss: 0.7896, Validation F1: 0.8872
+Epoch [89/200], Train Loss: 0.0064, Validation Loss: 0.7813, Validation F1: 0.9234
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/bilstmWeights_ugv_mv_balanced/best_model.pt
+Epoch [90/200], Train Loss: 0.0054, Validation Loss: 0.8402, Validation F1: 0.9094
+Epoch [91/200], Train Loss: 0.0047, Validation Loss: 0.8958, Validation F1: 0.8897
+Epoch [92/200], Train Loss: 0.0071, Validation Loss: 0.8646, Validation F1: 0.9147
+Epoch [93/200], Train Loss: 0.0049, Validation Loss: 0.8594, Validation F1: 0.9147
+Epoch [94/200], Train Loss: 0.0049, Validation Loss: 0.8019, Validation F1: 0.9118
+Epoch [95/200], Train Loss: 0.0069, Validation Loss: 0.8077, Validation F1: 0.8999
+Epoch [96/200], Train Loss: 0.0049, Validation Loss: 0.8478, Validation F1: 0.9046
+Epoch [97/200], Train Loss: 0.0054, Validation Loss: 0.8430, Validation F1: 0.9215
+Epoch [98/200], Train Loss: 0.0041, Validation Loss: 0.8411, Validation F1: 0.8944
+Epoch [99/200], Train Loss: 0.0057, Validation Loss: 0.8266, Validation F1: 0.8930
+Epoch [100/200], Train Loss: 0.0054, Validation Loss: 0.8670, Validation F1: 0.9128
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/bilstmWeights_ugv_mv_balanced/model_epoch_0100.pt
+Epoch [101/200], Train Loss: 0.0053, Validation Loss: 0.8016, Validation F1: 0.9129
+Epoch [102/200], Train Loss: 0.0036, Validation Loss: 0.8490, Validation F1: 0.9100
+Epoch [103/200], Train Loss: 0.0047, Validation Loss: 0.8400, Validation F1: 0.9053
+Epoch [104/200], Train Loss: 0.0044, Validation Loss: 0.8670, Validation F1: 0.9198
+Epoch [105/200], Train Loss: 0.0048, Validation Loss: 0.8821, Validation F1: 0.9225
+Epoch [106/200], Train Loss: 0.0062, Validation Loss: 0.9360, Validation F1: 0.9210
+Epoch [107/200], Train Loss: 0.0045, Validation Loss: 0.8769, Validation F1: 0.9238
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/bilstmWeights_ugv_mv_balanced/best_model.pt
+Epoch [108/200], Train Loss: 0.0033, Validation Loss: 0.9316, Validation F1: 0.9190
+Epoch [109/200], Train Loss: 0.0064, Validation Loss: 0.7621, Validation F1: 0.8847
+Epoch [110/200], Train Loss: 0.0052, Validation Loss: 0.7696, Validation F1: 0.9155
+Epoch [111/200], Train Loss: 0.0050, Validation Loss: 0.8057, Validation F1: 0.9096
+Epoch [112/200], Train Loss: 0.0037, Validation Loss: 0.7967, Validation F1: 0.9223
+Epoch [113/200], Train Loss: 0.0051, Validation Loss: 0.7942, Validation F1: 0.9197
+Epoch [114/200], Train Loss: 0.0052, Validation Loss: 0.7562, Validation F1: 0.9070
+Epoch [115/200], Train Loss: 0.0037, Validation Loss: 0.7877, Validation F1: 0.9068
+Epoch [116/200], Train Loss: 0.0063, Validation Loss: 0.7645, Validation F1: 0.9215
+Epoch [117/200], Train Loss: 0.0036, Validation Loss: 0.9119, Validation F1: 0.9077
+Epoch [118/200], Train Loss: 0.0028, Validation Loss: 0.9173, Validation F1: 0.9226
+Epoch [119/200], Train Loss: 0.0051, Validation Loss: 0.8314, Validation F1: 0.9088
+Epoch [120/200], Train Loss: 0.0053, Validation Loss: 0.8029, Validation F1: 0.9104
+Epoch [121/200], Train Loss: 0.0045, Validation Loss: 0.8393, Validation F1: 0.9223
+Epoch [122/200], Train Loss: 0.0040, Validation Loss: 0.8382, Validation F1: 0.9056
+Epoch [123/200], Train Loss: 0.0035, Validation Loss: 0.8219, Validation F1: 0.9124
+Epoch [124/200], Train Loss: 0.0041, Validation Loss: 0.8841, Validation F1: 0.9177
+Epoch [125/200], Train Loss: 0.0048, Validation Loss: 0.7982, Validation F1: 0.9156
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/bilstmWeights_ugv_mv_balanced/model_epoch_0125.pt
+Epoch [126/200], Train Loss: 0.0040, Validation Loss: 0.8306, Validation F1: 0.9212
+Epoch [127/200], Train Loss: 0.0039, Validation Loss: 0.9032, Validation F1: 0.9193
+Epoch [128/200], Train Loss: 0.0037, Validation Loss: 0.8625, Validation F1: 0.9198
+Epoch [129/200], Train Loss: 0.0046, Validation Loss: 0.8792, Validation F1: 0.9199
+Epoch [130/200], Train Loss: 0.0042, Validation Loss: 0.8579, Validation F1: 0.9131
+Epoch [131/200], Train Loss: 0.0032, Validation Loss: 1.0138, Validation F1: 0.9217
+Epoch [132/200], Train Loss: 0.0041, Validation Loss: 0.8849, Validation F1: 0.9190
+Epoch [133/200], Train Loss: 0.0050, Validation Loss: 0.8315, Validation F1: 0.9125
+Epoch [134/200], Train Loss: 0.0030, Validation Loss: 0.8297, Validation F1: 0.9225
+Epoch [135/200], Train Loss: 0.0045, Validation Loss: 0.7290, Validation F1: 0.9083
+Epoch [136/200], Train Loss: 0.0043, Validation Loss: 0.9061, Validation F1: 0.9223
+Epoch [137/200], Train Loss: 0.0026, Validation Loss: 0.9355, Validation F1: 0.9155
+Stopping early: no better validation score for 30 epochs (best at epoch 107).
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/bilstmWeights_ugv_mv_balanced/final_model.pt
+Best validation F1: 0.9238 at epoch 107.
+Loss history saved to /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/bilstmWeights_ugv_mv_balanced/loss_history.json
+BiLSTM weights saved to /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/bilstmWeights_ugv_mv_balanced
+=== best_model.pt ===
+--- BiLSTM val summary (10915 windows) ---
+   windows: TP=2395 FP=156 FN=239 TN=117275  P=0.939 R=0.909 F1=0.924  clean FPR=0.0013
+   window recall: short 0.71, noise 0.94, constant 0.92
+   event isolation recall: 0.939 of 180 (short 0.83/60, noise 0.98/60, constant 1.00/60)
+   clean time flagged: 0.0013
+   per channel (F1 | event recall | clean time flagged):
+      gps/altitude           0.975 | 1.00 of  16 | 0.0007
+      gps/latitude           0.784 | 1.00 of  15 | 0.0015
+      gps/longitude          0.879 | 1.00 of  16 | 0.0026
+      imu/ax                 0.967 | 0.89 of  18 | 0.0004
+      imu/ay                 0.902 | 1.00 of  17 | 0.0039
+      imu/az                 0.988 | 1.00 of  15 | 0.0002
+      imu/wx                 0.979 | 1.00 of  16 | 0.0000
+      imu/wy                 0.919 | 0.75 of  16 | 0.0014
+      imu/wz                 0.821 | 0.67 of  15 | 0.0020
+      wheel_odom/vx          0.978 | 1.00 of  16 | 0.0006
+      wheel_odom/wz          0.935 | 1.00 of  20 | 0.0014
+--- BiLSTM test summary (1180 windows) ---
+   windows: TP=154 FP=11 FN=41 TN=12774  P=0.933 R=0.790 F1=0.856  clean FPR=0.0009
+   window recall: short 0.80, noise 0.69, constant 0.83
+   event isolation recall: 1.000 of 15 (short 1.00/5, noise 1.00/5, constant 1.00/5)
+   clean time flagged: 0.0009
+   per channel (F1 | event recall | clean time flagged):
+      gps/altitude           0.938 | 1.00 of   2 | 0.0009
+      gps/latitude           0.678 | 1.00 of   1 | 0.0000
+      gps/longitude          0.979 | 1.00 of   3 | 0.0009
+      imu/ax                 0.000 | nan of   0 | 0.0008
+      imu/ay                 0.947 | 1.00 of   1 | 0.0000
+      imu/az                 0.000 | nan of   0 | 0.0000
+      imu/wx                 0.000 | nan of   0 | 0.0000
+      imu/wy                 0.706 | 1.00 of   2 | 0.0026
+      imu/wz                 0.323 | 1.00 of   3 | 0.0035
+      wheel_odom/vx          1.000 | 1.00 of   2 | 0.0000
+      wheel_odom/wz          0.941 | 1.00 of   1 | 0.0009
+--- BiLSTM test_extra summary (9735 windows) ---
+   windows: TP=2072 FP=141 FN=391 TN=104481  P=0.936 R=0.841 F1=0.886  clean FPR=0.0013
+   window recall: short 0.70, noise 0.92, constant 0.83
+   event isolation recall: 0.964 of 165 (short 0.93/55, noise 1.00/55, constant 0.96/55)
+   clean time flagged: 0.0013
+   per channel (F1 | event recall | clean time flagged):
+      gps/altitude           0.984 | 1.00 of  15 | 0.0006
+      gps/latitude           0.685 | 0.87 of  15 | 0.0021
+      gps/longitude          0.571 | 1.00 of  15 | 0.0022
+      imu/ax                 0.927 | 1.00 of  15 | 0.0010
+      imu/ay                 0.968 | 1.00 of  15 | 0.0005
+      imu/az                 0.979 | 1.00 of  15 | 0.0002
+      imu/wx                 0.990 | 1.00 of  15 | 0.0001
+      imu/wy                 0.945 | 0.80 of  15 | 0.0009
+      imu/wz                 0.650 | 1.00 of  15 | 0.0051
+      wheel_odom/vx          0.958 | 1.00 of  15 | 0.0009
+      wheel_odom/wz          0.900 | 0.93 of  15 | 0.0009
+Scores saved to /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/results/bilstmWeights_ugv_mv_balanced.json
+
+Done. Run inference with, e.g.:
+    ./bin/python main.py --mode run --model autoencoder

@@ -1,0 +1,127 @@
+Loading UGV fault variants from "/Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/datasets/ugv_faulty" (layout=multivariate, domain=time, seq_len=100, paired=True) ...
+    train: 281920 windows -> 66302 faulty (window, channel) pairs
+    val: 10915 windows -> 2634 faulty (window, channel) pairs
+    test: 1180 windows -> 195 faulty (window, channel) pairs
+    test_extra: 9735 windows -> 2463 faulty (window, channel) pairs
+Train: 281920 windows, Val: 10915 windows, feat_dim=15
+
+=== Training GRU ===
+   GRU specialists: 11 per-channel networks, 24,926 parameters
+   Positive weights (clean / faulty windows per channel): imu/wx=63, imu/wy=74, imu/wz=47, imu/ax=48, imu/ay=45, imu/az=53, wheel_odom/vx=28, wheel_odom/wz=42, gps/latitude=38, gps/longitude=41, gps/altitude=57
+TensorBoard run: /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/runs/ugv_mv_specialists_gru_time_20261118-203604
+Epoch [1/200], Train Loss: 0.6856, Validation Loss: 0.5169, Validation F1: 0.2133
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/gruWeights_ugv_mv_specialists/best_model.pt
+Epoch [2/200], Train Loss: 0.5114, Validation Loss: 0.4868, Validation F1: 0.2275
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/gruWeights_ugv_mv_specialists/best_model.pt
+Epoch [3/200], Train Loss: 0.4784, Validation Loss: 0.4442, Validation F1: 0.2172
+Epoch [4/200], Train Loss: 0.4341, Validation Loss: 0.4179, Validation F1: 0.4008
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/gruWeights_ugv_mv_specialists/best_model.pt
+Epoch [5/200], Train Loss: 0.4181, Validation Loss: 0.4026, Validation F1: 0.2574
+Epoch [6/200], Train Loss: 0.4088, Validation Loss: 0.3989, Validation F1: 0.4160
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/gruWeights_ugv_mv_specialists/best_model.pt
+Epoch [7/200], Train Loss: 0.4035, Validation Loss: 0.4015, Validation F1: 0.3840
+Epoch [8/200], Train Loss: 0.3986, Validation Loss: 0.4039, Validation F1: 0.2775
+Epoch [9/200], Train Loss: 0.3943, Validation Loss: 0.3969, Validation F1: 0.3932
+Epoch [10/200], Train Loss: 0.3913, Validation Loss: 0.3865, Validation F1: 0.2699
+Epoch [11/200], Train Loss: 0.3823, Validation Loss: 0.3821, Validation F1: 0.5042
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/gruWeights_ugv_mv_specialists/best_model.pt
+Epoch [12/200], Train Loss: 0.3683, Validation Loss: 0.3778, Validation F1: 0.5148
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/gruWeights_ugv_mv_specialists/best_model.pt
+Epoch [13/200], Train Loss: 0.3640, Validation Loss: 0.3792, Validation F1: 0.4259
+Epoch [14/200], Train Loss: 0.3609, Validation Loss: 0.3776, Validation F1: 0.4518
+Epoch [15/200], Train Loss: 0.3577, Validation Loss: 0.3747, Validation F1: 0.4884
+Epoch [16/200], Train Loss: 0.3551, Validation Loss: 0.3737, Validation F1: 0.4960
+Epoch [17/200], Train Loss: 0.3527, Validation Loss: 0.3665, Validation F1: 0.5372
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/gruWeights_ugv_mv_specialists/best_model.pt
+Epoch [18/200], Train Loss: 0.3512, Validation Loss: 0.3694, Validation F1: 0.4919
+Epoch [19/200], Train Loss: 0.3483, Validation Loss: 0.3725, Validation F1: 0.5145
+Epoch [20/200], Train Loss: 0.3467, Validation Loss: 0.3775, Validation F1: 0.4801
+Epoch [21/200], Train Loss: 0.3447, Validation Loss: 0.3701, Validation F1: 0.4909
+Epoch [22/200], Train Loss: 0.3425, Validation Loss: 0.3726, Validation F1: 0.4833
+Epoch [23/200], Train Loss: 0.3330, Validation Loss: 0.3464, Validation F1: 0.4419
+Epoch [24/200], Train Loss: 0.3160, Validation Loss: 0.3269, Validation F1: 0.4713
+Epoch [25/200], Train Loss: 0.3080, Validation Loss: 0.3400, Validation F1: 0.4795
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/gruWeights_ugv_mv_specialists/model_epoch_0025.pt
+Epoch [26/200], Train Loss: 0.3033, Validation Loss: 0.3471, Validation F1: 0.4986
+Epoch [27/200], Train Loss: 0.2989, Validation Loss: 0.3443, Validation F1: 0.4670
+Epoch [28/200], Train Loss: 0.2951, Validation Loss: 0.3401, Validation F1: 0.4786
+Epoch [29/200], Train Loss: 0.2928, Validation Loss: 0.3418, Validation F1: 0.4801
+Epoch [30/200], Train Loss: 0.2908, Validation Loss: 0.3252, Validation F1: 0.4955
+Epoch [31/200], Train Loss: 0.2887, Validation Loss: 0.3318, Validation F1: 0.4654
+Epoch [32/200], Train Loss: 0.2871, Validation Loss: 0.3356, Validation F1: 0.4472
+Epoch [33/200], Train Loss: 0.2858, Validation Loss: 0.3414, Validation F1: 0.4923
+Epoch [34/200], Train Loss: 0.2830, Validation Loss: 0.3409, Validation F1: 0.5012
+Epoch [35/200], Train Loss: 0.2813, Validation Loss: 0.3470, Validation F1: 0.5057
+Epoch [36/200], Train Loss: 0.2803, Validation Loss: 0.3400, Validation F1: 0.4928
+Epoch [37/200], Train Loss: 0.2787, Validation Loss: 0.3429, Validation F1: 0.4782
+Epoch [38/200], Train Loss: 0.2782, Validation Loss: 0.3485, Validation F1: 0.5228
+Epoch [39/200], Train Loss: 0.2769, Validation Loss: 0.3339, Validation F1: 0.5296
+Epoch [40/200], Train Loss: 0.2756, Validation Loss: 0.3456, Validation F1: 0.4942
+Epoch [41/200], Train Loss: 0.2742, Validation Loss: 0.3434, Validation F1: 0.5261
+Epoch [42/200], Train Loss: 0.2733, Validation Loss: 0.3390, Validation F1: 0.5047
+Epoch [43/200], Train Loss: 0.2720, Validation Loss: 0.3553, Validation F1: 0.4873
+Epoch [44/200], Train Loss: 0.2708, Validation Loss: 0.3523, Validation F1: 0.5052
+Epoch [45/200], Train Loss: 0.2699, Validation Loss: 0.3532, Validation F1: 0.5174
+Epoch [46/200], Train Loss: 0.2691, Validation Loss: 0.3482, Validation F1: 0.5088
+Epoch [47/200], Train Loss: 0.2682, Validation Loss: 0.3514, Validation F1: 0.5217
+Stopping early: no better validation score for 30 epochs (best at epoch 17).
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/gruWeights_ugv_mv_specialists/final_model.pt
+Best validation F1: 0.5372 at epoch 17.
+Loss history saved to /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/gruWeights_ugv_mv_specialists/loss_history.json
+GRU weights saved to /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/gruWeights_ugv_mv_specialists
+=== best_model.pt ===
+--- GRU val summary (10915 windows) ---
+   windows: TP=2247 FP=3485 FN=387 TN=113946  P=0.392 R=0.853 F1=0.537  clean FPR=0.0297
+   window recall: short 0.75, noise 0.96, constant 0.83
+   event isolation recall: 0.956 of 180 (short 0.93/60, noise 1.00/60, constant 0.93/60)
+   clean time flagged: 0.0297
+   per channel (F1 | event recall | clean time flagged):
+      gps/altitude           0.962 | 1.00 of  16 | 0.0013
+      gps/latitude           0.824 | 1.00 of  15 | 0.0052
+      gps/longitude          0.650 | 1.00 of  16 | 0.0305
+      imu/ax                 0.892 | 0.94 of  18 | 0.0056
+      imu/ay                 0.515 | 1.00 of  17 | 0.0426
+      imu/az                 0.978 | 1.00 of  15 | 0.0009
+      imu/wx                 0.866 | 1.00 of  16 | 0.0049
+      imu/wy                 0.661 | 0.94 of  16 | 0.0181
+      imu/wz                 0.212 | 0.60 of  15 | 0.0127
+      wheel_odom/vx          0.200 | 1.00 of  16 | 0.1180
+      wheel_odom/wz          0.241 | 1.00 of  20 | 0.0867
+--- GRU test summary (1180 windows) ---
+   windows: TP=153 FP=264 FN=42 TN=12521  P=0.367 R=0.785 F1=0.500  clean FPR=0.0206
+   window recall: short 0.73, noise 0.89, constant 0.75
+   event isolation recall: 0.933 of 15 (short 0.80/5, noise 1.00/5, constant 1.00/5)
+   clean time flagged: 0.0206
+   per channel (F1 | event recall | clean time flagged):
+      gps/altitude           0.938 | 1.00 of   2 | 0.0009
+      gps/latitude           0.963 | 1.00 of   1 | 0.0026
+      gps/longitude          0.920 | 1.00 of   3 | 0.0035
+      imu/ax                 0.000 | nan of   0 | 0.0008
+      imu/ay                 0.488 | 1.00 of   1 | 0.0362
+      imu/az                 0.000 | nan of   0 | 0.0034
+      imu/wx                 0.000 | nan of   0 | 0.0025
+      imu/wy                 0.206 | 1.00 of   2 | 0.0452
+      imu/wz                 0.560 | 0.67 of   3 | 0.0121
+      wheel_odom/vx          0.530 | 1.00 of   2 | 0.0241
+      wheel_odom/wz          0.065 | 1.00 of   1 | 0.0956
+--- GRU test_extra summary (9735 windows) ---
+   windows: TP=1984 FP=2193 FN=479 TN=102429  P=0.475 R=0.806 F1=0.598  clean FPR=0.0210
+   window recall: short 0.74, noise 0.97, constant 0.76
+   event isolation recall: 0.927 of 165 (short 0.87/55, noise 1.00/55, constant 0.91/55)
+   clean time flagged: 0.0210
+   per channel (F1 | event recall | clean time flagged):
+      gps/altitude           0.984 | 1.00 of  15 | 0.0010
+      gps/latitude           0.798 | 1.00 of  15 | 0.0023
+      gps/longitude          0.696 | 1.00 of  15 | 0.0040
+      imu/ax                 0.904 | 0.87 of  15 | 0.0015
+      imu/ay                 0.526 | 0.93 of  15 | 0.0353
+      imu/az                 0.897 | 1.00 of  15 | 0.0048
+      imu/wx                 0.932 | 1.00 of  15 | 0.0039
+      imu/wy                 0.506 | 0.87 of  15 | 0.0439
+      imu/wz                 0.359 | 0.53 of  15 | 0.0113
+      wheel_odom/vx          0.433 | 1.00 of  15 | 0.0274
+      wheel_odom/wz          0.241 | 1.00 of  15 | 0.0953
+Scores saved to /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/results/gruWeights_ugv_mv_specialists.json
+
+Done. Run inference with, e.g.:
+    ./bin/python main.py --mode run --model autoencoder

@@ -1,0 +1,73 @@
+Loading UGV fault variants from "/Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/datasets/ugv_faulty" (layout=multivariate, domain=frequency, seq_len=100, paired=True) ...
+    train: 281920 windows -> 66302 faulty (window, channel) pairs
+    val: 10915 windows -> 2634 faulty (window, channel) pairs
+    test: 1180 windows -> 195 faulty (window, channel) pairs
+    test_extra: 9735 windows -> 2463 faulty (window, channel) pairs
+Train: 281920 windows, Val: 10915 windows, feat_dim=15
+   vote member BiLSTM: /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/bilstmWeights_ugv_mv_specialists_freq
+   vote member GRU: /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/gruWeights_ugv_mv_specialists_freq
+   Clean-train reconstruction error p99 per channel (215618 windows):
+      imu/wx                 3.4489e-01
+      imu/wy                 5.4838e-01
+      imu/wz                 1.5979e-02
+      imu/ax                 6.5103e-01
+      imu/ay                 6.1511e-01
+      imu/az                 9.7522e-01
+      wheel_odom/vx          1.1514e-02
+      wheel_odom/wz          1.2886e-02
+      gps/latitude           6.5727e-02
+      gps/longitude          7.6673e-02
+      gps/altitude           4.0924e-01
+   vote member Autoencoder: /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/autoencoderWeights_ugv_mv_specialists_freq
+--- Majority vote (2 of 3) val summary (10915 windows) ---
+   windows: TP=2217 FP=2040 FN=417 TN=115391  P=0.521 R=0.842 F1=0.643  clean FPR=0.0174
+   window recall: short 0.68, noise 0.94, constant 0.83
+   event isolation recall: 0.961 of 180 (short 0.90/60, noise 1.00/60, constant 0.98/60)
+   clean time flagged: 0.0174
+   per channel (F1 | event recall | clean time flagged):
+      gps/altitude           0.968 | 1.00 of  16 | 0.0010
+      gps/latitude           0.853 | 1.00 of  15 | 0.0036
+      gps/longitude          0.845 | 1.00 of  16 | 0.0092
+      imu/ax                 0.634 | 0.94 of  18 | 0.0268
+      imu/ay                 0.484 | 1.00 of  17 | 0.0453
+      imu/az                 0.855 | 1.00 of  15 | 0.0072
+      imu/wx                 0.947 | 1.00 of  16 | 0.0016
+      imu/wy                 0.817 | 0.88 of  16 | 0.0064
+      imu/wz                 0.420 | 0.80 of  15 | 0.0181
+      wheel_odom/vx          0.346 | 1.00 of  16 | 0.0368
+      wheel_odom/wz          0.387 | 0.95 of  20 | 0.0353
+--- Majority vote (2 of 3) test summary (1180 windows) ---
+   windows: TP=133 FP=238 FN=62 TN=12547  P=0.358 R=0.682 F1=0.470  clean FPR=0.0186
+   window recall: short 0.87, noise 0.89, constant 0.57
+   event isolation recall: 0.933 of 15 (short 1.00/5, noise 1.00/5, constant 0.80/5)
+   clean time flagged: 0.0186
+   per channel (F1 | event recall | clean time flagged):
+      gps/altitude           0.909 | 1.00 of   2 | 0.0017
+      gps/latitude           1.000 | 1.00 of   1 | 0.0000
+      gps/longitude          1.000 | 1.00 of   3 | 0.0000
+      imu/ax                 0.000 | nan of   0 | 0.0254
+      imu/ay                 0.384 | 1.00 of   1 | 0.0517
+      imu/az                 0.000 | nan of   0 | 0.0000
+      imu/wx                 0.000 | nan of   0 | 0.0017
+      imu/wy                 0.308 | 1.00 of   2 | 0.0213
+      imu/wz                 0.596 | 1.00 of   3 | 0.0155
+      wheel_odom/vx          0.245 | 0.50 of   2 | 0.0303
+      wheel_odom/wz          0.026 | 1.00 of   1 | 0.0572
+--- Majority vote (2 of 3) test_extra summary (9735 windows) ---
+   windows: TP=1947 FP=1980 FN=516 TN=102642  P=0.496 R=0.790 F1=0.609  clean FPR=0.0189
+   window recall: short 0.67, noise 0.94, constant 0.75
+   event isolation recall: 0.970 of 165 (short 0.93/55, noise 1.00/55, constant 0.98/55)
+   clean time flagged: 0.0189
+   per channel (F1 | event recall | clean time flagged):
+      gps/altitude           0.977 | 1.00 of  15 | 0.0014
+      gps/latitude           0.801 | 1.00 of  15 | 0.0011
+      gps/longitude          0.896 | 1.00 of  15 | 0.0000
+      imu/ax                 0.402 | 0.93 of  15 | 0.0280
+      imu/ay                 0.450 | 1.00 of  15 | 0.0457
+      imu/az                 0.950 | 0.93 of  15 | 0.0008
+      imu/wx                 0.960 | 1.00 of  15 | 0.0022
+      imu/wy                 0.707 | 0.87 of  15 | 0.0174
+      imu/wz                 0.397 | 1.00 of  15 | 0.0184
+      wheel_odom/vx          0.347 | 0.93 of  15 | 0.0291
+      wheel_odom/wz          0.264 | 1.00 of  15 | 0.0638
+Scores saved to /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/results/voteWeights_ugv_mv_specialists_freq.json

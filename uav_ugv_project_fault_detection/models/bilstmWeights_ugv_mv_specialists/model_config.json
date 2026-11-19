@@ -1,0 +1,42 @@
+{
+  "readout": "full",
+  "window_len": 100,
+  "specialists": {
+    "bilstm_hidden": 15,
+    "gru_hidden": 15,
+    "ae_hidden": 128,
+    "ae_bottleneck": 4
+  },
+  "layout": "multivariate",
+  "seq_len": 100,
+  "features": [
+    "imu_wx",
+    "imu_wy",
+    "imu_wz",
+    "imu_ax",
+    "imu_ay",
+    "imu_az",
+    "wheel_vx",
+    "wheel_wz",
+    "gps_east",
+    "gps_north",
+    "gps_up",
+    "odom_east",
+    "odom_north",
+    "cmd_linear",
+    "cmd_angular"
+  ],
+  "targets": [
+    "imu/wx",
+    "imu/wy",
+    "imu/wz",
+    "imu/ax",
+    "imu/ay",
+    "imu/az",
+    "wheel_odom/vx",
+    "wheel_odom/wz",
+    "gps/latitude",
+    "gps/longitude",
+    "gps/altitude"
+  ]
+}

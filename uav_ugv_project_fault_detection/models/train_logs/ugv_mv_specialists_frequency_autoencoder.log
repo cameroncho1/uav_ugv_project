@@ -1,0 +1,193 @@
+Loading UGV fault variants from "/Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/datasets/ugv_faulty" (layout=multivariate, domain=frequency, seq_len=100, paired=True) ...
+    train: 281920 windows -> 66302 faulty (window, channel) pairs
+    val: 10915 windows -> 2634 faulty (window, channel) pairs
+    test: 1180 windows -> 195 faulty (window, channel) pairs
+    test_extra: 9735 windows -> 2463 faulty (window, channel) pairs
+Train: 281920 windows, Val: 10915 windows, feat_dim=15
+
+=== Training Autoencoder ===
+   Autoencoder specialists: 11 per-channel networks, 81,697 parameters
+TensorBoard run: /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/runs/ugv_mv_specialists_autoencoder_frequency_20261118-220641
+Epoch [1/300], Train Loss: 0.2351, Validation Loss: 0.0591
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/autoencoderWeights_ugv_mv_specialists_freq/best_model.pt
+Epoch [2/300], Train Loss: 0.0550, Validation Loss: 0.0453
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/autoencoderWeights_ugv_mv_specialists_freq/best_model.pt
+Epoch [3/300], Train Loss: 0.0478, Validation Loss: 0.0429
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/autoencoderWeights_ugv_mv_specialists_freq/best_model.pt
+Epoch [4/300], Train Loss: 0.0456, Validation Loss: 0.0413
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/autoencoderWeights_ugv_mv_specialists_freq/best_model.pt
+Epoch [5/300], Train Loss: 0.0443, Validation Loss: 0.0406
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/autoencoderWeights_ugv_mv_specialists_freq/best_model.pt
+Epoch [6/300], Train Loss: 0.0437, Validation Loss: 0.0401
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/autoencoderWeights_ugv_mv_specialists_freq/best_model.pt
+Epoch [7/300], Train Loss: 0.0434, Validation Loss: 0.0399
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/autoencoderWeights_ugv_mv_specialists_freq/best_model.pt
+Epoch [8/300], Train Loss: 0.0433, Validation Loss: 0.0398
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/autoencoderWeights_ugv_mv_specialists_freq/best_model.pt
+Epoch [9/300], Train Loss: 0.0432, Validation Loss: 0.0398
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/autoencoderWeights_ugv_mv_specialists_freq/best_model.pt
+Epoch [10/300], Train Loss: 0.0431, Validation Loss: 0.0397
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/autoencoderWeights_ugv_mv_specialists_freq/best_model.pt
+Epoch [11/300], Train Loss: 0.0430, Validation Loss: 0.0396
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/autoencoderWeights_ugv_mv_specialists_freq/best_model.pt
+Epoch [12/300], Train Loss: 0.0430, Validation Loss: 0.0396
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/autoencoderWeights_ugv_mv_specialists_freq/best_model.pt
+Epoch [13/300], Train Loss: 0.0429, Validation Loss: 0.0396
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/autoencoderWeights_ugv_mv_specialists_freq/best_model.pt
+Epoch [14/300], Train Loss: 0.0429, Validation Loss: 0.0396
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/autoencoderWeights_ugv_mv_specialists_freq/best_model.pt
+Epoch [15/300], Train Loss: 0.0429, Validation Loss: 0.0395
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/autoencoderWeights_ugv_mv_specialists_freq/best_model.pt
+Epoch [16/300], Train Loss: 0.0428, Validation Loss: 0.0396
+Epoch [17/300], Train Loss: 0.0428, Validation Loss: 0.0395
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/autoencoderWeights_ugv_mv_specialists_freq/best_model.pt
+Epoch [18/300], Train Loss: 0.0428, Validation Loss: 0.0395
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/autoencoderWeights_ugv_mv_specialists_freq/best_model.pt
+Epoch [19/300], Train Loss: 0.0427, Validation Loss: 0.0395
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/autoencoderWeights_ugv_mv_specialists_freq/best_model.pt
+Epoch [20/300], Train Loss: 0.0427, Validation Loss: 0.0395
+Epoch [21/300], Train Loss: 0.0427, Validation Loss: 0.0394
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/autoencoderWeights_ugv_mv_specialists_freq/best_model.pt
+Epoch [22/300], Train Loss: 0.0427, Validation Loss: 0.0394
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/autoencoderWeights_ugv_mv_specialists_freq/best_model.pt
+Epoch [23/300], Train Loss: 0.0427, Validation Loss: 0.0395
+Epoch [24/300], Train Loss: 0.0427, Validation Loss: 0.0394
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/autoencoderWeights_ugv_mv_specialists_freq/best_model.pt
+Epoch [25/300], Train Loss: 0.0427, Validation Loss: 0.0394
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/autoencoderWeights_ugv_mv_specialists_freq/model_epoch_0025.pt
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/autoencoderWeights_ugv_mv_specialists_freq/best_model.pt
+Epoch [26/300], Train Loss: 0.0427, Validation Loss: 0.0394
+Epoch [27/300], Train Loss: 0.0427, Validation Loss: 0.0394
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/autoencoderWeights_ugv_mv_specialists_freq/best_model.pt
+Epoch [28/300], Train Loss: 0.0427, Validation Loss: 0.0394
+Epoch [29/300], Train Loss: 0.0427, Validation Loss: 0.0395
+Epoch [30/300], Train Loss: 0.0427, Validation Loss: 0.0394
+Epoch [31/300], Train Loss: 0.0427, Validation Loss: 0.0395
+Epoch [32/300], Train Loss: 0.0427, Validation Loss: 0.0394
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/autoencoderWeights_ugv_mv_specialists_freq/best_model.pt
+Epoch [33/300], Train Loss: 0.0427, Validation Loss: 0.0394
+Epoch [34/300], Train Loss: 0.0427, Validation Loss: 0.0394
+Epoch [35/300], Train Loss: 0.0427, Validation Loss: 0.0395
+Epoch [36/300], Train Loss: 0.0427, Validation Loss: 0.0394
+Epoch [37/300], Train Loss: 0.0427, Validation Loss: 0.0394
+Epoch [38/300], Train Loss: 0.0427, Validation Loss: 0.0394
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/autoencoderWeights_ugv_mv_specialists_freq/best_model.pt
+Epoch [39/300], Train Loss: 0.0427, Validation Loss: 0.0394
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/autoencoderWeights_ugv_mv_specialists_freq/best_model.pt
+Epoch [40/300], Train Loss: 0.0427, Validation Loss: 0.0394
+Epoch [41/300], Train Loss: 0.0427, Validation Loss: 0.0394
+Epoch [42/300], Train Loss: 0.0427, Validation Loss: 0.0394
+Epoch [43/300], Train Loss: 0.0427, Validation Loss: 0.0394
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/autoencoderWeights_ugv_mv_specialists_freq/best_model.pt
+Epoch [44/300], Train Loss: 0.0427, Validation Loss: 0.0394
+Epoch [45/300], Train Loss: 0.0427, Validation Loss: 0.0394
+Epoch [46/300], Train Loss: 0.0427, Validation Loss: 0.0394
+Epoch [47/300], Train Loss: 0.0427, Validation Loss: 0.0394
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/autoencoderWeights_ugv_mv_specialists_freq/best_model.pt
+Epoch [48/300], Train Loss: 0.0427, Validation Loss: 0.0394
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/autoencoderWeights_ugv_mv_specialists_freq/best_model.pt
+Epoch [49/300], Train Loss: 0.0427, Validation Loss: 0.0394
+Epoch [50/300], Train Loss: 0.0427, Validation Loss: 0.0394
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/autoencoderWeights_ugv_mv_specialists_freq/model_epoch_0050.pt
+Epoch [51/300], Train Loss: 0.0427, Validation Loss: 0.0394
+Epoch [52/300], Train Loss: 0.0427, Validation Loss: 0.0394
+Epoch [53/300], Train Loss: 0.0427, Validation Loss: 0.0394
+Epoch [54/300], Train Loss: 0.0427, Validation Loss: 0.0394
+Epoch [55/300], Train Loss: 0.0427, Validation Loss: 0.0394
+Epoch [56/300], Train Loss: 0.0427, Validation Loss: 0.0394
+Epoch [57/300], Train Loss: 0.0427, Validation Loss: 0.0394
+Epoch [58/300], Train Loss: 0.0427, Validation Loss: 0.0394
+Epoch [59/300], Train Loss: 0.0427, Validation Loss: 0.0394
+Epoch [60/300], Train Loss: 0.0427, Validation Loss: 0.0394
+Epoch [61/300], Train Loss: 0.0427, Validation Loss: 0.0394
+Epoch [62/300], Train Loss: 0.0427, Validation Loss: 0.0394
+Epoch [63/300], Train Loss: 0.0427, Validation Loss: 0.0394
+Epoch [64/300], Train Loss: 0.0427, Validation Loss: 0.0394
+Epoch [65/300], Train Loss: 0.0427, Validation Loss: 0.0394
+Epoch [66/300], Train Loss: 0.0427, Validation Loss: 0.0394
+Epoch [67/300], Train Loss: 0.0427, Validation Loss: 0.0394
+Epoch [68/300], Train Loss: 0.0427, Validation Loss: 0.0394
+Epoch [69/300], Train Loss: 0.0427, Validation Loss: 0.0394
+Epoch [70/300], Train Loss: 0.0427, Validation Loss: 0.0395
+Epoch [71/300], Train Loss: 0.0427, Validation Loss: 0.0394
+Epoch [72/300], Train Loss: 0.0427, Validation Loss: 0.0394
+Epoch [73/300], Train Loss: 0.0427, Validation Loss: 0.0394
+Epoch [74/300], Train Loss: 0.0427, Validation Loss: 0.0394
+Epoch [75/300], Train Loss: 0.0427, Validation Loss: 0.0394
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/autoencoderWeights_ugv_mv_specialists_freq/model_epoch_0075.pt
+Epoch [76/300], Train Loss: 0.0427, Validation Loss: 0.0394
+Epoch [77/300], Train Loss: 0.0427, Validation Loss: 0.0394
+Epoch [78/300], Train Loss: 0.0427, Validation Loss: 0.0394
+Stopping early: no better validation score for 30 epochs (best at epoch 48).
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/autoencoderWeights_ugv_mv_specialists_freq/final_model.pt
+Best validation loss: 0.0394 at epoch 48.
+Loss history saved to /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/autoencoderWeights_ugv_mv_specialists_freq/loss_history.json
+Autoencoder weights saved to /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/autoencoderWeights_ugv_mv_specialists_freq
+   Clean-train reconstruction error p99 per channel (215618 windows):
+      imu/wx                 3.4489e-01
+      imu/wy                 5.4838e-01
+      imu/wz                 1.5979e-02
+      imu/ax                 6.5103e-01
+      imu/ay                 6.1511e-01
+      imu/az                 9.7522e-01
+      wheel_odom/vx          1.1514e-02
+      wheel_odom/wz          1.2886e-02
+      gps/latitude           6.5727e-02
+      gps/longitude          7.6673e-02
+      gps/altitude           4.0924e-01
+=== best_model.pt ===
+--- Autoencoder val summary (10915 windows) ---
+   windows: TP=1162 FP=706 FN=1472 TN=116725  P=0.622 R=0.441 F1=0.516  clean FPR=0.0060
+   window recall: short 0.41, noise 0.64, constant 0.38
+   event isolation recall: 0.644 of 180 (short 0.47/60, noise 0.83/60, constant 0.63/60)
+   clean time flagged: 0.0060
+   per channel (F1 | event recall | clean time flagged):
+      gps/altitude           0.660 | 1.00 of  16 | 0.0097
+      gps/latitude           0.344 | 0.93 of  15 | 0.0111
+      gps/longitude          0.286 | 0.81 of  16 | 0.0103
+      imu/ax                 0.591 | 0.44 of  18 | 0.0034
+      imu/ay                 0.191 | 0.35 of  17 | 0.0060
+      imu/az                 0.757 | 0.47 of  15 | 0.0061
+      imu/wx                 0.778 | 1.00 of  16 | 0.0095
+      imu/wy                 0.880 | 0.75 of  16 | 0.0027
+      imu/wz                 0.041 | 0.20 of  15 | 0.0000
+      wheel_odom/vx          0.396 | 0.75 of  16 | 0.0073
+      wheel_odom/wz          0.284 | 0.45 of  20 | 0.0000
+--- Autoencoder test summary (1180 windows) ---
+   windows: TP=38 FP=92 FN=157 TN=12693  P=0.292 R=0.195 F1=0.234  clean FPR=0.0072
+   window recall: short 0.53, noise 0.54, constant 0.01
+   event isolation recall: 0.533 of 15 (short 0.80/5, noise 0.60/5, constant 0.20/5)
+   clean time flagged: 0.0072
+   per channel (F1 | event recall | clean time flagged):
+      gps/altitude           0.545 | 1.00 of   2 | 0.0137
+      gps/latitude           0.000 | 0.00 of   1 | 0.0070
+      gps/longitude          0.691 | 1.00 of   3 | 0.0112
+      imu/ax                 0.000 | nan of   0 | 0.0068
+      imu/ay                 0.000 | 0.00 of   1 | 0.0000
+      imu/az                 0.000 | nan of   0 | 0.0110
+      imu/wx                 0.000 | nan of   0 | 0.0110
+      imu/wy                 0.500 | 1.00 of   2 | 0.0085
+      imu/wz                 0.000 | 0.00 of   3 | 0.0035
+      wheel_odom/vx          0.031 | 0.50 of   2 | 0.0036
+      wheel_odom/wz          0.000 | 0.00 of   1 | 0.0026
+--- Autoencoder test_extra summary (9735 windows) ---
+   windows: TP=1111 FP=760 FN=1352 TN=103862  P=0.594 R=0.451 F1=0.513  clean FPR=0.0073
+   window recall: short 0.39, noise 0.64, constant 0.39
+   event isolation recall: 0.612 of 165 (short 0.47/55, noise 0.82/55, constant 0.55/55)
+   clean time flagged: 0.0073
+   per channel (F1 | event recall | clean time flagged):
+      gps/altitude           0.621 | 1.00 of  15 | 0.0103
+      gps/latitude           0.315 | 0.80 of  15 | 0.0121
+      gps/longitude          0.277 | 0.73 of  15 | 0.0092
+      imu/ax                 0.235 | 0.27 of  15 | 0.0069
+      imu/ay                 0.253 | 0.27 of  15 | 0.0014
+      imu/az                 0.682 | 0.67 of  15 | 0.0118
+      imu/wx                 0.801 | 1.00 of  15 | 0.0136
+      imu/wy                 0.832 | 0.67 of  15 | 0.0068
+      imu/wz                 0.010 | 0.07 of  15 | 0.0033
+      wheel_odom/vx          0.408 | 0.87 of  15 | 0.0030
+      wheel_odom/wz          0.304 | 0.40 of  15 | 0.0015
+Scores saved to /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/results/autoencoderWeights_ugv_mv_specialists_freq.json
+
+Done. Run inference with, e.g.:
+    ./bin/python main.py --mode run --model autoencoder

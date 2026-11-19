@@ -1,0 +1,812 @@
+Loading UGV fault variants from "/Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/datasets/ugv_faulty" (layout=multivariate, domain=time, seq_len=100, paired=True) ...
+    train: 126160 windows -> 27573 faulty (window, channel) pairs
+    val: 1180 windows -> 194 faulty (window, channel) pairs
+    test: 1180 windows -> 195 faulty (window, channel) pairs
+    test_extra: 9735 windows -> 2463 faulty (window, channel) pairs
+Train: 126160 windows, Val: 1180 windows, feat_dim=15
+
+=== Training BiLSTM ===
+   Positive weights (clean / faulty windows per channel): imu/wx=94, imu/wy=161, imu/wz=56, imu/ax=56, imu/ay=56, imu/az=75, wheel_odom/vx=19, wheel_odom/wz=41, gps/latitude=36, gps/longitude=41, gps/altitude=85
+TensorBoard run: /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/runs/ugv_mv_bilstm_time_20261118-133615
+Epoch [1/700], Train Loss: 0.9008, Validation Loss: 1.1748, Validation F1: 0.0815
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/bilstmWeights_ugv_mv/best_model.pt
+Epoch [2/700], Train Loss: 0.6644, Validation Loss: 0.9546, Validation F1: 0.1163
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/bilstmWeights_ugv_mv/best_model.pt
+Epoch [3/700], Train Loss: 0.5936, Validation Loss: 1.3948, Validation F1: 0.1325
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/bilstmWeights_ugv_mv/best_model.pt
+Epoch [4/700], Train Loss: 0.5605, Validation Loss: 1.1839, Validation F1: 0.1712
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/bilstmWeights_ugv_mv/best_model.pt
+Epoch [5/700], Train Loss: 0.4807, Validation Loss: 0.9276, Validation F1: 0.2363
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/bilstmWeights_ugv_mv/best_model.pt
+Epoch [6/700], Train Loss: 0.3792, Validation Loss: 1.1428, Validation F1: 0.2724
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/bilstmWeights_ugv_mv/best_model.pt
+Epoch [7/700], Train Loss: 0.3293, Validation Loss: 1.0319, Validation F1: 0.3254
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/bilstmWeights_ugv_mv/best_model.pt
+Epoch [8/700], Train Loss: 0.2948, Validation Loss: 1.4533, Validation F1: 0.2473
+Epoch [9/700], Train Loss: 0.3068, Validation Loss: 1.0173, Validation F1: 0.3656
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/bilstmWeights_ugv_mv/best_model.pt
+Epoch [10/700], Train Loss: 0.2703, Validation Loss: 1.0525, Validation F1: 0.2523
+Epoch [11/700], Train Loss: 0.2529, Validation Loss: 1.0845, Validation F1: 0.3508
+Epoch [12/700], Train Loss: 0.2526, Validation Loss: 0.8306, Validation F1: 0.2649
+Epoch [13/700], Train Loss: 0.2643, Validation Loss: 1.3750, Validation F1: 0.2009
+Epoch [14/700], Train Loss: 0.2579, Validation Loss: 1.5240, Validation F1: 0.2693
+Epoch [15/700], Train Loss: 0.2360, Validation Loss: 1.2067, Validation F1: 0.2785
+Epoch [16/700], Train Loss: 0.2194, Validation Loss: 0.9280, Validation F1: 0.3892
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/bilstmWeights_ugv_mv/best_model.pt
+Epoch [17/700], Train Loss: 0.2095, Validation Loss: 1.2749, Validation F1: 0.3766
+Epoch [18/700], Train Loss: 0.1991, Validation Loss: 0.7381, Validation F1: 0.4650
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/bilstmWeights_ugv_mv/best_model.pt
+Epoch [19/700], Train Loss: 0.1876, Validation Loss: 1.0239, Validation F1: 0.3183
+Epoch [20/700], Train Loss: 0.1775, Validation Loss: 0.9402, Validation F1: 0.4452
+Epoch [21/700], Train Loss: 0.1734, Validation Loss: 0.8578, Validation F1: 0.3546
+Epoch [22/700], Train Loss: 0.1712, Validation Loss: 0.9422, Validation F1: 0.4635
+Epoch [23/700], Train Loss: 0.1663, Validation Loss: 1.0636, Validation F1: 0.4168
+Epoch [24/700], Train Loss: 0.1370, Validation Loss: 1.0621, Validation F1: 0.4658
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/bilstmWeights_ugv_mv/best_model.pt
+Epoch [25/700], Train Loss: 0.1204, Validation Loss: 1.0909, Validation F1: 0.4684
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/bilstmWeights_ugv_mv/best_model.pt
+Epoch [26/700], Train Loss: 0.1113, Validation Loss: 0.9545, Validation F1: 0.4197
+Epoch [27/700], Train Loss: 0.1008, Validation Loss: 1.2419, Validation F1: 0.5714
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/bilstmWeights_ugv_mv/best_model.pt
+Epoch [28/700], Train Loss: 0.0975, Validation Loss: 0.9785, Validation F1: 0.5913
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/bilstmWeights_ugv_mv/best_model.pt
+Epoch [29/700], Train Loss: 0.0940, Validation Loss: 1.1270, Validation F1: 0.5076
+Epoch [30/700], Train Loss: 0.0855, Validation Loss: 1.0515, Validation F1: 0.6009
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/bilstmWeights_ugv_mv/best_model.pt
+Epoch [31/700], Train Loss: 0.0778, Validation Loss: 1.1848, Validation F1: 0.5593
+Epoch [32/700], Train Loss: 0.0694, Validation Loss: 1.0060, Validation F1: 0.6074
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/bilstmWeights_ugv_mv/best_model.pt
+Epoch [33/700], Train Loss: 0.0700, Validation Loss: 1.0225, Validation F1: 0.6221
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/bilstmWeights_ugv_mv/best_model.pt
+Epoch [34/700], Train Loss: 0.0590, Validation Loss: 0.9697, Validation F1: 0.6573
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/bilstmWeights_ugv_mv/best_model.pt
+Epoch [35/700], Train Loss: 0.0573, Validation Loss: 1.3868, Validation F1: 0.6392
+Epoch [36/700], Train Loss: 0.0591, Validation Loss: 1.3043, Validation F1: 0.6099
+Epoch [37/700], Train Loss: 0.0580, Validation Loss: 1.4066, Validation F1: 0.5805
+Epoch [38/700], Train Loss: 0.0486, Validation Loss: 1.1648, Validation F1: 0.6301
+Epoch [39/700], Train Loss: 0.0465, Validation Loss: 1.0455, Validation F1: 0.6147
+Epoch [40/700], Train Loss: 0.0499, Validation Loss: 1.0663, Validation F1: 0.6223
+Epoch [41/700], Train Loss: 0.0487, Validation Loss: 1.1823, Validation F1: 0.6490
+Epoch [42/700], Train Loss: 0.0431, Validation Loss: 1.3430, Validation F1: 0.6520
+Epoch [43/700], Train Loss: 0.0405, Validation Loss: 1.3333, Validation F1: 0.6079
+Epoch [44/700], Train Loss: 0.0410, Validation Loss: 1.3506, Validation F1: 0.6275
+Epoch [45/700], Train Loss: 0.0321, Validation Loss: 1.6313, Validation F1: 0.6583
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/bilstmWeights_ugv_mv/best_model.pt
+Epoch [46/700], Train Loss: 0.0319, Validation Loss: 1.1784, Validation F1: 0.7287
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/bilstmWeights_ugv_mv/best_model.pt
+Epoch [47/700], Train Loss: 0.0280, Validation Loss: 1.3502, Validation F1: 0.6985
+Epoch [48/700], Train Loss: 0.0306, Validation Loss: 1.3672, Validation F1: 0.6863
+Epoch [49/700], Train Loss: 0.0388, Validation Loss: 1.4831, Validation F1: 0.6579
+Epoch [50/700], Train Loss: 0.0333, Validation Loss: 1.6664, Validation F1: 0.6650
+Epoch [51/700], Train Loss: 0.0293, Validation Loss: 1.8064, Validation F1: 0.7102
+Epoch [52/700], Train Loss: 0.0269, Validation Loss: 1.6546, Validation F1: 0.6927
+Epoch [53/700], Train Loss: 0.0243, Validation Loss: 1.5551, Validation F1: 0.7047
+Epoch [54/700], Train Loss: 0.0269, Validation Loss: 2.0259, Validation F1: 0.6321
+Epoch [55/700], Train Loss: 0.0237, Validation Loss: 1.3407, Validation F1: 0.6715
+Epoch [56/700], Train Loss: 0.0275, Validation Loss: 1.0926, Validation F1: 0.6821
+Epoch [57/700], Train Loss: 0.0259, Validation Loss: 1.2458, Validation F1: 0.6948
+Epoch [58/700], Train Loss: 0.0216, Validation Loss: 1.1033, Validation F1: 0.6792
+Epoch [59/700], Train Loss: 0.0186, Validation Loss: 1.1520, Validation F1: 0.7129
+Epoch [60/700], Train Loss: 0.0198, Validation Loss: 1.6004, Validation F1: 0.7010
+Epoch [61/700], Train Loss: 0.0313, Validation Loss: 1.6145, Validation F1: 0.6982
+Epoch [62/700], Train Loss: 0.0160, Validation Loss: 1.5328, Validation F1: 0.7263
+Epoch [63/700], Train Loss: 0.0148, Validation Loss: 1.4868, Validation F1: 0.7322
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/bilstmWeights_ugv_mv/best_model.pt
+Epoch [64/700], Train Loss: 0.0162, Validation Loss: 2.1858, Validation F1: 0.6196
+Epoch [65/700], Train Loss: 0.0227, Validation Loss: 1.8939, Validation F1: 0.6614
+Epoch [66/700], Train Loss: 0.0148, Validation Loss: 1.9407, Validation F1: 0.6898
+Epoch [67/700], Train Loss: 0.0205, Validation Loss: 2.3390, Validation F1: 0.6545
+Epoch [68/700], Train Loss: 0.0193, Validation Loss: 2.0066, Validation F1: 0.6649
+Epoch [69/700], Train Loss: 0.0133, Validation Loss: 2.2354, Validation F1: 0.6883
+Epoch [70/700], Train Loss: 0.0188, Validation Loss: 1.5648, Validation F1: 0.6151
+Epoch [71/700], Train Loss: 0.0270, Validation Loss: 1.8408, Validation F1: 0.6966
+Epoch [72/700], Train Loss: 0.0195, Validation Loss: 1.9083, Validation F1: 0.7225
+Epoch [73/700], Train Loss: 0.0109, Validation Loss: 2.0536, Validation F1: 0.6632
+Epoch [74/700], Train Loss: 0.0190, Validation Loss: 2.0857, Validation F1: 0.6702
+Epoch [75/700], Train Loss: 0.0174, Validation Loss: 2.0839, Validation F1: 0.6870
+Epoch [76/700], Train Loss: 0.0088, Validation Loss: 2.1619, Validation F1: 0.7151
+Epoch [77/700], Train Loss: 0.0141, Validation Loss: 2.3482, Validation F1: 0.6757
+Epoch [78/700], Train Loss: 0.0151, Validation Loss: 2.0040, Validation F1: 0.7011
+Epoch [79/700], Train Loss: 0.0087, Validation Loss: 2.6095, Validation F1: 0.6957
+Epoch [80/700], Train Loss: 0.0253, Validation Loss: 2.1021, Validation F1: 0.6781
+Epoch [81/700], Train Loss: 0.0138, Validation Loss: 2.5395, Validation F1: 0.7011
+Epoch [82/700], Train Loss: 0.0072, Validation Loss: 2.2980, Validation F1: 0.7303
+Epoch [83/700], Train Loss: 0.0076, Validation Loss: 2.6058, Validation F1: 0.7000
+Epoch [84/700], Train Loss: 0.0179, Validation Loss: 2.2775, Validation F1: 0.6838
+Epoch [85/700], Train Loss: 0.0119, Validation Loss: 2.2551, Validation F1: 0.7167
+Epoch [86/700], Train Loss: 0.0073, Validation Loss: 2.9342, Validation F1: 0.6817
+Epoch [87/700], Train Loss: 0.0190, Validation Loss: 2.1467, Validation F1: 0.7019
+Epoch [88/700], Train Loss: 0.0115, Validation Loss: 2.2677, Validation F1: 0.7000
+Epoch [89/700], Train Loss: 0.0043, Validation Loss: 2.5946, Validation F1: 0.7273
+Epoch [90/700], Train Loss: 0.0088, Validation Loss: 2.3291, Validation F1: 0.7135
+Epoch [91/700], Train Loss: 0.0158, Validation Loss: 1.9151, Validation F1: 0.6754
+Epoch [92/700], Train Loss: 0.0136, Validation Loss: 1.7226, Validation F1: 0.6667
+Epoch [93/700], Train Loss: 0.0107, Validation Loss: 2.1023, Validation F1: 0.7377
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/bilstmWeights_ugv_mv/best_model.pt
+Epoch [94/700], Train Loss: 0.0109, Validation Loss: 2.0113, Validation F1: 0.6684
+Epoch [95/700], Train Loss: 0.0199, Validation Loss: 2.3056, Validation F1: 0.6891
+Epoch [96/700], Train Loss: 0.0086, Validation Loss: 2.6672, Validation F1: 0.7278
+Epoch [97/700], Train Loss: 0.0030, Validation Loss: 2.7014, Validation F1: 0.7147
+Epoch [98/700], Train Loss: 0.0017, Validation Loss: 2.7230, Validation F1: 0.7152
+Epoch [99/700], Train Loss: 0.0014, Validation Loss: 2.7597, Validation F1: 0.7262
+Epoch [100/700], Train Loss: 0.0230, Validation Loss: 2.1650, Validation F1: 0.6268
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/bilstmWeights_ugv_mv/model_epoch_0100.pt
+Epoch [101/700], Train Loss: 0.0207, Validation Loss: 2.4771, Validation F1: 0.6989
+Epoch [102/700], Train Loss: 0.0066, Validation Loss: 2.5918, Validation F1: 0.7227
+Epoch [103/700], Train Loss: 0.0035, Validation Loss: 2.5485, Validation F1: 0.7378
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/bilstmWeights_ugv_mv/best_model.pt
+Epoch [104/700], Train Loss: 0.0022, Validation Loss: 2.6772, Validation F1: 0.7440
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/bilstmWeights_ugv_mv/best_model.pt
+Epoch [105/700], Train Loss: 0.0029, Validation Loss: 2.5965, Validation F1: 0.7122
+Epoch [106/700], Train Loss: 0.0192, Validation Loss: 2.1582, Validation F1: 0.6868
+Epoch [107/700], Train Loss: 0.0098, Validation Loss: 2.1660, Validation F1: 0.7471
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/bilstmWeights_ugv_mv/best_model.pt
+Epoch [108/700], Train Loss: 0.0046, Validation Loss: 2.2530, Validation F1: 0.7310
+Epoch [109/700], Train Loss: 0.0098, Validation Loss: 2.3069, Validation F1: 0.6789
+Epoch [110/700], Train Loss: 0.0209, Validation Loss: 2.7549, Validation F1: 0.6761
+Epoch [111/700], Train Loss: 0.0085, Validation Loss: 2.3613, Validation F1: 0.6801
+Epoch [112/700], Train Loss: 0.0045, Validation Loss: 2.1445, Validation F1: 0.7293
+Epoch [113/700], Train Loss: 0.0018, Validation Loss: 2.3465, Validation F1: 0.7294
+Epoch [114/700], Train Loss: 0.0012, Validation Loss: 2.4502, Validation F1: 0.7326
+Epoch [115/700], Train Loss: 0.0009, Validation Loss: 2.5776, Validation F1: 0.7294
+Epoch [116/700], Train Loss: 0.0008, Validation Loss: 2.5822, Validation F1: 0.7353
+Epoch [117/700], Train Loss: 0.0259, Validation Loss: 1.9968, Validation F1: 0.6234
+Epoch [118/700], Train Loss: 0.0142, Validation Loss: 2.1691, Validation F1: 0.7313
+Epoch [119/700], Train Loss: 0.0067, Validation Loss: 2.1024, Validation F1: 0.7466
+Epoch [120/700], Train Loss: 0.0074, Validation Loss: 2.0328, Validation F1: 0.7397
+Epoch [121/700], Train Loss: 0.0023, Validation Loss: 2.2887, Validation F1: 0.7425
+Epoch [122/700], Train Loss: 0.0029, Validation Loss: 2.1472, Validation F1: 0.7209
+Epoch [123/700], Train Loss: 0.0286, Validation Loss: 2.0188, Validation F1: 0.7411
+Epoch [124/700], Train Loss: 0.0089, Validation Loss: 1.9793, Validation F1: 0.7360
+Epoch [125/700], Train Loss: 0.0077, Validation Loss: 1.8155, Validation F1: 0.7606
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/bilstmWeights_ugv_mv/best_model.pt
+Epoch [126/700], Train Loss: 0.0070, Validation Loss: 2.2246, Validation F1: 0.7345
+Epoch [127/700], Train Loss: 0.0022, Validation Loss: 2.4222, Validation F1: 0.7566
+Epoch [128/700], Train Loss: 0.0011, Validation Loss: 2.2219, Validation F1: 0.7536
+Epoch [129/700], Train Loss: 0.0007, Validation Loss: 2.3691, Validation F1: 0.7522
+Epoch [130/700], Train Loss: 0.0005, Validation Loss: 2.3798, Validation F1: 0.7594
+Epoch [131/700], Train Loss: 0.0156, Validation Loss: 2.1759, Validation F1: 0.7087
+Epoch [132/700], Train Loss: 0.0139, Validation Loss: 2.0506, Validation F1: 0.7577
+Epoch [133/700], Train Loss: 0.0050, Validation Loss: 1.9651, Validation F1: 0.7654
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/bilstmWeights_ugv_mv/best_model.pt
+Epoch [134/700], Train Loss: 0.0022, Validation Loss: 2.0450, Validation F1: 0.7549
+Epoch [135/700], Train Loss: 0.0074, Validation Loss: 1.6599, Validation F1: 0.6619
+Epoch [136/700], Train Loss: 0.0111, Validation Loss: 2.0432, Validation F1: 0.7249
+Epoch [137/700], Train Loss: 0.0087, Validation Loss: 1.9105, Validation F1: 0.7592
+Epoch [138/700], Train Loss: 0.0022, Validation Loss: 1.7463, Validation F1: 0.7684
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/bilstmWeights_ugv_mv/best_model.pt
+Epoch [139/700], Train Loss: 0.0015, Validation Loss: 2.0893, Validation F1: 0.7586
+Epoch [140/700], Train Loss: 0.0008, Validation Loss: 2.2168, Validation F1: 0.7544
+Epoch [141/700], Train Loss: 0.0005, Validation Loss: 2.1785, Validation F1: 0.7666
+Epoch [142/700], Train Loss: 0.0003, Validation Loss: 2.2396, Validation F1: 0.7544
+Epoch [143/700], Train Loss: 0.0003, Validation Loss: 2.3264, Validation F1: 0.7580
+Epoch [144/700], Train Loss: 0.0002, Validation Loss: 2.3768, Validation F1: 0.7522
+Epoch [145/700], Train Loss: 0.0397, Validation Loss: 2.3702, Validation F1: 0.6505
+Epoch [146/700], Train Loss: 0.0130, Validation Loss: 2.0843, Validation F1: 0.6908
+Epoch [147/700], Train Loss: 0.0055, Validation Loss: 2.1809, Validation F1: 0.7049
+Epoch [148/700], Train Loss: 0.0026, Validation Loss: 2.4928, Validation F1: 0.6988
+Epoch [149/700], Train Loss: 0.0011, Validation Loss: 2.4115, Validation F1: 0.7027
+Epoch [150/700], Train Loss: 0.0007, Validation Loss: 2.5054, Validation F1: 0.7048
+Epoch [151/700], Train Loss: 0.0005, Validation Loss: 2.6123, Validation F1: 0.7069
+Epoch [152/700], Train Loss: 0.0049, Validation Loss: 2.6820, Validation F1: 0.6455
+Epoch [153/700], Train Loss: 0.0219, Validation Loss: 1.5069, Validation F1: 0.7720
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/bilstmWeights_ugv_mv/best_model.pt
+Epoch [154/700], Train Loss: 0.0063, Validation Loss: 1.7418, Validation F1: 0.7572
+Epoch [155/700], Train Loss: 0.0017, Validation Loss: 1.7290, Validation F1: 0.7688
+Epoch [156/700], Train Loss: 0.0010, Validation Loss: 1.7339, Validation F1: 0.7759
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/bilstmWeights_ugv_mv/best_model.pt
+Epoch [157/700], Train Loss: 0.0005, Validation Loss: 1.8258, Validation F1: 0.7791
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/bilstmWeights_ugv_mv/best_model.pt
+Epoch [158/700], Train Loss: 0.0004, Validation Loss: 1.8383, Validation F1: 0.7791
+Epoch [159/700], Train Loss: 0.0003, Validation Loss: 1.9289, Validation F1: 0.7719
+Epoch [160/700], Train Loss: 0.0002, Validation Loss: 1.9690, Validation F1: 0.7661
+Epoch [161/700], Train Loss: 0.0144, Validation Loss: 2.6297, Validation F1: 0.6581
+Epoch [162/700], Train Loss: 0.0261, Validation Loss: 1.2538, Validation F1: 0.7047
+Epoch [163/700], Train Loss: 0.0077, Validation Loss: 1.7151, Validation F1: 0.7738
+Epoch [164/700], Train Loss: 0.0030, Validation Loss: 1.7906, Validation F1: 0.7853
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/bilstmWeights_ugv_mv/best_model.pt
+Epoch [165/700], Train Loss: 0.0013, Validation Loss: 1.9084, Validation F1: 0.7794
+Epoch [166/700], Train Loss: 0.0008, Validation Loss: 1.8996, Validation F1: 0.7771
+Epoch [167/700], Train Loss: 0.0113, Validation Loss: 1.9025, Validation F1: 0.6802
+Epoch [168/700], Train Loss: 0.0178, Validation Loss: 1.9916, Validation F1: 0.7606
+Epoch [169/700], Train Loss: 0.0038, Validation Loss: 2.0847, Validation F1: 0.7450
+Epoch [170/700], Train Loss: 0.0020, Validation Loss: 2.3549, Validation F1: 0.7500
+Epoch [171/700], Train Loss: 0.0009, Validation Loss: 2.4559, Validation F1: 0.7566
+Epoch [172/700], Train Loss: 0.0009, Validation Loss: 1.9824, Validation F1: 0.7351
+Epoch [173/700], Train Loss: 0.0086, Validation Loss: 1.7447, Validation F1: 0.7705
+Epoch [174/700], Train Loss: 0.0123, Validation Loss: 2.1232, Validation F1: 0.7247
+Epoch [175/700], Train Loss: 0.0060, Validation Loss: 1.9724, Validation F1: 0.7654
+Epoch [176/700], Train Loss: 0.0032, Validation Loss: 2.0338, Validation F1: 0.7409
+Epoch [177/700], Train Loss: 0.0021, Validation Loss: 2.3191, Validation F1: 0.7486
+Epoch [178/700], Train Loss: 0.0012, Validation Loss: 2.5903, Validation F1: 0.7515
+Epoch [179/700], Train Loss: 0.0004, Validation Loss: 2.8141, Validation F1: 0.7560
+Epoch [180/700], Train Loss: 0.0003, Validation Loss: 2.6936, Validation F1: 0.7545
+Epoch [181/700], Train Loss: 0.0003, Validation Loss: 2.6821, Validation F1: 0.7568
+Epoch [182/700], Train Loss: 0.0002, Validation Loss: 2.6625, Validation F1: 0.7596
+Epoch [183/700], Train Loss: 0.0001, Validation Loss: 2.7333, Validation F1: 0.7522
+Epoch [184/700], Train Loss: 0.0001, Validation Loss: 2.7040, Validation F1: 0.7596
+Epoch [185/700], Train Loss: 0.0001, Validation Loss: 2.7403, Validation F1: 0.7522
+Epoch [186/700], Train Loss: 0.0291, Validation Loss: 2.2840, Validation F1: 0.6560
+Epoch [187/700], Train Loss: 0.0161, Validation Loss: 2.2273, Validation F1: 0.7535
+Epoch [188/700], Train Loss: 0.0032, Validation Loss: 2.2943, Validation F1: 0.7594
+Epoch [189/700], Train Loss: 0.0016, Validation Loss: 2.4123, Validation F1: 0.7683
+Epoch [190/700], Train Loss: 0.0010, Validation Loss: 2.4396, Validation F1: 0.7647
+Epoch [191/700], Train Loss: 0.0005, Validation Loss: 2.4626, Validation F1: 0.7596
+Epoch [192/700], Train Loss: 0.0003, Validation Loss: 2.4330, Validation F1: 0.7611
+Epoch [193/700], Train Loss: 0.0002, Validation Loss: 2.4656, Validation F1: 0.7633
+Epoch [194/700], Train Loss: 0.0008, Validation Loss: 2.4579, Validation F1: 0.7378
+Epoch [195/700], Train Loss: 0.0297, Validation Loss: 2.0039, Validation F1: 0.7087
+Epoch [196/700], Train Loss: 0.0068, Validation Loss: 2.5554, Validation F1: 0.6964
+Epoch [197/700], Train Loss: 0.0022, Validation Loss: 2.6483, Validation F1: 0.7246
+Epoch [198/700], Train Loss: 0.0010, Validation Loss: 2.6487, Validation F1: 0.7552
+Epoch [199/700], Train Loss: 0.0007, Validation Loss: 2.6594, Validation F1: 0.7522
+Epoch [200/700], Train Loss: 0.0004, Validation Loss: 2.7495, Validation F1: 0.7588
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/bilstmWeights_ugv_mv/model_epoch_0200.pt
+Epoch [201/700], Train Loss: 0.0002, Validation Loss: 2.7486, Validation F1: 0.7611
+Epoch [202/700], Train Loss: 0.0002, Validation Loss: 2.7698, Validation F1: 0.7647
+Epoch [203/700], Train Loss: 0.0001, Validation Loss: 2.7415, Validation F1: 0.7670
+Epoch [204/700], Train Loss: 0.0001, Validation Loss: 2.7768, Validation F1: 0.7670
+Epoch [205/700], Train Loss: 0.0241, Validation Loss: 2.0051, Validation F1: 0.6769
+Epoch [206/700], Train Loss: 0.0128, Validation Loss: 1.8605, Validation F1: 0.7411
+Epoch [207/700], Train Loss: 0.0041, Validation Loss: 2.0925, Validation F1: 0.7268
+Epoch [208/700], Train Loss: 0.0035, Validation Loss: 2.1530, Validation F1: 0.7550
+Epoch [209/700], Train Loss: 0.0012, Validation Loss: 2.1594, Validation F1: 0.7616
+Epoch [210/700], Train Loss: 0.0005, Validation Loss: 2.2674, Validation F1: 0.7588
+Epoch [211/700], Train Loss: 0.0003, Validation Loss: 2.3414, Validation F1: 0.7552
+Epoch [212/700], Train Loss: 0.0003, Validation Loss: 2.4454, Validation F1: 0.7485
+Epoch [213/700], Train Loss: 0.0013, Validation Loss: 2.3831, Validation F1: 0.7347
+Epoch [214/700], Train Loss: 0.0241, Validation Loss: 2.2391, Validation F1: 0.7459
+Epoch [215/700], Train Loss: 0.0051, Validation Loss: 2.1489, Validation F1: 0.7755
+Epoch [216/700], Train Loss: 0.0033, Validation Loss: 2.4436, Validation F1: 0.7706
+Epoch [217/700], Train Loss: 0.0061, Validation Loss: 1.9515, Validation F1: 0.7726
+Epoch [218/700], Train Loss: 0.0025, Validation Loss: 2.3732, Validation F1: 0.7616
+Epoch [219/700], Train Loss: 0.0035, Validation Loss: 2.3566, Validation F1: 0.7794
+Epoch [220/700], Train Loss: 0.0048, Validation Loss: 2.4714, Validation F1: 0.7931
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/bilstmWeights_ugv_mv/best_model.pt
+Epoch [221/700], Train Loss: 0.0010, Validation Loss: 2.2849, Validation F1: 0.7931
+Epoch [222/700], Train Loss: 0.0004, Validation Loss: 2.4343, Validation F1: 0.7895
+Epoch [223/700], Train Loss: 0.0003, Validation Loss: 2.5310, Validation F1: 0.7847
+Epoch [224/700], Train Loss: 0.0002, Validation Loss: 2.6178, Validation F1: 0.7801
+Epoch [225/700], Train Loss: 0.0002, Validation Loss: 2.6885, Validation F1: 0.7836
+Epoch [226/700], Train Loss: 0.0238, Validation Loss: 2.3720, Validation F1: 0.7293
+Epoch [227/700], Train Loss: 0.0088, Validation Loss: 1.9720, Validation F1: 0.7619
+Epoch [228/700], Train Loss: 0.0017, Validation Loss: 2.3539, Validation F1: 0.7564
+Epoch [229/700], Train Loss: 0.0007, Validation Loss: 2.4480, Validation F1: 0.7644
+Epoch [230/700], Train Loss: 0.0004, Validation Loss: 2.6383, Validation F1: 0.7478
+Epoch [231/700], Train Loss: 0.0003, Validation Loss: 2.7203, Validation F1: 0.7507
+Epoch [232/700], Train Loss: 0.0002, Validation Loss: 2.7562, Validation F1: 0.7588
+Epoch [233/700], Train Loss: 0.0002, Validation Loss: 2.7812, Validation F1: 0.7588
+Epoch [234/700], Train Loss: 0.0003, Validation Loss: 2.6429, Validation F1: 0.7588
+Epoch [235/700], Train Loss: 0.0123, Validation Loss: 2.7451, Validation F1: 0.6917
+Epoch [236/700], Train Loss: 0.0229, Validation Loss: 2.4358, Validation F1: 0.7371
+Epoch [237/700], Train Loss: 0.0034, Validation Loss: 2.3808, Validation F1: 0.7552
+Epoch [238/700], Train Loss: 0.0012, Validation Loss: 2.6056, Validation F1: 0.7553
+Epoch [239/700], Train Loss: 0.0007, Validation Loss: 2.6183, Validation F1: 0.7613
+Epoch [240/700], Train Loss: 0.0004, Validation Loss: 2.7079, Validation F1: 0.7568
+Epoch [241/700], Train Loss: 0.0003, Validation Loss: 2.7704, Validation F1: 0.7530
+Epoch [242/700], Train Loss: 0.0002, Validation Loss: 2.7268, Validation F1: 0.7545
+Epoch [243/700], Train Loss: 0.0004, Validation Loss: 2.4985, Validation F1: 0.7552
+Epoch [244/700], Train Loss: 0.0127, Validation Loss: 2.0955, Validation F1: 0.7374
+Epoch [245/700], Train Loss: 0.0045, Validation Loss: 2.2646, Validation F1: 0.7335
+Epoch [246/700], Train Loss: 0.0024, Validation Loss: 2.6924, Validation F1: 0.7470
+Epoch [247/700], Train Loss: 0.0060, Validation Loss: 2.2449, Validation F1: 0.7606
+Epoch [248/700], Train Loss: 0.0048, Validation Loss: 2.4881, Validation F1: 0.7464
+Epoch [249/700], Train Loss: 0.0011, Validation Loss: 2.6235, Validation F1: 0.7683
+Epoch [250/700], Train Loss: 0.0004, Validation Loss: 2.6425, Validation F1: 0.7706
+Epoch [251/700], Train Loss: 0.0002, Validation Loss: 2.7149, Validation F1: 0.7751
+Epoch [252/700], Train Loss: 0.0002, Validation Loss: 2.7199, Validation F1: 0.7729
+Epoch [253/700], Train Loss: 0.0001, Validation Loss: 2.7707, Validation F1: 0.7706
+Epoch [254/700], Train Loss: 0.0001, Validation Loss: 2.7806, Validation F1: 0.7729
+Epoch [255/700], Train Loss: 0.0099, Validation Loss: 2.3648, Validation F1: 0.7211
+Epoch [256/700], Train Loss: 0.0123, Validation Loss: 2.3070, Validation F1: 0.7268
+Epoch [257/700], Train Loss: 0.0063, Validation Loss: 2.4424, Validation F1: 0.7485
+Epoch [258/700], Train Loss: 0.0020, Validation Loss: 2.5818, Validation F1: 0.7679
+Epoch [259/700], Train Loss: 0.0008, Validation Loss: 2.6660, Validation F1: 0.7665
+Epoch [260/700], Train Loss: 0.0075, Validation Loss: 2.3960, Validation F1: 0.7819
+Epoch [261/700], Train Loss: 0.0025, Validation Loss: 2.3027, Validation F1: 0.7614
+Epoch [262/700], Train Loss: 0.0020, Validation Loss: 2.7301, Validation F1: 0.7440
+Epoch [263/700], Train Loss: 0.0005, Validation Loss: 2.7292, Validation F1: 0.7670
+Epoch [264/700], Train Loss: 0.0003, Validation Loss: 2.7233, Validation F1: 0.7715
+Epoch [265/700], Train Loss: 0.0002, Validation Loss: 2.7855, Validation F1: 0.7633
+Epoch [266/700], Train Loss: 0.0001, Validation Loss: 2.8354, Validation F1: 0.7656
+Epoch [267/700], Train Loss: 0.0001, Validation Loss: 2.8855, Validation F1: 0.7633
+Epoch [268/700], Train Loss: 0.0001, Validation Loss: 2.9272, Validation F1: 0.7633
+Epoch [269/700], Train Loss: 0.0001, Validation Loss: 3.0014, Validation F1: 0.7633
+Epoch [270/700], Train Loss: 0.0000, Validation Loss: 3.0685, Validation F1: 0.7560
+Epoch [271/700], Train Loss: 0.0000, Validation Loss: 3.1357, Validation F1: 0.7522
+Epoch [272/700], Train Loss: 0.0255, Validation Loss: 2.2457, Validation F1: 0.7181
+Epoch [273/700], Train Loss: 0.0073, Validation Loss: 2.1386, Validation F1: 0.7417
+Epoch [274/700], Train Loss: 0.0023, Validation Loss: 1.9656, Validation F1: 0.7875
+Epoch [275/700], Train Loss: 0.0009, Validation Loss: 2.0127, Validation F1: 0.8091
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/bilstmWeights_ugv_mv/best_model.pt
+Epoch [276/700], Train Loss: 0.0005, Validation Loss: 2.1103, Validation F1: 0.8057
+Epoch [277/700], Train Loss: 0.0057, Validation Loss: 2.2064, Validation F1: 0.6878
+Epoch [278/700], Train Loss: 0.0083, Validation Loss: 2.1828, Validation F1: 0.7803
+Epoch [279/700], Train Loss: 0.0025, Validation Loss: 2.1192, Validation F1: 0.7784
+Epoch [280/700], Train Loss: 0.0011, Validation Loss: 2.2984, Validation F1: 0.7861
+Epoch [281/700], Train Loss: 0.0005, Validation Loss: 2.3552, Validation F1: 0.7872
+Epoch [282/700], Train Loss: 0.0003, Validation Loss: 2.4315, Validation F1: 0.7918
+Epoch [283/700], Train Loss: 0.0002, Validation Loss: 2.4935, Validation F1: 0.7918
+Epoch [284/700], Train Loss: 0.0001, Validation Loss: 2.5422, Validation F1: 0.7895
+Epoch [285/700], Train Loss: 0.0001, Validation Loss: 2.5509, Validation F1: 0.7882
+Epoch [286/700], Train Loss: 0.0001, Validation Loss: 2.6227, Validation F1: 0.7847
+Epoch [287/700], Train Loss: 0.0186, Validation Loss: 1.4200, Validation F1: 0.7525
+Epoch [288/700], Train Loss: 0.0102, Validation Loss: 1.3894, Validation F1: 0.8207
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/bilstmWeights_ugv_mv/best_model.pt
+Epoch [289/700], Train Loss: 0.0020, Validation Loss: 1.5566, Validation F1: 0.7978
+Epoch [290/700], Train Loss: 0.0009, Validation Loss: 1.6353, Validation F1: 0.8033
+Epoch [291/700], Train Loss: 0.0005, Validation Loss: 1.7022, Validation F1: 0.8022
+Epoch [292/700], Train Loss: 0.0003, Validation Loss: 1.8048, Validation F1: 0.8011
+Epoch [293/700], Train Loss: 0.0002, Validation Loss: 1.8170, Validation F1: 0.8034
+Epoch [294/700], Train Loss: 0.0001, Validation Loss: 1.8606, Validation F1: 0.8034
+Epoch [295/700], Train Loss: 0.0001, Validation Loss: 1.9079, Validation F1: 0.8034
+Epoch [296/700], Train Loss: 0.0001, Validation Loss: 1.9293, Validation F1: 0.8056
+Epoch [297/700], Train Loss: 0.0001, Validation Loss: 1.9452, Validation F1: 0.8011
+Epoch [298/700], Train Loss: 0.0001, Validation Loss: 1.9737, Validation F1: 0.8011
+Epoch [299/700], Train Loss: 0.0000, Validation Loss: 2.0337, Validation F1: 0.8102
+Epoch [300/700], Train Loss: 0.0001, Validation Loss: 1.8737, Validation F1: 0.8011
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/bilstmWeights_ugv_mv/model_epoch_0300.pt
+Epoch [301/700], Train Loss: 0.0237, Validation Loss: 1.1411, Validation F1: 0.7700
+Epoch [302/700], Train Loss: 0.0040, Validation Loss: 1.5211, Validation F1: 0.7967
+Epoch [303/700], Train Loss: 0.0015, Validation Loss: 1.4806, Validation F1: 0.8110
+Epoch [304/700], Train Loss: 0.0007, Validation Loss: 1.8717, Validation F1: 0.8046
+Epoch [305/700], Train Loss: 0.0003, Validation Loss: 1.9054, Validation F1: 0.8092
+Epoch [306/700], Train Loss: 0.0002, Validation Loss: 1.9497, Validation F1: 0.8092
+Epoch [307/700], Train Loss: 0.0001, Validation Loss: 1.9832, Validation F1: 0.8092
+Epoch [308/700], Train Loss: 0.0001, Validation Loss: 2.0102, Validation F1: 0.8092
+Epoch [309/700], Train Loss: 0.0001, Validation Loss: 2.0478, Validation F1: 0.8092
+Epoch [310/700], Train Loss: 0.0001, Validation Loss: 2.0766, Validation F1: 0.8150
+Epoch [311/700], Train Loss: 0.0001, Validation Loss: 2.0676, Validation F1: 0.8150
+Epoch [312/700], Train Loss: 0.0000, Validation Loss: 2.0757, Validation F1: 0.8150
+Epoch [313/700], Train Loss: 0.0000, Validation Loss: 2.1179, Validation F1: 0.8140
+Epoch [314/700], Train Loss: 0.0000, Validation Loss: 2.1441, Validation F1: 0.8163
+Epoch [315/700], Train Loss: 0.0000, Validation Loss: 2.1620, Validation F1: 0.8105
+Epoch [316/700], Train Loss: 0.0134, Validation Loss: 1.3551, Validation F1: 0.7143
+Epoch [317/700], Train Loss: 0.0175, Validation Loss: 1.3728, Validation F1: 0.7661
+Epoch [318/700], Train Loss: 0.0061, Validation Loss: 2.0718, Validation F1: 0.7339
+Epoch [319/700], Train Loss: 0.0047, Validation Loss: 1.8575, Validation F1: 0.7688
+Epoch [320/700], Train Loss: 0.0015, Validation Loss: 2.0468, Validation F1: 0.7714
+Epoch [321/700], Train Loss: 0.0007, Validation Loss: 2.0017, Validation F1: 0.7816
+Epoch [322/700], Train Loss: 0.0005, Validation Loss: 2.0337, Validation F1: 0.7884
+Epoch [323/700], Train Loss: 0.0002, Validation Loss: 2.0778, Validation F1: 0.7861
+Epoch [324/700], Train Loss: 0.0002, Validation Loss: 2.1275, Validation F1: 0.7954
+Epoch [325/700], Train Loss: 0.0001, Validation Loss: 2.1922, Validation F1: 0.7954
+Epoch [326/700], Train Loss: 0.0001, Validation Loss: 2.2146, Validation F1: 0.7989
+Epoch [327/700], Train Loss: 0.0001, Validation Loss: 2.2493, Validation F1: 0.7989
+Epoch [328/700], Train Loss: 0.0001, Validation Loss: 2.2780, Validation F1: 0.7977
+Epoch [329/700], Train Loss: 0.0181, Validation Loss: 2.2262, Validation F1: 0.7584
+Epoch [330/700], Train Loss: 0.0053, Validation Loss: 1.6974, Validation F1: 0.7637
+Epoch [331/700], Train Loss: 0.0020, Validation Loss: 2.1464, Validation F1: 0.7723
+Epoch [332/700], Train Loss: 0.0007, Validation Loss: 2.1476, Validation F1: 0.7781
+Epoch [333/700], Train Loss: 0.0003, Validation Loss: 2.1962, Validation F1: 0.7861
+Epoch [334/700], Train Loss: 0.0002, Validation Loss: 2.1829, Validation F1: 0.7861
+Epoch [335/700], Train Loss: 0.0001, Validation Loss: 2.2232, Validation F1: 0.7791
+Epoch [336/700], Train Loss: 0.0001, Validation Loss: 2.2534, Validation F1: 0.7791
+Epoch [337/700], Train Loss: 0.0001, Validation Loss: 2.2269, Validation F1: 0.7791
+Epoch [338/700], Train Loss: 0.0001, Validation Loss: 2.2723, Validation F1: 0.7826
+Epoch [339/700], Train Loss: 0.0001, Validation Loss: 2.3274, Validation F1: 0.7791
+Epoch [340/700], Train Loss: 0.0146, Validation Loss: 2.3566, Validation F1: 0.6844
+Epoch [341/700], Train Loss: 0.0124, Validation Loss: 2.3606, Validation F1: 0.7528
+Epoch [342/700], Train Loss: 0.0031, Validation Loss: 2.2846, Validation F1: 0.7614
+Epoch [343/700], Train Loss: 0.0011, Validation Loss: 2.5303, Validation F1: 0.7742
+Epoch [344/700], Train Loss: 0.0005, Validation Loss: 2.5978, Validation F1: 0.7683
+Epoch [345/700], Train Loss: 0.0003, Validation Loss: 2.5819, Validation F1: 0.7683
+Epoch [346/700], Train Loss: 0.0018, Validation Loss: 2.7809, Validation F1: 0.7529
+Epoch [347/700], Train Loss: 0.0062, Validation Loss: 2.7386, Validation F1: 0.7514
+Epoch [348/700], Train Loss: 0.0016, Validation Loss: 2.5063, Validation F1: 0.7644
+Epoch [349/700], Train Loss: 0.0015, Validation Loss: 2.5592, Validation F1: 0.7674
+Epoch [350/700], Train Loss: 0.0035, Validation Loss: 2.5875, Validation F1: 0.7755
+Epoch [351/700], Train Loss: 0.0062, Validation Loss: 2.0995, Validation F1: 0.7831
+Epoch [352/700], Train Loss: 0.0071, Validation Loss: 2.1585, Validation F1: 0.7278
+Epoch [353/700], Train Loss: 0.0025, Validation Loss: 2.2183, Validation F1: 0.7622
+Epoch [354/700], Train Loss: 0.0007, Validation Loss: 2.4002, Validation F1: 0.7710
+Epoch [355/700], Train Loss: 0.0003, Validation Loss: 2.4531, Validation F1: 0.7697
+Epoch [356/700], Train Loss: 0.0002, Validation Loss: 2.5186, Validation F1: 0.7683
+Epoch [357/700], Train Loss: 0.0001, Validation Loss: 2.5376, Validation F1: 0.7719
+Epoch [358/700], Train Loss: 0.0001, Validation Loss: 2.5628, Validation F1: 0.7742
+Epoch [359/700], Train Loss: 0.0001, Validation Loss: 2.6017, Validation F1: 0.7742
+Epoch [360/700], Train Loss: 0.0001, Validation Loss: 2.6197, Validation F1: 0.7719
+Epoch [361/700], Train Loss: 0.0000, Validation Loss: 2.6443, Validation F1: 0.7755
+Epoch [362/700], Train Loss: 0.0000, Validation Loss: 2.6630, Validation F1: 0.7778
+Epoch [363/700], Train Loss: 0.0000, Validation Loss: 2.6665, Validation F1: 0.7733
+Epoch [364/700], Train Loss: 0.0000, Validation Loss: 2.6835, Validation F1: 0.7813
+Epoch [365/700], Train Loss: 0.0000, Validation Loss: 2.7437, Validation F1: 0.7778
+Epoch [366/700], Train Loss: 0.0000, Validation Loss: 2.7586, Validation F1: 0.7849
+Epoch [367/700], Train Loss: 0.0000, Validation Loss: 2.8011, Validation F1: 0.7849
+Epoch [368/700], Train Loss: 0.0000, Validation Loss: 2.8380, Validation F1: 0.7849
+Epoch [369/700], Train Loss: 0.0000, Validation Loss: 2.8742, Validation F1: 0.7801
+Epoch [370/700], Train Loss: 0.0237, Validation Loss: 1.9040, Validation F1: 0.7692
+Epoch [371/700], Train Loss: 0.0031, Validation Loss: 2.4538, Validation F1: 0.7684
+Epoch [372/700], Train Loss: 0.0009, Validation Loss: 2.5070, Validation F1: 0.7736
+Epoch [373/700], Train Loss: 0.0004, Validation Loss: 2.6214, Validation F1: 0.7701
+Epoch [374/700], Train Loss: 0.0002, Validation Loss: 2.6699, Validation F1: 0.7736
+Epoch [375/700], Train Loss: 0.0002, Validation Loss: 2.7870, Validation F1: 0.7701
+Epoch [376/700], Train Loss: 0.0001, Validation Loss: 2.8460, Validation F1: 0.7666
+Epoch [377/700], Train Loss: 0.0001, Validation Loss: 2.8966, Validation F1: 0.7666
+Epoch [378/700], Train Loss: 0.0001, Validation Loss: 2.9177, Validation F1: 0.7666
+Epoch [379/700], Train Loss: 0.0007, Validation Loss: 2.4422, Validation F1: 0.7472
+Epoch [380/700], Train Loss: 0.0140, Validation Loss: 1.6711, Validation F1: 0.8130
+Epoch [381/700], Train Loss: 0.0034, Validation Loss: 2.0754, Validation F1: 0.7731
+Epoch [382/700], Train Loss: 0.0013, Validation Loss: 2.4005, Validation F1: 0.7851
+Epoch [383/700], Train Loss: 0.0003, Validation Loss: 2.3954, Validation F1: 0.7908
+Epoch [384/700], Train Loss: 0.0002, Validation Loss: 2.4446, Validation F1: 0.7874
+Epoch [385/700], Train Loss: 0.0001, Validation Loss: 2.5367, Validation F1: 0.7861
+Epoch [386/700], Train Loss: 0.0001, Validation Loss: 2.5970, Validation F1: 0.7839
+Epoch [387/700], Train Loss: 0.0001, Validation Loss: 2.5943, Validation F1: 0.7861
+Epoch [388/700], Train Loss: 0.0000, Validation Loss: 2.5834, Validation F1: 0.7931
+Epoch [389/700], Train Loss: 0.0000, Validation Loss: 2.6122, Validation F1: 0.7954
+Epoch [390/700], Train Loss: 0.0000, Validation Loss: 2.6011, Validation F1: 0.7954
+Epoch [391/700], Train Loss: 0.0000, Validation Loss: 2.6177, Validation F1: 0.7931
+Epoch [392/700], Train Loss: 0.0000, Validation Loss: 2.6527, Validation F1: 0.7954
+Epoch [393/700], Train Loss: 0.0000, Validation Loss: 2.6737, Validation F1: 0.7931
+Epoch [394/700], Train Loss: 0.0000, Validation Loss: 2.7012, Validation F1: 0.7931
+Epoch [395/700], Train Loss: 0.0000, Validation Loss: 2.7191, Validation F1: 0.7896
+Epoch [396/700], Train Loss: 0.0000, Validation Loss: 2.7514, Validation F1: 0.7896
+Epoch [397/700], Train Loss: 0.0000, Validation Loss: 2.7910, Validation F1: 0.7896
+Epoch [398/700], Train Loss: 0.0000, Validation Loss: 2.7997, Validation F1: 0.7896
+Epoch [399/700], Train Loss: 0.0000, Validation Loss: 2.8499, Validation F1: 0.7896
+Epoch [400/700], Train Loss: 0.0001, Validation Loss: 2.8479, Validation F1: 0.7875
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/bilstmWeights_ugv_mv/model_epoch_0400.pt
+Epoch [401/700], Train Loss: 0.0280, Validation Loss: 3.2076, Validation F1: 0.7062
+Epoch [402/700], Train Loss: 0.0038, Validation Loss: 2.4148, Validation F1: 0.7645
+Epoch [403/700], Train Loss: 0.0013, Validation Loss: 2.5052, Validation F1: 0.7606
+Epoch [404/700], Train Loss: 0.0008, Validation Loss: 2.7007, Validation F1: 0.7608
+Epoch [405/700], Train Loss: 0.0004, Validation Loss: 2.6509, Validation F1: 0.7701
+Epoch [406/700], Train Loss: 0.0003, Validation Loss: 2.7442, Validation F1: 0.7657
+Epoch [407/700], Train Loss: 0.0007, Validation Loss: 2.6916, Validation F1: 0.7723
+Epoch [408/700], Train Loss: 0.0007, Validation Loss: 2.7299, Validation F1: 0.7616
+Epoch [409/700], Train Loss: 0.0068, Validation Loss: 2.5874, Validation F1: 0.7008
+Epoch [410/700], Train Loss: 0.0084, Validation Loss: 2.6841, Validation F1: 0.7062
+Epoch [411/700], Train Loss: 0.0024, Validation Loss: 2.7124, Validation F1: 0.7040
+Epoch [412/700], Train Loss: 0.0014, Validation Loss: 2.7642, Validation F1: 0.7207
+Epoch [413/700], Train Loss: 0.0004, Validation Loss: 2.8450, Validation F1: 0.7268
+Epoch [414/700], Train Loss: 0.0002, Validation Loss: 2.8964, Validation F1: 0.7314
+Epoch [415/700], Train Loss: 0.0001, Validation Loss: 2.9155, Validation F1: 0.7350
+Epoch [416/700], Train Loss: 0.0001, Validation Loss: 2.9560, Validation F1: 0.7350
+Epoch [417/700], Train Loss: 0.0001, Validation Loss: 2.9980, Validation F1: 0.7335
+Epoch [418/700], Train Loss: 0.0000, Validation Loss: 3.0029, Validation F1: 0.7356
+Epoch [419/700], Train Loss: 0.0000, Validation Loss: 3.0852, Validation F1: 0.7356
+Epoch [420/700], Train Loss: 0.0000, Validation Loss: 3.1382, Validation F1: 0.7414
+Epoch [421/700], Train Loss: 0.0000, Validation Loss: 3.1576, Validation F1: 0.7393
+Epoch [422/700], Train Loss: 0.0000, Validation Loss: 3.2032, Validation F1: 0.7414
+Epoch [423/700], Train Loss: 0.0000, Validation Loss: 3.2156, Validation F1: 0.7414
+Epoch [424/700], Train Loss: 0.0000, Validation Loss: 3.2322, Validation F1: 0.7414
+Epoch [425/700], Train Loss: 0.0000, Validation Loss: 3.2477, Validation F1: 0.7414
+Epoch [426/700], Train Loss: 0.0000, Validation Loss: 3.3080, Validation F1: 0.7393
+Epoch [427/700], Train Loss: 0.0000, Validation Loss: 3.3465, Validation F1: 0.7356
+Epoch [428/700], Train Loss: 0.0000, Validation Loss: 3.3866, Validation F1: 0.7420
+Epoch [429/700], Train Loss: 0.0000, Validation Loss: 3.4042, Validation F1: 0.7435
+Epoch [430/700], Train Loss: 0.0000, Validation Loss: 3.4800, Validation F1: 0.7399
+Epoch [431/700], Train Loss: 0.0000, Validation Loss: 3.5349, Validation F1: 0.7442
+Epoch [432/700], Train Loss: 0.0000, Validation Loss: 3.4037, Validation F1: 0.7457
+Epoch [433/700], Train Loss: 0.0000, Validation Loss: 3.4347, Validation F1: 0.7493
+Epoch [434/700], Train Loss: 0.0000, Validation Loss: 3.5144, Validation F1: 0.7457
+Epoch [435/700], Train Loss: 0.0000, Validation Loss: 3.5513, Validation F1: 0.7529
+Epoch [436/700], Train Loss: 0.0000, Validation Loss: 3.6037, Validation F1: 0.7529
+Epoch [437/700], Train Loss: 0.0288, Validation Loss: 2.0525, Validation F1: 0.7415
+Epoch [438/700], Train Loss: 0.0059, Validation Loss: 2.0677, Validation F1: 0.7812
+Epoch [439/700], Train Loss: 0.0022, Validation Loss: 2.2357, Validation F1: 0.7805
+Epoch [440/700], Train Loss: 0.0006, Validation Loss: 2.3182, Validation F1: 0.7824
+Epoch [441/700], Train Loss: 0.0003, Validation Loss: 2.4446, Validation F1: 0.7889
+Epoch [442/700], Train Loss: 0.0002, Validation Loss: 2.5119, Validation F1: 0.7889
+Epoch [443/700], Train Loss: 0.0001, Validation Loss: 2.5800, Validation F1: 0.7955
+Epoch [444/700], Train Loss: 0.0001, Validation Loss: 2.6417, Validation F1: 0.7944
+Epoch [445/700], Train Loss: 0.0001, Validation Loss: 2.6748, Validation F1: 0.7910
+Epoch [446/700], Train Loss: 0.0000, Validation Loss: 2.7179, Validation F1: 0.7932
+Epoch [447/700], Train Loss: 0.0000, Validation Loss: 2.7433, Validation F1: 0.7966
+Epoch [448/700], Train Loss: 0.0000, Validation Loss: 2.7803, Validation F1: 0.7910
+Epoch [449/700], Train Loss: 0.0000, Validation Loss: 2.8104, Validation F1: 0.7910
+Epoch [450/700], Train Loss: 0.0000, Validation Loss: 2.8453, Validation F1: 0.7910
+Epoch [451/700], Train Loss: 0.0000, Validation Loss: 2.8870, Validation F1: 0.7910
+Epoch [452/700], Train Loss: 0.0000, Validation Loss: 2.9134, Validation F1: 0.7910
+Epoch [453/700], Train Loss: 0.0000, Validation Loss: 2.9713, Validation F1: 0.7910
+Epoch [454/700], Train Loss: 0.0000, Validation Loss: 3.0407, Validation F1: 0.7910
+Epoch [455/700], Train Loss: 0.0000, Validation Loss: 3.0925, Validation F1: 0.7875
+Epoch [456/700], Train Loss: 0.0000, Validation Loss: 3.1253, Validation F1: 0.7910
+Epoch [457/700], Train Loss: 0.0000, Validation Loss: 3.1723, Validation F1: 0.7841
+Epoch [458/700], Train Loss: 0.0000, Validation Loss: 3.1992, Validation F1: 0.7841
+Epoch [459/700], Train Loss: 0.0000, Validation Loss: 3.2336, Validation F1: 0.7806
+Epoch [460/700], Train Loss: 0.0000, Validation Loss: 3.2805, Validation F1: 0.7886
+Epoch [461/700], Train Loss: 0.0000, Validation Loss: 3.3438, Validation F1: 0.7851
+Epoch [462/700], Train Loss: 0.0000, Validation Loss: 3.3615, Validation F1: 0.7829
+Epoch [463/700], Train Loss: 0.0000, Validation Loss: 3.4293, Validation F1: 0.7851
+Epoch [464/700], Train Loss: 0.0000, Validation Loss: 3.4530, Validation F1: 0.7829
+Epoch [465/700], Train Loss: 0.0000, Validation Loss: 3.4798, Validation F1: 0.7829
+Epoch [466/700], Train Loss: 0.0428, Validation Loss: 2.4398, Validation F1: 0.6957
+Epoch [467/700], Train Loss: 0.0075, Validation Loss: 2.9860, Validation F1: 0.7313
+Epoch [468/700], Train Loss: 0.0028, Validation Loss: 3.3134, Validation F1: 0.7263
+Epoch [469/700], Train Loss: 0.0010, Validation Loss: 3.4060, Validation F1: 0.7429
+Epoch [470/700], Train Loss: 0.0006, Validation Loss: 3.4481, Validation F1: 0.7429
+Epoch [471/700], Train Loss: 0.0004, Validation Loss: 3.5062, Validation F1: 0.7536
+Epoch [472/700], Train Loss: 0.0002, Validation Loss: 3.5498, Validation F1: 0.7536
+Epoch [473/700], Train Loss: 0.0001, Validation Loss: 3.5325, Validation F1: 0.7616
+Epoch [474/700], Train Loss: 0.0001, Validation Loss: 3.5762, Validation F1: 0.7616
+Epoch [475/700], Train Loss: 0.0001, Validation Loss: 3.5716, Validation F1: 0.7616
+Epoch [476/700], Train Loss: 0.0001, Validation Loss: 3.5755, Validation F1: 0.7616
+Epoch [477/700], Train Loss: 0.0000, Validation Loss: 3.5522, Validation F1: 0.7688
+Epoch [478/700], Train Loss: 0.0000, Validation Loss: 3.5767, Validation F1: 0.7688
+Epoch [479/700], Train Loss: 0.0000, Validation Loss: 3.6535, Validation F1: 0.7688
+Epoch [480/700], Train Loss: 0.0000, Validation Loss: 3.6890, Validation F1: 0.7710
+Epoch [481/700], Train Loss: 0.0000, Validation Loss: 3.6724, Validation F1: 0.7710
+Epoch [482/700], Train Loss: 0.0000, Validation Loss: 3.6678, Validation F1: 0.7710
+Epoch [483/700], Train Loss: 0.0282, Validation Loss: 2.4002, Validation F1: 0.7377
+Epoch [484/700], Train Loss: 0.0057, Validation Loss: 2.6393, Validation F1: 0.7578
+Epoch [485/700], Train Loss: 0.0020, Validation Loss: 2.3698, Validation F1: 0.7753
+Epoch [486/700], Train Loss: 0.0032, Validation Loss: 2.0123, Validation F1: 0.7554
+Epoch [487/700], Train Loss: 0.0028, Validation Loss: 2.3523, Validation F1: 0.7571
+Epoch [488/700], Train Loss: 0.0015, Validation Loss: 2.6092, Validation F1: 0.7723
+Epoch [489/700], Train Loss: 0.0004, Validation Loss: 2.6150, Validation F1: 0.7564
+Epoch [490/700], Train Loss: 0.0002, Validation Loss: 2.7564, Validation F1: 0.7697
+Epoch [491/700], Train Loss: 0.0001, Validation Loss: 2.8140, Validation F1: 0.7697
+Epoch [492/700], Train Loss: 0.0001, Validation Loss: 2.8689, Validation F1: 0.7697
+Epoch [493/700], Train Loss: 0.0001, Validation Loss: 2.9103, Validation F1: 0.7755
+Epoch [494/700], Train Loss: 0.0000, Validation Loss: 2.9444, Validation F1: 0.7755
+Epoch [495/700], Train Loss: 0.0000, Validation Loss: 2.9730, Validation F1: 0.7778
+Epoch [496/700], Train Loss: 0.0000, Validation Loss: 3.0019, Validation F1: 0.7755
+Epoch [497/700], Train Loss: 0.0000, Validation Loss: 3.0357, Validation F1: 0.7733
+Epoch [498/700], Train Loss: 0.0000, Validation Loss: 3.1165, Validation F1: 0.7733
+Epoch [499/700], Train Loss: 0.0000, Validation Loss: 3.1464, Validation F1: 0.7697
+Epoch [500/700], Train Loss: 0.0000, Validation Loss: 3.1906, Validation F1: 0.7697
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/bilstmWeights_ugv_mv/model_epoch_0500.pt
+Epoch [501/700], Train Loss: 0.0000, Validation Loss: 3.2314, Validation F1: 0.7661
+Epoch [502/700], Train Loss: 0.0000, Validation Loss: 3.2611, Validation F1: 0.7661
+Epoch [503/700], Train Loss: 0.0000, Validation Loss: 3.2695, Validation F1: 0.7661
+Epoch [504/700], Train Loss: 0.0032, Validation Loss: 2.7557, Validation F1: 0.6700
+Epoch [505/700], Train Loss: 0.0236, Validation Loss: 2.3075, Validation F1: 0.7204
+Epoch [506/700], Train Loss: 0.0067, Validation Loss: 2.4070, Validation F1: 0.7162
+Epoch [507/700], Train Loss: 0.0021, Validation Loss: 2.5932, Validation F1: 0.7600
+Epoch [508/700], Train Loss: 0.0010, Validation Loss: 2.6592, Validation F1: 0.7622
+Epoch [509/700], Train Loss: 0.0004, Validation Loss: 2.7183, Validation F1: 0.7580
+Epoch [510/700], Train Loss: 0.0002, Validation Loss: 2.7736, Validation F1: 0.7594
+Epoch [511/700], Train Loss: 0.0001, Validation Loss: 2.8382, Validation F1: 0.7544
+Epoch [512/700], Train Loss: 0.0001, Validation Loss: 2.8724, Validation F1: 0.7580
+Epoch [513/700], Train Loss: 0.0001, Validation Loss: 2.9065, Validation F1: 0.7638
+Epoch [514/700], Train Loss: 0.0001, Validation Loss: 2.9271, Validation F1: 0.7602
+Epoch [515/700], Train Loss: 0.0000, Validation Loss: 2.9560, Validation F1: 0.7638
+Epoch [516/700], Train Loss: 0.0000, Validation Loss: 2.9712, Validation F1: 0.7638
+Epoch [517/700], Train Loss: 0.0000, Validation Loss: 2.9860, Validation F1: 0.7638
+Epoch [518/700], Train Loss: 0.0000, Validation Loss: 3.0208, Validation F1: 0.7638
+Epoch [519/700], Train Loss: 0.0000, Validation Loss: 3.0720, Validation F1: 0.7638
+Epoch [520/700], Train Loss: 0.0000, Validation Loss: 3.1053, Validation F1: 0.7638
+Epoch [521/700], Train Loss: 0.0000, Validation Loss: 3.1453, Validation F1: 0.7616
+Epoch [522/700], Train Loss: 0.0000, Validation Loss: 3.1827, Validation F1: 0.7638
+Epoch [523/700], Train Loss: 0.0122, Validation Loss: 1.9503, Validation F1: 0.6979
+Epoch [524/700], Train Loss: 0.0238, Validation Loss: 2.3904, Validation F1: 0.7263
+Epoch [525/700], Train Loss: 0.0035, Validation Loss: 2.3653, Validation F1: 0.7283
+Epoch [526/700], Train Loss: 0.0014, Validation Loss: 2.5906, Validation F1: 0.7378
+Epoch [527/700], Train Loss: 0.0007, Validation Loss: 2.6659, Validation F1: 0.7500
+Epoch [528/700], Train Loss: 0.0004, Validation Loss: 2.6447, Validation F1: 0.7429
+Epoch [529/700], Train Loss: 0.0003, Validation Loss: 2.6911, Validation F1: 0.7493
+Epoch [530/700], Train Loss: 0.0002, Validation Loss: 2.7410, Validation F1: 0.7493
+Epoch [531/700], Train Loss: 0.0001, Validation Loss: 2.7702, Validation F1: 0.7536
+Epoch [532/700], Train Loss: 0.0001, Validation Loss: 2.8062, Validation F1: 0.7536
+Epoch [533/700], Train Loss: 0.0001, Validation Loss: 2.7792, Validation F1: 0.7586
+Epoch [534/700], Train Loss: 0.0000, Validation Loss: 2.8387, Validation F1: 0.7586
+Epoch [535/700], Train Loss: 0.0000, Validation Loss: 2.8504, Validation F1: 0.7608
+Epoch [536/700], Train Loss: 0.0000, Validation Loss: 2.8862, Validation F1: 0.7608
+Epoch [537/700], Train Loss: 0.0000, Validation Loss: 2.9001, Validation F1: 0.7644
+Epoch [538/700], Train Loss: 0.0000, Validation Loss: 2.9330, Validation F1: 0.7666
+Epoch [539/700], Train Loss: 0.0000, Validation Loss: 2.9748, Validation F1: 0.7688
+Epoch [540/700], Train Loss: 0.0000, Validation Loss: 2.9651, Validation F1: 0.7666
+Epoch [541/700], Train Loss: 0.0000, Validation Loss: 2.9817, Validation F1: 0.7666
+Epoch [542/700], Train Loss: 0.0089, Validation Loss: 1.9847, Validation F1: 0.6713
+Epoch [543/700], Train Loss: 0.0276, Validation Loss: 1.8207, Validation F1: 0.7111
+Epoch [544/700], Train Loss: 0.0056, Validation Loss: 2.0238, Validation F1: 0.7394
+Epoch [545/700], Train Loss: 0.0019, Validation Loss: 2.0171, Validation F1: 0.7396
+Epoch [546/700], Train Loss: 0.0017, Validation Loss: 2.3031, Validation F1: 0.6889
+Epoch [547/700], Train Loss: 0.0022, Validation Loss: 2.3457, Validation F1: 0.7273
+Epoch [548/700], Train Loss: 0.0006, Validation Loss: 2.3555, Validation F1: 0.7671
+Epoch [549/700], Train Loss: 0.0011, Validation Loss: 2.4143, Validation F1: 0.7473
+Epoch [550/700], Train Loss: 0.0003, Validation Loss: 2.4459, Validation F1: 0.7514
+Epoch [551/700], Train Loss: 0.0002, Validation Loss: 2.5270, Validation F1: 0.7590
+Epoch [552/700], Train Loss: 0.0001, Validation Loss: 2.5834, Validation F1: 0.7577
+Epoch [553/700], Train Loss: 0.0001, Validation Loss: 2.6452, Validation F1: 0.7528
+Epoch [554/700], Train Loss: 0.0001, Validation Loss: 2.6716, Validation F1: 0.7598
+Epoch [555/700], Train Loss: 0.0000, Validation Loss: 2.7120, Validation F1: 0.7598
+Epoch [556/700], Train Loss: 0.0090, Validation Loss: 2.1137, Validation F1: 0.7325
+Epoch [557/700], Train Loss: 0.0140, Validation Loss: 2.2853, Validation F1: 0.7357
+Epoch [558/700], Train Loss: 0.0029, Validation Loss: 2.5345, Validation F1: 0.7569
+Epoch [559/700], Train Loss: 0.0009, Validation Loss: 2.7443, Validation F1: 0.7409
+Epoch [560/700], Train Loss: 0.0003, Validation Loss: 2.7990, Validation F1: 0.7472
+Epoch [561/700], Train Loss: 0.0002, Validation Loss: 2.8378, Validation F1: 0.7535
+Epoch [562/700], Train Loss: 0.0001, Validation Loss: 2.8616, Validation F1: 0.7535
+Epoch [563/700], Train Loss: 0.0001, Validation Loss: 2.8818, Validation F1: 0.7535
+Epoch [564/700], Train Loss: 0.0001, Validation Loss: 2.8436, Validation F1: 0.7614
+Epoch [565/700], Train Loss: 0.0001, Validation Loss: 2.8919, Validation F1: 0.7666
+Epoch [566/700], Train Loss: 0.0000, Validation Loss: 2.9222, Validation F1: 0.7666
+Epoch [567/700], Train Loss: 0.0000, Validation Loss: 2.9591, Validation F1: 0.7701
+Epoch [568/700], Train Loss: 0.0000, Validation Loss: 2.9860, Validation F1: 0.7736
+Epoch [569/700], Train Loss: 0.0000, Validation Loss: 3.0179, Validation F1: 0.7771
+Epoch [570/700], Train Loss: 0.0000, Validation Loss: 3.0523, Validation F1: 0.7806
+Epoch [571/700], Train Loss: 0.0000, Validation Loss: 3.0903, Validation F1: 0.7841
+Epoch [572/700], Train Loss: 0.0000, Validation Loss: 3.1258, Validation F1: 0.7841
+Epoch [573/700], Train Loss: 0.0000, Validation Loss: 3.1825, Validation F1: 0.7841
+Epoch [574/700], Train Loss: 0.0000, Validation Loss: 3.2165, Validation F1: 0.7898
+Epoch [575/700], Train Loss: 0.0005, Validation Loss: 2.6890, Validation F1: 0.7383
+Epoch [576/700], Train Loss: 0.0312, Validation Loss: 1.8096, Validation F1: 0.7429
+Epoch [577/700], Train Loss: 0.0046, Validation Loss: 1.9777, Validation F1: 0.7667
+Epoch [578/700], Train Loss: 0.0012, Validation Loss: 2.3079, Validation F1: 0.7649
+Epoch [579/700], Train Loss: 0.0005, Validation Loss: 2.3165, Validation F1: 0.7705
+Epoch [580/700], Train Loss: 0.0003, Validation Loss: 2.4460, Validation F1: 0.7692
+Epoch [581/700], Train Loss: 0.0002, Validation Loss: 2.4876, Validation F1: 0.7670
+Epoch [582/700], Train Loss: 0.0001, Validation Loss: 2.5313, Validation F1: 0.7649
+Epoch [583/700], Train Loss: 0.0001, Validation Loss: 2.5992, Validation F1: 0.7705
+Epoch [584/700], Train Loss: 0.0069, Validation Loss: 2.4629, Validation F1: 0.7432
+Epoch [585/700], Train Loss: 0.0055, Validation Loss: 2.3676, Validation F1: 0.7374
+Epoch [586/700], Train Loss: 0.0029, Validation Loss: 2.5962, Validation F1: 0.7658
+Epoch [587/700], Train Loss: 0.0010, Validation Loss: 2.3791, Validation F1: 0.7756
+Epoch [588/700], Train Loss: 0.0012, Validation Loss: 2.6433, Validation F1: 0.7675
+Epoch [589/700], Train Loss: 0.0004, Validation Loss: 2.6632, Validation F1: 0.7787
+Epoch [590/700], Train Loss: 0.0001, Validation Loss: 2.7443, Validation F1: 0.7731
+Epoch [591/700], Train Loss: 0.0001, Validation Loss: 2.7410, Validation F1: 0.7809
+Epoch [592/700], Train Loss: 0.0001, Validation Loss: 2.7976, Validation F1: 0.7775
+Epoch [593/700], Train Loss: 0.0000, Validation Loss: 2.8256, Validation F1: 0.7753
+Epoch [594/700], Train Loss: 0.0000, Validation Loss: 2.8247, Validation F1: 0.7731
+Epoch [595/700], Train Loss: 0.0000, Validation Loss: 2.8667, Validation F1: 0.7718
+Epoch [596/700], Train Loss: 0.0000, Validation Loss: 2.9267, Validation F1: 0.7718
+Epoch [597/700], Train Loss: 0.0000, Validation Loss: 2.9402, Validation F1: 0.7705
+Epoch [598/700], Train Loss: 0.0000, Validation Loss: 2.9553, Validation F1: 0.7727
+Epoch [599/700], Train Loss: 0.0000, Validation Loss: 2.9939, Validation F1: 0.7749
+Epoch [600/700], Train Loss: 0.0000, Validation Loss: 3.0066, Validation F1: 0.7749
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/bilstmWeights_ugv_mv/model_epoch_0600.pt
+Epoch [601/700], Train Loss: 0.0000, Validation Loss: 3.0370, Validation F1: 0.7749
+Epoch [602/700], Train Loss: 0.0000, Validation Loss: 3.0547, Validation F1: 0.7727
+Epoch [603/700], Train Loss: 0.0000, Validation Loss: 3.1048, Validation F1: 0.7692
+Epoch [604/700], Train Loss: 0.0000, Validation Loss: 3.1089, Validation F1: 0.7727
+Epoch [605/700], Train Loss: 0.0000, Validation Loss: 3.1133, Validation F1: 0.7794
+Epoch [606/700], Train Loss: 0.0000, Validation Loss: 3.1381, Validation F1: 0.7759
+Epoch [607/700], Train Loss: 0.0225, Validation Loss: 1.8251, Validation F1: 0.7494
+Epoch [608/700], Train Loss: 0.0078, Validation Loss: 1.6491, Validation F1: 0.7937
+Epoch [609/700], Train Loss: 0.0025, Validation Loss: 1.8615, Validation F1: 0.8098
+Epoch [610/700], Train Loss: 0.0010, Validation Loss: 2.0000, Validation F1: 0.8187
+Epoch [611/700], Train Loss: 0.0004, Validation Loss: 2.1431, Validation F1: 0.8177
+Epoch [612/700], Train Loss: 0.0002, Validation Loss: 2.1700, Validation F1: 0.8089
+Epoch [613/700], Train Loss: 0.0001, Validation Loss: 2.1858, Validation F1: 0.8144
+Epoch [614/700], Train Loss: 0.0001, Validation Loss: 2.2098, Validation F1: 0.8167
+Epoch [615/700], Train Loss: 0.0001, Validation Loss: 2.2283, Validation F1: 0.8134
+Epoch [616/700], Train Loss: 0.0002, Validation Loss: 2.1639, Validation F1: 0.8154
+Epoch [617/700], Train Loss: 0.0116, Validation Loss: 1.9056, Validation F1: 0.7665
+Epoch [618/700], Train Loss: 0.0042, Validation Loss: 1.9394, Validation F1: 0.8075
+Epoch [619/700], Train Loss: 0.0014, Validation Loss: 2.2178, Validation F1: 0.7989
+Epoch [620/700], Train Loss: 0.0004, Validation Loss: 2.1999, Validation F1: 0.8066
+Epoch [621/700], Train Loss: 0.0002, Validation Loss: 2.3595, Validation F1: 0.7933
+Epoch [622/700], Train Loss: 0.0001, Validation Loss: 2.4592, Validation F1: 0.7899
+Epoch [623/700], Train Loss: 0.0001, Validation Loss: 2.5176, Validation F1: 0.7944
+Epoch [624/700], Train Loss: 0.0001, Validation Loss: 2.5607, Validation F1: 0.7932
+Epoch [625/700], Train Loss: 0.0000, Validation Loss: 2.6288, Validation F1: 0.7955
+Epoch [626/700], Train Loss: 0.0000, Validation Loss: 2.6844, Validation F1: 0.7920
+Epoch [627/700], Train Loss: 0.0000, Validation Loss: 2.7190, Validation F1: 0.7966
+Epoch [628/700], Train Loss: 0.0000, Validation Loss: 2.7715, Validation F1: 0.8000
+Epoch [629/700], Train Loss: 0.0000, Validation Loss: 2.8124, Validation F1: 0.8000
+Epoch [630/700], Train Loss: 0.0000, Validation Loss: 2.8565, Validation F1: 0.8000
+Epoch [631/700], Train Loss: 0.0000, Validation Loss: 2.8720, Validation F1: 0.8000
+Epoch [632/700], Train Loss: 0.0000, Validation Loss: 2.9013, Validation F1: 0.8034
+Epoch [633/700], Train Loss: 0.0000, Validation Loss: 2.8944, Validation F1: 0.7977
+Epoch [634/700], Train Loss: 0.0000, Validation Loss: 2.9608, Validation F1: 0.7943
+Epoch [635/700], Train Loss: 0.0000, Validation Loss: 2.9481, Validation F1: 0.7954
+Epoch [636/700], Train Loss: 0.0000, Validation Loss: 3.0544, Validation F1: 0.7942
+Epoch [637/700], Train Loss: 0.0000, Validation Loss: 3.0563, Validation F1: 0.7930
+Epoch [638/700], Train Loss: 0.0000, Validation Loss: 3.0321, Validation F1: 0.8000
+Epoch [639/700], Train Loss: 0.0000, Validation Loss: 3.1434, Validation F1: 0.7954
+Epoch [640/700], Train Loss: 0.0000, Validation Loss: 3.2177, Validation F1: 0.7931
+Epoch [641/700], Train Loss: 0.0000, Validation Loss: 3.1329, Validation F1: 0.7954
+Epoch [642/700], Train Loss: 0.0000, Validation Loss: 3.2150, Validation F1: 0.7954
+Epoch [643/700], Train Loss: 0.0000, Validation Loss: 3.2516, Validation F1: 0.7966
+Epoch [644/700], Train Loss: 0.0000, Validation Loss: 3.3028, Validation F1: 0.7966
+Epoch [645/700], Train Loss: 0.0000, Validation Loss: 3.3683, Validation F1: 0.7908
+Epoch [646/700], Train Loss: 0.0000, Validation Loss: 3.4074, Validation F1: 0.7931
+Epoch [647/700], Train Loss: 0.0000, Validation Loss: 3.4300, Validation F1: 0.7931
+Epoch [648/700], Train Loss: 0.0000, Validation Loss: 3.6134, Validation F1: 0.7826
+Epoch [649/700], Train Loss: 0.0257, Validation Loss: 2.4366, Validation F1: 0.7692
+Epoch [650/700], Train Loss: 0.0136, Validation Loss: 2.3491, Validation F1: 0.7612
+Epoch [651/700], Train Loss: 0.0056, Validation Loss: 2.4972, Validation F1: 0.7877
+Epoch [652/700], Train Loss: 0.0014, Validation Loss: 2.6819, Validation F1: 0.7688
+Epoch [653/700], Train Loss: 0.0006, Validation Loss: 2.8147, Validation F1: 0.7771
+Epoch [654/700], Train Loss: 0.0003, Validation Loss: 2.8569, Validation F1: 0.7816
+Epoch [655/700], Train Loss: 0.0002, Validation Loss: 2.8912, Validation F1: 0.7816
+Epoch [656/700], Train Loss: 0.0001, Validation Loss: 2.9815, Validation F1: 0.7781
+Epoch [657/700], Train Loss: 0.0001, Validation Loss: 3.0057, Validation F1: 0.7746
+Epoch [658/700], Train Loss: 0.0001, Validation Loss: 3.0246, Validation F1: 0.7746
+Epoch [659/700], Train Loss: 0.0001, Validation Loss: 3.0586, Validation F1: 0.7746
+Epoch [660/700], Train Loss: 0.0000, Validation Loss: 3.0804, Validation F1: 0.7746
+Epoch [661/700], Train Loss: 0.0000, Validation Loss: 3.1031, Validation F1: 0.7768
+Epoch [662/700], Train Loss: 0.0000, Validation Loss: 3.1201, Validation F1: 0.7768
+Epoch [663/700], Train Loss: 0.0000, Validation Loss: 3.1456, Validation F1: 0.7768
+Epoch [664/700], Train Loss: 0.0000, Validation Loss: 3.1607, Validation F1: 0.7768
+Epoch [665/700], Train Loss: 0.0000, Validation Loss: 3.1680, Validation F1: 0.7768
+Epoch [666/700], Train Loss: 0.0000, Validation Loss: 3.1372, Validation F1: 0.7768
+Epoch [667/700], Train Loss: 0.0000, Validation Loss: 3.1367, Validation F1: 0.7768
+Epoch [668/700], Train Loss: 0.0000, Validation Loss: 3.1540, Validation F1: 0.7733
+Epoch [669/700], Train Loss: 0.0000, Validation Loss: 3.2015, Validation F1: 0.7733
+Epoch [670/700], Train Loss: 0.0000, Validation Loss: 3.1450, Validation F1: 0.7733
+Epoch [671/700], Train Loss: 0.0000, Validation Loss: 3.1785, Validation F1: 0.7733
+Epoch [672/700], Train Loss: 0.0000, Validation Loss: 3.2081, Validation F1: 0.7733
+Epoch [673/700], Train Loss: 0.0000, Validation Loss: 3.2022, Validation F1: 0.7755
+Epoch [674/700], Train Loss: 0.0000, Validation Loss: 3.2411, Validation F1: 0.7719
+Epoch [675/700], Train Loss: 0.0000, Validation Loss: 3.2376, Validation F1: 0.7697
+Epoch [676/700], Train Loss: 0.0000, Validation Loss: 3.2630, Validation F1: 0.7647
+Epoch [677/700], Train Loss: 0.0000, Validation Loss: 3.2337, Validation F1: 0.7647
+Epoch [678/700], Train Loss: 0.0000, Validation Loss: 3.2076, Validation F1: 0.7661
+Epoch [679/700], Train Loss: 0.0136, Validation Loss: 2.7529, Validation F1: 0.6973
+Epoch [680/700], Train Loss: 0.0148, Validation Loss: 2.2531, Validation F1: 0.7619
+Epoch [681/700], Train Loss: 0.0031, Validation Loss: 2.8539, Validation F1: 0.7635
+Epoch [682/700], Train Loss: 0.0009, Validation Loss: 2.9070, Validation F1: 0.7705
+Epoch [683/700], Train Loss: 0.0003, Validation Loss: 2.9732, Validation F1: 0.7727
+Epoch [684/700], Train Loss: 0.0002, Validation Loss: 3.0715, Validation F1: 0.7679
+Epoch [685/700], Train Loss: 0.0001, Validation Loss: 3.1172, Validation F1: 0.7600
+Epoch [686/700], Train Loss: 0.0001, Validation Loss: 3.1563, Validation F1: 0.7493
+Epoch [687/700], Train Loss: 0.0001, Validation Loss: 3.1558, Validation F1: 0.7514
+Epoch [688/700], Train Loss: 0.0000, Validation Loss: 3.1643, Validation F1: 0.7550
+Epoch [689/700], Train Loss: 0.0000, Validation Loss: 3.1733, Validation F1: 0.7550
+Epoch [690/700], Train Loss: 0.0000, Validation Loss: 3.2082, Validation F1: 0.7514
+Epoch [691/700], Train Loss: 0.0000, Validation Loss: 3.2159, Validation F1: 0.7514
+Epoch [692/700], Train Loss: 0.0000, Validation Loss: 3.2443, Validation F1: 0.7514
+Epoch [693/700], Train Loss: 0.0000, Validation Loss: 3.2616, Validation F1: 0.7514
+Epoch [694/700], Train Loss: 0.0000, Validation Loss: 3.2697, Validation F1: 0.7550
+Epoch [695/700], Train Loss: 0.0000, Validation Loss: 3.2956, Validation F1: 0.7572
+Epoch [696/700], Train Loss: 0.0000, Validation Loss: 3.2987, Validation F1: 0.7608
+Epoch [697/700], Train Loss: 0.0000, Validation Loss: 3.3144, Validation F1: 0.7630
+Epoch [698/700], Train Loss: 0.0000, Validation Loss: 3.3279, Validation F1: 0.7630
+Epoch [699/700], Train Loss: 0.0000, Validation Loss: 3.3152, Validation F1: 0.7652
+Epoch [700/700], Train Loss: 0.0000, Validation Loss: 3.3284, Validation F1: 0.7652
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/bilstmWeights_ugv_mv/model_epoch_0700.pt
+Saved model -> /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/bilstmWeights_ugv_mv/final_model.pt
+Best validation F1: 0.8207 at epoch 288.
+Loss history saved to /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/bilstmWeights_ugv_mv/loss_history.json
+BiLSTM weights saved to /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/bilstmWeights_ugv_mv
+=== best_model.pt ===
+--- BiLSTM val summary (1180 windows) ---
+   windows: TP=151 FP=23 FN=43 TN=12763  P=0.868 R=0.778 F1=0.821  clean FPR=0.0018
+   window recall: short 0.81, noise 0.88, constant 0.75
+   event isolation recall: 0.933 of 15 (short 1.00/5, noise 1.00/5, constant 0.80/5)
+   clean time flagged: 0.0018
+   per channel (F1 | event recall | clean time flagged):
+      gps/altitude           1.000 | 1.00 of   1 | 0.0000
+      gps/latitude           0.000 | nan of   0 | 0.0017
+      gps/longitude          0.667 | 1.00 of   1 | 0.0008
+      imu/ax                 0.848 | 1.00 of   3 | 0.0064
+      imu/ay                 0.886 | 1.00 of   2 | 0.0000
+      imu/az                 0.000 | nan of   0 | 0.0000
+      imu/wx                 0.762 | 1.00 of   1 | 0.0043
+      imu/wy                 0.000 | 0.00 of   1 | 0.0000
+      imu/wz                 0.000 | nan of   0 | 0.0051
+      wheel_odom/vx          1.000 | 1.00 of   1 | 0.0000
+      wheel_odom/wz          0.842 | 1.00 of   5 | 0.0017
+--- BiLSTM test summary (1180 windows) ---
+   windows: TP=142 FP=12 FN=53 TN=12773  P=0.922 R=0.728 F1=0.814  clean FPR=0.0009
+   window recall: short 0.67, noise 0.59, constant 0.79
+   event isolation recall: 0.733 of 15 (short 0.60/5, noise 0.60/5, constant 1.00/5)
+   clean time flagged: 0.0009
+   per channel (F1 | event recall | clean time flagged):
+      gps/altitude           0.968 | 1.00 of   2 | 0.0000
+      gps/latitude           0.528 | 1.00 of   1 | 0.0000
+      gps/longitude          0.978 | 1.00 of   3 | 0.0000
+      imu/ax                 0.000 | nan of   0 | 0.0059
+      imu/ay                 0.974 | 1.00 of   1 | 0.0000
+      imu/az                 0.000 | nan of   0 | 0.0000
+      imu/wx                 0.000 | nan of   0 | 0.0000
+      imu/wy                 0.769 | 0.50 of   2 | 0.0000
+      imu/wz                 0.000 | 0.00 of   3 | 0.0035
+      wheel_odom/vx          0.992 | 1.00 of   2 | 0.0009
+      wheel_odom/wz          1.000 | 1.00 of   1 | 0.0000
+--- BiLSTM test_extra summary (9735 windows) ---
+   windows: TP=1694 FP=318 FN=769 TN=104304  P=0.842 R=0.688 F1=0.757  clean FPR=0.0030
+   window recall: short 0.46, noise 0.85, constant 0.66
+   event isolation recall: 0.812 of 165 (short 0.65/55, noise 0.96/55, constant 0.82/55)
+   clean time flagged: 0.0030
+   per channel (F1 | event recall | clean time flagged):
+      gps/altitude           0.980 | 1.00 of  15 | 0.0005
+      gps/latitude           0.519 | 0.93 of  15 | 0.0041
+      gps/longitude          0.486 | 0.80 of  15 | 0.0024
+      imu/ax                 0.716 | 0.73 of  15 | 0.0056
+      imu/ay                 0.592 | 0.53 of  15 | 0.0012
+      imu/az                 0.961 | 0.93 of  15 | 0.0003
+      imu/wx                 0.961 | 0.93 of  15 | 0.0004
+      imu/wy                 0.756 | 0.67 of  15 | 0.0018
+      imu/wz                 0.152 | 0.40 of  15 | 0.0101
+      wheel_odom/vx          0.935 | 1.00 of  15 | 0.0018
+      wheel_odom/wz          0.790 | 1.00 of  15 | 0.0051
+Scores saved to /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/results/bilstmWeights_ugv_mv.json
+
+Done. Run inference with, e.g.:
+    ./bin/python main.py --mode run --model autoencoder

@@ -1,0 +1,73 @@
+Loading UGV fault variants from "/Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/datasets/ugv_faulty" (layout=multivariate, domain=frequency, seq_len=100, paired=True) ...
+    train: 281920 windows -> 66302 faulty (window, channel) pairs
+    val: 10915 windows -> 2634 faulty (window, channel) pairs
+    test: 1180 windows -> 195 faulty (window, channel) pairs
+    test_extra: 9735 windows -> 2463 faulty (window, channel) pairs
+Train: 281920 windows, Val: 10915 windows, feat_dim=15
+   vote member BiLSTM: /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/bilstmWeights_ugv_mv_balanced_freq
+   vote member GRU: /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/gruWeights_ugv_mv_balanced_freq
+   Clean-train reconstruction error p99 per channel (215618 windows):
+      imu/wx                 3.5288e-01
+      imu/wy                 3.7072e-01
+      imu/wz                 4.0465e-02
+      imu/ax                 5.3858e-01
+      imu/ay                 6.0227e-01
+      imu/az                 1.0023e+00
+      wheel_odom/vx          3.2505e-02
+      wheel_odom/wz          4.5482e-02
+      gps/latitude           1.9436e-02
+      gps/longitude          2.1120e-02
+      gps/altitude           6.1747e-02
+   vote member Autoencoder: /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/autoencoderWeights_ugv_mv_w100_freq
+--- Majority vote (2 of 3) val summary (10915 windows) ---
+   windows: TP=2332 FP=171 FN=302 TN=117260  P=0.932 R=0.885 F1=0.908  clean FPR=0.0015
+   window recall: short 0.66, noise 0.92, constant 0.90
+   event isolation recall: 0.939 of 180 (short 0.83/60, noise 0.98/60, constant 1.00/60)
+   clean time flagged: 0.0015
+   per channel (F1 | event recall | clean time flagged):
+      gps/altitude           0.991 | 1.00 of  16 | 0.0000
+      gps/latitude           0.786 | 1.00 of  15 | 0.0019
+      gps/longitude          0.880 | 1.00 of  16 | 0.0017
+      imu/ax                 0.841 | 0.83 of  18 | 0.0034
+      imu/ay                 0.939 | 0.94 of  17 | 0.0010
+      imu/az                 0.941 | 1.00 of  15 | 0.0022
+      imu/wx                 0.982 | 1.00 of  16 | 0.0004
+      imu/wy                 0.951 | 0.81 of  16 | 0.0001
+      imu/wz                 0.794 | 0.80 of  15 | 0.0030
+      wheel_odom/vx          0.968 | 1.00 of  16 | 0.0007
+      wheel_odom/wz          0.905 | 0.95 of  20 | 0.0018
+--- Majority vote (2 of 3) test summary (1180 windows) ---
+   windows: TP=169 FP=25 FN=26 TN=12760  P=0.871 R=0.867 F1=0.869  clean FPR=0.0020
+   window recall: short 0.87, noise 0.74, constant 0.92
+   event isolation recall: 1.000 of 15 (short 1.00/5, noise 1.00/5, constant 1.00/5)
+   clean time flagged: 0.0019
+   per channel (F1 | event recall | clean time flagged):
+      gps/altitude           0.968 | 1.00 of   2 | 0.0000
+      gps/latitude           0.960 | 1.00 of   1 | 0.0000
+      gps/longitude          0.957 | 1.00 of   3 | 0.0009
+      imu/ax                 0.000 | nan of   0 | 0.0059
+      imu/ay                 0.667 | 1.00 of   1 | 0.0052
+      imu/az                 0.000 | nan of   0 | 0.0034
+      imu/wx                 0.000 | nan of   0 | 0.0000
+      imu/wy                 0.857 | 1.00 of   2 | 0.0000
+      imu/wz                 0.541 | 1.00 of   3 | 0.0043
+      wheel_odom/vx          0.992 | 1.00 of   2 | 0.0009
+      wheel_odom/wz          0.941 | 1.00 of   1 | 0.0009
+--- Majority vote (2 of 3) test_extra summary (9735 windows) ---
+   windows: TP=2040 FP=226 FN=423 TN=104396  P=0.900 R=0.828 F1=0.863  clean FPR=0.0022
+   window recall: short 0.60, noise 0.89, constant 0.84
+   event isolation recall: 0.939 of 165 (short 0.82/55, noise 1.00/55, constant 1.00/55)
+   clean time flagged: 0.0021
+   per channel (F1 | event recall | clean time flagged):
+      gps/altitude           0.995 | 1.00 of  15 | 0.0000
+      gps/latitude           0.741 | 1.00 of  15 | 0.0001
+      gps/longitude          0.722 | 1.00 of  15 | 0.0008
+      imu/ax                 0.581 | 0.80 of  15 | 0.0072
+      imu/ay                 0.845 | 0.87 of  15 | 0.0041
+      imu/az                 0.920 | 1.00 of  15 | 0.0021
+      imu/wx                 0.996 | 1.00 of  15 | 0.0001
+      imu/wy                 0.956 | 0.80 of  15 | 0.0006
+      imu/wz                 0.627 | 0.87 of  15 | 0.0075
+      wheel_odom/vx          0.971 | 1.00 of  15 | 0.0000
+      wheel_odom/wz          0.876 | 1.00 of  15 | 0.0011
+Scores saved to /Users/jeremyyin/Documents/GitHub/uav_ugv_project/uav_ugv_project_fault_detection/models/results/voteWeights_ugv_mv_balanced_freq.json
