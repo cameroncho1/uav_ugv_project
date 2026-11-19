@@ -39,6 +39,19 @@ Change the local goal, camera altitude, grid resolution, or image threshold with
 ros2 launch mission_manager simple_goal_demo.launch.py goal_x:=4.0 goal_y:=0.0 uav_altitude:=4.5 uav_follow:=true grid_resolution:=0.1 obstacle_luminance_threshold:=32.0
 ```
 
+The UAV coordination mode is selected independently of the UGV navigation system:
+
+| Argument | Default | Behavior |
+|---|---:|---|
+| `coordination_mode` | `ugv_follow` | `ugv_follow` flies above the fused UGV pose; `uav_scout` flies toward the goal ahead of the UGV |
+| `scout_lead_distance` | `3.0` | Horizontal lead distance in meters for scout mode |
+| `scout_max_speed` | `1.0` | Maximum horizontal UAV setpoint step speed in scout mode |
+| `uav_initial_settle_time` | `2.0` | UAV anchor settling time before localization publishing |
+| `world_name` | `simple_goal_demo` | SDF world stem under `simulation/worlds/` |
+| `map_bounds` | `-12.0,-10.0,12.0,10.0` | Mapper area as `min_x,min_y,max_x,max_y` |
+
+In either coordination mode, the UGV consumes its fused `map`-frame pose, while the UAV remains responsible for producing an independent map anchor and camera observations. Scout mode holds the UAV when the global goal or a valid UGV pose is unavailable.
+
 The larger scattered-obstacle world is selected explicitly. It spans approximately 60 m by
 40 m, starts the vehicles near `(-4, 0)`, and uses a diagonal goal with map bounds covering
 the larger area:

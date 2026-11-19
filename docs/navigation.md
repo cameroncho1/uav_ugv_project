@@ -24,6 +24,17 @@ The planner inflates two grids. The planning grid treats unknown cells as free a
 
 With `uav_follow:=true` (default) the offboard controller keeps its takeoff hold until PX4 reports Offboard, armed and at least 80% of the altitude setpoint. It then moves its horizontal setpoint toward the UGV fused pose, converted to PX4 NED with the same `map_origin` as the anchor adapter, at up to 1 m/s with a 0.15 m deadband. It holds whenever the fused pose is older than 0.5 s or its position standard deviation exceeds 0.5 m, so it never chases an unusable estimate. With GPS off at startup it holds until the camera's first UGV correction.
 
+## UAV coordination modes
+
+The `coordination_mode` launch argument selects one of two UAV behaviors:
+
+- `ugv_follow` preserves the baseline: the UAV follows the UGV's fused `map` pose.
+- `uav_scout` selects a lead point between the UGV and the global goal. The UAV advances toward a point `scout_lead_distance` meters ahead of the UGV, stops at the goal when the remaining distance is shorter, and is limited to `scout_max_speed`.
+
+Both modes require PX4 Offboard/armed state and at least 80% of the configured cruise altitude before horizontal motion. Scout mode holds at the current setpoint when the goal is unavailable or the UGV pose fails the shared pose guard. The `uav_initial_settle_time` launch argument configures the anchor adapter's startup settling interval.
+
+The mapper receives `map_bounds` as a comma-separated `min_x,min_y,max_x,max_y` string and may publish known ground beyond the UGV camera footprint. It does not require a matched UGV pose for every scout frame, but it masks the UGV when a timestamp-matched pose is available and sufficiently certain. The UGV controller independently consumes `/ugv/localization/pose`, the clearance grid, and the associated route.
+
 ## Camera transport
 
 The goal-demo launch sets `FASTRTPS_DEFAULT_PROFILES_FILE` to [config/fastdds_local_shm.xml](../config/fastdds_local_shm.xml) unless it is already set. Whole 3.7 MB camera images then pass through shared memory. With default UDP fragments and the default Linux receive buffer, an ARM64 UTM VM received about 0.3 of the 5 rendered images per second, and the map was usually older than the planner's 2 s limit. Processes started outside the launch need the same variable to receive images reliably.
