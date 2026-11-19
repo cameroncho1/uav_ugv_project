@@ -80,7 +80,6 @@ setsid ros2 launch mission_manager simple_goal_demo.launch.py \
   start_simulation:=false start_rviz:=false \
   world_file:="$WORLD" evaluation_trace:=true goal_x:="$GOAL_X" goal_y:="$GOAL_Y" \
   uav_assistance:="$UAV_ASSISTANCE" \
-  grid_resolution:="${GRID_RESOLUTION:-0.2}" \
   initial_gps_enabled:="${INITIAL_GPS_ENABLED:-false}" \
   uav_altitude:="${UAV_ALTITUDE:-4.5}" \
   uav_heading:="${UAV_HEADING:-true}" \

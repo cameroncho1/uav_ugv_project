@@ -36,7 +36,7 @@ ROS nodes use `/clock`, and `px4_goal_demo.sh` sets `UXRCE_DDS_SYNCT=0` so PX4 s
 Change the local goal, camera altitude, grid resolution, or image threshold with launch arguments:
 
 ```bash
-ros2 launch mission_manager simple_goal_demo.launch.py goal_x:=4.0 goal_y:=0.0 uav_altitude:=4.5 uav_follow:=true grid_resolution:=0.2 obstacle_luminance_threshold:=32.0
+ros2 launch mission_manager simple_goal_demo.launch.py goal_x:=4.0 goal_y:=0.0 uav_altitude:=4.5 uav_follow:=true grid_resolution:=0.1 obstacle_luminance_threshold:=32.0
 ```
 
 The UAV coordination mode is selected independently of the UGV navigation system:
@@ -48,7 +48,6 @@ The UAV coordination mode is selected independently of the UGV navigation system
 | `scout_max_speed` | `1.0` | Maximum horizontal UAV setpoint step speed in scout mode |
 | `uav_initial_settle_time` | `2.0` | UAV anchor settling time before localization publishing |
 | `world_name` | `simple_goal_demo` | SDF world stem under `simulation/worlds/` |
-| `grid_resolution` | `0.1` | Occupancy-grid cell size in meters; `0.2` is the lighter validation setting |
 | `map_bounds` | `-12.0,-10.0,12.0,10.0` | Mapper area as `min_x,min_y,max_x,max_y` |
 
 In either coordination mode, the UGV consumes its fused `map`-frame pose, while the UAV remains responsible for producing an independent map anchor and camera observations. Scout mode holds the UAV when the global goal or a valid UGV pose is unavailable.
@@ -62,8 +61,6 @@ ros2 launch mission_manager simple_goal_demo.launch.py \
   world_name:=simple_goal_demo_large \
   goal_x:=24.0 goal_y:=14.0 \
   map_bounds:=-30.0,-20.0,30.0,20.0 \
-  grid_resolution:=0.2 \
-  start_rviz:=false \
   coordination_mode:=uav_scout
 ```
 
