@@ -1,0 +1,41 @@
+{
+  "source_run": "run_1022",
+  "seed": 2003045,
+  "nominal_noise": true,
+  "noise_window_s": [
+    5.0,
+    30.0
+  ],
+  "nominal_sigma": {
+    "imu": {
+      "wx": 0.01,
+      "wy": 0.01,
+      "wz": 0.01,
+      "ax": 0.1,
+      "ay": 0.1,
+      "az": 0.1
+    },
+    "wheel_odom": {
+      "vx": 0.05,
+      "wz": 0.02
+    },
+    "gps": {
+      "latitude": 1.5,
+      "longitude": 1.5,
+      "altitude": 3.0
+    }
+  },
+  "faults": [
+    {
+      "sensor": "imu",
+      "column": "wy",
+      "kind": "noise",
+      "start": 97.0940163926924,
+      "end": 110.57733446670835,
+      "magnitude": 3.0865227995538733,
+      "sign": 1,
+      "spikes": [],
+      "labelled_samples": 674
+    }
+  ]
+}

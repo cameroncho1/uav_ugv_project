@@ -1,0 +1,57 @@
+{
+  "source_run": "run_1011",
+  "seed": 4008092,
+  "nominal_noise": true,
+  "noise_window_s": [
+    5.0,
+    30.0
+  ],
+  "nominal_sigma": {
+    "imu": {
+      "wx": 0.01,
+      "wy": 0.01,
+      "wz": 0.01,
+      "ax": 0.1,
+      "ay": 0.1,
+      "az": 0.1
+    },
+    "wheel_odom": {
+      "vx": 0.05,
+      "wz": 0.02
+    },
+    "gps": {
+      "latitude": 1.5,
+      "longitude": 1.5,
+      "altitude": 3.0
+    }
+  },
+  "faults": [
+    {
+      "sensor": "gps",
+      "column": "latitude",
+      "kind": "short",
+      "start": 34.45170583960894,
+      "end": 47.75496765159137,
+      "magnitude": 14.892820543642344,
+      "sign": 1,
+      "spikes": [
+        [
+          37.923302567303,
+          3,
+          14.892820543642344
+        ],
+        [
+          39.66415473974811,
+          2,
+          8.372815462848989
+        ],
+        [
+          44.94611219455636,
+          3,
+          -12.55778962257505
+        ]
+      ],
+      "labelled_samples": 8
+    }
+  ]
+}
