@@ -7,7 +7,12 @@
         "activation_function": "relu"
     },
     "autoencoder": {
-        "hidden_dim": 50
+        "hidden_dim": 50,
+        "encoder_dims": [
+            60
+        ],
+        "decoder_dims": [],
+        "activation": "leaky_relu"
     },
     "bilstm": {
         "hidden_dim": 50,
@@ -16,6 +21,16 @@
     "rnn": {
         "hidden_dim": 50,
         "num_layers": 2
+    },
+    "gru": {
+        "hidden_dim": 50,
+        "num_layers": 2
+    },
+    "specialists": {
+        "bilstm_hidden": 15,
+        "gru_hidden": 15,
+        "ae_hidden": 128,
+        "ae_bottleneck": 4
     },
     "Trainer": {
         "batch_size": 32,

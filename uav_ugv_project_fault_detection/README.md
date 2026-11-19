@@ -137,6 +137,18 @@ Defaults write one fault-free (`normal`) and one variant per fault type for
 each run (`run_<seed>_<type>_<index>/`); change counts with `--per-type`,
 `--normal-variants`, and `--types`. `--count TYPE=N` overrides the count for one
 type, and `--noise-window MIN MAX` sets the noise-fault length in seconds.
+`--runs RUN ...` restricts injection to the named clean runs, and `--balanced`
+writes one variant per fault type and faultable channel
+(`run_<seed>_<type>_<sensor>-<column>/`, 33 per run) instead of random channels.
+
+`datasets/ugv_faulty_test_balanced/` holds 165 such variants of the five test
+drives, so every channel and fault type is scored 15 times; it is used only as
+the `test_extra` split (`--extra-test-dir`):
+
+```
+./bin/python fault_injection.py --input datasets/ugv_clean --output datasets/ugv_faulty_test_balanced \
+  --runs run_1005 run_1010 run_1021 run_1022 run_1026 --balanced --normal-variants 0 --seed 2
+```
 
 `datasets/ugv_clean_long/` holds 30 further 300 s drives (seeds 1030–1059,
 recorded at `UPDATE_RATE=1000`, so truth is about 15 Hz; sensor rates are
@@ -194,6 +206,51 @@ Weights go to `models/<name>Weights_ugv_paired[_freq]/`
 (`<name>Weights_ugv` holds the earlier single-channel run on a 24/6 split).
 `--device mps` uses the Apple GPU for the BiLSTM and autoencoder; `nn.RNN`
 trains faster on `--device cpu`.
+
+Normalization statistics come from the training split and are not stored with
+the weights, so `--mode run` must use the training directories of the run
+(for `*_long` weights: `--tag long --extra-train-dir datasets/ugv_faulty_long`).
+
+### Multivariate layout
+
+`--layout multivariate` ([`ugv_multivariate.py`](ugv_multivariate.py)) gives
+every 50 Hz time step all sensor channels at once (15 features: IMU, wheel
+speeds, GPS and wheel-odometry position, drive command). The RNN and BiLSTM
+output one sigmoid per faultable channel (11), so a window can be clean or
+faulty on any subset of channels; the autoencoder flags a channel when its
+feature's reconstruction error exceeds that channel's threshold. See
+[MODELS.md, Section 10](MODELS.md#10-multivariate-layout).
+
+```
+./bin/python main.py --dataset ugv --layout multivariate --model bilstm --device mps \
+  --epochs 700 --batch-size 256 --save-every 100 \
+  --extra-train-dir datasets/ugv_faulty_long --extra-test-dir datasets/ugv_faulty_test_balanced
+./bin/python main.py --dataset ugv --layout multivariate --mode run --model ensemble \
+  --extra-train-dir datasets/ugv_faulty_long --extra-test-dir datasets/ugv_faulty_test_balanced
+./bin/python summarize_results.py              # layout comparison on test_extra
+./bin/python test_training.py                  # Trainer options, GRU, specialists, split rules
+```
+
+`datasets/ugv_faulty_train_balanced/` and `datasets/ugv_faulty_val_balanced/`
+hold balanced variants of the training and validation drives
+(`fault_injection.py --balanced`). `--extra-val-dir` adds variants of the
+validation drives to the validation split. `--model gru` trains the gated
+recurrent classifier that replaces the plain RNN; train it on `--device cpu`
+with `OMP_NUM_THREADS=1`. `--grad-clip` limits each step's gradient norm, and
+`--patience` stops training after that many epochs without a better
+validation score ([MODELS.md, Section 10.7](MODELS.md#107-second-round-balanced-faults-gru-early-stopping)).
+
+`--specialists` trains 11 small networks for the chosen model, one per
+faultable channel. Each sees only its own channel's feature column. With
+`--mode run`, `--model vote` flags a (window, channel) pair when at least two of
+the BiLSTM, GRU, and autoencoder flag it. Members load from `--tag`, or per
+model from `--vote-tag MODEL=TAG` (for example `--vote-tag autoencoder=w100`).
+See [MODELS.md, Section 10.9](MODELS.md#109-per-channel-specialists-and-majority-vote).
+
+Weights go to `models/<name>Weights_ugv_mv[_freq]/`. Both layouts save their
+validation and test scores to `models/results/<weight folder>.json`, including
+event isolation recall and clean time flagged, which compare layouts with
+different window lengths ([`ugv_eval.py`](ugv_eval.py)).
 
 ## Live training curves (TensorBoard)
 

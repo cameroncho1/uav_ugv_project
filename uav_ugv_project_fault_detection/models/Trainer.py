@@ -7,7 +7,7 @@ import time
 
 import torch
 import torch.optim as optim
-from torch.utils.data import DataLoader
+from torch.utils.data import BatchSampler, DataLoader, RandomSampler, SequentialSampler
 
 
 # Define the Trainer class
@@ -26,6 +26,8 @@ class Trainer:
         device="cpu",
         writer=None,
         select_by="loss",
+        grad_clip=None,
+        patience=None,
     ):
         # Device for training (e.g. 'cpu', 'mps', 'cuda'); batches move with it.
         self.device = torch.device(device)
@@ -50,25 +52,38 @@ class Trainer:
         # Optional torch.utils.tensorboard SummaryWriter for live loss curves.
         self.writer = writer
         # 'loss': keep the lowest validation loss as best_model.pt. 'f1': keep the
-        # highest validation F1 of the fault class (argmax of classifier logits),
-        # which suits rare-fault data where the loss tracks confidence, not detection.
+        # highest validation F1 of the fault class (argmax of classifier logits, or
+        # logit > 0 per channel for 2-D multi-label targets, micro-averaged), which
+        # suits rare-fault data where the loss tracks confidence, not detection.
         if select_by not in ("loss", "f1"):
             raise ValueError(f"select_by must be 'loss' or 'f1', not {select_by!r}")
         self.select_by = select_by
         self.best_val_f1 = -1.0
+        # Optional maximum L2 norm of the gradient per step (None: no clipping).
+        self.grad_clip = grad_clip
+        # Optional early stop after this many epochs without a better validation
+        # score (None: always run num_epochs).
+        self.patience = patience
 
     def _save(self, path) -> None:
         # Persist the model so it can be loaded later with model.load_state_dict
         torch.save(self.model.state_dict(), path)
         print(f"Saved model -> {path}")
 
+    def _loader(self, dataset, shuffle):
+        # Tensor-backed datasets (main.WindowDataset) are indexed one whole batch
+        # at a time, avoiding a Python call and a collate per sample.
+        if getattr(dataset, "batch_indexable", False):
+            order = RandomSampler(dataset) if shuffle else SequentialSampler(dataset)
+            return DataLoader(dataset, batch_size=None,
+                              sampler=BatchSampler(order, self.batch_size, drop_last=False))
+        return DataLoader(dataset, batch_size=self.batch_size, shuffle=shuffle)
+
     def train(self) -> None:
-        train_loader = DataLoader(
-            self.train_data, batch_size=self.batch_size, shuffle=True
-        )
+        train_loader = self._loader(self.train_data, shuffle=True)
         # Validation is optional; some runs may pass val_data=None.
         val_loader = (
-            DataLoader(self.val_data, batch_size=self.batch_size, shuffle=False)
+            self._loader(self.val_data, shuffle=False)
             if self.val_data is not None
             else None
         )
@@ -83,6 +98,8 @@ class Trainer:
                 outputs = self.model(inputs)
                 loss = self.criterion(outputs, targets)
                 loss.backward()
+                if self.grad_clip is not None:
+                    torch.nn.utils.clip_grad_norm_(self.model.parameters(), self.grad_clip)
                 self.optimizer.step()
                 running_loss += loss.item()
 
@@ -101,11 +118,15 @@ class Trainer:
                         loss = self.criterion(outputs, targets)
                         val_loss += loss.item()
                         if self.select_by == "f1":
-                            pred = outputs.argmax(dim=1)
+                            if targets.dim() == 2:   # multi-label: logit > 0 is p > 0.5
+                                pred, truth = outputs > 0, targets > 0.5
+                            else:
+                                pred, truth = outputs.argmax(dim=1) == 1, targets == 1
+                            # Micro counts over every (window, channel) decision.
                             counts += torch.stack([
-                                ((pred == 1) & (targets == 1)).sum(),
-                                ((pred == 1) & (targets == 0)).sum(),
-                                ((pred == 0) & (targets == 1)).sum()]).cpu()
+                                (pred & truth).sum(),
+                                (pred & ~truth).sum(),
+                                (~pred & truth).sum()]).cpu()
                 val_loss = val_loss / max(len(val_loader), 1)
                 tp, fp, fn = counts.tolist()
                 val_f1 = 2 * tp / (2 * tp + fp + fn) if tp else 0.0
@@ -147,9 +168,17 @@ class Trainer:
                     self.best_epoch = epoch + 1
                     self._save(os.path.join(self.save_dir, "best_model.pt"))
 
+            stop = (self.patience is not None and val_loader is not None
+                    and epoch + 1 - max(self.best_epoch, 0) >= self.patience)
+            if stop:
+                print(f"Stopping early: no better validation score for {self.patience} "
+                      f"epochs (best at epoch {self.best_epoch}).")
+
             # Always keep the latest epoch as a checkpoint when saving is on.
-            if self.save_dir is not None and (epoch + 1) == self.num_epochs:
+            if self.save_dir is not None and (stop or (epoch + 1) == self.num_epochs):
                 self._save(os.path.join(self.save_dir, "final_model.pt"))
+            if stop:
+                break
 
         if self.save_dir is not None:
             score = (f"F1: {self.best_val_f1:.4f}" if self.select_by == "f1"

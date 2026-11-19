@@ -83,13 +83,16 @@ def channel_windows(variants, seq_len, stride, paired):
                 features.append(refs.get((sensor, column), np.full(len(frame), np.nan)))
             values = np.stack(features, axis=1)
             faulty = ((frame["fault"] == 1) & (frame["fault_column"] == column)).to_numpy()
+            stamps = frame["stamp"].to_numpy()
             for start in range(0, len(frame) - seq_len + 1, stride):
                 rows = slice(start, start + seq_len)
                 label = int(faulty[rows].any())
                 windows.append(values[rows])
                 labels.append(label)
-                info.append((variant.name, sensor, column, kind if label else "none"))
-    info = pd.DataFrame(info, columns=["variant", "sensor", "column", "fault_type"])
+                info.append((variant.name, sensor, column, kind if label else "none",
+                             stamps[start], stamps[start + seq_len - 1]))
+    info = pd.DataFrame(info, columns=["variant", "sensor", "column", "fault_type",
+                                       "t_first", "t_last"])
     return np.stack(windows), np.asarray(labels, dtype=np.int64), info
 
 
@@ -122,21 +125,52 @@ def find_variants(folder):
     return variants
 
 
-def build_ugv_splits(base_dir, seq_len=100, stride=None, val_runs=5, test_runs=5, seed=42,
-                     domain="time", paired=False, extra_train_dirs=()):
-    """Return ``{"train"|"val"|"test": (windows, labels, info)}`` standardized windows.
+def variant_splits(base_dir, val_runs, test_runs, seed, extra_train_dirs=(), extra_test_dirs=(),
+                   extra_val_dirs=()):
+    """Return ``{"train"|"val"|"test"[|"test_extra"]: [variant folders]}``.
 
     Variants in ``extra_train_dirs`` join the training split only, so validation
-    and test stay the runs drawn from ``base_dir``.
+    and test stay the runs drawn from ``base_dir``. Variants in ``extra_val_dirs``
+    join the validation split and must come from the validation drives. Variants in
+    ``extra_test_dirs`` form a separate ``test_extra`` split and must come from the
+    test drives.
     """
     splits = split_runs(find_variants(base_dir), val_runs, test_runs, seed)
-    held_out = {v.name.split("_")[1] for name in ("val", "test") for v in splits[name]}
+    run_of = lambda variants: {v.name.split("_")[1] for v in variants}
+    held_out = run_of(splits["val"]) | run_of(splits["test"])
     for folder in extra_train_dirs:
         extra = find_variants(folder)
-        overlap = held_out & {v.name.split("_")[1] for v in extra}
+        overlap = held_out & run_of(extra)
         if overlap:
             raise ValueError(f"{folder} reuses held-out source runs {sorted(overlap)}")
         splits["train"] += extra
+    val_drives = run_of(splits["val"])
+    for folder in extra_val_dirs:
+        extra = find_variants(folder)
+        outside = run_of(extra) - val_drives
+        if outside:
+            raise ValueError(f"{folder} uses source runs {sorted(outside)} outside the validation split")
+        splits["val"] += extra
+    if extra_test_dirs:
+        splits["test_extra"] = []
+    for folder in extra_test_dirs:
+        extra = find_variants(folder)
+        outside = run_of(extra) - run_of(splits["test"])
+        if outside:
+            raise ValueError(f"{folder} uses source runs {sorted(outside)} outside the test split")
+        splits["test_extra"] += extra
+    return splits
+
+
+def build_ugv_splits(base_dir, seq_len=100, stride=None, val_runs=5, test_runs=5, seed=42,
+                     domain="time", paired=False, extra_train_dirs=(), extra_test_dirs=(),
+                     extra_val_dirs=()):
+    """Return ``{"train"|"val"|"test"[|"test_extra"]: (windows, labels, info)}``.
+
+    Windows are standardized; see ``variant_splits`` for the split rules.
+    """
+    splits = variant_splits(base_dir, val_runs, test_runs, seed, extra_train_dirs,
+                            extra_test_dirs, extra_val_dirs)
     raw = {name: channel_windows(group, seq_len, stride or seq_len, paired)
            for name, group in splits.items()}
     stats = channel_stats(*raw["train"])

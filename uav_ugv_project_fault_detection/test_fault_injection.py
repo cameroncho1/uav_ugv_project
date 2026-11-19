@@ -76,6 +76,13 @@ def test_noise_window_is_configurable_and_clipped():
         assert 3.0 <= short_run.start < short_run.end <= 20.0
 
 
+def test_fixed_channel_is_used_for_every_kind():
+    rng = np.random.default_rng(7)
+    for kind in ("short", "noise", "constant"):
+        spec = random_fault(kind, 120.0, rng, channel=("wheel_odom", "wz"))
+        assert (spec.sensor, spec.column, spec.kind) == ("wheel_odom", "wz", kind)
+
+
 def test_labels_and_variant_files():
     frames = synthetic_frames()
     spec = FaultSpec("gps", "altitude", "constant", 30.0, 60.0, 3.0)
