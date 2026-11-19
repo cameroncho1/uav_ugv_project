@@ -103,7 +103,7 @@ def main():
     parser.add_argument("--verify", action="store_true")
     args = parser.parse_args()
 
-    from models.Autoencoder import Autoencoder
+    from models.Autoencoder import LEGACY, Autoencoder
     from models.BiLstm import BiLSTM
 
     config = json.loads((args.bilstm_dir / "model_config.json").read_text())
@@ -118,8 +118,12 @@ def main():
         raise SystemExit("the live detector needs paired (2-feature) time-domain weights")
     bilstm = BiLSTM(input_dim=2, hidden_dim=hidden, output_dim=2, num_layers=layers, readout="full")
     bilstm.load_state_dict(bilstm_state)
+    # sensor_fault_model.py implements the single-layer ReLU autoencoder; build that
+    # layout explicitly, since the config default now adds a hidden encoder layer.
+    if "encoder.weight" not in ae_state:
+        raise SystemExit("the live detector implements the single-layer ReLU autoencoder only")
     autoencoder = Autoencoder(input_dim=ae_state["encoder.weight"].shape[1],
-                              hidden_dim=ae_state["encoder.weight"].shape[0])
+                              hidden_dim=ae_state["encoder.weight"].shape[0], **LEGACY)
     autoencoder.load_state_dict(ae_state)
     bilstm.eval()
     autoencoder.eval()
