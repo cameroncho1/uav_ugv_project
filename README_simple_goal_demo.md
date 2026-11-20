@@ -4,7 +4,7 @@
 
 The camera UAV climbs to camera altitude, then flies over the UGV's fused pose as it drives (`uav_follow:=false` keeps it hovering at its takeoff point). The mapper fuses every downward camera frame into one remembered occupancy map. A* plans from the UGV pose to the fixed goal, through unseen ground when necessary, and the UGV drives only the part of that route the camera has seen to be clear. The flat world uses a solid matte ground color and simple geometric vehicle and goal visuals, with shadows disabled to reduce rendering load. It has no physical obstacles. The image classifier is an initial dark-pixel heuristic, not semantic obstacle detection. Unseen ground is assumed passable for planning only; the route is replanned at 5 Hz as the camera reveals it.
 
-The default local goal is `(4, 0)` in the ROS `map` frame. The UGV and UAV start near `(-4, 0)`. The UAV takes off from its PX4 local origin to a 4.5 m altitude setpoint and then follows the UGV or scouts toward the goal, depending on `coordination_mode`. The integration-owned world configuration supplies the UGV spawn and independent UAV map origin. Goal and altitude can be changed with launch arguments; if changing the goal coordinates, also update the bullseye pose in the world SDF.
+The default local goal is `(4, 0)` in the ROS `map` frame. The UGV starts at `(-4, 0)`. The UAV takes off from its PX4 local origin to a 4.5 m altitude setpoint and then follows the UGV. The integration-owned world configuration supplies the UGV spawn and independent UAV map origin. Goal and altitude can be changed with launch arguments; if changing the goal coordinates, also update the bullseye pose in the world SDF.
 
 ## Build
 
@@ -37,31 +37,6 @@ Change the local goal, camera altitude, grid resolution, or image threshold with
 
 ```bash
 ros2 launch mission_manager simple_goal_demo.launch.py goal_x:=4.0 goal_y:=0.0 uav_altitude:=4.5 uav_follow:=true grid_resolution:=0.1 obstacle_luminance_threshold:=32.0
-```
-
-The UAV coordination mode is selected independently of the UGV navigation system:
-
-| Argument | Default | Behavior |
-|---|---:|---|
-| `coordination_mode` | `ugv_follow` | `ugv_follow` flies above the fused UGV pose; `uav_scout` flies toward the goal ahead of the UGV |
-| `scout_lead_distance` | `3.0` | Horizontal lead distance in meters for scout mode |
-| `scout_max_speed` | `1.0` | Maximum horizontal UAV setpoint step speed in scout mode |
-| `uav_initial_settle_time` | `2.0` | UAV anchor settling time before localization publishing |
-| `world_name` | `simple_goal_demo` | SDF world stem under `simulation/worlds/` |
-| `map_bounds` | `-12.0,-10.0,12.0,10.0` | Mapper area as `min_x,min_y,max_x,max_y` |
-
-In either coordination mode, the UGV consumes its fused `map`-frame pose, while the UAV remains responsible for producing an independent map anchor and camera observations. Scout mode holds the UAV when the global goal or a valid UGV pose is unavailable.
-
-The larger scattered-obstacle world is selected explicitly. It spans approximately 60 m by
-40 m, starts the vehicles near `(-4, 0)`, and uses a diagonal goal with map bounds covering
-the larger area:
-
-```bash
-ros2 launch mission_manager simple_goal_demo.launch.py \
-  world_name:=simple_goal_demo_large \
-  goal_x:=24.0 goal_y:=14.0 \
-  map_bounds:=-30.0,-20.0,30.0,20.0 \
-  coordination_mode:=uav_scout
 ```
 
 If the matching `simple_goal_demo` world, camera UAV, PX4, and DDS agent are already running, use `start_simulation:=false`. The basic `start_sim.sh` world and X500 are not that camera setup. To omit RViz, use `start_rviz:=false`. The camera still requires `DISPLAY`.
@@ -118,9 +93,3 @@ rviz2 -d install/mission_manager/share/mission_manager/config/simple_goal_demo.r
 ```
 
 The demo uses actual PX4 anchors and calibrated camera-derived relative positions. [Simulation setup](docs/simulation_setup.md) defines the matching firmware, ROS messages, UAV models, and ENU/tesla magnetometer settings.
-
-With `coordination_mode:=uav_scout`, the UAV maps toward the goal from a lead point
-ahead of the UGV. A valid timestamp-matched UGV pose is used only to mask the UGV
-when it is visible; scout frames remain usable when the UGV is outside the camera
-footprint. The UGV still requires its own valid map-frame localization to follow
-the observed, clearance-safe route.

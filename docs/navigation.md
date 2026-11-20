@@ -24,61 +24,6 @@ The planner inflates two grids. The planning grid treats unknown cells as free a
 
 With `uav_follow:=true` (default) the offboard controller keeps its takeoff hold until PX4 reports Offboard, armed and at least 80% of the altitude setpoint. It then moves its horizontal setpoint toward the UGV fused pose, converted to PX4 NED with the same `map_origin` as the anchor adapter, at up to 1 m/s with a 0.15 m deadband. It holds whenever the fused pose is older than 0.5 s or its position standard deviation exceeds 0.5 m, so it never chases an unusable estimate. With GPS off at startup it holds until the camera's first UGV correction.
 
-## UAV coordination modes
-
-The `coordination_mode` launch argument selects one of two UAV behaviors:
-
-- `ugv_follow` preserves the baseline: the UAV follows the UGV's fused `map` pose.
-- `uav_scout` selects a lead point between the UGV and the global goal. The UAV advances toward a point `scout_lead_distance` meters ahead of the UGV, stops at the goal when the remaining distance is shorter, and is limited to `scout_max_speed`.
-
-Use this command for the original UAV-follow behavior on the small world:
-
-```bash
-source /opt/ros/humble/setup.bash
-source ~/ros_gz_harmonic_ws/install/setup.bash
-source ~/uav_ugv_project/ros2_ws/install/setup.bash
-
-cd ~/uav_ugv_project
-ros2 launch mission_manager simple_goal_demo.launch.py \
-  coordination_mode:=ugv_follow \
-  uav_follow:=true \
-  grid_resolution:=0.2 \
-  start_rviz:=false
-```
-
-Set `uav_follow:=false` instead to keep the UAV at its initial horizontal hold while the UGV operates:
-
-```bash
-ros2 launch mission_manager simple_goal_demo.launch.py \
-  coordination_mode:=ugv_follow \
-  uav_follow:=false \
-  grid_resolution:=0.2 \
-  start_rviz:=false
-```
-
-Use this command for UAV-led scouting on the large obstacle world:
-
-```bash
-source /opt/ros/humble/setup.bash
-source ~/ros_gz_harmonic_ws/install/setup.bash
-source ~/uav_ugv_project/ros2_ws/install/setup.bash
-
-cd ~/uav_ugv_project
-ros2 launch mission_manager simple_goal_demo.launch.py \
-  world_name:=simple_goal_demo_large \
-  goal_x:=24.0 \
-  goal_y:=14.0 \
-  map_bounds:=-30.0,-20.0,30.0,20.0 \
-  grid_resolution:=0.2 \
-  coordination_mode:=uav_scout \
-  uav_follow:=true \
-  start_rviz:=false
-```
-
-Both modes require PX4 Offboard/armed state and at least 80% of the configured cruise altitude before horizontal motion. Scout mode holds at the current setpoint when the goal is unavailable or the UGV pose fails the shared pose guard. The `uav_initial_settle_time` launch argument configures the anchor adapter's startup settling interval.
-
-The mapper receives `map_bounds` as a comma-separated `min_x,min_y,max_x,max_y` string and may publish known ground beyond the UGV camera footprint. It does not require a matched UGV pose for every scout frame, but it masks the UGV when a timestamp-matched pose is available and sufficiently certain. The UGV controller independently consumes `/ugv/localization/pose`, the clearance grid, and the associated route.
-
 ## Camera transport
 
 The goal-demo launch sets `FASTRTPS_DEFAULT_PROFILES_FILE` to [config/fastdds_local_shm.xml](../config/fastdds_local_shm.xml) unless it is already set. Whole 3.7 MB camera images then pass through shared memory. With default UDP fragments and the default Linux receive buffer, an ARM64 UTM VM received about 0.3 of the 5 rendered images per second, and the map was usually older than the planner's 2 s limit. Processes started outside the launch need the same variable to receive images reliably.

@@ -6,7 +6,6 @@
 #include <vector>
 
 #include <geometry_msgs/msg/pose_with_covariance_stamped.hpp>
-#include <geometry_msgs/msg/pose_stamped.hpp>
 #include <px4_msgs/msg/offboard_control_mode.hpp>
 #include <px4_msgs/msg/trajectory_setpoint.hpp>
 #include <px4_msgs/msg/vehicle_command.hpp>
@@ -15,7 +14,6 @@
 #include <rclcpp/rclcpp.hpp>
 #include <uav_control/follow_setpoint.hpp>
 #include <uav_ugv_msgs/pose_guard.hpp>
-#include <uav_ugv_msgs/route_contract.hpp>
 
 using namespace std::chrono_literals;
 
@@ -26,23 +24,17 @@ public:
   : Node("uav_goal_controller")
   {
     uav_altitude_ = declare_parameter("uav_altitude", 4.0);
-    coordination_mode_ = declare_parameter("coordination_mode", "ugv_follow");
     // Follow mode flies over the UGV's fused map pose. It reads the estimate only to
     // choose where to fly; the camera detector and PX4 anchor stay independent of it.
     follow_ugv_ = declare_parameter("follow_ugv", false);
     const auto origin = declare_parameter("map_origin", std::vector<double>{0.0, 0.0, 0.0});
     follow_speed_ = declare_parameter("follow_max_speed", 1.0);
     follow_deadband_ = declare_parameter("follow_deadband", 0.15);
-    scout_speed_ = declare_parameter("scout_max_speed", 1.0);
-    scout_lead_distance_ = declare_parameter("scout_lead_distance", 3.0);
     const auto follow_age = declare_parameter("follow_max_pose_age", 0.5);
     const auto follow_stddev = declare_parameter("follow_max_position_stddev", 0.5);
     if (origin.size() != 3 || !std::isfinite(origin[0]) || !std::isfinite(origin[1]) ||
       !std::isfinite(follow_speed_) || follow_speed_ <= 0 || follow_speed_ > 5 ||
-      !std::isfinite(follow_deadband_) || follow_deadband_ < 0 || follow_deadband_ > 2 ||
-      !std::isfinite(scout_speed_) || scout_speed_ <= 0 || scout_speed_ > 5 ||
-      !std::isfinite(scout_lead_distance_) || scout_lead_distance_ < 0 ||
-      (coordination_mode_ != "ugv_follow" && coordination_mode_ != "uav_scout"))
+      !std::isfinite(follow_deadband_) || follow_deadband_ < 0 || follow_deadband_ > 2)
     {
       throw std::invalid_argument("Invalid UAV follow parameters");
     }
@@ -96,30 +88,16 @@ public:
         }
       });
 
-    if ((coordination_mode_ == "ugv_follow" && follow_ugv_) ||
-      coordination_mode_ == "uav_scout")
-    {
+    if (follow_ugv_) {
       ugv_pose_sub_ = create_subscription<geometry_msgs::msg::PoseWithCovarianceStamped>(
         "/ugv/localization/pose", 10,
         [this](geometry_msgs::msg::PoseWithCovarianceStamped::SharedPtr msg) {
           ugv_guard_.update(*msg, now().nanoseconds(), uav_ugv_msgs::steady_time_ns());
         });
     }
-    if (coordination_mode_ == "uav_scout") {
-      goal_sub_ = create_subscription<geometry_msgs::msg::PoseStamped>(
-        "/global_goal_pose", 10,
-        [this](geometry_msgs::msg::PoseStamped::SharedPtr msg) {
-          if (uav_ugv_msgs::valid_goal(*msg)) {
-            goal_ = *msg;
-            have_goal_ = true;
-          }
-        });
-    }
 
     timer_ = create_wall_timer(100ms, [this]() {control_tick();});
-    RCLCPP_INFO(
-      get_logger(), "Waiting for PX4 odometry and vehicle status; coordination mode: %s",
-      coordination_mode_.c_str());
+    RCLCPP_INFO(get_logger(), "Waiting for PX4 odometry and vehicle status; UAV will hold XY");
   }
 
 private:
@@ -195,18 +173,6 @@ private:
   // Follow only once PX4 flies the setpoints near cruise height; otherwise hold.
   void update_follow_command()
   {
-    if (coordination_mode_ == "uav_scout") {
-      if (!offboard_active_ || !armed_ || -current_down_ < 0.8 * uav_altitude_) {
-        const auto status = std::string("Climbing before scouting toward the global goal");
-        if (status != follow_status_) {
-          RCLCPP_INFO(get_logger(), "%s", status.c_str());
-          follow_status_ = status;
-        }
-        return;
-      }
-      update_scout_command();
-      return;
-    }
     if (!follow_ugv_) {return;}
     std::string status;
     if (!offboard_active_ || !armed_ || -current_down_ < 0.8 * uav_altitude_) {
@@ -226,43 +192,14 @@ private:
     }
   }
 
-  void update_scout_command()
-  {
-    std::string status;
-    if (!have_goal_) {
-      status = "Holding position: waiting for a valid global goal";
-    } else if (!ugv_guard_.check(now().nanoseconds(), uav_ugv_msgs::steady_time_ns())) {
-      status = std::string("Holding position: ") + ugv_guard_.reason();
-    } else {
-      const auto & position = ugv_guard_.pose().position;
-      const auto target = uav_control::lead_toward_goal(
-        uav_control::map_to_ned(position.x, position.y, origin_x_, origin_y_),
-        uav_control::map_to_ned(
-          goal_.pose.position.x, goal_.pose.position.y, origin_x_, origin_y_),
-        scout_lead_distance_);
-      command_ = uav_control::step_toward(
-        command_, target, scout_speed_ * 0.1, follow_deadband_);
-      status = "Scouting ahead of the UGV";
-    }
-    if (status != follow_status_) {
-      RCLCPP_INFO(get_logger(), "%s", status.c_str());
-      follow_status_ = status;
-    }
-  }
-
   double uav_altitude_{2.0};
-  std::string coordination_mode_{"ugv_follow"};
   bool follow_ugv_{false};
-  double follow_speed_{1.0}, follow_deadband_{0.15}, scout_speed_{1.0};
-  double scout_lead_distance_{3.0}, origin_x_{0.0}, origin_y_{0.0};
+  double follow_speed_{1.0}, follow_deadband_{0.15}, origin_x_{0.0}, origin_y_{0.0};
   float current_down_{0.0F};
   uav_control::NorthEast command_;
   uav_ugv_msgs::PoseGuard ugv_guard_;
-  geometry_msgs::msg::PoseStamped goal_;
-  bool have_goal_{false};
   std::string follow_status_;
   rclcpp::Subscription<geometry_msgs::msg::PoseWithCovarianceStamped>::SharedPtr ugv_pose_sub_;
-  rclcpp::Subscription<geometry_msgs::msg::PoseStamped>::SharedPtr goal_sub_;
   float hold_north_{0.0F};
   float hold_east_{0.0F};
   uint32_t setpoint_count_{0};
