@@ -1,0 +1,325 @@
+{
+    "checks":  {
+                   "first_goal":  {
+                                      "elapsed_sim_s":  67.99,
+                                      "truth_distance_m":  0.37420823265756586,
+                                      "truth":  [
+                                                    8.941197585941184,
+                                                    2.630440698277591,
+                                                    1.2883339660676654
+                                                ],
+                                      "hazards":  [
+                                                      {
+                                                          "id":  "scenario_slalom_box",
+                                                          "kind":  "box",
+                                                          "x":  7.1,
+                                                          "y":  1.0,
+                                                          "half_x":  0.3,
+                                                          "half_y":  0.3,
+                                                          "yaw":  0.0
+                                                      },
+                                                      {
+                                                          "id":  "scenario_live_block_1",
+                                                          "kind":  "box",
+                                                          "x":  0.67,
+                                                          "y":  2.66,
+                                                          "half_x":  0.3,
+                                                          "half_y":  0.3,
+                                                          "yaw":  0.0
+                                                      }
+                                                  ]
+                                  },
+                   "block_added":  true,
+                   "hazard_seen":  true,
+                   "restore_ok":  true,
+                   "live_blocks_removed":  true,
+                   "controls_restored":  true,
+                   "history_preserved":  true
+               },
+    "final_phase":  "sensors_restored",
+    "actions":  [
+                    {
+                        "t":  32.28,
+                        "path":  "/block",
+                        "body":  {
+
+                                 },
+                        "code":  200,
+                        "result":  {
+                                       "ok":  true
+                                   }
+                    },
+                    {
+                        "t":  89.84,
+                        "path":  "/goal",
+                        "body":  {
+                                     "x":  -4.0,
+                                     "y":  -3.0
+                                 },
+                        "code":  200,
+                        "result":  {
+                                       "ok":  true
+                                   }
+                    },
+                    {
+                        "t":  89.84,
+                        "path":  "/control",
+                        "body":  {
+                                     "name":  "noise_scale",
+                                     "value":  3.0
+                                 },
+                        "code":  200,
+                        "result":  {
+                                       "ok":  true
+                                   }
+                    },
+                    {
+                        "t":  105.24,
+                        "path":  "/control",
+                        "body":  {
+                                     "name":  "noise_scale",
+                                     "value":  1.0
+                                 },
+                        "code":  200,
+                        "result":  {
+                                       "ok":  true
+                                   }
+                    },
+                    {
+                        "t":  105.24,
+                        "path":  "/control",
+                        "body":  {
+                                     "name":  "gps_enabled",
+                                     "value":  false
+                                 },
+                        "code":  200,
+                        "result":  {
+                                       "ok":  true
+                                   }
+                    },
+                    {
+                        "t":  125.4,
+                        "path":  "/control",
+                        "body":  {
+                                     "name":  "wheel_speed_scale",
+                                     "value":  1.2
+                                 },
+                        "code":  200,
+                        "result":  {
+                                       "ok":  true
+                                   }
+                    },
+                    {
+                        "t":  125.4,
+                        "path":  "/control",
+                        "body":  {
+                                     "name":  "imu_yaw_bias_rate",
+                                     "value":  0.03490658503988659
+                                 },
+                        "code":  200,
+                        "result":  {
+                                       "ok":  true
+                                   }
+                    },
+                    {
+                        "t":  145.8,
+                        "path":  "/control",
+                        "body":  {
+                                     "name":  "uav_assistance",
+                                     "value":  false
+                                 },
+                        "code":  200,
+                        "result":  {
+                                       "ok":  true
+                                   }
+                    },
+                    {
+                        "t":  165.84,
+                        "path":  "/control",
+                        "body":  {
+                                     "name":  "uav_assistance",
+                                     "value":  true
+                                 },
+                        "code":  200,
+                        "result":  {
+                                       "ok":  true
+                                   }
+                    },
+                    {
+                        "t":  196.2,
+                        "path":  "/reset",
+                        "body":  {
+
+                                 },
+                        "code":  200,
+                        "result":  {
+                                       "ok":  true
+                                   }
+                    }
+                ],
+    "errors":  {
+                   "assistance_restored":  {
+                                               "cooperative":  {
+                                                                   "count":  117,
+                                                                   "mean_m":  0.5355280041865418,
+                                                                   "max_m":  0.5644547528921352,
+                                                                   "last_m":  0.5510115846889365
+                                                               },
+                                               "baseline":  {
+                                                                "count":  117,
+                                                                "mean_m":  1.0776500755172884,
+                                                                "max_m":  1.1060442399180181,
+                                                                "last_m":  1.0921278806441297
+                                                            }
+                                           },
+                   "course":  {
+                                  "cooperative":  {
+                                                      "count":  261,
+                                                      "mean_m":  0.03107856793928023,
+                                                      "max_m":  0.08227572955415278,
+                                                      "last_m":  0.06294210858451119
+                                                  },
+                                  "baseline":  {
+                                                   "count":  261,
+                                                   "mean_m":  0.35360111398833516,
+                                                   "max_m":  0.871434296107798,
+                                                   "last_m":  0.1649621056891371
+                                               }
+                              },
+                   "drift":  {
+                                 "cooperative":  {
+                                                     "count":  78,
+                                                     "mean_m":  0.3803296730773638,
+                                                     "max_m":  0.6273294644850689,
+                                                     "last_m":  0.594207289249709
+                                                 },
+                                 "baseline":  {
+                                                  "count":  78,
+                                                  "mean_m":  0.8491312069866601,
+                                                  "max_m":  1.1705969883125342,
+                                                  "last_m":  1.1370985724978648
+                                              }
+                             },
+                   "gps_off":  {
+                                   "cooperative":  {
+                                                       "count":  77,
+                                                       "mean_m":  0.026153368812718132,
+                                                       "max_m":  0.058233746442773945,
+                                                       "last_m":  0.007508132009907545
+                                                   },
+                                   "baseline":  {
+                                                    "count":  77,
+                                                    "mean_m":  0.23234794117418778,
+                                                    "max_m":  0.261907803522152,
+                                                    "last_m":  0.20143696920323173
+                                                }
+                               },
+                   "no_assistance":  {
+                                         "cooperative":  {
+                                                             "count":  77,
+                                                             "mean_m":  0.5634855081347672,
+                                                             "max_m":  0.5900674766276253,
+                                                             "last_m":  0.511538616718919
+                                                         },
+                                         "baseline":  {
+                                                          "count":  77,
+                                                          "mean_m":  1.1061056741422521,
+                                                          "max_m":  1.132877551829636,
+                                                          "last_m":  1.0540469524903724
+                                                      }
+                                     },
+                   "noise_3x":  {
+                                    "cooperative":  {
+                                                        "count":  59,
+                                                        "mean_m":  0.040328175653878334,
+                                                        "max_m":  0.10852944139413147,
+                                                        "last_m":  0.02297094130862548
+                                                    },
+                                    "baseline":  {
+                                                     "count":  59,
+                                                     "mean_m":  0.47294886651934365,
+                                                     "max_m":  1.0261536911078744,
+                                                     "last_m":  0.2216801983018029
+                                                 }
+                                },
+                   "sensors_restored":  {
+                                            "cooperative":  {
+                                                                "count":  79,
+                                                                "mean_m":  0.43529995775892766,
+                                                                "max_m":  1.0983148784898629,
+                                                                "last_m":  0.4287127323497009
+                                                            },
+                                            "baseline":  {
+                                                             "count":  79,
+                                                             "mean_m":  0.44887799003429996,
+                                                             "max_m":  1.277385213974433,
+                                                             "last_m":  0.4286897188595073
+                                                         }
+                                        },
+                   "startup":  {
+                                   "cooperative":  {
+                                                       "count":  2,
+                                                       "mean_m":  0.025373183901169133,
+                                                       "max_m":  0.028590155555736404,
+                                                       "last_m":  0.022156212246601865
+                                                   },
+                                   "baseline":  {
+                                                    "count":  2,
+                                                    "mean_m":  0.31414706496063505,
+                                                    "max_m":  0.3945970516034921,
+                                                    "last_m":  0.23369707831777795
+                                                }
+                               }
+               },
+    "configuration":  {
+                          "base_commit":  "5990c7b",
+                          "date":  "2026-11-23",
+                          "distro":  "Ubuntu-22.04",
+                          "seed":  513,
+                          "measurement_profile":  "nominal",
+                          "ros_domain_id":  173,
+                          "gz_partition":  "review_5990c7b_173",
+                          "fault_hold":  false,
+                          "first_drive_dashboard_s":  21.85
+                      },
+    "correction_recovery":  [
+                                {
+                                    "wall":  311245.419378216,
+                                    "name":  "cooperative_localization/uav_correction",
+                                    "message":  "Waiting for valid measurements",
+                                    "counters":  {
+                                                     "expired":  "22",
+                                                     "heading_accepted":  "623",
+                                                     "accepted":  "623"
+                                                 }
+                                },
+                                {
+                                    "wall":  311274.281917494,
+                                    "name":  "cooperative_localization/uav_correction",
+                                    "message":  "Receiving corrections",
+                                    "counters":  {
+                                                     "expired":  "22",
+                                                     "heading_accepted":  "763",
+                                                     "accepted":  "763"
+                                                 }
+                                }
+                            ],
+    "flight_log_excerpt":  [
+                               "[px4_sitl-26] INFO  [commander] Ready for takeoff!",
+                               "[px4_sitl-26] INFO  [commander] Armed by external command\t",
+                               "[px4_sitl-26] INFO  [commander] Takeoff detected\t"
+                           ],
+    "registered_checks":  {
+                              "packages":  [
+                                               "fault_management",
+                                               "mission_manager"
+                                           ],
+                              "total":  234,
+                              "errors":  0,
+                              "failures":  0,
+                              "skipped":  3,
+                              "skip_reason":  "ament skips cppcheck 2.7 due to performance issues",
+                              "full_build_packages":  12,
+                              "owned_simulation_processes_remaining":  0
+                          }
+}

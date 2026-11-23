@@ -14,7 +14,8 @@ if(BUILD_TESTING)
   ament_add_pytest_test(sim_sensor_test test/test_sim_sensors.py)
   ament_add_pytest_test(launch_modes_test test/test_launch_modes.py)
   ament_add_pytest_test(ugv_dataset_recorder_test test/test_ugv_dataset_recorder.py)
-  ament_add_pytest_test(hazard_assessment_test test/test_hazard_assessment.py)
+  ament_add_pytest_test(hazard_assessment_test test/test_hazard_assessment.py
+    APPEND_ENV PYTHONPATH=${CMAKE_CURRENT_SOURCE_DIR}/../../../verification/src)
   ament_add_pytest_test(verification_test ../../../verification/tests
     TIMEOUT 300
     APPEND_ENV PYTHONPATH=${CMAKE_CURRENT_SOURCE_DIR}/../../../verification/src)
@@ -25,5 +26,7 @@ if(BUILD_TESTING)
     APPEND_ENV PYTHONPATH=${CMAKE_CURRENT_SOURCE_DIR}/../../../verification/src)
   ament_add_pytest_test(sensor_fault_model_test test/test_sensor_fault_model.py)
   ament_add_pytest_test(dashboard_core_test test/test_dashboard_core.py)
+  ament_add_pytest_test(dashboard_ros_test test/test_dashboard_ros.py TIMEOUT 60
+    ENV ROS_DOMAIN_ID=75)
 endif()
 ament_package()

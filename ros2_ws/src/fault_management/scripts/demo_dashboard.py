@@ -14,6 +14,7 @@ import math
 import queue
 import subprocess
 import threading
+from collections import deque
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
@@ -23,7 +24,7 @@ from ament_index_python.packages import get_package_share_directory
 from geometry_msgs.msg import PoseStamped, PoseWithCovarianceStamped
 from nav_msgs.msg import OccupancyGrid
 from rcl_interfaces.msg import Parameter, ParameterType, ParameterValue
-from rcl_interfaces.srv import SetParameters
+from rcl_interfaces.srv import GetParameters, SetParameters, SetParametersAtomically
 from rclpy.executors import ExternalShutdownException
 from rclpy.node import Node
 from rclpy.qos import DurabilityPolicy, QoSProfile, ReliabilityPolicy, qos_profile_sensor_data
@@ -32,7 +33,7 @@ from std_srvs.srv import SetBool
 from uav_ugv_msgs.msg import FaultStatus, PlannedRoute
 
 from dashboard_core import (ErrorStats, block_site, classify_layers, encode_layers,
-                            goal_error, position_error, stddev_from_covariance,
+                            goal_error, position_at, position_error, stddev_from_covariance,
                             validate_control, world_geometry)
 from localization_common.geodesy import yaw_from_quaternion
 
@@ -52,6 +53,8 @@ class Dashboard(Node):
         self.declare_parameter("world_file", "")
         self.declare_parameter("port", 8765)
         self.declare_parameter("host", "127.0.0.1")
+        self.declare_parameter("initial_gps_enabled", True)
+        self.declare_parameter("initial_uav_assistance", True)
         world_file = self.get_parameter("world_file").value
         self.world = world_geometry(world_file) if world_file else dict(
             obstacles=[], goal=None, start=None)
@@ -59,9 +62,14 @@ class Dashboard(Node):
         self.lock = threading.Lock()
         self.commands = queue.Queue()
         self.controls = dict(NOMINAL)
+        self.controls.update(
+            gps_enabled=self.get_parameter("initial_gps_enabled").value,
+            uav_assistance=self.get_parameter("initial_uav_assistance").value)
         self.state = dict(truth=None, fused=None, baseline=None, gps=None, uav=None, route=[], goal=None,
-                          partial=False, mode=None, reason="", flags={}, hazards=[], speed=0.0)
+                          partial=False, mode=None, reason="", flags={}, hazards=[], speed=0.0,
+                          detector_hold=False)
         self.trail = dict(truth=[], fused=[], baseline=[])
+        self.positions = {name: deque(maxlen=600) for name in self.trail}
         self.series = []  # (t, fused error, baseline error)
         self.stats = dict(fused=ErrorStats(), baseline=ErrorStats())
         self.last_sample = None
@@ -107,9 +115,13 @@ class Dashboard(Node):
             "uav_assistance": self.create_client(SetBool, "/ugv/localization/set_uav_enabled"),
         }
         self.parameter_client = self.create_client(SetParameters, "/sim_ugv_sensors/set_parameters")
-        self.goal_client = self.create_client(SetParameters, "/goal_manager/set_parameters")
+        self.parameter_reader = self.create_client(GetParameters, "/sim_ugv_sensors/get_parameters")
+        self.goal_client = self.create_client(
+            SetParametersAtomically, "/goal_manager/set_parameters_atomically")
         self.create_timer(0.05, self.drain_commands)
         self.create_timer(0.5, self.encode_grid)
+        self.parameter_read_pending = False
+        self.create_timer(1.0, self.read_controls)
 
         web = Path(get_package_share_directory("fault_management")) / "web/dashboard.html"
         self.page = web.read_bytes()
@@ -144,17 +156,20 @@ class Dashboard(Node):
                     length = int(self.headers.get("Content-Length", "0"))
                     body = json.loads(self.rfile.read(min(length, 4096)) or b"{}")
                     if self.path == "/reset":
-                        node.commands.put(("reset", None))
+                        node.submit("reset", None)
                     elif self.path == "/block":
                         node.add_block()
                     elif self.path == "/goal":
-                        reason = goal_error(node.world, body["x"], body["y"])
+                        with node.lock:
+                            obstacles = node.world["obstacles"] + node.state["hazards"]
+                        with node.block_lock:
+                            obstacles += [b.shape() for b in node.blocks]
+                        reason = goal_error(dict(obstacles=obstacles), body["x"], body["y"])
                         if reason:
                             raise ValueError(reason)
-                        node.commands.put(("goal", (float(body["x"]), float(body["y"]))))
+                        node.submit("goal", (float(body["x"]), float(body["y"])))
                     elif self.path == "/control":
-                        node.commands.put((body["name"], validate_control(
-                            body["name"], body["value"])))
+                        node.submit(body["name"], validate_control(body["name"], body["value"]))
                     else:
                         return self.reply(404, b"{}")
                     self.reply(200, b'{"ok":true}')
@@ -179,21 +194,29 @@ class Dashboard(Node):
         yaw = yaw_from_quaternion(message.pose.orientation)
         with self.lock:
             self.state["truth"] = [position.x, position.y, yaw]
+            stamp = message.header.stamp.sec + message.header.stamp.nanosec * 1e-9
+            self.positions["truth"].append((stamp, (position.x, position.y)))
             time_s = self.now_s()
             if not self.recording:
                 return
             if self.last_sample is not None and 0 <= time_s - self.last_sample < SAMPLE_PERIOD_S:
                 return
             self.last_sample = time_s
-            truth = (position.x, position.y)
+            # Brief display delay lets both filters bracket the same acquisition time.
+            # A stale/missing stream produces a gap, never an apparent zero error.
+            sample_stamp = stamp - 0.15
+            truth = position_at(self.positions["truth"], sample_stamp)
+            if truth is None:
+                return
+            estimates = {name: position_at(self.positions[name], sample_stamp)
+                         for name in ("fused", "baseline")}
             errors = {}
             for name in ("fused", "baseline"):
-                estimate = self.state[name]
-                errors[name] = position_error(estimate[:2] if estimate else None, truth)
+                errors[name] = position_error(estimates[name], truth)
                 self.stats[name].add(time_s, errors[name])
-            self.trail["truth"].append([round(position.x, 3), round(position.y, 3)])
+            self.trail["truth"].append([round(v, 3) for v in truth])
             for name in ("fused", "baseline"):
-                estimate = self.state[name]
+                estimate = estimates[name]
                 if estimate:
                     self.trail[name].append([round(estimate[0], 3), round(estimate[1], 3)])
             self.series.append([round(time_s, 2), errors["fused"], errors["baseline"]])
@@ -203,6 +226,8 @@ class Dashboard(Node):
         sigma = stddev_from_covariance(list(message.pose.covariance))
         with self.lock:
             self.state[name] = [position.x, position.y, sigma]
+            stamp = message.header.stamp.sec + message.header.stamp.nanosec * 1e-9
+            self.positions[name].append((stamp, (position.x, position.y)))
 
     def on_gps(self, message):
         position = message.pose.pose.position
@@ -242,6 +267,7 @@ class Dashboard(Node):
         with self.lock:
             self.state["mode"] = mode
             self.state["reason"] = tick.get("hold_reason", "")
+            self.state["detector_hold"] = bool(tick.get("detector_enabled", False))
             if not self.recording and mode and "NAV" in mode.upper():
                 self.recording = True
                 for trail in self.trail.values():
@@ -314,6 +340,7 @@ class Dashboard(Node):
                                   obstacle=box.id), box)
                 except RuntimeError as error:
                     self.get_logger().warning(f"{box.id}: {error}")
+                    raise
                 self.blocks.pop()
 
     def on_goal(self, message):
@@ -329,43 +356,98 @@ class Dashboard(Node):
             self.state["hazards"] = hazards
 
     # Controls -----------------------------------------------------------------------
+    def read_controls(self):
+        """Show the producer's configured values, including non-default launch profiles."""
+        if self.parameter_read_pending or not self.parameter_reader.service_is_ready():
+            return
+        self.parameter_read_pending = True
+        request = GetParameters.Request(names=list(PARAMETER_CONTROLS))
+
+        def done(result):
+            self.parameter_read_pending = False
+            try:
+                values = result.result().values
+                with self.lock:
+                    for name, value in zip(PARAMETER_CONTROLS, values):
+                        if value.type == ParameterType.PARAMETER_DOUBLE:
+                            self.controls[name] = value.double_value
+            except Exception as error:
+                self.get_logger().warning(f"Cannot read sensor settings: {error}")
+
+        self.parameter_reader.call_async(request).add_done_callback(done)
+
+    def submit(self, name, value):
+        """HTTP success means the ROS service accepted the action, not just queued it."""
+        completed = threading.Event()
+        errors = []
+
+        def finish(error=None):
+            if error:
+                errors.append(error)
+            completed.set()
+
+        self.commands.put((name, value, finish))
+        if not completed.wait(8.0):
+            raise RuntimeError("action timed out; check the shown sensor state before retrying")
+        if errors:
+            raise RuntimeError(errors[0])
+
     def drain_commands(self):
         while True:
             try:
-                name, value = self.commands.get_nowait()
+                name, value, finish = self.commands.get_nowait()
             except queue.Empty:
                 return
             if name == "goal":
-                self.apply_goal(*value)
+                self.apply_goal(*value, finish)
             elif name == "reset":
-                threading.Thread(target=self.remove_blocks, daemon=True).start()
-                with self.lock:
-                    for stats in self.stats.values():
-                        stats.reset()
-                    self.series.clear()
-                for control, nominal in NOMINAL.items():
-                    self.apply(control, nominal)
-            else:
-                self.apply(name, value)
+                # Restoring sensor settings does not rewind the world, erase estimator
+                # state, or discard the evidence on the error chart.
+                pending = [len(NOMINAL) + 1]
+                errors = []
+                completion_lock = threading.Lock()
 
-    def apply_goal(self, x, y):
+                def restored(error=None, done=finish, remaining=pending, failures=errors,
+                             mutex=completion_lock):
+                    with mutex:
+                        if error:
+                            failures.append(error)
+                        remaining[0] -= 1
+                        if not remaining[0]:
+                            done("; ".join(failures) or None)
+
+                def remove(done=restored):
+                    try:
+                        self.remove_blocks()
+                        done()
+                    except RuntimeError as error:
+                        done(str(error))
+
+                threading.Thread(target=remove, daemon=True).start()
+                for control, nominal in NOMINAL.items():
+                    self.apply(control, nominal, restored)
+            else:
+                self.apply(name, value, finish)
+
+    def apply_goal(self, x, y, finish):
         if not self.goal_client.service_is_ready():
-            return
-        request = SetParameters.Request()
+            return finish("goal service is unavailable")
+        request = SetParametersAtomically.Request()
         for name, value in (("goal_x", x), ("goal_y", y)):
             parameter = Parameter(name=name)
             parameter.value = ParameterValue(type=ParameterType.PARAMETER_DOUBLE,
                                              double_value=float(value))
             request.parameters.append(parameter)
-        self.goal_client.call_async(request).add_done_callback(
-            lambda result: self.move_goal_marker(x, y) if self.goal_accepted(result) else None)
+        def done(result):
+            try:
+                response = result.result().result
+                if response.successful:
+                    self.move_goal_marker(x, y)
+                finish(None if response.successful else response.reason)
+            except Exception as error:
+                finish(str(error))
 
-    @staticmethod
-    def goal_accepted(result):
-        try:
-            return all(r.successful for r in result.result().results)
-        except Exception:
-            return False
+        self.goal_client.call_async(request).add_done_callback(done)
 
     def move_goal_marker(self, x, y):
         """Best effort: keep the bullseye in the Gazebo world under the new goal."""
@@ -377,17 +459,17 @@ class Dashboard(Node):
         threading.Thread(target=lambda: subprocess.run(
             command, capture_output=True, timeout=5, check=False), daemon=True).start()
 
-    def apply(self, name, value):
+    def apply(self, name, value, finish):
         if name in self.service_clients:
             client = self.service_clients[name]
             if not client.service_is_ready():
-                return
+                return finish(f"{name} service is unavailable")
             request = SetBool.Request()
             request.data = bool(value)
             future = client.call_async(request)
         else:
             if not self.parameter_client.service_is_ready():
-                return
+                return finish("sensor parameter service is unavailable")
             request = SetParameters.Request()
             parameter = Parameter(name=name)
             parameter.value = ParameterValue(type=ParameterType.PARAMETER_DOUBLE,
@@ -400,11 +482,12 @@ class Dashboard(Node):
                 response = result.result()
             except Exception as error:  # service vanished; leave the shown value unchanged
                 self.get_logger().warning(f"{name}: {error}")
-                return
+                return finish(str(error))
             ok = response.success if hasattr(response, "success") else response.results[0].successful
             if ok:
                 with self.lock:
                     self.controls[name] = value
+            finish(None if ok else f"{name} was rejected")
 
         future.add_done_callback(done)
 
@@ -423,7 +506,8 @@ class Dashboard(Node):
                 fused=state["fused"], goal=state["goal"],
                 baseline=state["baseline"], uav=state["uav"], route=state["route"],
                 partial=state["partial"], mode=state["mode"], reason=state["reason"],
-                flags=state["flags"],
+                flags=state["flags"], detector_hold=state["detector_hold"],
+                goal_available=self.goal_client.service_is_ready(),
                 hazards=state["hazards"] + [b.shape() for b in list(self.blocks)],
                 gps=gps if gps and now - gps[2] < 2.0 else None,
                 controls=self.controls, available=available,

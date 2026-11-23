@@ -113,7 +113,8 @@ def generate_launch_description():
         ),
         DeclareLaunchArgument(
             "scenario_output", default_value=str(
-                project_root / "localization_results/demo_scenario" / time.strftime("%Y%m%d-%H%M%S")),
+                project_root / "localization_results/demo_scenario" /
+                time.strftime("%Y%m%d-%H%M%S")),
             description="Fresh directory for the scenario operation log.",
         ),
         DeclareLaunchArgument(
@@ -163,7 +164,9 @@ def generate_launch_description():
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(
                 str(sensing_share / "launch/uav_camera_sensor.launch.py")),
-            launch_arguments={"detect_ugv": LaunchConfiguration("uav_assistance")}.items()),
+            launch_arguments={"detect_ugv": PythonExpression([
+                "'true' if '", dashboard, "'.lower() == 'true' else '",
+                LaunchConfiguration("uav_assistance"), "'"])}.items()),
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(
                 str(fault_share / "launch/sensor_fault_detector.launch.py")),
@@ -253,6 +256,10 @@ def generate_launch_description():
              condition=IfCondition(dashboard)),
         Node(package="fault_management", executable="demo_dashboard.py",
              parameters=[{"world_file": LaunchConfiguration("world_file"),
+                          "initial_gps_enabled": ParameterValue(
+                              LaunchConfiguration("initial_gps_enabled"), value_type=bool),
+                          "initial_uav_assistance": ParameterValue(
+                              LaunchConfiguration("uav_assistance"), value_type=bool),
                           "port": ParameterValue(LaunchConfiguration("dashboard_port"),
                                                  value_type=int)}],
              output="screen", condition=IfCondition(dashboard)),

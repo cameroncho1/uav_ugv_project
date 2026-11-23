@@ -16,7 +16,25 @@
     font: 14px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
     font-variant-numeric: tabular-nums; overflow: hidden;
   }
+  main { position: relative; min-width: 0; min-height: 0; }
   #map { width: 100%; height: 100%; display: block; cursor: crosshair; }
+  header { position: absolute; top: 24px; left: 28px; right: 28px; pointer-events: none; }
+  h1 { margin: 0; font-size: 23px; font-weight: 650; letter-spacing: -.5px; }
+  header p, .caption { margin: 5px 0 0; color: #a5afbd; font-size: 12px; }
+  .legend { position: absolute; left: 28px; right: 28px; bottom: 22px; display: flex;
+            flex-wrap: wrap; gap: 10px 20px; color: #b6bfcc; font-size: 12px; pointer-events: none; }
+  .legend span { display: flex; align-items: center; gap: 7px; }
+  .legend i { width: 20px; border-top: 2px solid white; }
+  .legend .cooperative { border-color: var(--blue); }
+  .legend .baseline { border-color: var(--orange); border-top-style: dashed; }
+  .legend .route { border-color: var(--teal); border-top-style: dashed; }
+  #connection { color: var(--orange); }
+  #connection.live { color: var(--green); }
+  h2 { margin: 0 0 12px; color: #a5afbd; font-size: 12px; font-weight: 500; }
+  #reason { color: var(--orange); margin-top: 8px; font-size: 12px; }
+  #notice { min-height: 2.8em; color: #b6bfcc; font-size: 12px; }
+  #notice.error { color: var(--red); }
+  :focus-visible { outline: 2px solid var(--blue) !important; outline-offset: 5px; }
   aside {
     background: var(--panel); border-left: 1px solid var(--line); padding: 28px 24px;
     display: flex; flex-direction: column; gap: 28px; overflow-y: auto;
@@ -60,34 +78,55 @@
   #block:hover { border-color: var(--red); color: var(--red); }
   #block:disabled { opacity: .35; pointer-events: none; }
   #block.no { border-color: var(--red); color: var(--red); }
-  body.waiting aside > :not(.controls) { opacity: .4; }
+  body.waiting .reading, body.waiting #chart { opacity: .4; }
+  @media (max-width: 850px) {
+    html, body { height: auto; min-height: 100%; overflow: auto; }
+    body { grid-template-columns: 1fr; }
+    main { height: 70vh; min-height: 480px; }
+    aside { border-left: 0; border-top: 1px solid var(--line); gap: 22px; }
+    header { left: 20px; right: 20px; }
+    .legend { left: 20px; right: 20px; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
 </head>
 <body class="waiting">
-<canvas id="map"></canvas>
+<main>
+  <header><h1>UAV + UGV</h1><p>Camera mapping · A* routing · Cooperative localization</p>
+    <p id="connection" role="status">Connecting to simulation</p></header>
+  <canvas id="map" aria-label="Live course map. Click clear ground to change the goal."></canvas>
+  <div class="legend"><span><i></i>Actual path</span><span><i class="cooperative"></i>With UAV</span>
+    <span><i class="baseline"></i>Without UAV</span><span><i class="route"></i>Planned route</span>
+    <span>Click clear ground to set a goal</span></div>
+</main>
 <aside>
   <section>
     <div class="state" id="state" data-s="wait"><span class="dot"></span><span id="mode">Waiting</span></div>
+    <div id="reason"></div>
+    <h2 id="detector" style="margin:18px 0 0">Detector flags · display only</h2>
     <div class="chips" id="chips"></div>
   </section>
   <section>
+    <h2>Position error against simulator truth</h2>
     <div class="reading"><i style="background:var(--blue)"></i><b id="eFused">–</b><span>with UAV</span></div>
     <div class="reading"><i style="background:var(--orange)"></i><b id="eBase">–</b><span>without UAV</span></div>
     <canvas id="chart"></canvas>
+    <p class="caption">60 seconds ago <span style="float:right">Now</span></p>
   </section>
   <section class="controls">
     <div class="row"><label for="gps">GPS</label><span class="switch"><input type="checkbox" id="gps"></span></div>
-    <div class="row"><label for="uav">UAV</label><span class="switch"><input type="checkbox" id="uav"></span></div>
-    <div class="row"><label for="noise">Noise</label><output id="noiseV"></output>
+    <div class="row"><label for="uav">UAV corrections</label><span class="switch"><input type="checkbox" id="uav"></span></div>
+    <div class="row"><label for="noise">Sensor noise</label><output id="noiseV"></output>
       <input type="range" id="noise" min="0" max="5" step="0.1"></div>
-    <div class="row"><label for="gpsErr">GPS error</label><output id="gpsErrV"></output>
+    <div class="row"><label for="gpsErr">GPS noise (1σ)</label><output id="gpsErrV"></output>
       <input type="range" id="gpsErr" min="0" max="10" step="0.1"></div>
-    <div class="row"><label for="wheel">Wheel slip</label><output id="wheelV"></output>
+    <div class="row"><label for="wheel">Wheel speed error</label><output id="wheelV"></output>
       <input type="range" id="wheel" min="-30" max="30" step="1"></div>
     <div class="row"><label for="gyro">Gyro drift</label><output id="gyroV"></output>
       <input type="range" id="gyro" min="-2" max="2" step="0.05"></div>
   </section>
-  <div class="foot"><button id="reset">Reset</button><button id="block" disabled>Add block</button></div>
+  <div id="notice" role="status" aria-live="polite"></div>
+  <div class="foot"><button id="reset">Restore sensors</button><button id="block" disabled>Add block</button></div>
 </aside>
 <script>
 const $ = id => document.getElementById(id);
@@ -98,9 +137,23 @@ let s = null, counts = { truth: 0, fused: 0, baseline: 0, series: 0 };
 const trail = { truth: [], fused: [], baseline: [] };
 let series = [], gpsDots = [], seenHazards = new Map(), editing = {};
 let view = null, hover = null, fog = null, fogSeq = -1, pulseUntil = 0;
+let connected = false, lastClock = null, clockAdvanced = performance.now();
+let blockPending = false, restorePending = false;
 
 // Controls -------------------------------------------------------------------------
-const send = (name, value) => fetch("/control", { method: "POST", body: JSON.stringify({ name, value }) });
+function notice(message, error = false) {
+  $("notice").textContent = message; $("notice").classList.toggle("error", error);
+}
+async function action(path, body, message) {
+  try {
+    const response = await fetch(path, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+    const result = await response.json();
+    if (!response.ok) throw Error(result.error || "Action was rejected");
+    if (message) notice(message);
+    return true;
+  } catch (e) { notice(e.message, true); return false; }
+}
+const send = (name, value) => action("/control", { name, value });
 const slider = (id, name, toWire, fromWire, show) => {
   const el = $(id), out = $(id + "V");
   let last = 0;
@@ -127,10 +180,18 @@ for (const [id, name] of [["gps", "gps_enabled"], ["uav", "uav_assistance"]]) {
   $(id).addEventListener("change", e => { editing[name] = performance.now(); send(name, e.target.checked); });
 }
 $("block").addEventListener("click", async () => {
-  const ok = (await fetch("/block", { method: "POST", body: "{}" })).ok;
-  if (!ok) { $("block").classList.add("no"); setTimeout(() => $("block").classList.remove("no"), 700); }
+  blockPending = true;
+  $("block").disabled = true;
+  await action("/block", {}, "Block added ahead. Watch the camera map and route.");
+  blockPending = false;
 });
-$("reset").addEventListener("click", () => { fetch("/reset", { method: "POST", body: "{}" }); series = []; counts.series = 0; });
+$("reset").addEventListener("click", async () => {
+  restorePending = true;
+  $("reset").disabled = true;
+  await action("/reset", {}, "Sensors restored and live blocks removed. Accumulated drift may remain.");
+  $("reset").disabled = false;
+  restorePending = false;
+});
 
 function syncControls() {
   const c = s.controls, a = s.available;
@@ -154,14 +215,18 @@ function syncReadouts() {
     : name.includes("HOLD") ? "hold" : name.includes("NAV") ? "go" : "wait";
   $("state").dataset.s = kind;
   $("mode").textContent = { wait: "Waiting", go: "Navigating", hold: "Holding", done: "Goal reached" }[kind];
+  if (!s.started) $("mode").textContent = s.uav ? "Preparing route" : "Waiting for UAV";
+  $("reason").textContent = kind === "hold" ? s.reason : "";
   document.body.classList.toggle("waiting", !s.truth);
-  $("block").disabled = !s.started || (s.route || []).length < 2;
+  $("block").disabled = blockPending || !s.started || (s.route || []).length < 2;
   const f = s.flags || {}, chips = [];
-  if (f.gps) chips.push("GPS lost");
-  if (f.wheels) chips.push("Wheel slip");
-  if (f.gyro) chips.push("Gyro drift");
-  if (f.uav) chips.push("UAV lost");
-  $("chips").innerHTML = chips.map(t => `<span class="chip">${t}</span>`).join("");
+  if (f.valid && f.gps) chips.push("GPS outage");
+  if (f.valid && f.wheels) chips.push("Wheel speed error");
+  if (f.valid && f.gyro) chips.push("Gyro drift");
+  if (f.valid && f.uav) chips.push("UAV loss");
+  $("detector").textContent = "Detector flags · " + (s.detector_hold ? "holds enabled" : "display only");
+  $("chips").innerHTML = chips.length ? chips.map(t => `<span class="chip">${t}</span>`).join("")
+    : `<span class="caption">${f.valid ? "No flags" : "Waiting for valid samples"}</span>`;
   const last = series[series.length - 1];
   $("eFused").textContent = last && last[1] != null ? last[1].toFixed(2) + " m" : "–";
   $("eBase").textContent = last && last[2] != null ? last[2].toFixed(2) + " m" : "–";
@@ -170,14 +235,18 @@ function syncReadouts() {
 // Drawing ----------------------------------------------------------------------------
 function fit(canvas) {
   const r = canvas.getBoundingClientRect(), d = devicePixelRatio || 1;
-  if (canvas.width !== Math.round(r.width * d)) { canvas.width = Math.round(r.width * d); canvas.height = Math.round(r.height * d); }
+  if (canvas.width !== Math.round(r.width * d) || canvas.height !== Math.round(r.height * d)) { canvas.width = Math.round(r.width * d); canvas.height = Math.round(r.height * d); }
   const g = canvas.getContext("2d"); g.setTransform(d, 0, 0, d, 0, 0);
   return [g, r.width, r.height];
 }
 function bounds() {
   const pts = [];
-  for (const o of world.obstacles) { const r = o.radius ?? Math.hypot(o.half_x, o.half_y); pts.push([o.x - r, o.y - r], [o.x + r, o.y + r]); }
-  for (const p of [world.goal, world.start]) if (p) pts.push([p[0] - 1, p[1] - 1], [p[0] + 1, p[1] + 1]);
+  for (const o of world.obstacles) {
+    const c = Math.abs(Math.cos(o.yaw || 0)), sn = Math.abs(Math.sin(o.yaw || 0));
+    const rx = o.radius ?? c * o.half_x + sn * o.half_y, ry = o.radius ?? sn * o.half_x + c * o.half_y;
+    pts.push([o.x - rx, o.y - ry], [o.x + rx, o.y + ry]);
+  }
+  for (const p of [world.goal, world.start, s && s.goal]) if (p) pts.push([p[0] - 1, p[1] - 1], [p[0] + 1, p[1] + 1]);
   if (!pts.length) pts.push([-6, -4], [6, 4]);
   const xs = pts.map(p => p[0]), ys = pts.map(p => p[1]);
   return [Math.min(...xs) - 1, Math.max(...xs) + 1, Math.min(...ys) - 1, Math.max(...ys) + 1];
@@ -186,11 +255,15 @@ function drawMap() {
   const [g, w, h] = fit($("map"));
   g.clearRect(0, 0, w, h);
   g.imageSmoothingEnabled = false;
-  const [x0, x1, y0, y1] = bounds(), pad = 40;
+  const [x0, x1, y0, y1] = bounds(), pad = 90;
   const k = Math.min((w - 2 * pad) / (x1 - x0), (h - 2 * pad) / (y1 - y0));
   const ox = (w - k * (x1 - x0)) / 2 - k * x0, oy = (h + k * (y1 - y0)) / 2 + k * y0;
   const X = x => ox + k * x, Y = y => oy - k * y;
   view = { ox, oy, k };
+  g.strokeStyle = g.fillStyle = "#a5afbd"; g.lineWidth = 1; g.font = "12px system-ui";
+  g.beginPath(); g.moveTo(28, h - 70); g.lineTo(28 + 2 * k, h - 70); g.stroke();
+  g.fillText("2 m", 28, h - 80);
+  g.fillText("North ↑", w - 90, 40);
   const path = (pts, color, width, dash = []) => {
     if (pts.length < 2) return;
     g.beginPath(); pts.forEach((p, i) => i ? g.lineTo(X(p[0]), Y(p[1])) : g.moveTo(X(p[0]), Y(p[1])));
@@ -230,7 +303,7 @@ function drawMap() {
   if (pulse) { g.shadowColor = C.teal; g.shadowBlur = 16 * pulse; }
   path(route.slice(from), C.teal, 2 + 2.5 * pulse, s.partial ? [3, 6] : [8, 6]);
   g.shadowBlur = 0;
-  path(trail.baseline, C.orange, 2);
+  path(trail.baseline, C.orange, 2, [6, 4]);
   path(trail.fused, C.blue, 2);
   path(trail.truth, "rgba(255,255,255,.85)", 1.5);
   gpsDots = gpsDots.filter(d => t - d.t < 6000);
@@ -292,6 +365,8 @@ async function poll() {
   try {
     const q = new URLSearchParams({ ...counts, layers: fogSeq });
     const next = await (await fetch("/state?" + q)).json();
+    connected = true;
+    if (next.t !== lastClock) { lastClock = next.t; clockAdvanced = performance.now(); }
     for (const k of ["truth", "fused", "baseline"]) {
       if (next.trail_count[k] < counts[k]) trail[k] = [];
       trail[k].push(...next.trail[k]); counts[k] = next.trail_count[k];
@@ -301,7 +376,23 @@ async function poll() {
     if (next.gps && (!s || !s.gps || next.gps[2] !== s.gps[2])) gpsDots.push({ x: next.gps[0], y: next.gps[1], t: performance.now() });
     if (next.layers) { buildFog(next.layers); fogSeq = next.layers_seq; }
     s = next; syncControls(); syncReadouts();
-  } catch (e) { document.body.classList.add("waiting"); }
+    const paused = performance.now() - clockAdvanced > 2000;
+    $("connection").textContent = paused ? "Simulation clock paused" : "Live simulation";
+    $("connection").classList.toggle("live", !paused);
+    if (paused) { $("mode").textContent = "Paused"; $("state").dataset.s = "wait"; }
+  } catch (e) {
+    connected = false;
+    document.body.classList.add("waiting");
+    $("connection").textContent = "Simulation disconnected"; $("connection").classList.remove("live");
+    $("mode").textContent = "Disconnected"; $("state").dataset.s = "wait";
+    for (const el of document.querySelectorAll("input, button")) el.disabled = true;
+  }
+  if (connected) {
+    for (const el of document.querySelectorAll("input")) el.disabled = !s.available[
+      ({ gps: "gps_enabled", uav: "uav_assistance", noise: "noise_scale", gpsErr: "gps_horizontal_stddev",
+         wheel: "wheel_speed_scale", gyro: "imu_yaw_bias_rate" })[el.id]];
+    $("reset").disabled = restorePending;
+  }
   setTimeout(poll, 100);
 }
 const gap = (o, x, y) => o.radius != null ? Math.hypot(x - o.x, y - o.y) - o.radius
@@ -309,13 +400,15 @@ const gap = (o, x, y) => o.radius != null ? Math.hypot(x - o.x, y - o.y) - o.rad
 const pointer = e => {
   if (!view) return null;
   const r = $("map").getBoundingClientRect(), x = (e.clientX - r.left - view.ox) / view.k, y = (view.oy - (e.clientY - r.top)) / view.k;
-  return { x, y, ok: world.obstacles.every(o => gap(o, x, y) >= 0.8) };
+  const obstacles = [...world.obstacles, ...((s && s.hazards) || [])];
+  return { x, y, ok: connected && s.goal_available && obstacles.every(o => gap(o, x, y) >= 0.8) };
 };
 $("map").addEventListener("mousemove", e => { hover = pointer(e); });
 $("map").addEventListener("mouseleave", () => { hover = null; });
 $("map").addEventListener("click", e => {
   const p = pointer(e);
-  if (p && p.ok) fetch("/goal", { method: "POST", body: JSON.stringify({ x: +p.x.toFixed(2), y: +p.y.toFixed(2) }) });
+  if (p && p.ok) action("/goal", { x: +p.x.toFixed(2), y: +p.y.toFixed(2) }, "New goal accepted.");
+  else notice("Choose clear ground while the simulation and goal service are ready.", true);
 });
 fetch("/world").then(r => r.json()).then(w => { world = w; });
 (function frame() { drawMap(); drawChart(); requestAnimationFrame(frame); })();

@@ -1,69 +1,65 @@
-# Presentation demo (about 4 minutes)
+# Presentation demo (3–5 minutes)
 
-[Documentation index](README.md) | [Navigation](navigation.md) | [Dynamic obstacles](dynamic_obstacles/README.md) | [Goal demo](../README_simple_goal_demo.md)
+[Documentation index](README.md) | [Navigation](navigation.md) | [Dynamic obstacles](dynamic_obstacles/README.md) | [Validation](demo_validation.md)
 
-One run shows the system the team built: UAV-assisted localization against a GPS/wheel/IMU-only estimate, camera mapping and A* routing through a 12-obstacle course, obstacles that appear mid-run, and a live sensor-fault detector. A dashboard shows all of it and changes the sensors, noise, goal and obstacles while the vehicle drives.
+The demo shows camera mapping, A* routing through a 12-obstacle course, two obstacles added during navigation, cooperative localization, and the learned sensor-fault detector. The dashboard compares two estimators on the **same physical vehicle and sensor stream**. The orange estimator never receives UAV corrections; it does not control a second vehicle.
 
 ## Run it
 
-Build as in the [goal demo](../README_simple_goal_demo.md#build), then from the repository root in an Ubuntu desktop session:
+Build in Linux as in the [goal demo](../README_simple_goal_demo.md#build), then run from the repository root:
 
 ```bash
 ./scripts/run_demo.sh
 ```
 
-Open <http://localhost:8765> next to the Gazebo window. Extra arguments pass to the launch file, for example `start_rviz:=false` or `dashboard_port:=8800`. Ctrl+C stops every process. The vehicle starts driving about 20 s after the UAV takes off.
+Open <http://localhost:8765> beside Gazebo. Extra arguments pass to the launch file, including `start_rviz:=false` and `dashboard_port:=8800`. Ctrl+C stops the launch. Windows is for editing and Git; [WSL setup and bounded execution](demo_validation.md#wsl-reproduction) use Ubuntu-22.04, ROS 2 Humble, Gazebo Harmonic and MicroXRCEAgent. Node is unnecessary.
 
-`fault_hold:=true` lets detector decisions hold the UGV. The learned detector raises brief false alarms in nominal runs (five holds in one 95 s run), so the demo leaves hold off and only displays detector flags.
+Wait for **Live simulation**, then **Navigating**. In the recorded run, the UGV starts about 22 simulation seconds after truth becomes available. If it remains waiting for the UAV, inspect PX4's preflight output and the spawn area; do not disable preflight checks. The generated complex course reserves 0.8 m around the UAV spawn, including rejecting obstacles that cover it.
 
-## The dashboard
+The detector displays predictions. It can raise false flags. `fault_hold:=true` additionally connects its decisions to supervisor holds; the presentation defaults to display only, as the dashboard states. The independent position, map, route and command guards remain active.
 
-- **Map.** Ground the UAV camera has seen is lighter; unseen ground stays dark. Obstacles appear as the camera detects them, with the planner's clearance halo around them. Faint outlines show the world's true obstacles.
-- **Tracks.** Truth (white), cooperative estimate (blue, with its 2-sigma circle), GPS/wheel/IMU-only estimate (orange), recent GPS fixes (red dots). The UAV is the hollow diamond.
-- **Route.** The dashed teal line is the remaining route; short dots mean the route stops at the edge of seen ground. It glows when a new obstacle appears.
-- **Click the map** to send the UGV to a new goal. The ring turns red over obstacles.
-- **Add block** drops a 0.6 m box on the route about 2 m ahead. It refuses (button flashes) when no spot leaves room to pass. Reset removes added blocks.
-- **Top right.** Navigation state and any active detector flags.
-- **Errors.** Position error of the two estimates against truth, now and over the last 60 s.
-- **Controls.** GPS and UAV switches; sliders for noise on every sensor, GPS error, wheel slip and gyro drift. Reset returns all to nominal.
+## Read and operate the dashboard
+
+- The white vehicle and path show simulator truth. Blue shows the cooperative estimate; dashed orange shows GPS/wheel/IMU only. Their position errors share the same colors and a 60-second chart.
+- Errors and trails use interpolated acquisition times with a short display delay. Stale inputs leave gaps. The blue circle has radius twice the largest horizontal standard deviation; it is a conservative display circle, not a measured confidence guarantee.
+- Lighter ground is camera-seen ground. Gray cells are detected obstacles; the surrounding halo is clearance near those detections. Faint outlines show static world geometry for the audience. Unseen-ground and map-edge padding also constrain the planner but are omitted from this display halo.
+- The green bullseye is the current goal. Click clear ground to change both goal coordinates atomically. The dashboard reports rejection reasons, including goals near active hazard boxes. The dashboard and RViz show live goals; the Gazebo bullseye is a best-effort visual update.
+- **Add block** places a 0.6 m box ahead on the route when there is room to pass. A refused placement explains why; the timed hazard still demonstrates an obstacle appearing during the run.
+- **UAV corrections** gates cooperative measurements. The UAV keeps flying and mapping. **Wheel speed error** scales measured forward speed; **Gyro drift** adds a growing heading bias. These are injected simulation assumptions.
+- **GPS noise (1σ)** is the unscaled horizontal standard deviation. **Sensor noise** multiplies it and the other configured sensor standard deviations.
+- **Restore sensors** restores nominal settings and removes dashboard-added blocks. It preserves the tracks and error history. It does not rewind the world, remove the timed hazard, reset either filter, or erase integrated gyro bias. Restart the launch for a fresh presentation.
+- A disconnected server or paused simulation clock is stated explicitly; a frozen page is not evidence of continued navigation.
 
 ## The course
 
-- Start (-4, 0), default goal (9, 3), about 17 m of path at up to 0.5 m/s.
-- A U-shaped pocket sits straight ahead of the UGV, opening toward it; the route goes around.
-- A wall at x = 3 runs to the edge of the mapped area with one 2.0 m opening.
-- A cylinder slalom and scattered blocks follow before the goal.
-- A 0.6 m box appears 22 s after the first drive command, past the wall opening (`complex_course_box.yaml`).
-- The world comes from `scripts/generate_obstacle_worlds.py --layout complex`.
+- Start (-4, 0), goal (9, 3): 13 m eastward displacement, with a longer driven detour.
+- A U-shaped pocket opens toward the start. The route goes around it as the camera maps it.
+- A wall at x = 3 reaches the usable map edges, with a 2.0 m opening at y in [-2, 0].
+- Cylinders and scattered blocks follow the opening.
+- A timed 0.6 m box appears at (7.1, 1.0), 22 seconds after the first drive command, through `complex_course_box.yaml`.
+- `scripts/generate_obstacle_worlds.py --layout complex` generates the world. Dark, low obstacles suit the existing luminance mapper and flat-ground projection.
 
-## Script
+## Presentation script
 
-Times are from the first drive command unless noted. Speak the quoted lines; the bullets are what to do.
+Times are approximate and start with the first drive command. Follow the visible events if the simulation runs slowly. The complete recorded run takes about 3.6 simulation minutes after truth starts, including startup and recovery observation.
 
 | Time | Do | Say |
 | --- | --- | --- |
-| Before | Launch. The dashboard shows the UAV climbing. | "A UAV and a ground vehicle. The UAV follows the vehicle and watches the ground with a downward camera." |
-| 0:00 | UGV starts. Point at the lighter ground growing. | "The vehicle plans through ground it hasn't seen and drives only the part the camera has confirmed clear." |
-| 0:08 | The route bends around the U. | "The straight line leads into a dead end. As the camera sees it, the route goes around." |
-| 0:12 | Press **Add block**. | "Now I drop a block on its path. The camera sees it and the route changes." |
-| 0:22 | The scenario box flashes red past the wall opening. | "A second one appears on a timer. Nobody told the planner either of them were there." |
-| 1:00 | UGV reaches the goal. Point at the two numbers. | "Blue uses the UAV, orange uses GPS, wheels and the gyro only. Same sensors, the UAV is the difference." |
-| 1:15 | Click a new goal. Raise **Noise** to 3x. | "Triple the sensor noise. Orange gets noisier. Blue does not move." |
-| 1:45 | Lower **Noise**. Turn **GPS** off. | "Cut GPS. The detector flags it within a second." |
-| 2:15 | Drag **Wheel slip** to +20% and **Gyro drift** up. | "Now the wheels and the gyro lie too. Orange drifts toward two metres. Blue stays well under it." |
-| 2:45 | Switch **UAV** off. | "Remove the UAV and the safety guard stops the vehicle once its position uncertainty passes the limit." |
-| 3:15 | Click **Reset**. | "Every control returns to nominal and the added blocks go away." |
+| Before | Launch; show Gazebo and the dashboard. | “The UAV follows a ground vehicle with a downward camera. This map comes from those images.” |
+| 0:00 | Point to the lighter ground, route and pocket. | “The planner can search unseen ground, but the vehicle drives only the section confirmed clear. As the pocket appears in the map, the route bends around it.” |
+| 0:10–0:20 | Press **Add block** once in open space. If refused, keep driving. | “This box enters through the simulator. The planner learns about it through the camera.” |
+| 0:22 | Point to the timed red box. | “A second obstacle appears on a timer. Watch the detected cells and the remaining route as the camera reaches it.” |
+| About 1:10 | Wait for **Goal reached**; point to the position errors. | “White is the actual path. Blue uses UAV corrections; orange uses GPS, wheels and IMU only. Both estimates receive the same ground-vehicle measurements.” |
+| 1:15 | Click clear ground near (-4, -3). Set **Sensor noise** to 3× for about 15 seconds. | “The goal changes during the run. Now the sensor noise is tripled. The chart shows how each estimate responds.” |
+| 1:35 | Return noise to 1×; switch **GPS** off. | “GPS is unavailable. The UAV still supplies independent position observations. Detector flags are predictions; they are displayed separately from injected settings.” |
+| 1:55 | Set **Wheel speed error** to +20% and **Gyro drift** to +2°/s. | “Now speed and heading measurements are corrupted too. Compare the error growth and watch the navigation state. A position-uncertainty hold is an expected limit under these combined faults.” |
+| 2:15 | Switch **UAV corrections** off for 20 seconds, then on. | “This removes corrections from the estimator while the camera keeps mapping. Turning them back on does not guarantee recovery after large drift.” |
+| About 3:05 | Press **Restore sensors**; show the retained chart and hold reason if present. | “The settings return to nominal, and the live block is removed. The accumulated filter and sensor state remains visible. This run demonstrates the benefit of assistance and the point where the navigation guard refuses to proceed.” |
 
-## Measured in this configuration
+Do not attribute a hold to the last switch pressed without checking its reason: in the recorded run, uncertainty triggers a hold **before** UAV corrections are disabled. Do not promise that blue stays fixed under noise, that the detector always responds within one second, or that restoring settings instantly recovers localization.
 
-From scripted runs of the course in Gazebo Harmonic (simulation assumptions, one seed, positions against simulator truth):
+## Recorded conditions
 
-- Goal reached 54 s after the first drive command with the scenario box present, and 64 s with one added block.
-- Nominal, GPS on: cooperative error about 0.02 to 0.05 m; GPS/wheel/IMU-only 0.2 to 0.4 m.
-- GPS switched off: the detector's GPS flag appeared within 1 s.
-- Noise at 3x with GPS on: GPS/wheel/IMU-only error rose from 0.36 to 0.7 m; cooperative error did not change.
-- Wheel slip +20% and gyro drift 2 deg/s with GPS on: negligible change in either estimate (GPS corrects it).
-- The same faults with GPS off: GPS/wheel/IMU-only error averaged 1.1 m (max 1.9 m); cooperative error averaged 0.28 m (max 0.8 m).
-- UAV assistance off during those faults: the pose guard held the vehicle. Switching assistance back on did not reduce the error within 30 s.
+The [retained review result](demo_validation.md) records one seed on flat simulated ground. With both added obstacles present, the first goal is reached about 68 seconds after the first observed navigation state, 0.374 m from the goal in simulator truth. During that course, mean position error is 0.031 m with UAV corrections and 0.354 m without them. Under GPS loss plus injected wheel/gyro faults, both error and uncertainty grow and the supervisor holds.
 
-These values apply to the recorded conditions only: flat ground, simulated noise and faults, one seed.
+These are measurements of this configuration, not hardware accuracy or general fault-tolerance guarantees.

@@ -165,7 +165,7 @@ def check_layout(name, shapes):
     if keep_out is not None:
         for i, s in enumerate(shapes, 1):
             distance = dist_point_to_shape(*UAV_SPAWN, s)
-            if 0.0 < distance < keep_out:
+            if distance < keep_out:
                 problems.append(f"obstacle_{i} edge is {distance:.2f} m from the UAV spawn")
     # Touching or overlapping shapes form one structure (a wall, a pocket); only the
     # gaps between separate structures must stay passable.

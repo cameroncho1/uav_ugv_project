@@ -8,11 +8,13 @@ endif()
 # find dependencies
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
+find_package(rcl_interfaces REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(visualization_msgs REQUIRED)
 
 add_executable(goal_manager src/goal_manager.cpp)
-ament_target_dependencies(goal_manager rclcpp geometry_msgs visualization_msgs)
+target_include_directories(goal_manager PRIVATE include)
+ament_target_dependencies(goal_manager rclcpp rcl_interfaces geometry_msgs visualization_msgs)
 install(TARGETS goal_manager DESTINATION lib/${PROJECT_NAME})
 
 install(DIRECTORY launch config DESTINATION share/${PROJECT_NAME})
@@ -20,6 +22,10 @@ get_filename_component(PROJECT_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../../.." ABSOL
 install(FILES "${PROJECT_ROOT}/config/simple_goal_demo.rviz" DESTINATION share/${PROJECT_NAME}/config)
 
 if(BUILD_TESTING)
+  find_package(ament_cmake_gtest REQUIRED)
+  ament_add_gtest(goal_revision_test test/test_goal_revision.cpp)
+  target_include_directories(goal_revision_test PRIVATE include)
+  ament_target_dependencies(goal_revision_test rclcpp rcl_interfaces geometry_msgs visualization_msgs)
   find_package(ament_lint_auto REQUIRED)
   # the following line skips the linter which checks for copyrights
   # comment the line when a copyright and license is added to all source files

@@ -47,12 +47,31 @@ def position_error(estimate, truth):
     return math.hypot(estimate[0] - truth[0], estimate[1] - truth[1])
 
 
+def position_at(samples, stamp, max_gap=0.1):
+    """Interpolate acquisition-stamped display samples, without extrapolation."""
+    for index, (time_s, point) in enumerate(samples):
+        if time_s == stamp:
+            return point
+        if time_s > stamp:
+            if not index:
+                return None
+            before, first = samples[index - 1]
+            if not 0 < time_s - before <= max_gap:
+                return None
+            fraction = (stamp - before) / (time_s - before)
+            return tuple(a + fraction * (b - a) for a, b in zip(first, point))
+    return None
+
+
 def stddev_from_covariance(covariance):
-    """Horizontal one-sigma radius from a 6x6 row-major pose covariance."""
+    """Largest horizontal standard deviation for a conservative display circle."""
     if covariance is None or len(covariance) < 8:
         return None
-    variance = 0.5 * (covariance[0] + covariance[7])
-    return math.sqrt(variance) if variance >= 0.0 and math.isfinite(variance) else None
+    horizontal = np.array([[covariance[0], covariance[1]], [covariance[6], covariance[7]]])
+    if not np.isfinite(horizontal).all() or not np.allclose(horizontal, horizontal.T):
+        return None
+    eigenvalues = np.linalg.eigvalsh(horizontal)
+    return math.sqrt(eigenvalues[-1]) if eigenvalues[0] >= 0.0 else None
 
 
 class ErrorStats:
@@ -115,11 +134,15 @@ def validate_control(name, value):
 
 
 def point_gap(obstacle, x, y):
-    """Distance from (x, y) to the edge of an obstacle (boxes are axis-aligned)."""
+    """Distance from (x, y) to the edge of a box or cylinder in map ENU."""
     if obstacle["kind"] == "cylinder":
         return max(math.hypot(x - obstacle["x"], y - obstacle["y"]) - obstacle["radius"], 0.0)
-    return math.hypot(max(abs(x - obstacle["x"]) - obstacle["half_x"], 0.0),
-                      max(abs(y - obstacle["y"]) - obstacle["half_y"], 0.0))
+    yaw = obstacle.get("yaw", 0.0)
+    dx, dy = x - obstacle["x"], y - obstacle["y"]
+    local_x = math.cos(yaw) * dx + math.sin(yaw) * dy
+    local_y = -math.sin(yaw) * dx + math.cos(yaw) * dy
+    return math.hypot(max(abs(local_x) - obstacle["half_x"], 0.0),
+                      max(abs(local_y) - obstacle["half_y"], 0.0))
 
 
 GOAL_LIMIT_M = 50.0

@@ -1,13 +1,14 @@
 """Dashboard helpers: world geometry, error statistics and control validation."""
 
 import base64
+import importlib.util
 import math
 from pathlib import Path
 
 import numpy as np
 import pytest
 from dashboard_core import (ErrorStats, block_site, classify_layers, encode_layers,
-                            goal_error, point_along, position_error, reduce_layers,
+                            goal_error, point_along, position_at, position_error, reduce_layers,
                             stddev_from_covariance, validate_control, world_geometry)
 
 WORLD = Path(__file__).resolve().parents[4] / "simulation/worlds/simple_goal_demo_complex.sdf"
@@ -39,8 +40,36 @@ def test_position_error_and_sigma():
     assert position_error(None, (0.0, 0.0)) is None
     covariance = [0.0] * 36
     covariance[0], covariance[7] = 0.04, 0.16
-    assert stddev_from_covariance(covariance) == pytest.approx(math.sqrt(0.1))
+    assert stddev_from_covariance(covariance) == pytest.approx(0.4)
+    covariance[1] = covariance[6] = 0.1  # indefinite covariance is not an uncertainty radius
+    assert stddev_from_covariance(covariance) is None
     assert stddev_from_covariance([]) is None
+
+
+def test_display_errors_match_acquisition_times_and_leave_gaps():
+    truth = [(10.0, (0.0, 0.0)), (10.08, (0.08, 0.0))]
+    estimate = [(10.02, (0.12, 0.0)), (10.10, (0.20, 0.0))]
+    assert position_error(position_at(estimate, 10.04), position_at(truth, 10.04)) == pytest.approx(0.1)
+    assert position_at(estimate, 10.01) is None  # no extrapolation before the first sample
+    assert position_at(estimate, 10.11) is None  # no extrapolation after the last sample
+    assert position_at([(1.0, (0.0, 0.0)), (1.2, (1.0, 0.0))], 1.1) is None
+
+
+def test_goal_clearance_uses_rotated_box_geometry():
+    world = dict(obstacles=[dict(kind="box", x=0.0, y=0.0,
+                                half_x=2.0, half_y=0.1, yaw=math.pi / 2)])
+    assert goal_error(world, 0.0, 1.5)  # inside the rotated wall
+    assert goal_error(world, 1.5, 0.0) is None
+
+
+@pytest.mark.parametrize("x", [0.0, 0.4, 0.9])
+def test_course_rejects_obstacles_covering_or_near_uav_spawn(x):
+    script = WORLD.parents[2] / "scripts/generate_obstacle_worlds.py"
+    spec = importlib.util.spec_from_file_location("obstacle_generator", script)
+    generator = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(generator)
+    problems, _, _ = generator.check_layout("complex", [("box", x, 0.0, 1.0, 1.0)])
+    assert any("UAV spawn" in problem for problem in problems)
 
 
 @pytest.mark.parametrize("name,value", [
