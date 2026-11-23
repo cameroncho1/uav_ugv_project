@@ -1,4 +1,7 @@
+import time
 from pathlib import Path
+
+import yaml
 
 from ament_index_python.packages import get_package_prefix, get_package_share_directory
 from launch import LaunchDescription
@@ -20,6 +23,9 @@ def generate_launch_description():
     localization_share = Path(get_package_share_directory("cooperative_localization"))
     start_simulation = LaunchConfiguration("start_simulation")
     start_rviz = LaunchConfiguration("start_rviz")
+    dashboard = LaunchConfiguration("dashboard")
+    baseline_ekf = yaml.safe_load(
+        (localization_share / "config/ugv_ekf.yaml").read_text())["ugv_ekf"]["ros__parameters"]
     # Map position of PX4's local origin; shared by the anchor adapter and UAV follower.
     map_origin = [0.0, 0.0, 0.3]
 
@@ -93,6 +99,22 @@ def generate_launch_description():
         DeclareLaunchArgument(
             "grid_resolution", default_value="0.1",
             description="Camera occupancy-grid cell size in meters.",
+        ),
+        DeclareLaunchArgument(
+            "dashboard", default_value="false",
+            description="Serve the live dashboard and run the GPS/wheel/IMU-only comparison "
+                        "estimator. Needs evaluation_trace:=true for the navigation state."),
+        DeclareLaunchArgument("dashboard_port", default_value="8765"),
+        DeclareLaunchArgument(
+            "obstacle_scenario", default_value="",
+            description="Scenario YAML that spawns obstacles during the run (for example "
+                        "simulation_support/config/scenarios/complex_course_box.yaml). "
+                        "Needs evaluation_trace:=true, which supplies the first-drive trigger.",
+        ),
+        DeclareLaunchArgument(
+            "scenario_output", default_value=str(
+                project_root / "localization_results/demo_scenario" / time.strftime("%Y%m%d-%H%M%S")),
+            description="Fresh directory for the scenario operation log.",
         ),
         DeclareLaunchArgument(
             "obstacle_luminance_threshold", default_value="32.0",
@@ -213,6 +235,38 @@ def generate_launch_description():
             name="ugv_command_bridge",
             parameters=[{"config_file": str(package_share / "config/ugv_command_bridge.yaml")}],
             output="screen",
+        ),
+        # Dashboard inputs: simulator truth for display and a second estimator that never
+        # receives UAV measurements. Both are scoring aids, not inputs to navigation.
+        Node(package="simulation_support", executable="ugv_truth",
+             parameters=[{"world": "simple_goal_demo"}], condition=IfCondition(dashboard)),
+        Node(package="robot_localization", executable="ekf_node", name="ugv_ekf_baseline",
+             parameters=[baseline_ekf],
+             remappings=[("odometry/filtered", "/evaluation/baseline_odometry")],
+             condition=IfCondition(dashboard)),
+        Node(package="cooperative_localization", executable="ugv_fused_pose.py",
+             name="baseline_pose",
+             parameters=[{"systematic_position_stddev": ParameterValue(
+                 LaunchConfiguration("systematic_position_stddev"), value_type=float)}],
+             remappings=[("/ugv/localization/odometry", "/evaluation/baseline_odometry"),
+                         ("/ugv/localization/pose", "/evaluation/baseline_pose")],
+             condition=IfCondition(dashboard)),
+        Node(package="fault_management", executable="demo_dashboard.py",
+             parameters=[{"world_file": LaunchConfiguration("world_file"),
+                          "port": ParameterValue(LaunchConfiguration("dashboard_port"),
+                                                 value_type=int)}],
+             output="screen", condition=IfCondition(dashboard)),
+        Node(
+            package="simulation_support",
+            executable="obstacle_scenario",
+            name="obstacle_scenario",
+            parameters=[{
+                "scenario_file": LaunchConfiguration("obstacle_scenario"),
+                "output_directory": LaunchConfiguration("scenario_output"),
+            }],
+            output="screen",
+            condition=IfCondition(PythonExpression(
+                ["'", LaunchConfiguration("obstacle_scenario"), "' != ''"])),
         ),
         Node(
             package="rviz2",

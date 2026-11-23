@@ -28,6 +28,7 @@ The project uses UAV observations to map terrain, estimate a ground robot's pose
 | [Cooperative localization](cooperative_localization/README.md) | Sensor fusion, UAV assistance, interfaces, extension points, results, research, presentations, and implementation history. |
 | [Requirements and verification](verification/README.md) | Reusable R1-R8 evaluator, recorded experiments, six-page report, headless demo/replay, schemas, and validation. |
 | [Verified navigation supervisor](verification/supervisor.md) | Persistent fault/goal holds, finite-state proof, compiled conformance, and paper evidence. |
+| [Presentation demo](demo.md) | One-command demo, live dashboard controls, a timed script, and the measured results behind it. |
 | [Dynamic obstacle scenarios](dynamic_obstacles/README.md) | Scheduled obstacles, camera-map observation, reusable trial infrastructure, and hazard-response evaluation. |
 | [Navigation](navigation.md) | Goal-associated routes, footprint clearance, path following, actuator expiry, and scoring. |
 | [Camera heading](cooperative_localization/camera_heading.md) | Measured UGV direction overlay, relative orientation, joint heading fusion, and calibration. |

@@ -1,5 +1,8 @@
 #include <chrono>
+#include <cmath>
 #include <memory>
+#include <string>
+#include <vector>
 
 #include <geometry_msgs/msg/pose_stamped.hpp>
 #include <rclcpp/rclcpp.hpp>
@@ -26,6 +29,36 @@ public:
     timer_ = create_wall_timer(1s, [this]() {publish_goal();});
 
     RCLCPP_INFO(get_logger(), "Global goal in map frame: (%.1f, %.1f)", goal_x_, goal_y_);
+
+    // A new goal is a new revision: routes and completion belong to the revision that
+    // produced them. Both coordinates must be set in one request.
+    goal_callback_ = add_on_set_parameters_callback(
+      [this](const std::vector<rclcpp::Parameter> & parameters) {
+        rcl_interfaces::msg::SetParametersResult result;
+        result.successful = true;
+        double x = goal_x_, y = goal_y_;
+        bool changed = false;
+        for (const auto & parameter : parameters) {
+          if (parameter.get_name() != "goal_x" && parameter.get_name() != "goal_y") {continue;}
+          if (parameter.get_type() != rclcpp::ParameterType::PARAMETER_DOUBLE ||
+            !std::isfinite(parameter.as_double()) || std::abs(parameter.as_double()) > 100.0)
+          {
+            result.successful = false;
+            result.reason = parameter.get_name() + " must be a finite number within 100 m";
+            return result;
+          }
+          (parameter.get_name() == "goal_x" ? x : y) = parameter.as_double();
+          changed = true;
+        }
+        if (changed && (x != goal_x_ || y != goal_y_)) {
+          goal_x_ = x;
+          goal_y_ = y;
+          revision_ = rclcpp::Time(0, 0, RCL_ROS_TIME);  // restamped by the next publish
+          RCLCPP_INFO(get_logger(), "New global goal in map frame: (%.1f, %.1f)", goal_x_, goal_y_);
+          publish_goal();
+        }
+        return result;
+      });
   }
 
 private:
@@ -68,6 +101,7 @@ private:
   rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr goal_pub_;
   rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr marker_pub_;
   rclcpp::TimerBase::SharedPtr timer_;
+  rclcpp::node_interfaces::OnSetParametersCallbackHandle::SharedPtr goal_callback_;
   rclcpp::Time revision_{0, 0, RCL_ROS_TIME}, last_clock_{0, 0, RCL_ROS_TIME};
 };
 

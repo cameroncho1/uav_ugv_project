@@ -13,6 +13,7 @@ from geometry_msgs.msg import PoseWithCovarianceStamped, Quaternion
 from nav_msgs.msg import Odometry
 from rclpy.executors import ExternalShutdownException
 from rclpy.node import Node
+from rcl_interfaces.msg import SetParametersResult
 from rclpy.qos import QoSProfile, ReliabilityPolicy, DurabilityPolicy, qos_profile_sensor_data
 from sensor_msgs.msg import Imu, NavSatFix, NavSatStatus
 from std_srvs.srv import SetBool
@@ -23,6 +24,14 @@ from localization_common.geodesy import (diagonal_covariance, enu_to_geodetic,
                                           geodetic_to_enu, make_enu_origin,
                                           wrap_angle, yaw_from_quaternion)
 import numpy as np
+
+
+STDDEV_FIELDS = (
+    "gps_xy_stddev", "gps_z_stddev", "odom_xy_stddev", "odom_yaw_stddev",
+    "odom_linear_stddev", "odom_angular_stddev", "imu_orientation_stddev",
+    "imu_angular_stddev", "imu_accel_stddev",
+)
+LIVE_PARAMETERS = ("noise_scale", "gps_horizontal_stddev", "wheel_speed_scale", "imu_yaw_bias_rate")
 
 
 def yaw_quaternion(yaw):
@@ -53,6 +62,9 @@ class SimUgvSensors(Node):
         self.declare_parameter("wheel_speed_scale", 1.0)
         self.declare_parameter("imu_yaw_bias_rate", 0.0)
         self.declare_parameter("evaluation_trace", False)
+        # Live controls: all measurement stddevs are scaled by noise_scale, and the
+        # scale, GPS stddev, wheel scale and yaw bias can be set while running.
+        self.declare_parameter("noise_scale", 1.0)
 
         def parameter(name):
             return self.get_parameter(name).value
@@ -82,6 +94,9 @@ class SimUgvSensors(Node):
         self.wheel_speed_scale = parameter("wheel_speed_scale")
         self.imu_yaw_bias_rate = parameter("imu_yaw_bias_rate")
         self.imu_start = None
+        self.imu_bias_offset = 0.0  # keeps the bias continuous when the rate changes live
+        self.imu_bias_since = None
+        self.last_imu_stamp = None
         self.last_odom = None
         self.trace_sequence = 0
         self.active_gps_event = "gps-initial" if not self.gps_enabled else None
@@ -98,13 +113,14 @@ class SimUgvSensors(Node):
         self.position_variance = 0.01
         self.yaw_variance = 0.0004
 
-        for name in (
-            "gps_xy_stddev", "gps_z_stddev", "odom_xy_stddev", "odom_yaw_stddev",
-            "odom_linear_stddev", "odom_angular_stddev", "imu_orientation_stddev",
-            "imu_angular_stddev", "imu_accel_stddev",
-        ):
+        for name in STDDEV_FIELDS:
             if not math.isfinite(getattr(self, name)) or getattr(self, name) < 0.0:
                 raise ValueError(f"{name} must be nonnegative")
+
+        self.base_stddev = {name: getattr(self, name) for name in STDDEV_FIELDS}
+        self.noise_scale = parameter("noise_scale")
+        self.apply_noise_scale()
+        self.add_on_set_parameters_callback(self.on_parameters)
 
         output_qos = QoSProfile(depth=10, reliability=ReliabilityPolicy.RELIABLE)
         self.odom_pub = self.create_publisher(
@@ -120,6 +136,39 @@ class SimUgvSensors(Node):
         self.create_subscription(
             NavSatFix, "/simulation/ugv/gps", self.on_gps, qos_profile_sensor_data)
         self.create_service(SetBool, "/evaluation/set_gps_enabled", self.set_gps_enabled)
+
+    def apply_noise_scale(self):
+        for name, base in self.base_stddev.items():
+            setattr(self, name, base * self.noise_scale)
+
+    def on_parameters(self, parameters):
+        """Validate every live change first, then apply it."""
+        changes = {}
+        for parameter in parameters:
+            if parameter.name not in LIVE_PARAMETERS:
+                continue
+            value = parameter.value
+            if (isinstance(value, bool) or not isinstance(value, (int, float))
+                    or not math.isfinite(value)):
+                return SetParametersResult(successful=False, reason=f"{parameter.name} must be finite")
+            if parameter.name != "imu_yaw_bias_rate" and value < 0.0:
+                return SetParametersResult(successful=False, reason=f"{parameter.name} must be nonnegative")
+            changes[parameter.name] = float(value)
+        if "noise_scale" in changes:
+            self.noise_scale = changes["noise_scale"]
+        if "gps_horizontal_stddev" in changes:
+            self.base_stddev["gps_xy_stddev"] = changes["gps_horizontal_stddev"]
+        if "wheel_speed_scale" in changes:
+            self.wheel_speed_scale = changes["wheel_speed_scale"]
+        if "imu_yaw_bias_rate" in changes:
+            if self.last_imu_stamp is not None and self.imu_bias_since is not None:
+                self.imu_bias_offset += self.imu_yaw_bias_rate * (
+                    self.last_imu_stamp - self.imu_bias_since)
+                self.imu_bias_since = self.last_imu_stamp
+            self.imu_yaw_bias_rate = changes["imu_yaw_bias_rate"]
+        if "noise_scale" in changes or "gps_horizontal_stddev" in changes:
+            self.apply_noise_scale()
+        return SetParametersResult(successful=True)
 
     def set_gps_enabled(self, request, response):
         self.publish_initial_fault_state()
@@ -213,7 +262,10 @@ class SimUgvSensors(Node):
         stamp = message.header.stamp.sec + message.header.stamp.nanosec*1e-9
         if self.imu_start is None or stamp < self.imu_start:
             self.imu_start = stamp
-        bias = self.imu_yaw_bias_rate * (stamp-self.imu_start)
+            self.imu_bias_since = stamp
+            self.imu_bias_offset = 0.0
+        self.last_imu_stamp = stamp
+        bias = self.imu_bias_offset + self.imu_yaw_bias_rate * (stamp - self.imu_bias_since)
         output = Imu()
         output.header = deepcopy(message.header)
         output.orientation = yaw_quaternion(

@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>UAV–UGV</title>
+<style>
+  :root {
+    --bg: #0d1117; --panel: #141a22; --line: #222b37; --text: #e8ebf0; --muted: #7d8796;
+    --blue: #4da3ff; --orange: #ff9f43; --red: #ff5d73; --green: #3ddc97; --teal: #5eead4;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    display: grid; grid-template-columns: 1fr 340px; background: var(--bg); color: var(--text);
+    font: 14px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-variant-numeric: tabular-nums; overflow: hidden;
+  }
+  #map { width: 100%; height: 100%; display: block; cursor: crosshair; }
+  aside {
+    background: var(--panel); border-left: 1px solid var(--line); padding: 28px 24px;
+    display: flex; flex-direction: column; gap: 28px; overflow-y: auto;
+  }
+  .state { display: flex; align-items: center; gap: 12px; font-size: 22px; font-weight: 600; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--muted); flex: none; }
+  .state[data-s="go"] .dot { background: var(--green); box-shadow: 0 0 12px var(--green); }
+  .state[data-s="hold"] .dot { background: var(--orange); box-shadow: 0 0 12px var(--orange); }
+  .state[data-s="done"] .dot { background: var(--blue); box-shadow: 0 0 12px var(--blue); }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; min-height: 0; }
+  .chip { padding: 2px 10px; border-radius: 99px; font-size: 12px; color: var(--orange);
+          background: #ff9f4318; border: 1px solid #ff9f4340; }
+  .reading { display: flex; align-items: baseline; gap: 10px; }
+  .reading + .reading { margin-top: 6px; }
+  .reading b { font-size: 28px; font-weight: 600; min-width: 5.2ch; }
+  .reading span { color: var(--muted); }
+  .reading i { width: 8px; height: 8px; border-radius: 50%; flex: none; align-self: center; }
+  canvas#chart { width: 100%; height: 96px; display: block; margin-top: 14px; }
+  .row { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 4px 12px;
+         padding: 7px 0; }
+  .row output { color: var(--muted); }
+  .row input[type=range] { grid-column: 1 / -1; }
+  .row.off { opacity: .35; pointer-events: none; }
+  .switch { position: relative; width: 38px; height: 22px; }
+  .switch input { appearance: none; position: absolute; inset: 0; margin: 0; cursor: pointer;
+                  background: #2b3542; border-radius: 99px; transition: background .15s; }
+  .switch input::after { content: ""; position: absolute; top: 3px; left: 3px; width: 16px;
+                         height: 16px; border-radius: 50%; background: #fff; transition: transform .15s; }
+  .switch input:checked { background: var(--green); }
+  .switch input:checked::after { transform: translateX(16px); }
+  input[type=range] { appearance: none; width: 100%; height: 4px; border-radius: 4px;
+                      background: #2b3542; outline: none; margin: 8px 0 4px; }
+  input[type=range]::-webkit-slider-thumb { appearance: none; width: 16px; height: 16px;
+                      border-radius: 50%; background: #fff; cursor: pointer; border: 0; }
+  input[type=range]::-moz-range-thumb { width: 16px; height: 16px; border-radius: 50%;
+                      background: #fff; cursor: pointer; border: 0; }
+  .foot { margin-top: auto; display: flex; justify-content: space-between; align-items: center; }
+  button { background: none; border: 0; color: var(--muted); font: inherit; cursor: pointer; padding: 0; }
+  button:hover { color: var(--text); }
+  #block { color: var(--text); border: 1px solid #2b3542; border-radius: 99px; padding: 6px 16px; transition: border-color .15s, color .15s; }
+  #block:hover { border-color: var(--red); color: var(--red); }
+  #block:disabled { opacity: .35; pointer-events: none; }
+  #block.no { border-color: var(--red); color: var(--red); }
+  body.waiting aside > :not(.controls) { opacity: .4; }
+</style>
+</head>
+<body class="waiting">
+<canvas id="map"></canvas>
+<aside>
+  <section>
+    <div class="state" id="state" data-s="wait"><span class="dot"></span><span id="mode">Waiting</span></div>
+    <div class="chips" id="chips"></div>
+  </section>
+  <section>
+    <div class="reading"><i style="background:var(--blue)"></i><b id="eFused">–</b><span>with UAV</span></div>
+    <div class="reading"><i style="background:var(--orange)"></i><b id="eBase">–</b><span>without UAV</span></div>
+    <canvas id="chart"></canvas>
+  </section>
+  <section class="controls">
+    <div class="row"><label for="gps">GPS</label><span class="switch"><input type="checkbox" id="gps"></span></div>
+    <div class="row"><label for="uav">UAV</label><span class="switch"><input type="checkbox" id="uav"></span></div>
+    <div class="row"><label for="noise">Noise</label><output id="noiseV"></output>
+      <input type="range" id="noise" min="0" max="5" step="0.1"></div>
+    <div class="row"><label for="gpsErr">GPS error</label><output id="gpsErrV"></output>
+      <input type="range" id="gpsErr" min="0" max="10" step="0.1"></div>
+    <div class="row"><label for="wheel">Wheel slip</label><output id="wheelV"></output>
+      <input type="range" id="wheel" min="-30" max="30" step="1"></div>
+    <div class="row"><label for="gyro">Gyro drift</label><output id="gyroV"></output>
+      <input type="range" id="gyro" min="-2" max="2" step="0.05"></div>
+  </section>
+  <div class="foot"><button id="reset">Reset</button><button id="block" disabled>Add block</button></div>
+</aside>
+<script>
+const $ = id => document.getElementById(id);
+const C = { blue: "#4da3ff", orange: "#ff9f43", red: "#ff5d73", green: "#3ddc97", teal: "#5eead4" };
+const DEG = Math.PI / 180;
+let world = { obstacles: [], goal: null, start: null };
+let s = null, counts = { truth: 0, fused: 0, baseline: 0, series: 0 };
+const trail = { truth: [], fused: [], baseline: [] };
+let series = [], gpsDots = [], seenHazards = new Map(), editing = {};
+let view = null, hover = null, fog = null, fogSeq = -1, pulseUntil = 0;
+
+// Controls -------------------------------------------------------------------------
+const send = (name, value) => fetch("/control", { method: "POST", body: JSON.stringify({ name, value }) });
+const slider = (id, name, toWire, fromWire, show) => {
+  const el = $(id), out = $(id + "V");
+  let last = 0;
+  el.addEventListener("input", () => {
+    editing[name] = performance.now();
+    out.textContent = show(+el.value);
+    if (performance.now() - last > 80) { last = performance.now(); send(name, toWire(+el.value)); }
+  });
+  el.addEventListener("change", () => { editing[name] = performance.now(); send(name, toWire(+el.value)); });
+  return value => {
+    if (performance.now() - (editing[name] || 0) < 900) return;
+    el.value = fromWire(value); out.textContent = show(+el.value);
+  };
+};
+const syncers = {
+  noise_scale: slider("noise", "noise_scale", v => v, v => v, v => v.toFixed(1) + "×"),
+  gps_horizontal_stddev: slider("gpsErr", "gps_horizontal_stddev", v => v, v => v, v => v.toFixed(1) + " m"),
+  wheel_speed_scale: slider("wheel", "wheel_speed_scale", v => 1 + v / 100, v => Math.round((v - 1) * 100),
+                            v => (v > 0 ? "+" : "") + v + "%"),
+  imu_yaw_bias_rate: slider("gyro", "imu_yaw_bias_rate", v => v * DEG, v => +(v / DEG).toFixed(2),
+                            v => (v > 0 ? "+" : "") + v.toFixed(2) + "°/s"),
+};
+for (const [id, name] of [["gps", "gps_enabled"], ["uav", "uav_assistance"]]) {
+  $(id).addEventListener("change", e => { editing[name] = performance.now(); send(name, e.target.checked); });
+}
+$("block").addEventListener("click", async () => {
+  const ok = (await fetch("/block", { method: "POST", body: "{}" })).ok;
+  if (!ok) { $("block").classList.add("no"); setTimeout(() => $("block").classList.remove("no"), 700); }
+});
+$("reset").addEventListener("click", () => { fetch("/reset", { method: "POST", body: "{}" }); series = []; counts.series = 0; });
+
+function syncControls() {
+  const c = s.controls, a = s.available;
+  for (const [id, name] of [["gps", "gps_enabled"], ["uav", "uav_assistance"]]) {
+    if (performance.now() - (editing[name] || 0) > 900) $(id).checked = c[name];
+    $(id).closest(".row").classList.toggle("off", !a[name]);
+  }
+  for (const [name, sync] of Object.entries(syncers)) {
+    sync(c[name]);
+  }
+  for (const [id, name] of [["noise", "noise_scale"], ["gpsErr", "gps_horizontal_stddev"],
+                            ["wheel", "wheel_speed_scale"], ["gyro", "imu_yaw_bias_rate"]]) {
+    $(id).closest(".row").classList.toggle("off", !a[name]);
+  }
+}
+
+// State and readouts -----------------------------------------------------------------
+function syncReadouts() {
+  const name = (s.mode || "").toUpperCase();
+  const kind = !s.truth || !s.mode || !s.started ? "wait" : name.includes("GOAL") ? "done"
+    : name.includes("HOLD") ? "hold" : name.includes("NAV") ? "go" : "wait";
+  $("state").dataset.s = kind;
+  $("mode").textContent = { wait: "Waiting", go: "Navigating", hold: "Holding", done: "Goal reached" }[kind];
+  document.body.classList.toggle("waiting", !s.truth);
+  $("block").disabled = !s.started || (s.route || []).length < 2;
+  const f = s.flags || {}, chips = [];
+  if (f.gps) chips.push("GPS lost");
+  if (f.wheels) chips.push("Wheel slip");
+  if (f.gyro) chips.push("Gyro drift");
+  if (f.uav) chips.push("UAV lost");
+  $("chips").innerHTML = chips.map(t => `<span class="chip">${t}</span>`).join("");
+  const last = series[series.length - 1];
+  $("eFused").textContent = last && last[1] != null ? last[1].toFixed(2) + " m" : "–";
+  $("eBase").textContent = last && last[2] != null ? last[2].toFixed(2) + " m" : "–";
+}
+
+// Drawing ----------------------------------------------------------------------------
+function fit(canvas) {
+  const r = canvas.getBoundingClientRect(), d = devicePixelRatio || 1;
+  if (canvas.width !== Math.round(r.width * d)) { canvas.width = Math.round(r.width * d); canvas.height = Math.round(r.height * d); }
+  const g = canvas.getContext("2d"); g.setTransform(d, 0, 0, d, 0, 0);
+  return [g, r.width, r.height];
+}
+function bounds() {
+  const pts = [];
+  for (const o of world.obstacles) { const r = o.radius ?? Math.hypot(o.half_x, o.half_y); pts.push([o.x - r, o.y - r], [o.x + r, o.y + r]); }
+  for (const p of [world.goal, world.start]) if (p) pts.push([p[0] - 1, p[1] - 1], [p[0] + 1, p[1] + 1]);
+  if (!pts.length) pts.push([-6, -4], [6, 4]);
+  const xs = pts.map(p => p[0]), ys = pts.map(p => p[1]);
+  return [Math.min(...xs) - 1, Math.max(...xs) + 1, Math.min(...ys) - 1, Math.max(...ys) + 1];
+}
+function drawMap() {
+  const [g, w, h] = fit($("map"));
+  g.clearRect(0, 0, w, h);
+  g.imageSmoothingEnabled = false;
+  const [x0, x1, y0, y1] = bounds(), pad = 40;
+  const k = Math.min((w - 2 * pad) / (x1 - x0), (h - 2 * pad) / (y1 - y0));
+  const ox = (w - k * (x1 - x0)) / 2 - k * x0, oy = (h + k * (y1 - y0)) / 2 + k * y0;
+  const X = x => ox + k * x, Y = y => oy - k * y;
+  view = { ox, oy, k };
+  const path = (pts, color, width, dash = []) => {
+    if (pts.length < 2) return;
+    g.beginPath(); pts.forEach((p, i) => i ? g.lineTo(X(p[0]), Y(p[1])) : g.moveTo(X(p[0]), Y(p[1])));
+    g.strokeStyle = color; g.lineWidth = width; g.setLineDash(dash); g.lineJoin = g.lineCap = "round"; g.stroke(); g.setLineDash([]);
+  };
+  const shape = (o, fill, stroke, lw = 1) => {
+    g.beginPath();
+    if (o.radius != null) g.arc(X(o.x), Y(o.y), o.radius * k, 0, 7);
+    else { g.save(); g.translate(X(o.x), Y(o.y)); g.rotate(-(o.yaw || 0)); g.rect(-o.half_x * k, -o.half_y * k, 2 * o.half_x * k, 2 * o.half_y * k); g.restore(); }
+    if (fill) { g.fillStyle = fill; g.fill(); }
+    g.strokeStyle = stroke; g.lineWidth = lw; g.stroke();
+  };
+  if (fog) g.drawImage(fog.canvas, X(fog.ox), Y(fog.oy + fog.h * fog.res), fog.w * fog.res * k, fog.h * fog.res * k);
+  for (const o of world.obstacles) shape(o, null, "#1f2832");
+  const goal = (s && s.goal) || world.goal;
+  if (goal) {
+    for (const [r, a] of [[.8, .25], [.45, .5], [.12, 1]]) {
+      g.beginPath(); g.arc(X(goal[0]), Y(goal[1]), r * k, 0, 7);
+      g.strokeStyle = g.fillStyle = C.green; g.globalAlpha = a; r < .2 ? g.fill() : g.stroke(); g.globalAlpha = 1;
+    }
+  }
+  if (hover) {
+    g.beginPath(); g.arc(X(hover.x), Y(hover.y), .45 * k, 0, 7);
+    g.strokeStyle = hover.ok ? C.green : C.red; g.globalAlpha = .7; g.lineWidth = 1.5; g.setLineDash([4, 4]); g.stroke(); g.setLineDash([]); g.globalAlpha = 1;
+  }
+  if (!s) return;
+  const t = performance.now();
+  for (const h2 of s.hazards || []) {
+    if (!seenHazards.has(h2.id)) { seenHazards.set(h2.id, t); pulseUntil = t + 2500; }
+    const age = (t - seenHazards.get(h2.id)) / 1000;
+    shape(h2, "#2a1c22", C.red, 1.5 + (age < 2.5 ? 3 * Math.abs(Math.sin(age * 5)) : 0));
+  }
+  const pulse = Math.max(0, (pulseUntil - t) / 2500);
+  const here = s.fused || s.truth, route = s.route || [];
+  let from = 0;
+  if (here && route.length) { let best = Infinity; route.forEach((p, i) => { const d = Math.hypot(p[0] - here[0], p[1] - here[1]); if (d < best) { best = d; from = i; } }); }
+  if (pulse) { g.shadowColor = C.teal; g.shadowBlur = 16 * pulse; }
+  path(route.slice(from), C.teal, 2 + 2.5 * pulse, s.partial ? [3, 6] : [8, 6]);
+  g.shadowBlur = 0;
+  path(trail.baseline, C.orange, 2);
+  path(trail.fused, C.blue, 2);
+  path(trail.truth, "rgba(255,255,255,.85)", 1.5);
+  gpsDots = gpsDots.filter(d => t - d.t < 6000);
+  for (const d of gpsDots) { g.globalAlpha = 1 - (t - d.t) / 6000; g.fillStyle = C.red; g.beginPath(); g.arc(X(d.x), Y(d.y), 2.5, 0, 7); g.fill(); }
+  g.globalAlpha = 1;
+  const f = s.fused;
+  if (f && f[2] != null) {
+    g.beginPath(); g.arc(X(f[0]), Y(f[1]), Math.max(3, 2 * f[2] * k), 0, 7);
+    g.fillStyle = "rgba(77,163,255,.14)"; g.fill(); g.strokeStyle = "rgba(77,163,255,.5)"; g.lineWidth = 1; g.stroke();
+  }
+  if (s.baseline) { g.beginPath(); g.arc(X(s.baseline[0]), Y(s.baseline[1]), 5, 0, 7); g.fillStyle = C.orange; g.fill(); }
+  if (f) { g.beginPath(); g.arc(X(f[0]), Y(f[1]), 5, 0, 7); g.fillStyle = C.blue; g.fill(); }
+  if (s.uav) {
+    const u = [X(s.uav[0]), Y(s.uav[1])];
+    g.beginPath(); g.moveTo(u[0], u[1] - 9); g.lineTo(u[0] + 9, u[1]); g.lineTo(u[0], u[1] + 9); g.lineTo(u[0] - 9, u[1]); g.closePath();
+    g.strokeStyle = "#fff"; g.lineWidth = 1.5; g.stroke();
+  }
+  if (s.truth) {
+    g.save(); g.translate(X(s.truth[0]), Y(s.truth[1])); g.rotate(-s.truth[2]);
+    g.beginPath(); g.roundRect(-.45 * k, -.3 * k, .9 * k, .6 * k, 4);
+    g.fillStyle = "#fff"; g.fill();
+    g.beginPath(); g.moveTo(.45 * k, 0); g.lineTo(.2 * k, -.15 * k); g.lineTo(.2 * k, .15 * k); g.closePath();
+    g.fillStyle = "#0d1117"; g.fill(); g.restore();
+  }
+}
+function drawChart() {
+  const [g, w, h] = fit($("chart"));
+  g.clearRect(0, 0, w, h);
+  if (series.length < 2) return;
+  const end = series[series.length - 1][0], start = end - 60;
+  const view = series.filter(p => p[0] >= start);
+  const top = Math.max(0.5, ...view.map(p => Math.max(p[1] ?? 0, p[2] ?? 0))) * 1.1;
+  const X = t => (t - start) / 60 * w, Y = e => h - 4 - (h - 12) * e / top;
+  g.strokeStyle = "#222b37"; g.lineWidth = 1; g.beginPath(); g.moveTo(0, h - 3.5); g.lineTo(w, h - 3.5); g.stroke();
+  g.fillStyle = "#7d8796"; g.font = "11px system-ui"; g.fillText(top.toFixed(1) + " m", 0, 10);
+  for (const [i, color] of [[2, C.orange], [1, C.blue]]) {
+    g.beginPath(); let pen = false;
+    for (const p of view) { if (p[i] == null) { pen = false; continue; } pen ? g.lineTo(X(p[0]), Y(p[i])) : g.moveTo(X(p[0]), Y(p[i])); pen = true; }
+    g.strokeStyle = color; g.lineWidth = 2; g.lineJoin = "round"; g.stroke();
+  }
+}
+
+// Seen ground, detected obstacles and the planner's clearance halo, one pixel per cell.
+const LAYER_COLORS = [[0, 0, 0, 0], [255, 255, 255, 14], [74, 88, 108, 255], [167, 139, 250, 34]];
+function buildFog(l) {
+  const bytes = Uint8Array.from(atob(l.data), c => c.charCodeAt(0));
+  const canvas = document.createElement("canvas"); canvas.width = l.w; canvas.height = l.h;
+  const ctx = canvas.getContext("2d"), image = ctx.createImageData(l.w, l.h);
+  for (let r = 0; r < l.h; r++) for (let c = 0; c < l.w; c++) {
+    const color = LAYER_COLORS[bytes[r * l.w + c]], o = ((l.h - 1 - r) * l.w + c) * 4;
+    image.data.set(color, o);
+  }
+  ctx.putImageData(image, 0, 0);
+  fog = { canvas, ox: l.ox, oy: l.oy, res: l.res, w: l.w, h: l.h };
+}
+
+// Polling ----------------------------------------------------------------------------
+async function poll() {
+  try {
+    const q = new URLSearchParams({ ...counts, layers: fogSeq });
+    const next = await (await fetch("/state?" + q)).json();
+    for (const k of ["truth", "fused", "baseline"]) {
+      if (next.trail_count[k] < counts[k]) trail[k] = [];
+      trail[k].push(...next.trail[k]); counts[k] = next.trail_count[k];
+    }
+    if (next.series_count < counts.series) series = [];
+    series.push(...next.series); counts.series = next.series_count;
+    if (next.gps && (!s || !s.gps || next.gps[2] !== s.gps[2])) gpsDots.push({ x: next.gps[0], y: next.gps[1], t: performance.now() });
+    if (next.layers) { buildFog(next.layers); fogSeq = next.layers_seq; }
+    s = next; syncControls(); syncReadouts();
+  } catch (e) { document.body.classList.add("waiting"); }
+  setTimeout(poll, 100);
+}
+const gap = (o, x, y) => o.radius != null ? Math.hypot(x - o.x, y - o.y) - o.radius
+  : Math.hypot(Math.max(Math.abs(x - o.x) - o.half_x, 0), Math.max(Math.abs(y - o.y) - o.half_y, 0));
+const pointer = e => {
+  if (!view) return null;
+  const r = $("map").getBoundingClientRect(), x = (e.clientX - r.left - view.ox) / view.k, y = (view.oy - (e.clientY - r.top)) / view.k;
+  return { x, y, ok: world.obstacles.every(o => gap(o, x, y) >= 0.8) };
+};
+$("map").addEventListener("mousemove", e => { hover = pointer(e); });
+$("map").addEventListener("mouseleave", () => { hover = null; });
+$("map").addEventListener("click", e => {
+  const p = pointer(e);
+  if (p && p.ok) fetch("/goal", { method: "POST", body: JSON.stringify({ x: +p.x.toFixed(2), y: +p.y.toFixed(2) }) });
+});
+fetch("/world").then(r => r.json()).then(w => { world = w; });
+(function frame() { drawMap(); drawChart(); requestAnimationFrame(frame); })();
+poll();
+</script>
+</body>
+</html>

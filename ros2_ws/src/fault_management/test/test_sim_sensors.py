@@ -80,3 +80,42 @@ def test_vector_fixture_reports_chassis_point_in_uav_body():
     finally:
         sensor.destroy_node()
         rclpy.try_shutdown()
+
+def test_live_noise_and_fault_parameters_apply_and_reject_invalid_values():
+    from rclpy.parameter import Parameter
+    rclpy.init()
+    sensor = SimUgvSensors()
+    try:
+        base_gps = sensor.gps_xy_stddev
+        base_odom = sensor.odom_xy_stddev
+        assert sensor.set_parameters([Parameter('noise_scale', value=3.0)])[0].successful
+        assert sensor.gps_xy_stddev == pytest.approx(3.0 * base_gps)
+        assert sensor.odom_xy_stddev == pytest.approx(3.0 * base_odom)
+        assert sensor.set_parameters([Parameter('gps_horizontal_stddev', value=4.0)])[0].successful
+        assert sensor.gps_xy_stddev == pytest.approx(12.0)
+        assert sensor.set_parameters([Parameter('wheel_speed_scale', value=1.2)])[0].successful
+        assert sensor.wheel_speed_scale == 1.2
+        assert not sensor.set_parameters([Parameter('noise_scale', value=-1.0)])[0].successful
+        assert not sensor.set_parameters([Parameter('wheel_speed_scale', value=float('nan'))])[0].successful
+        assert sensor.noise_scale == 3.0 and sensor.wheel_speed_scale == 1.2
+    finally:
+        sensor.destroy_node()
+        rclpy.try_shutdown()
+
+
+def test_imu_yaw_bias_stays_continuous_when_rate_changes_live():
+    from rclpy.parameter import Parameter
+    rclpy.init()
+    sensor = SimUgvSensors()
+    try:
+        sensor.imu_start = 10.0
+        sensor.imu_bias_since = 10.0
+        sensor.last_imu_stamp = 20.0
+        sensor.imu_yaw_bias_rate = 0.01
+        assert sensor.set_parameters([Parameter('imu_yaw_bias_rate', value=0.02)])[0].successful
+        assert sensor.imu_bias_offset == pytest.approx(0.1)
+        assert sensor.imu_bias_offset + sensor.imu_yaw_bias_rate * (25.0 - sensor.imu_bias_since) == pytest.approx(0.2)
+    finally:
+        sensor.destroy_node()
+        rclpy.try_shutdown()
+
