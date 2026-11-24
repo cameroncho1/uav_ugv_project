@@ -284,7 +284,7 @@ Each evaluation also publishes one `uav_ugv_msgs/FaultStatus` class decision on
 
 | Flag | Set by | Supervisor response |
 | --- | --- | --- |
-| `odometry_scale` | BiLSTM flag on `wheel_odom/vx` or `wheel_odom/wz` | hold |
+| `odometry_scale` | BiLSTM flag on `wheel_odom/vx` | hold |
 | `imu_drift` | BiLSTM flag on `imu/wz` | hold |
 | `gps_outage` | no GPS fix for `gps_timeout` (1 s), or a flag on `gps/latitude` or `gps/longitude` | hold only if the pose guard fails |
 | `uav_loss` | no UAV relative measurement for `uav_timeout` (2 s); off when `uav_assistance:=false` | hold only if the pose guard fails |
@@ -299,9 +299,11 @@ With `evaluation_trace:=true` each change is a `fault_event` on `/evaluation/fau
 `uav_loss` also rises whenever the camera loses the marker for 2 s, for
 example before the UAV is airborne.
 
-`imu/{wx,wy,ax,ay,az}` and `gps/altitude` set no flag. A decision is valid
-when `imu/wz`, `wheel_odom/vx`, and `wheel_odom/wz` each have a current
-evaluation, and is stamped with the oldest of their window ends. Before that it
+`imu/{wx,wy,ax,ay,az}`, `wheel_odom/wz`, and `gps/altitude` set no flag; the
+simulated wheel-speed scale fault changes only the forward speed, so
+`wheel_odom/wz` cannot show it. A decision is valid when `imu/wz` and
+`wheel_odom/vx` each have a current evaluation, and is stamped with the older
+of their window ends. Before that it
 is published with `window_valid: false`. If no newer window exists, nothing is
 published, and the supervisor's 1 s decision-age limit holds. A clock reset
 starts a new `source_id` and sequence. `fault_hold:=true` sets the goal
@@ -309,9 +311,38 @@ controller's `detector_enabled`, so the supervisor holds on wheel-scale or
 yaw-drift flags and on missing or invalid decisions. It defaults to `false`
 and needs `fault_detection:=true`; without decisions the supervisor holds.
 
-Closed-loop goal-demo trials with `fault_detection:=true fault_hold:=true` (seed 513, goal (4, 0),
-150 s recorded, one simulation at a time, 2026-11-18). Counts are decisions with
-the flag set out of all decisions:
+A model-derived class flag (`odometry_scale`, `imu_drift`, and the model part
+of `gps_outage`) is published only after its channel is flagged in
+`flag_persistence` consecutive decision windows (default 3, 1.5 s). An invalid
+decision resets the count. Isolated single-window flags therefore never reach
+the supervisor, and a persistent fault is reported about 1 s later than its
+first flagged window. Missing GPS fixes and missing UAV measurements set their
+flags without this delay. The node limits numpy to one BLAS thread: with
+multithreaded OpenBLAS on a CPU shared with Gazebo and PX4, one evaluation took
+about 1 s instead of 0.1 s, decisions exceeded the supervisor's 1 s age limit,
+and the UGV held on missing decisions.
+
+Clean goal-demo trials with `fault_detection:=true fault_hold:=true
+evaluation_trace:=true` after both changes (`flag_persistence` 3, single-thread
+BLAS, `wheel_odom/wz` still mapped to `odometry_scale`; seed 513, goal (4, 0),
+RViz on, one simulation at a time, 2026-11-24):
+
+| Trial | Sim time recorded | Fault holds after driving began | Hold-channel flags → published class flags | Goal |
+| --- | ---: | ---: | --- | --- |
+| 1 | 64 s | 0 | 2 → 0 | reached |
+| 2 | 143 s | 0 | 1 → 0 | reached |
+| 3 | 146 s | 0 | 1 → 0 | reached |
+
+No decision gap exceeded 0.9 s. Each run held only at startup, before driving,
+until ten clear decisions spanned 5 s. In trial 1 the Gazebo and RViz windows
+were closed at about 71 s sim time, after the goal; the simulation stopped and
+the supervisor held on the stale pose. Three runs bound no false-alarm rate.
+No faulted trial has been run with `flag_persistence` 3.
+
+Earlier closed-loop goal-demo trials with `fault_detection:=true fault_hold:=true`
+(seed 513, goal (4, 0), 150 s recorded, one simulation at a time, 2026-11-18),
+before flag persistence, single-thread BLAS, and the `wheel_odom/wz` mapping
+change. Counts are decisions with the flag set out of all decisions:
 
 | Trial | `odometry_scale` | `imu_drift` | `gps_outage` | Fault holds while driving | Goal |
 | --- | ---: | ---: | ---: | --- | --- |

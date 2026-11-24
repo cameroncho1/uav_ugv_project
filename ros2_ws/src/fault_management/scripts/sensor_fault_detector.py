@@ -37,8 +37,8 @@ from rclpy.time import Time
 from sensor_msgs.msg import Imu, NavSatFix, NavSatStatus
 from uav_ugv_msgs.msg import FaultStatus
 
-from sensor_fault_model import (CHANNELS, SensorFaultModel, channel_name, fault_decision,
-                                reference)
+from sensor_fault_model import (CHANNELS, FlagPersistence, SensorFaultModel, channel_name,
+                                fault_decision, reference)
 
 # Channels whose training windows had a reference; they wait until it exists.
 REFERENCED = {("imu", "wz"), ("imu", "ax"), ("imu", "ay"), ("wheel_odom", "vx"),
@@ -99,6 +99,9 @@ class SensorFaultDetector(Node):
         self.declare_parameter("monitor_uav", True)
         self.declare_parameter("uav_topic", "/ugv/sensors/uav_relative_pose")
         self.declare_parameter("uav_timeout", 2.0)
+        # Consecutive flagged decision windows before a model-derived class flag
+        # is published; 3 windows at 0.5 s suppress isolated single-window flags.
+        self.declare_parameter("flag_persistence", 3)
         self.declare_parameter("command_rate", 20.0)
         self.declare_parameter("command_timeout", 0.5)
         self.declare_parameter("evaluation_period", 0.5)
@@ -123,6 +126,7 @@ class SensorFaultDetector(Node):
         self.monitor_uav = parameter("monitor_uav")
         self.uav_timeout = parameter("uav_timeout")
         self.uav_latest = None   # acquisition stamp of the newest UAV measurement
+        self.persistence = FlagPersistence(parameter("flag_persistence"))
         # GPS windows span about 20 s; their odometry reference must cover them.
         self.streams = {name: StreamBuffer(fields, 45.0) for name, fields in FIELDS.items()}
         self.command = (0.0, 0.0)
@@ -203,6 +207,7 @@ class SensorFaultDetector(Node):
             self.evaluated.clear()
             self.decisions.clear()
             self.uav_latest = None
+            self.persistence.reset()
             self.command_time = None
             self.start_session()
         self.last_now = now
@@ -266,7 +271,8 @@ class SensorFaultDetector(Node):
         gps_available = gps_latest is not None and now - gps_latest <= self.gps_timeout
         uav_available = not self.monitor_uav or (
             self.uav_latest is not None and now - self.uav_latest <= self.uav_timeout)
-        valid, stamp, flags = fault_decision(current, gps_available, uav_available)
+        valid, stamp, flags = fault_decision(current, gps_available, uav_available,
+                                             self.persistence)
         if not valid:
             stamp = now
         # Stamps strictly increase within a session; without newer evidence the

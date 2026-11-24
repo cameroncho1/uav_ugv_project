@@ -5,7 +5,8 @@ from pathlib import Path
 
 import numpy as np
 import pytest
-from sensor_fault_model import (CHANNELS, DECISION_CHANNELS, EARTH_RADIUS, SensorFaultModel,
+from sensor_fault_model import (CHANNELS, DECISION_CHANNELS, EARTH_RADIUS, FlagPersistence,
+                                SensorFaultModel,
                                 fault_decision, reference)
 
 MODEL = Path(__file__).resolve().parents[1] / "models/ugv_sensor_fault_detector.npz"
@@ -80,12 +81,11 @@ def test_fault_decision_maps_channels_to_classes():
     assert stamp == 12.0
 
     for channel, flag in ((("wheel_odom", "vx"), "odometry_scale"),
-                          (("wheel_odom", "wz"), "odometry_scale"),
                           (("imu", "wz"), "imu_drift"),
                           (("gps", "longitude"), "gps_outage")):
         _, _, flags = fault_decision({**clear, channel: (True, 20.0)}, True, True)
         assert [name for name, value in flags.items() if value] == [flag]
-    for channel in (("imu", "ay"), ("imu", "wx"), ("gps", "altitude")):
+    for channel in (("imu", "ay"), ("imu", "wx"), ("wheel_odom", "wz"), ("gps", "altitude")):
         assert not any(fault_decision({**clear, channel: (True, 20.0)}, True, True)[2].values())
 
 
@@ -99,3 +99,34 @@ def test_fault_decision_validity_and_gps_outage():
         partial = {c: v for c, v in clear.items() if c != missing}
         valid, stamp, flags = fault_decision(partial, gps_available=True, uav_available=False)
         assert not valid and stamp is None and not any(flags.values())
+
+
+def test_flag_persistence_suppresses_isolated_flags():
+    persistence = FlagPersistence(3)
+    clear = {channel: (False, 0.0) for channel in DECISION_CHANNELS}
+
+    def decide(stamp, faulty=(), gps=True):
+        current = {c: (c in faulty, stamp) for c in clear}
+        return fault_decision(current, gps, True, persistence)[2]
+
+    yaw = (("imu", "wz"),)
+    assert not decide(1.0, yaw)["imu_drift"]          # isolated flag
+    assert not decide(1.5)["imu_drift"]
+    assert not decide(2.0, yaw)["imu_drift"]
+    assert not decide(2.5, yaw)["imu_drift"]
+    assert decide(3.0, yaw)["imu_drift"]               # third consecutive window
+    assert decide(3.0, yaw)["imu_drift"]               # same window: unchanged, not recounted
+    assert not decide(3.5)["imu_drift"]                # clears on the first clear window
+    # Loss of a sensor is not delayed by persistence.
+    assert decide(4.0, gps=False)["gps_outage"]
+
+
+def test_flag_persistence_resets_on_invalid_decision():
+    persistence = FlagPersistence(2)
+    wheel = {c: (c == ("wheel_odom", "vx"), 0.0) for c in DECISION_CHANNELS}
+    fault_decision({c: (v[0], 1.0) for c, v in wheel.items()}, True, True, persistence)
+    fault_decision({}, True, True, persistence)        # invalid: counts reset
+    flags = fault_decision({c: (v[0], 2.0) for c, v in wheel.items()}, True, True, persistence)[2]
+    assert not flags["odometry_scale"]
+    with pytest.raises(ValueError):
+        FlagPersistence(0)
