@@ -4,7 +4,9 @@ set -e
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 PX4="$ROOT/external/PX4-Autopilot"
 WORLD="${WORLD_FILE:-$ROOT/simulation/worlds/simple_goal_demo.sdf}"
+GUI_CONFIG="${GZ_GUI_CONFIG:-$ROOT/simulation/gui/demo.config}"
 test -f "$WORLD" || { echo "World file not found: $WORLD" >&2; exit 2; }
+test -f "$GUI_CONFIG" || { echo "GUI configuration not found: $GUI_CONFIG" >&2; exit 2; }
 
 python3 "$ROOT/scripts/check_sim_dependencies.py"
 
@@ -53,7 +55,8 @@ while [ "$SECONDS" -lt "$deadline" ] && kill -0 "$server" 2>/dev/null; do
 	gz topic -l 2>/dev/null | grep -q '/sensor/camera/image$' && break
 	sleep 0.5
 done
-gz sim -v4 -g --render-engine-gui ogre &
+# Keep the presentation view independent of saved editor tools and selections.
+gz sim -v4 -g --render-engine-gui ogre --gui-config "$GUI_CONFIG" &
 gui=$!
 
 # Closing the GUI or losing the server stops both, as the combined command did. The first

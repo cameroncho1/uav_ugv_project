@@ -16,6 +16,7 @@
   ```
 
 - Open <http://localhost:8765> beside Gazebo. The launcher selects **Navigation**, the 13 m course, the timed obstacle and display-only detector decisions. RViz is off. Extra launch arguments override defaults, including `start_rviz:=true` and `dashboard_port:=8800`.
+- Gazebo uses the [project viewer configuration](../simulation/gui/demo.config), with a course overview and no transform editor. To select a different layout, run `GZ_GUI_CONFIG=/path/to/gui.config ./scripts/run_demo.sh`.
 - Record at 1440×960 or larger. Frame the drone and ground robot in Gazebo for takeoff; keep the dashboard map and error panel readable during driving. Begin controls at **Navigating**.
 - Run the presentation controls automatically in a second Linux terminal:
 

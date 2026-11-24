@@ -61,6 +61,8 @@
 - The ROS dashboard check distinguishes a raw flagged window from the published persistent decision and checks stale diagnostics. The model checks cover persistence, duplicate stamps, invalid resets and class mapping.
 - Both live views pass browser checks at 1440×960 and 390×844 with no JavaScript errors or horizontal overflow. Desktop controls fit without scrolling. The ML launcher selects its view by default; switching views preserves the live stream. Rejected requests display a reason, and disconnection disables controls.
 - Evaluation cleanup stops the owned Gazebo, PX4, MicroXRCEAgent and ROS launch processes, including PX4's separate terminal session. The owned-process check reports zero remaining processes after each chapter.
+- The project viewer regression checks actual rendered movement alongside Gazebo truth. At simulation times 58.03 s and 77.20 s, the UGV moves from (1.469, 2.282) m to (3.436, -0.672) m; its blue body moves from screen center (580.8, 384.4) px to (631.2, 458.9) px. The saved editor view remains stationary during the same investigation. The launcher selects the project-owned viewer configuration.
+- The viewer regression also runs the registered `simulation_support` and `mission_manager` checks. The workspace report contains **301 tests, zero errors, zero failures and three cppcheck skips**.
 
 ```bash
 source /opt/ros/humble/setup.bash
