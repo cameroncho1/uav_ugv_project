@@ -21,7 +21,8 @@ def run(args):
     counts = dict(truth=0, fused=0, baseline=0, series=0, ml=0, layers=-1)
     result = dict(recorded_utc=datetime.now(timezone.utc).isoformat(), success=False,
                   configuration=dict(seed=513, model="paired time-domain BiLSTM", threshold=0.5,
-                                     persistence=3, wheel_speed_scale=1.6, fault_hold=True),
+                                     persistence=3, wheel_speed_scale=1.6, fault_hold=True,
+                                     check_uav_timeout=args.check_uav_timeout),
                   actions=[], highlights={}, checks={}, model_series=[])
 
     def capture(label, state):
@@ -83,6 +84,8 @@ def run(args):
                     capture("goal", state)
                     if math.dist(state["truth"][:2], [4.0, 0.0]) > 0.85:
                         raise RuntimeError("Goal truth distance exceeds 0.85 m")
+                    if not args.check_uav_timeout:
+                        break
                     control("uav_measurements", False, state)
                     phase, phase_at = "uav_outage", t
                 elif phase == "uav_outage" and flags.get("uav"):
@@ -102,9 +105,11 @@ def run(args):
             learned_hold=h["detector_hold"]["flags"]["wheels"] and h["detector_hold"]["mode"] == "HOLD_FAULT",
             pose_guard_valid=h["detector_hold"]["guard_valid"],
             navigation_recovers=h["navigation_resumes"]["mode"] == "NAVIGATE",
-            goal_reached=h["goal"]["mode"] == "GOAL",
-            f4_timeout=h["uav_timeout"]["flags"]["uav"],
-            f4_restored=not h["uav_measurements_return"]["flags"]["uav"])
+            goal_reached=h["goal"]["mode"] == "GOAL")
+        if args.check_uav_timeout:
+            result["checks"].update(
+                f4_timeout=h["uav_timeout"]["flags"]["uav"],
+                f4_restored=not h["uav_measurements_return"]["flags"]["uav"])
         result["duration"] = dict(wall_s=round(time.monotonic() - started_wall, 3), simulation_s=state["t"])
         result["success"] = all(result["checks"].values())
         if not result["success"]:
@@ -122,4 +127,6 @@ if __name__ == "__main__":
     parser.add_argument("--url", default="http://127.0.0.1:8765")
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--timeout", type=float, default=180)
+    parser.add_argument("--check-uav-timeout", action="store_true",
+                        help="Append UAV outage/restoration checks after goal arrival.")
     run(parser.parse_args())

@@ -37,7 +37,8 @@
   python3 scripts/rehearse_ml_demo.py --output localization_results/ml_take
   ```
 
-- Each output directory must be new. Both drivers save `summary.json` and raw `samples.jsonl`. The ML driver also verifies UAV measurement timeout and restoration after goal arrival. Stop the owned simulation processes when recording finishes.
+- Each output directory must be new. Both drivers save `summary.json` and raw `samples.jsonl`. The ML driver finishes at goal arrival with sensors nominal and UAV measurements enabled. Hold the final shot on **Goal reached**, the clear wheel flag and the stopped robot. Stop the owned simulation processes when recording finishes.
+- Optional UAV timeout validation uses `python3 scripts/rehearse_ml_demo.py --check-uav-timeout --output localization_results/ml_timeout_check` against a fresh ML run. This adds outage and restoration checks after goal arrival. Keep this sequence in separate validation footage.
 
 ## Navigation screen and course
 
@@ -76,7 +77,7 @@
 | 2:10–2:40 | Switch UAV corrections off for 8 s, then on for 8 s. Restore sensors and observe for 8 s. | “UAV corrections are off while the camera keeps mapping. The blue uncertainty circle grows, and the position guard stops navigation. Corrections return, uncertainty contracts, and navigation resumes. Restore sensors returns the controls to nominal and removes the live block.” |
 | 2:40–3:00 | Chapter card: Live ML fault detection. Fresh straight-drive simulation, ML detector view. Show clean input and score. | “This straight drive shows the learned sensor detector. The measured wheel speed tracks the command reference. The BiLSTM reads paired sensor windows and produces this fault score.” |
 | 3:00–3:25 | Set Wheel speed error to +60%. Show input separation, score crossing 0.50, persistence 1/3, 2/3, 3/3 and FAULT. Keep Holding visible. | “Wheel speed is reported sixty percent high. The measured input separates from its reference. The learned score crosses the threshold. Three consecutive flagged decisions publish a wheel fault, and the supervisor holds the robot.” |
-| 3:25–3:50 | Return Wheel speed error to 0%. Show score clearing, navigation resuming and goal arrival. | “The injected error is removed. Clean model decisions clear the flag. The supervisor's clear interval completes, the robot resumes, and it reaches the goal.” |
-| 3:50–4:10 | Switch UAV measurement stream off until its timeout appears, then on until it clears. End on the ML view and vehicle. | “The UAV stream control stops relative observations. The separate timeout reports missing data and clears when observations return. The demo connects camera mapping, cooperative localization, route planning and a live learned fault detector to visible navigation behavior.” |
+| 3:25–3:55 | Return Wheel speed error to 0%. Show the score clearing, navigation resuming and goal arrival. Keep Gazebo visible beside the ML readings. | “The injected error is removed. Clean model decisions clear the flag. The supervisor's clear interval completes, the robot resumes, and it reaches the goal.” |
+| 3:55–4:10 | Hold on Goal reached, the clear wheel flag and the robot at its goal. End without another injection. | “The robot reaches its destination with the fault cleared. Camera mapping, cooperative localization, route planning and learned fault detection support the completed drive.” |
 
 - The [validation report](demo_validation.md) links exact measured conditions, test results, screenshots and both chronological event traces.

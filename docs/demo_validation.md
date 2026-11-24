@@ -34,6 +34,7 @@
 ## Live ML run
 
 - The [ML rehearsal](../scripts/rehearse_ml_demo.py) waits for clean navigation and a score below threshold, injects +60% wheel speed error, records persistence counts 1, 2 and 3, requires a learned fault hold with the pose guard valid, removes the injection, verifies recovery and checks physical goal arrival.
+- The presentation driver ends at goal arrival and leaves the UAV stream enabled. The recorded eight-check validation sequence includes the optional `--check-uav-timeout` extension; the main presentation runs the six ML checks and ends on recovery and success.
 - The wheel class consumes `wheel_odom/vx`. Wheel turn rate supplies no wheel-speed class flag. The gyro class consumes `imu/wz`. Persistence counts distinct acquisition windows and rejects duplicate decision stamps.
 - The learned wheel flag and `HOLD_FAULT` occur together while `guard_valid=true`. The hold therefore exercises the detector input to the supervisor. The UAV timeout remains clear throughout that sequence.
 
