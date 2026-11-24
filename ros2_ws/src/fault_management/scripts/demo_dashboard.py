@@ -22,6 +22,7 @@ from urllib.parse import parse_qs, urlparse
 import rclpy
 from ament_index_python.packages import get_package_share_directory
 from geometry_msgs.msg import PoseStamped, PoseWithCovarianceStamped
+from diagnostic_msgs.msg import DiagnosticArray, DiagnosticStatus
 from nav_msgs.msg import OccupancyGrid
 from rcl_interfaces.msg import Parameter, ParameterType, ParameterValue
 from rcl_interfaces.srv import GetParameters, SetParameters, SetParametersAtomically
@@ -39,7 +40,7 @@ from localization_common.geodesy import yaw_from_quaternion
 
 MAX_BLOCKS = 8
 BLOCK_SIZE = (0.6, 0.6, 0.4)
-NOMINAL = dict(gps_enabled=True, uav_assistance=True, noise_scale=1.0,
+NOMINAL = dict(gps_enabled=True, uav_assistance=True, uav_measurements=True, noise_scale=1.0,
                gps_horizontal_stddev=1.5, wheel_speed_scale=1.0, imu_yaw_bias_rate=0.0)
 PARAMETER_CONTROLS = ("noise_scale", "gps_horizontal_stddev", "wheel_speed_scale",
                       "imu_yaw_bias_rate")
@@ -55,6 +56,8 @@ class Dashboard(Node):
         self.declare_parameter("host", "127.0.0.1")
         self.declare_parameter("initial_gps_enabled", True)
         self.declare_parameter("initial_uav_assistance", True)
+        self.declare_parameter("initial_uav_measurements", True)
+        self.declare_parameter("view", "navigation")
         world_file = self.get_parameter("world_file").value
         self.world = world_geometry(world_file) if world_file else dict(
             obstacles=[], goal=None, start=None)
@@ -67,13 +70,16 @@ class Dashboard(Node):
         self.controls.update(
             gps_enabled=self.get_parameter("initial_gps_enabled").value,
             uav_assistance=self.get_parameter("initial_uav_assistance").value)
+        self.controls["uav_measurements"] = self.get_parameter("initial_uav_measurements").value
         self.state = dict(truth=None, fused=None, baseline=None, gps=None, uav=None, route=[], goal=None,
                           partial=False, mode=None, reason="", flags={}, hazards=[], speed=0.0,
-                          detector_hold=False)
+                          detector_hold=False, guard_valid=False)
         self.trail = dict(truth=[], fused=[], baseline=[])
         self.positions = {name: deque(maxlen=600) for name in self.trail}
         self.series = []  # (t, fused error, baseline error)
         self.events = []  # chronological display/scoring evidence; never a navigation input
+        self.ml = dict(wheel=None, gyro=None, policy=None)
+        self.ml_series = []
         self.stats = dict(fused=ErrorStats(), baseline=ErrorStats())
         self.last_sample = None
         self.start_time = None
@@ -100,6 +106,7 @@ class Dashboard(Node):
                                  self.on_uav, best_effort)
         self.create_subscription(PlannedRoute, "/ugv/navigation/route", self.on_route, best_effort)
         self.create_subscription(FaultStatus, "/fault_detection/status", self.on_faults, 20)
+        self.create_subscription(DiagnosticArray, "/ugv/sensor_faults", self.on_ml, 20)
         self.create_subscription(
             OccupancyGrid, "/local_grid", self.on_grid,
             QoSProfile(depth=1, durability=DurabilityPolicy.TRANSIENT_LOCAL))
@@ -116,6 +123,7 @@ class Dashboard(Node):
         self.service_clients = {
             "gps_enabled": self.create_client(SetBool, "/evaluation/set_gps_enabled"),
             "uav_assistance": self.create_client(SetBool, "/ugv/localization/set_uav_enabled"),
+            "uav_measurements": self.create_client(SetBool, "/evaluation/set_uav_enabled"),
         }
         self.parameter_client = self.create_client(SetParameters, "/sim_ugv_sensors/set_parameters")
         self.parameter_reader = self.create_client(GetParameters, "/sim_ugv_sensors/get_parameters")
@@ -272,6 +280,35 @@ class Dashboard(Node):
                 self.record_event("flags", "Sensor check changed", flags=flags)
             self.state["flags"] = flags
 
+    def on_ml(self, message):
+        """Display detector telemetry; no scoring or inference runs in the dashboard."""
+        channels = {"ugv_sensor_fault/wheel_odom/vx": "wheel", "ugv_sensor_fault/imu/wz": "gyro"}
+        with self.lock:
+            for status in message.status:
+                values = {v.key: v.value for v in status.values}
+                if status.name == "ugv_sensor_fault/decision_policy":
+                    policy = dict(valid=status.level == DiagnosticStatus.OK, **values)
+                    previous = self.ml["policy"] or {}
+                    if any(policy.get(k) != previous.get(k) for k in (
+                            "valid", "required", "wheel_count", "gyro_count", "wheel_flag", "gyro_flag")):
+                        self.record_event("ml_policy", "Detector persistence", policy=policy)
+                    self.ml["policy"] = policy
+                elif status.name in channels:
+                    name = channels[status.name]
+                    if status.level == DiagnosticStatus.STALE:
+                        self.ml[name] = None
+                        continue
+                    try:
+                        row = {k: float(values[k]) for k in (
+                            "measured", "reference", "fault_probability", "threshold", "window_start", "window_end")}
+                    except (KeyError, ValueError):
+                        continue
+                    row = {k: v if math.isfinite(v) else None for k, v in row.items()}
+                    previous = self.ml[name]
+                    self.ml[name] = row
+                    if previous is None or previous["window_end"] != row["window_end"]:
+                        self.ml_series.append(dict(t=round(self.now_s(), 3), channel=name, **row))
+
     def on_control(self, message):
         try:
             tick = json.loads(message.data)
@@ -285,6 +322,7 @@ class Dashboard(Node):
             self.state["mode"] = mode
             self.state["reason"] = reason
             self.state["detector_hold"] = bool(tick.get("detector_enabled", False))
+            self.state["guard_valid"] = bool(tick.get("guard_valid", False))
             if not self.recording and mode and "NAV" in mode.upper():
                 self.recording = True
                 for trail in self.trail.values():
@@ -538,6 +576,9 @@ class Dashboard(Node):
                 baseline=state["baseline"], uav=state["uav"], route=state["route"],
                 partial=state["partial"], mode=state["mode"], reason=state["reason"],
                 flags=state["flags"], detector_hold=state["detector_hold"],
+                guard_valid=state["guard_valid"],
+                view=self.get_parameter("view").value, ml=self.ml,
+                ml_series=self.ml_series[counts.get("ml", 0):], ml_count=len(self.ml_series),
                 goal_available=self.goal_client.service_is_ready(),
                 hazards=state["hazards"] + [b.shape() for b in list(self.blocks)],
                 gps=gps if gps and now - gps[2] < 2.0 else None,

@@ -1,67 +1,81 @@
 # UAV–UGV demo video
 
-[Documentation](README.md) | [Validation and results](demo_validation.md) | [Recorded data](demo_results.json)
+[Documentation](README.md) | [Validation](demo_validation.md) | [Navigation results](demo_results.json) | [ML results](ml_demo_results.json)
 
-- Show a drone following a ground robot, camera mapping, A* routing, cooperative localization, fault injection, and learned sensor checks.
-- Compare two estimates of the **same ground robot**. Blue uses UAV corrections. Orange uses GPS, wheels and IMU. The cooperative estimate controls the robot; orange is a display comparison. Simulator truth supplies the white vehicle and scoring reference.
-- Record 3–5 minutes in chronological order. Cut idle startup and waiting. Keep each control change and its consequence together.
+- Record one 3–5 minute course-project video with two chapters: **camera-assisted navigation and localization**, then **live ML fault detection and recovery**. Each chapter uses a fresh simulation and proceeds in chronological order. Cut startup and idle waiting; keep each action with its response.
+- The drone follows the ground robot, its downward camera builds the obstacle map, and A* plans the ground robot's route. Cooperative localization controls the robot. A second estimator uses GPS, wheels and IMU for comparison. Simulator truth supplies display and scoring data.
+- The ML chapter runs the exported paired time-domain BiLSTM on live sensor windows. The screen connects measured input, independent reference, model score, persistence, published fault and supervisor response.
 
-## Run
+## Run and record
 
-- Build in Linux using the [goal demo instructions](../README_simple_goal_demo.md#build). The [WSL setup](demo_validation.md#wsl-reproduction) uses Ubuntu-22.04, ROS 2 Humble, Gazebo Harmonic, PX4 SITL and MicroXRCEAgent. Windows provides editing and Git.
-- Run from the built repository root:
+- Build in Linux using the [goal demo instructions](../README_simple_goal_demo.md#build) or [WSL reproduction](demo_validation.md#wsl-reproduction). Runtime dependencies are Ubuntu-22.04, ROS 2 Humble, Gazebo Harmonic, PX4 SITL and MicroXRCEAgent. Windows provides editing and Git. The dashboard needs no Node runtime.
+- Start chapter 1 from the built repository root:
 
   ```bash
   ./scripts/run_demo.sh
   ```
 
-- Open <http://localhost:8765> beside Gazebo. The launcher starts the course, timed obstacle, detector, comparison estimator and dashboard. RViz is off. Extra launch arguments override defaults, including `start_rviz:=true` and `dashboard_port:=8800`.
-- Frame the drone and ground robot in Gazebo. Record at 1440×960 or larger. Use a close Gazebo shot for takeoff, then keep the dashboard map and error panel readable.
-- Start the driving segment at **Navigating**. Press Ctrl+C when finished and stop remaining processes belonging to that launch.
+- Open <http://localhost:8765> beside Gazebo. The launcher selects **Navigation**, the 13 m course, the timed obstacle and display-only detector decisions. RViz is off. Extra launch arguments override defaults, including `start_rviz:=true` and `dashboard_port:=8800`.
+- Record at 1440×960 or larger. Frame the drone and ground robot in Gazebo for takeoff; keep the dashboard map and error panel readable during driving. Begin controls at **Navigating**.
+- Run the presentation controls automatically in a second Linux terminal:
 
-## Visual key
+  ```bash
+  python3 scripts/rehearse_demo.py --output localization_results/navigation_take
+  ```
 
-- **White vehicle and thick white track:** actual ground-robot position. **Blue:** cooperative estimate, drawn over white when they agree. **Dashed orange:** estimate without UAV corrections.
+- Stop the launch with Ctrl+C and stop its remaining simulation processes. Start a fresh simulation for chapter 2:
+
+  ```bash
+  ./scripts/run_ml_demo.sh
+  ```
+
+- Reload the dashboard. The launcher selects **ML detector**, an unobstructed straight drive from (-4, 0) to (4, 0), and detector-driven holds. Wheel speed error starts at 0%. Keep **Wheel forward speed (m/s)** selected.
+- Run the ML controls in a second Linux terminal:
+
+  ```bash
+  python3 scripts/rehearse_ml_demo.py --output localization_results/ml_take
+  ```
+
+- Each output directory must be new. Both drivers save `summary.json` and raw `samples.jsonl`. The ML driver also verifies UAV measurement timeout and restoration after goal arrival. Stop the owned simulation processes when recording finishes.
+
+## Navigation screen and course
+
+- **White vehicle and thick white track:** actual ground-robot position. **Blue:** cooperative estimate, drawn over white when they agree. **Dashed orange:** estimate of the same robot without UAV corrections.
 - **Green G:** goal. **S:** start. **Return goal** selects (-10, -3), left of S. Clicking clear ground selects another goal.
 - **Lighter ground:** camera-seen ground. **Gray cells:** camera-detected obstacles. **Purple halo:** planner clearance near detections. Unseen ground and map edges also constrain planning.
-- **Red outlines labeled Live block or Timed block:** simulator placement. They appear when a box is spawned. Gray occupied cells appear when the camera observes it. The planned route changes from mapped inputs.
-- **Gold dots:** UGV GPS fixes. Increasing noise spreads the fixes; switching UGV GPS off stops them. The drone retains its own PX4 localization.
-- **White diamond:** UAV position. **Blue circle:** twice the largest horizontal standard deviation. It displays reported uncertainty, not a measured confidence guarantee.
-- **Action caption and chart markers:** acknowledged control changes. The chart shows the current 60-second window. Explain the current response while it is visible.
-- **UGV GPS check:** combines GPS model flags with a missing-fix timeout. **Learned wheel/gyro flags:** BiLSTM predictions. These flags are displayed; the navigation position, map, route and command guards remain active. `fault_hold:=true` also connects detector decisions to supervisor holds.
-- **UAV corrections:** switches estimator corrections while the drone keeps flying and mapping. UAV loss is outside the detector's monitored channels.
+- **Red outlines labeled Live block or Timed block:** simulator placement. Gray occupied cells appear when the camera observes the box. The planner consumes the camera map.
+- **Gold dots:** UGV GPS fixes. Noise spreads the fixes; switching UGV GPS off stops them. The drone retains its own PX4 localization.
+- **White diamond:** UAV position. **Blue circle:** twice the largest reported horizontal standard deviation. It displays filter uncertainty. Position errors compare estimates with truth at matching acquisition times.
+- **Action caption and chart markers:** acknowledged control changes. The error chart shows 60 seconds. Explain each response while it is visible.
+- Start (-4, 0), goal (9, 3): 13 m eastward displacement. A U-shaped pocket, a wall with a 2.0 m opening, cylinders and scattered blocks force detours. **Add block** places the live box 10 seconds into navigation. The timed box appears at (7.1, 1.0), 22 seconds after the first drive command.
+- `scripts/generate_obstacle_worlds.py --layout complex` generates the course. The UAV spawn has 0.8 m obstacle clearance. PX4 preflight checks stay enabled.
 
-## Course
+## ML screen and decisions
 
-- Start (-4, 0), goal (9, 3): 13 m eastward displacement. A U-shaped pocket, a wall with a 2.0 m opening, cylinders and scattered blocks force detours.
-- Press **Add block** 10 seconds into navigation. The red **Live block** label identifies the clicked box. The button reports rejected placements when passing clearance is unavailable.
-- The **Timed block** appears at (7.1, 1.0), 22 seconds after the first drive command. Its red outline marks placement; gray camera cells supply the mapping evidence.
-- `scripts/generate_obstacle_worlds.py --layout complex` generates the world. The UAV spawn has 0.8 m obstacle clearance. PX4 preflight checks stay enabled.
+- **Measured sensor / Command or wheel reference:** raw values supplied to the paired model, sampled at each inference window's last acquisition time. Wheel forward speed uses the drive command as its reference; gyro turn rate uses wheel odometry. The plot displays those window endpoints over 30 seconds.
+- **BiLSTM fault score:** live classifier output. A score above 0.50 flags the raw window. The score is a model output, not calibrated confidence.
+- **Consecutive flagged decision windows:** the detector's actual persistence count. Three distinct consecutive flagged decisions raise the wheel or gyro class flag. **Published detector flag** shows the resulting decision. The dashboard displays telemetry; inference and persistence execute in the detector.
+- Each input window contains 100 measured samples. Inference runs every 0.5 simulation seconds over overlapping windows. The exported weights, standardization, threshold 0.50 and three-decision persistence remain fixed. The autoencoder is disabled by default.
+- **Holding** with **Fault hold** identifies the navigation supervisor's response to the published detector flag. **Restore sensors** returns controls to nominal; it preserves integrated bias, filter state and trace history. Clean model decisions and the supervisor's clear interval permit navigation to resume.
+- **UAV corrections** controls whether the cooperative estimator uses UAV observations. **UAV measurement stream** controls the independent relative-observation gate. The drone keeps flying and mapping. The separate **UAV measurement timeout** status reports missing observations after two seconds; it is a timeout rule.
+- **UGV GPS check** combines learned GPS outputs with a missing-fix timeout. The demonstrated learned stop uses the wheel-speed class. The gyro selector exposes the live gyro channel without claiming a demonstrated gyro stop.
 
 ## Presentation script
 
-- Use the video times to pace the edit. Use visible events to advance the explanation. Each row continues the same run.
+- Follow visible events within each chapter. The video times allocate room for narration and a clear chapter transition.
 
 | Video time | Screen and action | Narration |
 | --- | --- | --- |
-| 0:00–0:20 | Gazebo close shot: drone above the ground robot. Switch to the dashboard. | “The drone follows the ground robot with a downward camera. The camera builds the obstacle map, and the ground robot follows an A* route.” |
-| 0:20–0:35 | Point to white, blue, orange, gray cells and gold dots. | “White is the actual vehicle. Blue uses UAV corrections. Orange estimates that same vehicle using GPS, wheels and IMU. Gray cells come from the camera. Gold dots are GPS fixes.” |
-| 0:35–1:15 | Follow the pocket detour. Add the live block 10 seconds into navigation. Show the timed block and its camera detection. | “The route bends around the pocket. This click places the box labeled Live block. The second box is labeled Timed block. Red shows simulator placement; gray cells show what the camera detects. The planner routes around the mapped obstacles.” |
-| 1:15–1:30 | Hold on **Goal reached** and the two error readings. | “The robot reaches its goal. These numbers compare both estimates against simulator truth. Blue lies inside the white track because the cooperative position is close to the actual path.” |
-| 1:30–1:50 | Press **Return goal**. Set noise to 3× for 12 s, then 1× for 3 s. | “The new green goal redraws the route past the start area. Sensor noise is tripled. The GPS fixes spread, and the error chart shows each estimator's response. Noise returns to its nominal setting.” |
-| 1:50–2:10 | Switch **UGV GPS** off. Observe for 8 s. | “The ground robot's GPS is off. The drone keeps its own localization. Gold fixes stop, and the GPS timeout reports missing data. Orange estimates motion from wheels and IMU; its short-term estimate is steadier without the noisy fixes.” |
-| 2:10–2:40 | Switch **UAV corrections** off for 8 s, then on for 8 s. Keep the uncertainty circle, error panel and hold reason visible. | “UAV corrections are off while the camera keeps mapping. The blue uncertainty circle grows, and the position guard stops navigation. Corrections are on again. The circle contracts and the robot continues.” |
-| 2:40–3:15 | Set **Wheel speed error** to +20% for 6 s. Add **Gyro drift** at +2°/s. Observe for 30 s. | “Measured wheel speed is twenty percent high. The gyro adds two degrees of heading bias per second. The learned wheel and gyro flags stay clear under this injection. The position guard stops navigation as reported uncertainty grows.” |
-| 3:15–3:35 | Read the displayed hold reason. Press **Restore sensors** and observe for 8 s. End on the dashboard and vehicle. | “The robot is held because its reported position uncertainty exceeds the navigation limit. Restore sensors removes the live block and returns the injection settings to nominal. Integrated bias and filter state are preserved. The system combines camera mapping, route planning, cooperative localization, fault injection and learned sensor checks.” |
+| 0:00–0:20 | Gazebo close shot: drone follows the ground robot. Switch to Navigation. | “The drone follows the ground robot with a downward camera. The camera builds this obstacle map, and the ground robot follows an A* route.” |
+| 0:20–0:40 | Point to white, blue, orange, gray cells and gold dots. | “White is the actual vehicle. Blue uses UAV corrections. Orange estimates that same vehicle using GPS, wheels and IMU. Gray cells are camera detections; gold dots are GPS fixes.” |
+| 0:40–1:15 | Show the pocket detour. Add the live block 10 seconds into navigation; show the timed block and gray camera detections. | “The route bends around the pocket. This control places the Live block. The Timed block appears farther along the course. Red shows placement; gray shows camera detection. The route follows the mapped free space.” |
+| 1:15–1:30 | Hold on Goal reached and both error readings. Press Return goal. | “The robot reaches its goal. Both position errors are measured against simulator truth. The return goal gives us a second route for the sensor controls.” |
+| 1:30–1:50 | Set noise to 3× for 12 s, then 1× for 3 s. | “The sensor noise is tripled. GPS fixes spread, and both error traces show the response. Noise returns to its nominal setting.” |
+| 1:50–2:10 | Switch UGV GPS off for 8 s. | “The ground robot's GPS is off. Gold fixes stop, and the missing-fix timeout reports the outage. The drone keeps its own localization and continues supplying observations.” |
+| 2:10–2:40 | Switch UAV corrections off for 8 s, then on for 8 s. Restore sensors and observe for 8 s. | “UAV corrections are off while the camera keeps mapping. The blue uncertainty circle grows, and the position guard stops navigation. Corrections return, uncertainty contracts, and navigation resumes. Restore sensors returns the controls to nominal and removes the live block.” |
+| 2:40–3:00 | Chapter card: Live ML fault detection. Fresh straight-drive simulation, ML detector view. Show clean input and score. | “This straight drive shows the learned sensor detector. The measured wheel speed tracks the command reference. The BiLSTM reads paired sensor windows and produces this fault score.” |
+| 3:00–3:25 | Set Wheel speed error to +60%. Show input separation, score crossing 0.50, persistence 1/3, 2/3, 3/3 and FAULT. Keep Holding visible. | “Wheel speed is reported sixty percent high. The measured input separates from its reference. The learned score crosses the threshold. Three consecutive flagged decisions publish a wheel fault, and the supervisor holds the robot.” |
+| 3:25–3:50 | Return Wheel speed error to 0%. Show score clearing, navigation resuming and goal arrival. | “The injected error is removed. Clean model decisions clear the flag. The supervisor's clear interval completes, the robot resumes, and it reaches the goal.” |
+| 3:50–4:10 | Switch UAV measurement stream off until its timeout appears, then on until it clears. End on the ML view and vehicle. | “The UAV stream control stops relative observations. The separate timeout reports missing data and clears when observations return. The demo connects camera mapping, cooperative localization, route planning and a live learned fault detector to visible navigation behavior.” |
 
-## Repeat the sequence
-
-- Start a fresh demo, then run the rehearsal driver in a second Linux terminal:
-
-  ```bash
-  python3 scripts/rehearse_demo.py --output localization_results/demo_take
-  ```
-
-- The driver performs the presentation controls in order and saves actions, phase statistics, raw samples, navigation reasons and actual detector flags. The output directory must be new.
-- **Restore sensors** changes settings and removes dashboard-added blocks. The timed box, integrated sensor bias and filter state stay in the run. Restart the launch to initialize a new take.
-- The [validation report](demo_validation.md) states the measured conditions and results for this sequence.
+- The [validation report](demo_validation.md) links exact measured conditions, test results, screenshots and both chronological event traces.

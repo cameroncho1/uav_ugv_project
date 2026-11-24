@@ -12,15 +12,22 @@ interfaces only; simulator truth is not used.
 """
 
 import math
+import os
 import uuid
 from collections import deque
 from pathlib import Path
 
-import numpy as np
+# The model's matrices are small. Multithreaded BLAS on a CPU shared with
+# Gazebo and PX4 stretched one evaluation from about 0.1 s to 1 s and delayed
+# decisions past the supervisor's 1 s age limit. Must be set before numpy loads.
+for _variable in ("OPENBLAS_NUM_THREADS", "OMP_NUM_THREADS", "MKL_NUM_THREADS"):
+    os.environ.setdefault(_variable, "1")
+
+import numpy as np  # noqa: E402
 import rclpy
 from ament_index_python.packages import get_package_share_directory
 from diagnostic_msgs.msg import DiagnosticArray, DiagnosticStatus, KeyValue
-from geometry_msgs.msg import Twist
+from geometry_msgs.msg import PoseWithCovarianceStamped, Twist
 from nav_msgs.msg import Odometry
 from rclpy._rclpy_pybind11 import RCLError
 from rclpy.executors import ExternalShutdownException
@@ -30,8 +37,8 @@ from rclpy.time import Time
 from sensor_msgs.msg import Imu, NavSatFix, NavSatStatus
 from uav_ugv_msgs.msg import FaultStatus
 
-from sensor_fault_model import (CHANNELS, SensorFaultModel, channel_name, fault_decision,
-                                reference)
+from sensor_fault_model import (CHANNELS, FlagPersistence, SensorFaultModel, channel_name,
+                                fault_decision, reference)
 
 # Channels whose training windows had a reference; they wait until it exists.
 REFERENCED = {("imu", "wz"), ("imu", "ax"), ("imu", "ay"), ("wheel_odom", "vx"),
@@ -89,6 +96,12 @@ class SensorFaultDetector(Node):
         self.declare_parameter("output_topic", "/ugv/sensor_faults")
         self.declare_parameter("status_topic", "/fault_detection/status")
         self.declare_parameter("gps_timeout", 1.0)
+        self.declare_parameter("monitor_uav", True)
+        self.declare_parameter("uav_topic", "/ugv/sensors/uav_relative_pose")
+        self.declare_parameter("uav_timeout", 2.0)
+        # Consecutive flagged decision windows before a model-derived class flag
+        # is published; 3 windows at 0.5 s suppress isolated single-window flags.
+        self.declare_parameter("flag_persistence", 3)
         self.declare_parameter("command_rate", 20.0)
         self.declare_parameter("command_timeout", 0.5)
         self.declare_parameter("evaluation_period", 0.5)
@@ -110,6 +123,10 @@ class SensorFaultDetector(Node):
         self.command_timeout = parameter("command_timeout")
         self.stale_after = parameter("stale_after")
         self.gps_timeout = parameter("gps_timeout")
+        self.monitor_uav = parameter("monitor_uav")
+        self.uav_timeout = parameter("uav_timeout")
+        self.uav_latest = None   # acquisition stamp of the newest UAV measurement
+        self.persistence = FlagPersistence(parameter("flag_persistence"))
         # GPS windows span about 20 s; their odometry reference must cover them.
         self.streams = {name: StreamBuffer(fields, 45.0) for name, fields in FIELDS.items()}
         self.command = (0.0, 0.0)
@@ -128,6 +145,9 @@ class SensorFaultDetector(Node):
         self.create_subscription(Odometry, "/ugv/sensors/wheel_odom", self.on_odom, qos)
         self.create_subscription(NavSatFix, "/ugv/sensors/gps", self.on_gps, qos)
         self.create_subscription(Twist, parameter("command_topic"), self.on_command, 10)
+        if self.monitor_uav:
+            self.create_subscription(PoseWithCovarianceStamped, parameter("uav_topic"),
+                                     self.on_uav, qos)
         self.create_timer(1.0 / parameter("command_rate"), self.sample_command)
         self.create_timer(parameter("evaluation_period"), self.evaluate)
         meta = self.model.metadata
@@ -167,6 +187,11 @@ class SensorFaultDetector(Node):
             return
         self.streams["gps"].add(stamp_seconds(message.header.stamp), values)
 
+    def on_uav(self, message):
+        stamp = stamp_seconds(message.header.stamp)
+        if stamp > 0.0 and (self.uav_latest is None or stamp > self.uav_latest):
+            self.uav_latest = stamp
+
     def on_command(self, message):
         self.command = (message.linear.x, message.angular.z)
         self.command_time = self.now_seconds()
@@ -181,6 +206,8 @@ class SensorFaultDetector(Node):
                 stream.clear()
             self.evaluated.clear()
             self.decisions.clear()
+            self.uav_latest = None
+            self.persistence.reset()
             self.command_time = None
             self.start_session()
         self.last_now = now
@@ -220,6 +247,9 @@ class SensorFaultDetector(Node):
             fault = result["bilstm"] or (self.use_autoencoder and result.get("autoencoder", False))
             self.decisions[channel] = (bool(fault), info[channel][1])
             values = [("fault_probability", f"{result['probability']:.4f}"),
+                      ("threshold", "0.5"),
+                      ("measured", f"{windows[channel][-1, 0]:.6f}"),
+                      ("reference", f"{windows[channel][-1, 1]:.6f}"),
                       ("window_start", f"{info[channel][0]:.3f}"),
                       ("window_end", f"{info[channel][1]:.3f}")]
             if self.use_autoencoder:
@@ -242,7 +272,10 @@ class SensorFaultDetector(Node):
                    if channel in self.decisions and statuses[channel][0] != DiagnosticStatus.STALE}
         gps_latest = self.streams["gps"].latest()
         gps_available = gps_latest is not None and now - gps_latest <= self.gps_timeout
-        valid, stamp, flags = fault_decision(current, gps_available)
+        uav_available = not self.monitor_uav or (
+            self.uav_latest is not None and now - self.uav_latest <= self.uav_timeout)
+        valid, stamp, flags = fault_decision(current, gps_available, uav_available,
+                                             self.persistence)
         if not valid:
             stamp = now
         # Stamps strictly increase within a session; without newer evidence the
@@ -259,6 +292,20 @@ class SensorFaultDetector(Node):
                               sequence=self.sequence, window_valid=valid, **flags)
         message.header.stamp = Time(nanoseconds=round(stamp * 1e9)).to_msg()
         self.status_publisher.publish(message)
+        # Display telemetry follows the same persistence update as FaultStatus.
+        policy = DiagnosticStatus(name="ugv_sensor_fault/decision_policy",
+                                  level=DiagnosticStatus.OK if valid else DiagnosticStatus.STALE,
+                                  message="valid" if valid else "warming up")
+        policy.values = [KeyValue(key=k, value=str(v)) for k, v in {
+            "required": self.persistence.required,
+            "wheel_count": self.persistence.counts["odometry_scale"],
+            "gyro_count": self.persistence.counts["imu_drift"],
+            "wheel_flag": flags["odometry_scale"], "gyro_flag": flags["imu_drift"],
+            "decision_stamp": stamp,
+        }.items()]
+        telemetry = DiagnosticArray(status=[policy])
+        telemetry.header.stamp = message.header.stamp
+        self.publisher.publish(telemetry)
 
     def report_transition(self, channel, fault, result, window):
         name = channel_name(channel)

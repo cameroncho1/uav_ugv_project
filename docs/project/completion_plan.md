@@ -130,7 +130,9 @@ Windows: 100 samples at 20 Hz (5 s), stride 10 samples (0.5 s). Models take `(10
 
 **Model selection.** RNN, BiLSTM and autoencoder are trained on the same splits. Selection uses validation runs. The test runs are scored once.
 
-**Weights and code.** Training stays in `uav_ugv_project_fault_detection/`. The node lives in a new `fault_detection` package that loads the selected weights. `AGENTS.md` component ownership is updated to list it.
+**Weights and code.** Training stays in `uav_ugv_project_fault_detection/`. The online detector is `sensor_fault_detector` in `fault_management`; it loads the exported weights from `fault_management/models/`. `AGENTS.md` lists it under `fault_management`.
+
+**Implemented detector.** The deployed model is the paired time-domain BiLSTM: each UGV sensor channel is windowed (100 samples) together with a reference for the same quantity from another sensor or the drive command, rather than the residual channels above. Its class mapping and live trials are in the [fault-detection README](../../uav_ugv_project_fault_detection/README.md#live-detection-in-the-simulation).
 
 ### 4.3 Fault classes and responses
 
@@ -139,7 +141,7 @@ Windows: 100 samples at 20 Hz (5 s), stride 10 samples (0.5 s). Models take `(10
 | F1 GPS outage | GPS gate | `/evaluation/set_gps_enabled`, `initial_gps_enabled` | flag `gps_out` | continue; estimator uses wheel, IMU, UAV |
 | F2 Wheel-speed scale | scale on wheel odometry | `wheel_speed_scale` | flag `odom_scale` | hold |
 | F3 IMU yaw drift | bias rate on IMU yaw | `imu_yaw_bias_rate` | flag `imu_drift` | hold |
-| F4 UAV measurement loss | gate on `/ugv/sensors/uav_relative_pose` | new `uav_dropout` control (W1) | flag `uav_loss` | continue if GPS valid; otherwise the pose guard holds |
+| F4 UAV measurement loss | gate on `/ugv/sensors/uav_relative_pose` | `uav_dropout_control:=true`; `/evaluation/set_uav_enabled`, `initial_uav_enabled` | flag `uav_loss` | continue if GPS valid; otherwise the pose guard holds |
 
 A shared GPS/UAV position error is not detected by cross-sensor residuals. It is covered by the systematic uncertainty prior and the pose guard, and it is recorded as an undetected class.
 

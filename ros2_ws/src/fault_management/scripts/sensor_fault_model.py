@@ -26,9 +26,11 @@ CHANNELS = (
 
 
 # FaultStatus classes (completion plan section 4.3) and the channels whose
-# BiLSTM flags set them. Other IMU channels and GPS altitude feed no class.
+# BiLSTM flags set them. The simulated wheel-speed scale fault changes only the
+# forward speed, so wheel_odom/wz sets no class; neither do the other IMU
+# channels or GPS altitude.
 FAULT_CLASSES = {
-    "odometry_scale": (("wheel_odom", "vx"), ("wheel_odom", "wz")),
+    "odometry_scale": (("wheel_odom", "vx"),),
     "imu_drift": (("imu", "wz"),),
     "gps_outage": (("gps", "latitude"), ("gps", "longitude")),
 }
@@ -38,26 +40,64 @@ DECISION_CHANNELS = FAULT_CLASSES["odometry_scale"] + FAULT_CLASSES["imu_drift"]
 FAULT_FLAGS = ("gps_outage", "odometry_scale", "imu_drift", "uav_loss")
 
 
+class FlagPersistence:
+    """Raise a model-derived class flag only after ``required`` consecutive flags.
+
+    Counts distinct decision windows (strictly increasing stamps), so a repeated
+    evaluation of the same window does not count twice. An invalid decision
+    resets every count. Isolated single-window flags then never reach the
+    supervisor; a persistent fault is reported ``required - 1`` windows later.
+    """
+
+    def __init__(self, required):
+        if int(required) != required or required < 1:
+            raise ValueError("flag persistence must be a positive integer")
+        self.required = int(required)
+        self.reset()
+
+    def reset(self):
+        self.counts = dict.fromkeys(FAULT_CLASSES, 0)
+        self.last_stamp = None
+        self.output = dict.fromkeys(FAULT_CLASSES, False)
+
+    def update(self, stamp, flags):
+        if self.last_stamp is not None and stamp <= self.last_stamp:
+            return dict(self.output)
+        self.last_stamp = stamp
+        for name in FAULT_CLASSES:
+            self.counts[name] = self.counts[name] + 1 if flags[name] else 0
+            self.output[name] = self.counts[name] >= self.required
+        return dict(self.output)
+
+
 def channel_name(channel):
     return f"{channel[0]}/{channel[1]}"
 
 
-def fault_decision(current, gps_available):
+def fault_decision(current, gps_available, uav_available, persistence=None):
     """Combine per-channel results into one class decision.
 
     ``current`` maps a channel to ``(fault, window_end)`` for channels with a
-    current (not stale) evaluation. ``gps_available`` is whether a GPS fix
-    arrived recently; its absence is an outage. UAV measurements are not
-    monitored, so ``uav_loss`` is always false. Returns ``(valid, stamp, flags)``;
-    an invalid decision has no stamp and all flags false.
+    current (not stale) evaluation. ``gps_available`` and ``uav_available`` are
+    whether a GPS fix or a UAV relative measurement arrived recently; absence
+    sets ``gps_outage`` or ``uav_loss`` immediately. With a ``FlagPersistence``,
+    the model-derived part of each class must persist before it is raised.
+    Returns ``(valid, stamp, flags)``; an invalid decision has no stamp and all
+    flags false.
     """
     flags = dict.fromkeys(FAULT_FLAGS, False)
     if any(channel not in current for channel in DECISION_CHANNELS):
+        if persistence is not None:
+            persistence.reset()
         return False, None, flags
-    for name, channels in FAULT_CLASSES.items():
-        flags[name] = any(current[channel][0] for channel in channels if channel in current)
-    flags["gps_outage"] = flags["gps_outage"] or not gps_available
     stamp = min(current[channel][1] for channel in DECISION_CHANNELS)
+    model = {name: any(current[channel][0] for channel in channels if channel in current)
+             for name, channels in FAULT_CLASSES.items()}
+    if persistence is not None:
+        model = persistence.update(stamp, model)
+    flags.update(model)
+    flags["gps_outage"] = flags["gps_outage"] or not gps_available
+    flags["uav_loss"] = not uav_available
     return True, stamp, flags
 
 

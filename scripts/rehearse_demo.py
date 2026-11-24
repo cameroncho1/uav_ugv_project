@@ -25,8 +25,6 @@ STEPS = (
     ("gps_off", "/control", dict(name="gps_enabled", value=False), 8),
     ("corrections_off", "/control", dict(name="uav_assistance", value=False), 8),
     ("corrections_on", "/control", dict(name="uav_assistance", value=True), 8),
-    ("wheel_error", "/control", dict(name="wheel_speed_scale", value=1.2), 6),
-    ("combined_faults", "/control", dict(name="imu_yaw_bias_rate", value=math.radians(2)), 30),
     ("sensors_restored", "/reset", {}, 8),
 )
 
@@ -124,7 +122,7 @@ def run(args):
         first_goal = next(e["t"] for e in navigation if e["mode"] == "GOAL")
         checks["first_goal"]["navigation_elapsed_sim_s"] = round(first_goal - first_nav, 3)
         checks["timed_hazard_present"] = any("slalom_box" in h["id"] for h in checks["first_goal"]["hazards"])
-        checks["controls_restored"] = state["controls"] == dict(gps_enabled=True, uav_assistance=True,
+        checks["controls_restored"] = state["controls"] == dict(gps_enabled=True, uav_assistance=True, uav_measurements=True,
             noise_scale=1.0, gps_horizontal_stddev=1.5, wheel_speed_scale=1.0, imu_yaw_bias_rate=0.0)
         checks["live_blocks_removed"] = not any("live_block" in h["id"] for h in state["hazards"])
         checks["return_goal_observed"] = state["goal"] == result["configuration"]["return_goal"]
@@ -148,19 +146,6 @@ def run(args):
         on = result["errors"]["corrections_on"]["cooperative_sigma"]
         checks["uncertainty_grows_without_corrections"] = off["max_m"] > off["first_m"] * 1.5
         checks["uncertainty_recovers_with_corrections"] = on["last_m"] < off["max_m"] * 0.7
-        limit_t = next(p["t"] for p in phases if p["name"] == "combined_faults")
-        restore_t = next(p["t"] for p in phases if p["name"] == "sensors_restored")
-        checks["combined_fault_guard_hold"] = any(e["mode"] == "HOLD_GUARD" and
-            "uncertainty" in e["reason"].lower() and limit_t <= e["t"] < restore_t for e in navigation)
-        return_start = next(e["t"] for e in events if e["kind"] == "goal" and
-                            e["goal"] == result["configuration"]["return_goal"])
-        checks["fault_hold_precedes_return_arrival"] = not any(
-            e["mode"] == "GOAL" and return_start <= e["t"] < restore_t for e in navigation)
-        held = next((s for s in samples if s["phase"] == "combined_faults" and
-                     s["mode"] == "HOLD_GUARD" and "uncertainty" in s["reason"].lower()), None)
-        if held:
-            result["combined_hold"] = dict(t=held["t"], reason=held["reason"], truth=held["truth"],
-                distance_to_return_goal_m=math.dist(held["truth"][:2], result["configuration"]["return_goal"]))
         result["duration"] = dict(wall_s=round(time.monotonic() - started_wall, 2), simulation_s=state["t"])
         result["success"] = all(bool(value) for value in checks.values())
         if not result["success"]:

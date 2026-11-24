@@ -8,6 +8,7 @@ from urllib.request import Request, urlopen
 
 import pytest
 import rclpy
+from diagnostic_msgs.msg import DiagnosticArray, DiagnosticStatus, KeyValue
 from rcl_interfaces.msg import SetParametersResult
 from rclpy.executors import MultiThreadedExecutor
 from rclpy.node import Node
@@ -109,3 +110,24 @@ def test_event_trace_preserves_navigation_reason_and_actual_detector_flags(dashb
     assert events[-1]["flags"]["gps"] is True
     assert events[-1]["flags"]["gyro"] is False
     assert events[-1]["t"] >= events[-2]["t"]
+
+
+def test_ml_display_keeps_raw_score_separate_from_confirmed_decision(dashboard):
+    node, _, _, _ = dashboard
+    node.on_ml(DiagnosticArray(status=[
+        DiagnosticStatus(name="ugv_sensor_fault/wheel_odom/vx", level=DiagnosticStatus.ERROR,
+                         values=[KeyValue(key=k, value=v) for k, v in {
+                             "measured": "0.8", "reference": "0.5", "fault_probability": "0.9",
+                             "threshold": "0.5", "window_start": "1.0", "window_end": "6.0"}.items()]),
+        DiagnosticStatus(name="ugv_sensor_fault/decision_policy", level=DiagnosticStatus.OK,
+                         values=[KeyValue(key=k, value=v) for k, v in {
+                             "required": "3", "wheel_count": "1", "wheel_flag": "False"}.items()]),
+    ]))
+    snapshot = node.snapshot({})
+    assert snapshot["ml"]["wheel"]["fault_probability"] == 0.9
+    assert snapshot["ml"]["policy"]["valid"] is True
+    assert snapshot["ml"]["policy"]["wheel_flag"] == "False"
+    assert snapshot["ml_count"] == 1
+    node.on_ml(DiagnosticArray(status=[DiagnosticStatus(
+        name="ugv_sensor_fault/wheel_odom/vx", level=DiagnosticStatus.STALE)]))
+    assert node.snapshot({})["ml"]["wheel"] is None

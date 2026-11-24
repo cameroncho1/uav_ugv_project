@@ -39,6 +39,21 @@
   .action-caption { display: inline-block; margin-top: 12px; padding: 7px 12px; background: #18222f;
                     border-left: 3px solid var(--blue); font-size: 15px; color: var(--text); }
   .gps-status { display: flex; justify-content: space-between; color: #b6bfcc; margin-top: 16px; font-size: 12px; }
+  .view-tabs { pointer-events: auto; display: inline-flex; gap: 16px; margin-left: 16px; }
+  .view-tabs button { color: #b6bfcc; font-size: 13px; }
+  .view-tabs button[aria-pressed=true] { color: var(--blue); border-bottom: 2px solid var(--blue); }
+  #mlPanel { display: none; position: absolute; inset: 175px 28px 28px; overflow: auto; }
+  .ml-view #mlPanel { display: block; }
+  .ml-view #map, .ml-view .legend, .ml-view #localizationReadouts { display: none; }
+  .ml-metrics { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; margin: 20px 0 26px; }
+  .ml-metrics b { display: block; font-size: 27px; font-weight: 600; color: var(--blue); }
+  .ml-metrics span { color: #b6bfcc; font-size: 12px; }
+  .ml-metrics .alarm { color: var(--red); }
+  #mlPanel canvas { width: 100%; height: 170px; display: block; margin: 8px 0 14px; }
+  #mlPanel h2 { margin-top: 22px; font-size: 14px; color: var(--text); }
+  #mlPanel select { background: var(--panel); color: var(--text); border: 1px solid #536276; padding: 7px; font: inherit; }
+  .plot-key { display: flex; gap: 18px; color: #b6bfcc; font-size: 12px; }
+  @media (max-width: 850px) { .ml-view main { min-height: 850px; } .ml-metrics { gap: 10px; } }
   #gpsStatus { color: var(--gps); }
   #connection { color: var(--orange); }
   #connection.live { color: var(--green); }
@@ -106,7 +121,23 @@
 <main>
   <header><h1>UAV + UGV</h1><p>Camera mapping · A* routing · Cooperative localization</p>
     <p id="connection" role="status">Connecting to simulation</p>
-    <div class="action-caption" id="actionCaption" role="status">Waiting for navigation</div></header>
+    <div class="action-caption" id="actionCaption" role="status">Waiting for navigation</div>
+    <nav class="view-tabs" aria-label="Demo chapter"><button id="navView" aria-pressed="true">Navigation</button><button id="mlView" aria-pressed="false">ML detector</button></nav></header>
+  <article id="mlPanel">
+    <label for="mlChannel">Model input channel </label><select id="mlChannel"><option value="wheel">Wheel forward speed (m/s)</option><option value="gyro">Gyro turn rate (rad/s)</option></select>
+    <div class="ml-metrics"><div><b id="mlScore">–</b><span>BiLSTM fault score · threshold 0.50</span></div>
+      <div><b id="mlCount">–</b><span>Consecutive flagged decision windows</span></div>
+      <div><b id="mlDecision">Waiting</b><span>Published detector flag</span></div></div>
+    <h2>1. Measured input and independent reference</h2>
+    <div class="plot-key"><span style="color:var(--orange)">Measured sensor</span><span style="color:var(--teal)">Command / wheel reference</span></div>
+    <canvas id="mlInputs" aria-label="Measured input and model reference over 30 seconds"></canvas>
+    <h2>2. Learned score and decision threshold</h2>
+    <div class="plot-key"><span style="color:var(--blue)">BiLSTM score</span><span>Dashed line: threshold</span></div>
+    <canvas id="mlScores" aria-label="BiLSTM fault score and threshold over 30 seconds"></canvas>
+    <p class="caption" id="mlWindow">Waiting for a complete sensor window</p>
+    <p class="caption">100 measured samples per window · Score above 0.50 is a raw flag · Three consecutive flagged decisions raise the published flag.</p>
+    <p class="caption">Injected settings are controls. Model scores are measured outputs. The navigation state identifies the supervisor response.</p>
+  </article>
   <canvas id="map" aria-label="Live course map. Click clear ground to change the goal."></canvas>
   <div class="legend">
     <div class="legend-row"><span><i></i>Actual path</span><span><i class="cooperative"></i>With UAV</span>
@@ -123,10 +154,11 @@
     <div class="state" id="state" data-s="wait"><span class="dot"></span><span id="mode">Waiting</span></div>
     <div id="reason"></div>
     <div class="gps-status"><span>UGV GPS check · model + timeout</span><b id="gpsStatus">Waiting</b></div>
+    <div class="gps-status"><span>UAV measurement timeout</span><b id="uavStatus">Waiting</b></div>
     <h2 id="detector" style="margin:12px 0 0">Learned wheel/gyro flags · display only</h2>
     <div class="chips" id="chips"></div>
   </section>
-  <section>
+  <section id="localizationReadouts">
     <h2>Position error against simulator truth</h2>
     <div class="reading"><i style="background:var(--blue)"></i><b id="eFused">–</b><span>with UAV</span></div>
     <div class="reading"><i style="background:var(--orange)"></i><b id="eBase">–</b><span>without UAV</span></div>
@@ -136,12 +168,13 @@
   <section class="controls">
     <div class="row"><label for="gps">UGV GPS</label><span class="switch"><input type="checkbox" id="gps"></span></div>
     <div class="row"><label for="uav">UAV corrections</label><span class="switch"><input type="checkbox" id="uav"></span></div>
+    <div class="row"><label for="uavData">UAV measurement stream</label><span class="switch"><input type="checkbox" id="uavData"></span></div>
     <div class="row"><label for="noise">Sensor noise</label><output id="noiseV"></output>
       <input type="range" id="noise" min="0" max="5" step="0.1"></div>
     <div class="row"><label for="gpsErr">GPS noise (1σ)</label><output id="gpsErrV"></output>
       <input type="range" id="gpsErr" min="0" max="10" step="0.1"></div>
     <div class="row"><label for="wheel">Wheel speed error</label><output id="wheelV"></output>
-      <input type="range" id="wheel" min="-30" max="30" step="1"></div>
+      <input type="range" id="wheel" min="-30" max="100" step="1"></div>
     <div class="row"><label for="gyro">Gyro drift</label><output id="gyroV"></output>
       <input type="range" id="gyro" min="-2" max="2" step="0.05"></div>
   </section>
@@ -153,7 +186,15 @@ const $ = id => document.getElementById(id);
 const C = { blue: "#4da3ff", orange: "#ff9f43", red: "#ff5d73", green: "#3ddc97", teal: "#5eead4", gps: "#f5d76e" };
 const DEG = Math.PI / 180;
 let world = { obstacles: [], goal: null, start: null };
-let s = null, counts = { truth: 0, fused: 0, baseline: 0, series: 0 };
+let s = null, counts = { truth: 0, fused: 0, baseline: 0, series: 0, ml: 0 };
+let selectedView = null, mlSeries = [];
+function selectView(value) {
+  selectedView = value; document.body.classList.toggle('ml-view', value === 'ml');
+  $('navView').setAttribute('aria-pressed', value === 'navigation');
+  $('mlView').setAttribute('aria-pressed', value === 'ml');
+}
+$('navView').onclick = () => selectView('navigation');
+$('mlView').onclick = () => selectView('ml');
 const trail = { truth: [], fused: [], baseline: [] };
 let series = [], gpsDots = [], seenHazards = new Map(), editing = {};
 let view = null, hover = null, fog = null, fogSeq = -1;
@@ -196,7 +237,7 @@ const syncers = {
   imu_yaw_bias_rate: slider("gyro", "imu_yaw_bias_rate", v => v * DEG, v => +(v / DEG).toFixed(2),
                             v => (v > 0 ? "+" : "") + v.toFixed(2) + "°/s"),
 };
-for (const [id, name] of [["gps", "gps_enabled"], ["uav", "uav_assistance"]]) {
+for (const [id, name] of [["gps", "gps_enabled"], ["uav", "uav_assistance"], ["uavData", "uav_measurements"]]) {
   $(id).addEventListener("change", e => { editing[name] = performance.now(); send(name, e.target.checked); });
 }
 $("block").addEventListener("click", async () => {
@@ -219,7 +260,7 @@ $("returnGoal").addEventListener("click", () => {
 
 function syncControls() {
   const c = s.controls, a = s.available;
-  for (const [id, name] of [["gps", "gps_enabled"], ["uav", "uav_assistance"]]) {
+  for (const [id, name] of [["gps", "gps_enabled"], ["uav", "uav_assistance"], ["uavData", "uav_measurements"]]) {
     if (performance.now() - (editing[name] || 0) > 900) $(id).checked = c[name];
     $(id).closest(".row").classList.toggle("off", !a[name]);
   }
@@ -248,6 +289,7 @@ function syncReadouts() {
   if (f.valid && f.wheels) chips.push("Wheel speed error");
   if (f.valid && f.gyro) chips.push("Gyro drift");
   $("gpsStatus").textContent = !s.gps ? "No fixes" : f.valid && f.gps ? "Model flag" : "Receiving";
+  $("uavStatus").textContent = !f.valid ? "Waiting" : f.uav ? "No measurements" : "Receiving";
   $("detector").textContent = "Learned wheel/gyro · " + (s.detector_hold ? "holds enabled" : "display only");
   $("chips").innerHTML = chips.length ? chips.map(t => `<span class="chip">${t}</span>`).join("")
     : `<span class="caption">${f.valid ? "No flags" : "Waiting for valid samples"}</span>`;
@@ -257,6 +299,37 @@ function syncReadouts() {
   const actions = (s.events || []).filter(e => ["control", "goal", "block", "scenario", "restore"].includes(e.kind));
   const latest = actions[actions.length - 1];
   if (latest) $("actionCaption").textContent = latest.label;
+}
+
+function drawML() {
+  const channel = $('mlChannel').value, ml = s && s.ml, row = ml && ml[channel], policy = ml && ml.policy;
+  const flag = policy && policy[channel + '_flag'] === 'True';
+  $('mlScore').textContent = row && row.fault_probability != null ? row.fault_probability.toFixed(3) : '–';
+  const required = policy ? +policy.required : 3, count = policy ? +policy[channel + '_count'] : 0;
+  $('mlCount').textContent = policy && policy.valid ? Math.min(count, required) + ' / ' + required : '–';
+  $('mlDecision').textContent = !policy || !policy.valid ? 'Waiting' : flag ? 'FAULT' : 'Clear';
+  $('mlDecision').classList.toggle('alarm', !!flag);
+  $('mlWindow').textContent = row ? `Acquisition window ${row.window_start.toFixed(1)}–${row.window_end.toFixed(1)} s · Last 30 seconds shown` : 'Waiting for a complete sensor window';
+  const data = mlSeries.filter(p => p.channel === channel), end = data.length ? data[data.length - 1].t : 30;
+  const rows = data.filter(p => p.t >= end - 30);
+  function plot(id, keys, colors, score = false) {
+    const [g, w, h] = fit($(id)); g.clearRect(0, 0, w, h);
+    const values = rows.flatMap(p => keys.map(k => p[k])).filter(Number.isFinite);
+    let low = score ? 0 : Math.min(0, ...values), high = score ? 1 : Math.max(.1, ...values);
+    if (!score) { const pad = Math.max(.05, (high - low) * .15); low -= pad; high += pad; }
+    const X = t => 38 + (t - end + 30) / 30 * (w - 48), Y = v => h - 22 - (v - low) / (high - low) * (h - 36);
+    g.font = '11px system-ui'; g.fillStyle = '#a5afbd'; g.fillText(high.toFixed(2), 0, 12); g.fillText(low.toFixed(2), 0, h - 20);
+    g.fillText('30 s ago', 38, h - 3); g.fillText('Now', w - 28, h - 3);
+    if (score) { g.setLineDash([5, 5]); g.strokeStyle = '#a5afbd'; g.beginPath(); g.moveTo(38, Y(.5)); g.lineTo(w - 10, Y(.5)); g.stroke(); g.setLineDash([]); }
+    keys.forEach((key, index) => {
+      g.beginPath(); let pen = false;
+      for (const point of rows) { if (!Number.isFinite(point[key])) { pen = false; continue; }
+        if (pen) g.lineTo(X(point.t), Y(point[key])); else g.moveTo(X(point.t), Y(point[key])); pen = true; }
+      g.strokeStyle = colors[index]; g.lineWidth = 2.5; g.stroke();
+    });
+  }
+  plot('mlInputs', ['measured', 'reference'], [C.orange, C.teal]);
+  plot('mlScores', ['fault_probability'], [C.blue], true);
 }
 
 // Drawing ----------------------------------------------------------------------------
@@ -429,6 +502,9 @@ async function poll() {
     if (next.gps && (!s || !s.gps || next.gps[2] !== s.gps[2])) gpsDots.push({ x: next.gps[0], y: next.gps[1], t: performance.now() });
     if (next.layers) { buildFog(next.layers); fogSeq = next.layers_seq; }
     s = next; syncControls(); syncReadouts();
+    if (selectedView === null) selectView(next.view || 'navigation');
+    if (next.ml_count < counts.ml) mlSeries = [];
+    mlSeries.push(...(next.ml_series || [])); counts.ml = next.ml_count || 0;
     const paused = performance.now() - clockAdvanced > 2000;
     $("connection").textContent = paused ? "Simulation clock paused" : "Live simulation";
     $("connection").classList.toggle("live", !paused);
@@ -441,8 +517,9 @@ async function poll() {
     for (const el of document.querySelectorAll("input, button")) el.disabled = true;
   }
   if (connected) {
+    $('navView').disabled = $('mlView').disabled = false;
     for (const el of document.querySelectorAll("input")) el.disabled = !s.available[
-      ({ gps: "gps_enabled", uav: "uav_assistance", noise: "noise_scale", gpsErr: "gps_horizontal_stddev",
+      ({ gps: "gps_enabled", uav: "uav_assistance", uavData: "uav_measurements", noise: "noise_scale", gpsErr: "gps_horizontal_stddev",
          wheel: "wheel_speed_scale", gyro: "imu_yaw_bias_rate" })[el.id]];
     $("reset").disabled = restorePending;
   }
@@ -464,7 +541,7 @@ $("map").addEventListener("click", e => {
   else notice("Choose clear ground while the simulation and goal service are ready.", true);
 });
 fetch("/world").then(r => r.json()).then(w => { world = w; });
-(function frame() { drawMap(); drawChart(); requestAnimationFrame(frame); })();
+(function frame() { if (selectedView === 'ml') drawML(); else { drawMap(); drawChart(); } requestAnimationFrame(frame); })();
 poll();
 </script>
 </body>

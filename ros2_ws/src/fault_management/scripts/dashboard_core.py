@@ -110,9 +110,10 @@ class ErrorStats:
 CONTROLS = {
     "gps_enabled": ("bool", None),
     "uav_assistance": ("bool", None),
+    "uav_measurements": ("bool", None),
     "noise_scale": ("float", (0.0, 10.0)),
     "gps_horizontal_stddev": ("float", (0.0, 20.0)),
-    "wheel_speed_scale": ("float", (0.5, 1.5)),
+    "wheel_speed_scale": ("float", (0.5, 2.0)),
     "imu_yaw_bias_rate": ("float", (-0.05, 0.05)),
 }
 
@@ -123,6 +124,8 @@ def control_caption(name, value):
         return "UGV GPS " + ("on" if value else "off")
     if name == "uav_assistance":
         return "UAV corrections " + ("on" if value else "off")
+    if name == "uav_measurements":
+        return "UAV measurements " + ("on" if value else "off")
     if name == "noise_scale":
         return f"Sensor noise {value:.1f}x"
     if name == "gps_horizontal_stddev":
