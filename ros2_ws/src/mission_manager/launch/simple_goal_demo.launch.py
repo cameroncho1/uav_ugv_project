@@ -63,6 +63,12 @@ def generate_launch_description():
                               description="Fuse camera-derived UGV heading with position."),
         DeclareLaunchArgument("initial_gps_enabled", default_value="true",
                               description="Enable prepared UGV GPS at startup."),
+        DeclareLaunchArgument("uav_dropout_control", default_value="false",
+                              description="Route UAV relative measurements through the F4 "
+                                          "outage gate (/evaluation/set_uav_enabled)."),
+        DeclareLaunchArgument("initial_uav_enabled", default_value="true",
+                              description="With uav_dropout_control:=true, pass UAV relative "
+                                          "measurements at startup."),
         DeclareLaunchArgument("seed", default_value="513"),
         DeclareLaunchArgument("fault_detection", default_value="false",
                               description="Flag UGV sensor-channel faults on /ugv/sensor_faults "
@@ -141,11 +147,28 @@ def generate_launch_description():
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(
                 str(sensing_share / "launch/uav_camera_sensor.launch.py")),
-            launch_arguments={"detect_ugv": LaunchConfiguration("uav_assistance")}.items()),
+            launch_arguments={"detect_ugv": LaunchConfiguration("uav_assistance"),
+                              "measurement_topic": PythonExpression([
+                                  "'/ugv/sensors/uav_relative_pose_raw' if '",
+                                  LaunchConfiguration("uav_dropout_control"),
+                                  "'.lower() == 'true' else '/ugv/sensors/uav_relative_pose'"])
+                              }.items()),
+        # Optional F4 outage control between the camera producer and its consumers.
+        Node(package="fault_management", executable="uav_measurement_gate.py",
+             parameters=[{
+                 "initial_uav_enabled": ParameterValue(
+                     LaunchConfiguration("initial_uav_enabled"), value_type=bool),
+                 "evaluation_trace": ParameterValue(
+                     LaunchConfiguration("evaluation_trace"), value_type=bool)}],
+             condition=IfCondition(PythonExpression([
+                 "'", LaunchConfiguration("uav_assistance"), "'.lower() == 'true' and '",
+                 LaunchConfiguration("uav_dropout_control"), "'.lower() == 'true'"])),
+             output="screen"),
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(
                 str(fault_share / "launch/sensor_fault_detector.launch.py")),
-            launch_arguments={"command_topic": "/ugv/cmd_vel"}.items(),
+            launch_arguments={"command_topic": "/ugv/cmd_vel",
+                              "monitor_uav": LaunchConfiguration("uav_assistance")}.items(),
             condition=IfCondition(LaunchConfiguration("fault_detection"))),
         Node(package="fault_management", executable="sim_anchor_fault.py",
              parameters=[{"random_seed": ParameterValue(

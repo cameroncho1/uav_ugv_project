@@ -12,15 +12,22 @@ interfaces only; simulator truth is not used.
 """
 
 import math
+import os
 import uuid
 from collections import deque
 from pathlib import Path
 
-import numpy as np
+# The model's matrices are small. Multithreaded BLAS on a CPU shared with
+# Gazebo and PX4 stretched one evaluation from about 0.1 s to 1 s and delayed
+# decisions past the supervisor's 1 s age limit. Must be set before numpy loads.
+for _variable in ("OPENBLAS_NUM_THREADS", "OMP_NUM_THREADS", "MKL_NUM_THREADS"):
+    os.environ.setdefault(_variable, "1")
+
+import numpy as np  # noqa: E402
 import rclpy
 from ament_index_python.packages import get_package_share_directory
 from diagnostic_msgs.msg import DiagnosticArray, DiagnosticStatus, KeyValue
-from geometry_msgs.msg import Twist
+from geometry_msgs.msg import PoseWithCovarianceStamped, Twist
 from nav_msgs.msg import Odometry
 from rclpy._rclpy_pybind11 import RCLError
 from rclpy.executors import ExternalShutdownException
@@ -89,6 +96,9 @@ class SensorFaultDetector(Node):
         self.declare_parameter("output_topic", "/ugv/sensor_faults")
         self.declare_parameter("status_topic", "/fault_detection/status")
         self.declare_parameter("gps_timeout", 1.0)
+        self.declare_parameter("monitor_uav", True)
+        self.declare_parameter("uav_topic", "/ugv/sensors/uav_relative_pose")
+        self.declare_parameter("uav_timeout", 2.0)
         self.declare_parameter("command_rate", 20.0)
         self.declare_parameter("command_timeout", 0.5)
         self.declare_parameter("evaluation_period", 0.5)
@@ -110,6 +120,9 @@ class SensorFaultDetector(Node):
         self.command_timeout = parameter("command_timeout")
         self.stale_after = parameter("stale_after")
         self.gps_timeout = parameter("gps_timeout")
+        self.monitor_uav = parameter("monitor_uav")
+        self.uav_timeout = parameter("uav_timeout")
+        self.uav_latest = None   # acquisition stamp of the newest UAV measurement
         # GPS windows span about 20 s; their odometry reference must cover them.
         self.streams = {name: StreamBuffer(fields, 45.0) for name, fields in FIELDS.items()}
         self.command = (0.0, 0.0)
@@ -128,6 +141,9 @@ class SensorFaultDetector(Node):
         self.create_subscription(Odometry, "/ugv/sensors/wheel_odom", self.on_odom, qos)
         self.create_subscription(NavSatFix, "/ugv/sensors/gps", self.on_gps, qos)
         self.create_subscription(Twist, parameter("command_topic"), self.on_command, 10)
+        if self.monitor_uav:
+            self.create_subscription(PoseWithCovarianceStamped, parameter("uav_topic"),
+                                     self.on_uav, qos)
         self.create_timer(1.0 / parameter("command_rate"), self.sample_command)
         self.create_timer(parameter("evaluation_period"), self.evaluate)
         meta = self.model.metadata
@@ -167,6 +183,11 @@ class SensorFaultDetector(Node):
             return
         self.streams["gps"].add(stamp_seconds(message.header.stamp), values)
 
+    def on_uav(self, message):
+        stamp = stamp_seconds(message.header.stamp)
+        if stamp > 0.0 and (self.uav_latest is None or stamp > self.uav_latest):
+            self.uav_latest = stamp
+
     def on_command(self, message):
         self.command = (message.linear.x, message.angular.z)
         self.command_time = self.now_seconds()
@@ -181,6 +202,7 @@ class SensorFaultDetector(Node):
                 stream.clear()
             self.evaluated.clear()
             self.decisions.clear()
+            self.uav_latest = None
             self.command_time = None
             self.start_session()
         self.last_now = now
@@ -242,7 +264,9 @@ class SensorFaultDetector(Node):
                    if channel in self.decisions and statuses[channel][0] != DiagnosticStatus.STALE}
         gps_latest = self.streams["gps"].latest()
         gps_available = gps_latest is not None and now - gps_latest <= self.gps_timeout
-        valid, stamp, flags = fault_decision(current, gps_available)
+        uav_available = not self.monitor_uav or (
+            self.uav_latest is not None and now - self.uav_latest <= self.uav_timeout)
+        valid, stamp, flags = fault_decision(current, gps_available, uav_available)
         if not valid:
             stamp = now
         # Stamps strictly increase within a session; without newer evidence the

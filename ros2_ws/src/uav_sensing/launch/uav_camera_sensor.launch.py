@@ -18,6 +18,8 @@ def generate_launch_description():
         DeclareLaunchArgument('detect_ugv', default_value='true'),
         DeclareLaunchArgument('world', default_value='simple_goal_demo'),
         DeclareLaunchArgument('uav_model', default_value='cooperative_camera_uav_0'),
+        DeclareLaunchArgument('measurement_topic', default_value='/ugv/sensors/uav_relative_pose',
+                              description='Output topic for UGV relative observations.'),
         Node(package='ros_gz_bridge', executable='parameter_bridge', name='uav_camera_bridge',
              arguments=[prefix + ['image@sensor_msgs/msg/Image[gz.msgs.Image'],
                         prefix + ['camera_info@sensor_msgs/msg/CameraInfo[gz.msgs.CameraInfo']],
@@ -28,5 +30,8 @@ def generate_launch_description():
              output='screen'),
         Node(package='uav_sensing', executable='uav_fiducial_sensor.py',
              name='uav_fiducial_sensor', condition=IfCondition(LaunchConfiguration('detect_ugv')),
-             parameters=[str(share / 'config/camera_calibration.yaml')], output='screen'),
+             parameters=[str(share / 'config/camera_calibration.yaml')],
+             remappings=[('/ugv/sensors/uav_relative_pose',
+                          LaunchConfiguration('measurement_topic'))],
+             output='screen'),
     ])

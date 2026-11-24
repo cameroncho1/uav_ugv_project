@@ -42,14 +42,14 @@ def channel_name(channel):
     return f"{channel[0]}/{channel[1]}"
 
 
-def fault_decision(current, gps_available):
+def fault_decision(current, gps_available, uav_available):
     """Combine per-channel results into one class decision.
 
     ``current`` maps a channel to ``(fault, window_end)`` for channels with a
-    current (not stale) evaluation. ``gps_available`` is whether a GPS fix
-    arrived recently; its absence is an outage. UAV measurements are not
-    monitored, so ``uav_loss`` is always false. Returns ``(valid, stamp, flags)``;
-    an invalid decision has no stamp and all flags false.
+    current (not stale) evaluation. ``gps_available`` and ``uav_available`` are
+    whether a GPS fix or a UAV relative measurement arrived recently; absence
+    sets ``gps_outage`` or ``uav_loss``. Returns ``(valid, stamp, flags)``; an
+    invalid decision has no stamp and all flags false.
     """
     flags = dict.fromkeys(FAULT_FLAGS, False)
     if any(channel not in current for channel in DECISION_CHANNELS):
@@ -57,6 +57,7 @@ def fault_decision(current, gps_available):
     for name, channels in FAULT_CLASSES.items():
         flags[name] = any(current[channel][0] for channel in channels if channel in current)
     flags["gps_outage"] = flags["gps_outage"] or not gps_available
+    flags["uav_loss"] = not uav_available
     stamp = min(current[channel][1] for channel in DECISION_CHANNELS)
     return True, stamp, flags
 

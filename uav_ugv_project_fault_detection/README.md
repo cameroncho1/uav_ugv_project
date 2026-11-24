@@ -273,7 +273,7 @@ runs the paired time-domain BiLSTM (`bilstmWeights_ugv_paired`) on the prepared
 UGV measurements (`/ugv/sensors/{imu,wheel_odom,gps}`) and the drive command.
 It rebuilds each channel's last 100 samples with the training reference
 ([`sensor_fault_model.py`](../ros2_ws/src/fault_management/scripts/sensor_fault_model.py),
-numpy only), scores every channel each 0.5 s of sim time, and publishes one
+numpy only), scores every channel each 0.5 s of sim time (`evaluation_period`), and publishes one
 `diagnostic_msgs/DiagnosticStatus` per channel (`ERROR` = fault) on
 `/ugv/sensor_faults`. The goal demo starts it with `fault_detection:=true` (default
 `false`); `use_autoencoder:=true` also flags windows above the autoencoder threshold.
@@ -287,7 +287,17 @@ Each evaluation also publishes one `uav_ugv_msgs/FaultStatus` class decision on
 | `odometry_scale` | BiLSTM flag on `wheel_odom/vx` or `wheel_odom/wz` | hold |
 | `imu_drift` | BiLSTM flag on `imu/wz` | hold |
 | `gps_outage` | no GPS fix for `gps_timeout` (1 s), or a flag on `gps/latitude` or `gps/longitude` | hold only if the pose guard fails |
-| `uav_loss` | always false; UAV measurements are not monitored | — |
+| `uav_loss` | no UAV relative measurement for `uav_timeout` (2 s); off when `uav_assistance:=false` | hold only if the pose guard fails |
+
+With `uav_dropout_control:=true` (default `false`) the goal demo's camera
+producer publishes on `/ugv/sensors/uav_relative_pose_raw`, and
+[`uav_measurement_gate`](../ros2_ws/src/fault_management/scripts/uav_measurement_gate.py)
+forwards it to `/ugv/sensors/uav_relative_pose`. Without it the camera publishes
+there directly and no gate runs. To inject F4, add `initial_uav_enabled:=false` or call
+`ros2 service call /evaluation/set_uav_enabled std_srvs/srv/SetBool "{data: false}"`.
+With `evaluation_trace:=true` each change is a `fault_event` on `/evaluation/faults`.
+`uav_loss` also rises whenever the camera loses the marker for 2 s, for
+example before the UAV is airborne.
 
 `imu/{wx,wy,ax,ay,az}` and `gps/altitude` set no flag. A decision is valid
 when `imu/wz`, `wheel_odom/vx`, and `wheel_odom/wz` each have a current

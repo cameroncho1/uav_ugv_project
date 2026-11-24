@@ -74,7 +74,7 @@ def test_constant_offsets_are_flagged(model):
 
 def test_fault_decision_maps_channels_to_classes():
     clear = {channel: (False, 10.0 + i) for i, channel in enumerate(CHANNELS)}
-    valid, stamp, flags = fault_decision(clear, gps_available=True)
+    valid, stamp, flags = fault_decision(clear, gps_available=True, uav_available=True)
     assert valid and not any(flags.values())
     # Oldest window end among the hold channels (imu/wz is index 2).
     assert stamp == 12.0
@@ -83,17 +83,19 @@ def test_fault_decision_maps_channels_to_classes():
                           (("wheel_odom", "wz"), "odometry_scale"),
                           (("imu", "wz"), "imu_drift"),
                           (("gps", "longitude"), "gps_outage")):
-        _, _, flags = fault_decision({**clear, channel: (True, 20.0)}, True)
+        _, _, flags = fault_decision({**clear, channel: (True, 20.0)}, True, True)
         assert [name for name, value in flags.items() if value] == [flag]
     for channel in (("imu", "ay"), ("imu", "wx"), ("gps", "altitude")):
-        assert not any(fault_decision({**clear, channel: (True, 20.0)}, True)[2].values())
+        assert not any(fault_decision({**clear, channel: (True, 20.0)}, True, True)[2].values())
 
 
 def test_fault_decision_validity_and_gps_outage():
     clear = {channel: (False, 10.0) for channel in DECISION_CHANNELS}
-    valid, _, flags = fault_decision(clear, gps_available=False)
+    valid, _, flags = fault_decision(clear, gps_available=False, uav_available=True)
     assert valid and flags["gps_outage"] and not flags["uav_loss"]
+    valid, _, flags = fault_decision(clear, gps_available=True, uav_available=False)
+    assert valid and flags["uav_loss"] and not flags["gps_outage"]
     for missing in DECISION_CHANNELS:
         partial = {c: v for c, v in clear.items() if c != missing}
-        valid, stamp, flags = fault_decision(partial, gps_available=True)
+        valid, stamp, flags = fault_decision(partial, gps_available=True, uav_available=False)
         assert not valid and stamp is None and not any(flags.values())

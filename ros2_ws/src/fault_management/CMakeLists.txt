@@ -3,7 +3,8 @@ project(fault_management)
 find_package(ament_cmake REQUIRED)
 install(PROGRAMS scripts/sim_ugv_sensors.py scripts/sim_uav_sensor.py
   scripts/sim_anchor_fault.py scripts/localization_trial.py
-  scripts/ugv_dataset_recorder.py scripts/sensor_fault_detector.py DESTINATION lib/${PROJECT_NAME})
+  scripts/ugv_dataset_recorder.py scripts/sensor_fault_detector.py
+  scripts/uav_measurement_gate.py DESTINATION lib/${PROJECT_NAME})
 install(PROGRAMS scripts/hazard_observer.py DESTINATION lib/${PROJECT_NAME})
 install(FILES scripts/simulation_faults.py scripts/hazard_assessment.py
   scripts/sensor_fault_model.py DESTINATION lib/${PROJECT_NAME})
