@@ -7,7 +7,7 @@
 <style>
   :root {
     --bg: #0d1117; --panel: #141a22; --line: #222b37; --text: #e8ebf0; --muted: #7d8796;
-    --blue: #4da3ff; --orange: #ff9f43; --red: #ff5d73; --green: #3ddc97; --teal: #5eead4;
+    --blue: #4da3ff; --orange: #ff9f43; --red: #ff5d73; --green: #3ddc97; --teal: #5eead4; --gps: #f5d76e;
   }
   * { box-sizing: border-box; }
   html, body { height: 100%; margin: 0; }
@@ -21,13 +21,25 @@
   header { position: absolute; top: 24px; left: 28px; right: 28px; pointer-events: none; }
   h1 { margin: 0; font-size: 23px; font-weight: 650; letter-spacing: -.5px; }
   header p, .caption { margin: 5px 0 0; color: #a5afbd; font-size: 12px; }
-  .legend { position: absolute; left: 28px; right: 28px; bottom: 22px; display: flex;
-            flex-wrap: wrap; gap: 10px 20px; color: #b6bfcc; font-size: 12px; pointer-events: none; }
+  .legend { position: absolute; left: 28px; right: 28px; bottom: 22px; display: grid;
+            gap: 10px; color: #c3cbd6; font-size: 12px; pointer-events: none; }
+  .legend-row { display: flex; flex-wrap: wrap; gap: 8px 18px; }
   .legend span { display: flex; align-items: center; gap: 7px; }
   .legend i { width: 20px; border-top: 2px solid white; }
   .legend .cooperative { border-color: var(--blue); }
   .legend .baseline { border-color: var(--orange); border-top-style: dashed; }
   .legend .route { border-color: var(--teal); border-top-style: dashed; }
+  .legend .swatch { width: 12px; height: 12px; border: 0; background: #26303b; }
+  .legend .detected { background: #65788e; }
+  .legend .clearance { background: #4a405b; }
+  .legend .placement { background: transparent; border: 2px solid var(--red); }
+  .legend .fix { width: 7px; height: 7px; border-radius: 50%; background: var(--gps); }
+  .legend .uncertainty { border: 1px solid var(--blue); background: #4da3ff24; border-radius: 50%; }
+  .legend .aircraft { border: 1px solid white; background: none; transform: rotate(45deg); }
+  .action-caption { display: inline-block; margin-top: 12px; padding: 7px 12px; background: #18222f;
+                    border-left: 3px solid var(--blue); font-size: 15px; color: var(--text); }
+  .gps-status { display: flex; justify-content: space-between; color: #b6bfcc; margin-top: 16px; font-size: 12px; }
+  #gpsStatus { color: var(--gps); }
   #connection { color: var(--orange); }
   #connection.live { color: var(--green); }
   h2 { margin: 0 0 12px; color: #a5afbd; font-size: 12px; font-weight: 500; }
@@ -36,8 +48,8 @@
   #notice.error { color: var(--red); }
   :focus-visible { outline: 2px solid var(--blue) !important; outline-offset: 5px; }
   aside {
-    background: var(--panel); border-left: 1px solid var(--line); padding: 28px 24px;
-    display: flex; flex-direction: column; gap: 28px; overflow-y: auto;
+    background: var(--panel); border-left: 1px solid var(--line); padding: 24px;
+    display: flex; flex-direction: column; gap: 20px; overflow-y: auto;
   }
   .state { display: flex; align-items: center; gap: 12px; font-size: 22px; font-weight: 600; }
   .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--muted); flex: none; }
@@ -93,17 +105,25 @@
 <body class="waiting">
 <main>
   <header><h1>UAV + UGV</h1><p>Camera mapping · A* routing · Cooperative localization</p>
-    <p id="connection" role="status">Connecting to simulation</p></header>
+    <p id="connection" role="status">Connecting to simulation</p>
+    <div class="action-caption" id="actionCaption" role="status">Waiting for navigation</div></header>
   <canvas id="map" aria-label="Live course map. Click clear ground to change the goal."></canvas>
-  <div class="legend"><span><i></i>Actual path</span><span><i class="cooperative"></i>With UAV</span>
-    <span><i class="baseline"></i>Without UAV</span><span><i class="route"></i>Planned route</span>
-    <span>Click clear ground to set a goal</span></div>
+  <div class="legend">
+    <div class="legend-row"><span><i></i>Actual path</span><span><i class="cooperative"></i>With UAV</span>
+      <span><i class="baseline"></i>Without UAV</span><span><i class="route"></i>Planned route</span>
+      <span><i class="swatch uncertainty"></i>Position uncertainty</span><span><i class="swatch aircraft"></i>UAV</span></div>
+    <div class="legend-row"><span><i class="swatch"></i>Camera-seen ground</span><span><i class="swatch detected"></i>Camera obstacle</span>
+      <span><i class="swatch clearance"></i>Clearance</span><span><i class="swatch placement"></i>Simulator block</span>
+      <span><i class="fix"></i>UGV GPS fix</span></div>
+    <div class="caption">Click clear ground to set a goal · Start marked S · Goal marked G</div>
+  </div>
 </main>
 <aside>
   <section>
     <div class="state" id="state" data-s="wait"><span class="dot"></span><span id="mode">Waiting</span></div>
     <div id="reason"></div>
-    <h2 id="detector" style="margin:18px 0 0">Detector flags · display only</h2>
+    <div class="gps-status"><span>UGV GPS check · model + timeout</span><b id="gpsStatus">Waiting</b></div>
+    <h2 id="detector" style="margin:12px 0 0">Learned wheel/gyro flags · display only</h2>
     <div class="chips" id="chips"></div>
   </section>
   <section>
@@ -114,7 +134,7 @@
     <p class="caption">60 seconds ago <span style="float:right">Now</span></p>
   </section>
   <section class="controls">
-    <div class="row"><label for="gps">GPS</label><span class="switch"><input type="checkbox" id="gps"></span></div>
+    <div class="row"><label for="gps">UGV GPS</label><span class="switch"><input type="checkbox" id="gps"></span></div>
     <div class="row"><label for="uav">UAV corrections</label><span class="switch"><input type="checkbox" id="uav"></span></div>
     <div class="row"><label for="noise">Sensor noise</label><output id="noiseV"></output>
       <input type="range" id="noise" min="0" max="5" step="0.1"></div>
@@ -126,17 +146,17 @@
       <input type="range" id="gyro" min="-2" max="2" step="0.05"></div>
   </section>
   <div id="notice" role="status" aria-live="polite"></div>
-  <div class="foot"><button id="reset">Restore sensors</button><button id="block" disabled>Add block</button></div>
+  <div class="foot"><button id="reset">Restore sensors</button><button id="returnGoal" disabled>Return goal</button><button id="block" disabled>Add block</button></div>
 </aside>
 <script>
 const $ = id => document.getElementById(id);
-const C = { blue: "#4da3ff", orange: "#ff9f43", red: "#ff5d73", green: "#3ddc97", teal: "#5eead4" };
+const C = { blue: "#4da3ff", orange: "#ff9f43", red: "#ff5d73", green: "#3ddc97", teal: "#5eead4", gps: "#f5d76e" };
 const DEG = Math.PI / 180;
 let world = { obstacles: [], goal: null, start: null };
 let s = null, counts = { truth: 0, fused: 0, baseline: 0, series: 0 };
 const trail = { truth: [], fused: [], baseline: [] };
 let series = [], gpsDots = [], seenHazards = new Map(), editing = {};
-let view = null, hover = null, fog = null, fogSeq = -1, pulseUntil = 0;
+let view = null, hover = null, fog = null, fogSeq = -1;
 let connected = false, lastClock = null, clockAdvanced = performance.now();
 let blockPending = false, restorePending = false;
 
@@ -182,15 +202,19 @@ for (const [id, name] of [["gps", "gps_enabled"], ["uav", "uav_assistance"]]) {
 $("block").addEventListener("click", async () => {
   blockPending = true;
   $("block").disabled = true;
-  await action("/block", {}, "Block added ahead. Watch the camera map and route.");
+  await action("/block", {}, "Live block placed. Red is simulator placement; gray cells are camera detections.");
   blockPending = false;
 });
 $("reset").addEventListener("click", async () => {
   restorePending = true;
   $("reset").disabled = true;
-  await action("/reset", {}, "Sensors restored and live blocks removed. Accumulated drift may remain.");
+  await action("/reset", {}, "Sensors restored. Live blocks removed. Integrated bias and filter state are preserved.");
   $("reset").disabled = false;
   restorePending = false;
+});
+$("returnGoal").addEventListener("click", () => {
+  const [x, y] = world.return_goal;
+  action("/goal", { x, y }, "Return goal accepted.");
 });
 
 function syncControls() {
@@ -219,17 +243,20 @@ function syncReadouts() {
   $("reason").textContent = kind === "hold" ? s.reason : "";
   document.body.classList.toggle("waiting", !s.truth);
   $("block").disabled = blockPending || !s.started || (s.route || []).length < 2;
+  $("returnGoal").disabled = !s.goal_available || !world.return_goal;
   const f = s.flags || {}, chips = [];
-  if (f.valid && f.gps) chips.push("GPS outage");
   if (f.valid && f.wheels) chips.push("Wheel speed error");
   if (f.valid && f.gyro) chips.push("Gyro drift");
-  if (f.valid && f.uav) chips.push("UAV loss");
-  $("detector").textContent = "Detector flags · " + (s.detector_hold ? "holds enabled" : "display only");
+  $("gpsStatus").textContent = !s.gps ? "No fixes" : f.valid && f.gps ? "Model flag" : "Receiving";
+  $("detector").textContent = "Learned wheel/gyro · " + (s.detector_hold ? "holds enabled" : "display only");
   $("chips").innerHTML = chips.length ? chips.map(t => `<span class="chip">${t}</span>`).join("")
     : `<span class="caption">${f.valid ? "No flags" : "Waiting for valid samples"}</span>`;
   const last = series[series.length - 1];
   $("eFused").textContent = last && last[1] != null ? last[1].toFixed(2) + " m" : "–";
   $("eBase").textContent = last && last[2] != null ? last[2].toFixed(2) + " m" : "–";
+  const actions = (s.events || []).filter(e => ["control", "goal", "block", "scenario", "restore"].includes(e.kind));
+  const latest = actions[actions.length - 1];
+  if (latest) $("actionCaption").textContent = latest.label;
 }
 
 // Drawing ----------------------------------------------------------------------------
@@ -241,7 +268,8 @@ function fit(canvas) {
 }
 function bounds() {
   const pts = [];
-  for (const o of world.obstacles) {
+  const features = world.obstacles.filter(o => o.radius != null || Math.max(o.half_x, o.half_y) < 3);
+  for (const o of features.length ? features : world.obstacles) {
     const c = Math.abs(Math.cos(o.yaw || 0)), sn = Math.abs(Math.sin(o.yaw || 0));
     const rx = o.radius ?? c * o.half_x + sn * o.half_y, ry = o.radius ?? sn * o.half_x + c * o.half_y;
     pts.push([o.x - rx, o.y - ry], [o.x + rx, o.y + ry]);
@@ -255,15 +283,21 @@ function drawMap() {
   const [g, w, h] = fit($("map"));
   g.clearRect(0, 0, w, h);
   g.imageSmoothingEnabled = false;
-  const [x0, x1, y0, y1] = bounds(), pad = 90;
-  const k = Math.min((w - 2 * pad) / (x1 - x0), (h - 2 * pad) / (y1 - y0));
-  const ox = (w - k * (x1 - x0)) / 2 - k * x0, oy = (h + k * (y1 - y0)) / 2 + k * y0;
+  const [x0, x1, y0, y1] = bounds();
+  const top = document.querySelector('header').offsetHeight + 48;
+  const bottom = document.querySelector('.legend').offsetHeight + 78;
+  const k = Math.min((w - 64) / (x1 - x0), Math.max(80, h - top - bottom) / (y1 - y0));
+  const ox = (w - k * (x1 - x0)) / 2 - k * x0;
+  const oy = top + (h - top - bottom + k * (y1 - y0)) / 2 + k * y0;
   const X = x => ox + k * x, Y = y => oy - k * y;
   view = { ox, oy, k };
   g.strokeStyle = g.fillStyle = "#a5afbd"; g.lineWidth = 1; g.font = "12px system-ui";
-  g.beginPath(); g.moveTo(28, h - 70); g.lineTo(28 + 2 * k, h - 70); g.stroke();
-  g.fillText("2 m", 28, h - 80);
+  const scaleY = h - bottom + 30;
+  g.beginPath(); g.moveTo(28, scaleY); g.lineTo(28 + 2 * k, scaleY); g.stroke();
+  g.fillText("2 m", 28, scaleY - 10);
   g.fillText("North ↑", w - 90, 40);
+  g.save();
+  g.beginPath(); g.rect(16, top - 12, w - 32, Math.max(80, h - top - bottom + 24)); g.clip();
   const path = (pts, color, width, dash = []) => {
     if (pts.length < 2) return;
     g.beginPath(); pts.forEach((p, i) => i ? g.lineTo(X(p[0]), Y(p[1])) : g.moveTo(X(p[0]), Y(p[1])));
@@ -284,6 +318,12 @@ function drawMap() {
       g.beginPath(); g.arc(X(goal[0]), Y(goal[1]), r * k, 0, 7);
       g.strokeStyle = g.fillStyle = C.green; g.globalAlpha = a; r < .2 ? g.fill() : g.stroke(); g.globalAlpha = 1;
     }
+    g.fillStyle = C.green; g.fillText("G", X(goal[0]) + 10, Y(goal[1]) - 10);
+  }
+  if (world.start) {
+    g.strokeStyle = g.fillStyle = "#c3cbd6";
+    g.strokeRect(X(world.start[0]) - 6, Y(world.start[1]) - 6, 12, 12);
+    g.fillText("S", X(world.start[0]) - 20, Y(world.start[1]) - 10);
   }
   if (hover) {
     g.beginPath(); g.arc(X(hover.x), Y(hover.y), .45 * k, 0, 7);
@@ -292,22 +332,23 @@ function drawMap() {
   if (!s) return;
   const t = performance.now();
   for (const h2 of s.hazards || []) {
-    if (!seenHazards.has(h2.id)) { seenHazards.set(h2.id, t); pulseUntil = t + 2500; }
+    if (!seenHazards.has(h2.id)) seenHazards.set(h2.id, t);
     const age = (t - seenHazards.get(h2.id)) / 1000;
     shape(h2, "#2a1c22", C.red, 1.5 + (age < 2.5 ? 3 * Math.abs(Math.sin(age * 5)) : 0));
+    const label = h2.id.includes("live_block") ? "Live block" : "Timed block";
+    const tx = X(h2.x) + 9, ty = Y(h2.y) - 12;
+    g.fillStyle = "#0d1117e6"; g.fillRect(tx - 3, ty - 12, g.measureText(label).width + 6, 16);
+    g.fillStyle = C.red; g.fillText(label, tx, ty);
   }
-  const pulse = Math.max(0, (pulseUntil - t) / 2500);
   const here = s.fused || s.truth, route = s.route || [];
   let from = 0;
   if (here && route.length) { let best = Infinity; route.forEach((p, i) => { const d = Math.hypot(p[0] - here[0], p[1] - here[1]); if (d < best) { best = d; from = i; } }); }
-  if (pulse) { g.shadowColor = C.teal; g.shadowBlur = 16 * pulse; }
-  path(route.slice(from), C.teal, 2 + 2.5 * pulse, s.partial ? [3, 6] : [8, 6]);
-  g.shadowBlur = 0;
+  path(route.slice(from), C.teal, 2, s.partial ? [3, 6] : [8, 6]);
+  path(trail.truth, "rgba(255,255,255,.8)", 5);
   path(trail.baseline, C.orange, 2, [6, 4]);
-  path(trail.fused, C.blue, 2);
-  path(trail.truth, "rgba(255,255,255,.85)", 1.5);
+  path(trail.fused, C.blue, 2.5);
   gpsDots = gpsDots.filter(d => t - d.t < 6000);
-  for (const d of gpsDots) { g.globalAlpha = 1 - (t - d.t) / 6000; g.fillStyle = C.red; g.beginPath(); g.arc(X(d.x), Y(d.y), 2.5, 0, 7); g.fill(); }
+  for (const d of gpsDots) { g.globalAlpha = 1 - (t - d.t) / 6000; g.fillStyle = C.gps; g.beginPath(); g.arc(X(d.x), Y(d.y), 2.5, 0, 7); g.fill(); }
   g.globalAlpha = 1;
   const f = s.fused;
   if (f && f[2] != null) {
@@ -328,6 +369,7 @@ function drawMap() {
     g.beginPath(); g.moveTo(.45 * k, 0); g.lineTo(.2 * k, -.15 * k); g.lineTo(.2 * k, .15 * k); g.closePath();
     g.fillStyle = "#0d1117"; g.fill(); g.restore();
   }
+  g.restore();
 }
 function drawChart() {
   const [g, w, h] = fit($("chart"));
@@ -337,6 +379,17 @@ function drawChart() {
   const view = series.filter(p => p[0] >= start);
   const top = Math.max(0.5, ...view.map(p => Math.max(p[1] ?? 0, p[2] ?? 0))) * 1.1;
   const X = t => (t - start) / 60 * w, Y = e => h - 4 - (h - 12) * e / top;
+  let lastLabel = -Infinity;
+  for (const event of (s && s.events) || []) {
+    if (event.kind !== "control" || event.t < start || event.t > end) continue;
+    const x = X(event.t);
+    g.strokeStyle = "#8999ae66"; g.beginPath(); g.moveTo(x, 16); g.lineTo(x, h - 4); g.stroke();
+    if (x - lastLabel < 75 || x > w - 45) continue;
+    const label = event.label.replace("UGV ", "").replace("corrections ", "").replace("Sensor noise", "Noise")
+      .replace("Wheel speed error", "Wheel").replace("Gyro drift", "Gyro");
+    g.fillStyle = "#a5afbd"; g.font = "10px system-ui"; g.fillText(label, x + 3, 12);
+    lastLabel = x;
+  }
   g.strokeStyle = "#222b37"; g.lineWidth = 1; g.beginPath(); g.moveTo(0, h - 3.5); g.lineTo(w, h - 3.5); g.stroke();
   g.fillStyle = "#7d8796"; g.font = "11px system-ui"; g.fillText(top.toFixed(1) + " m", 0, 10);
   for (const [i, color] of [[2, C.orange], [1, C.blue]]) {
@@ -347,7 +400,7 @@ function drawChart() {
 }
 
 // Seen ground, detected obstacles and the planner's clearance halo, one pixel per cell.
-const LAYER_COLORS = [[0, 0, 0, 0], [255, 255, 255, 14], [74, 88, 108, 255], [167, 139, 250, 34]];
+const LAYER_COLORS = [[0, 0, 0, 0], [38, 48, 59, 255], [101, 120, 142, 255], [74, 64, 91, 255]];
 function buildFog(l) {
   const bytes = Uint8Array.from(atob(l.data), c => c.charCodeAt(0));
   const canvas = document.createElement("canvas"); canvas.width = l.w; canvas.height = l.h;

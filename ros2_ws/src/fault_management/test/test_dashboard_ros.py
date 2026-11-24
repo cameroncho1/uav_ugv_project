@@ -11,6 +11,8 @@ import rclpy
 from rcl_interfaces.msg import SetParametersResult
 from rclpy.executors import MultiThreadedExecutor
 from rclpy.node import Node
+from std_msgs.msg import String
+from uav_ugv_msgs.msg import FaultStatus
 
 from demo_dashboard import Dashboard
 
@@ -86,6 +88,24 @@ def test_sensor_action_reports_service_result_and_preserves_rejected_value(dashb
     node, _, sensor, _ = dashboard
     assert post(node, "/control", dict(name="noise_scale", value=2.0))[0] == 200
     assert sensor.get_parameter("noise_scale").value == 2.0
+    event = node.snapshot({})["events"][-1]
+    assert event["kind"] == "control" and event["label"] == "Sensor noise 2.0x"
+    assert event["control"] == "noise_scale" and event["value"] == 2.0
+    before = len(node.events)
     code, body = post(node, "/control", dict(name="wheel_speed_scale", value=1.45))
     assert code == 400 and "rejected" in body["error"]
     assert node.controls["wheel_speed_scale"] == 1.0
+    assert len(node.events) == before
+
+
+def test_event_trace_preserves_navigation_reason_and_actual_detector_flags(dashboard):
+    node, _, _, _ = dashboard
+    node.on_control(String(data=json.dumps(dict(
+        supervisor_state="HOLD_GUARD", hold_reason="Position uncertainty exceeds the navigation limit"))))
+    node.on_faults(FaultStatus(window_valid=True, gps_outage=True, imu_drift=False))
+    events = node.snapshot({})["events"]
+    assert events[-2]["mode"] == "HOLD_GUARD"
+    assert events[-2]["reason"] == "Position uncertainty exceeds the navigation limit"
+    assert events[-1]["flags"]["gps"] is True
+    assert events[-1]["flags"]["gyro"] is False
+    assert events[-1]["t"] >= events[-2]["t"]

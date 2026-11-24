@@ -32,7 +32,7 @@ from std_msgs.msg import String
 from std_srvs.srv import SetBool
 from uav_ugv_msgs.msg import FaultStatus, PlannedRoute
 
-from dashboard_core import (ErrorStats, block_site, classify_layers, encode_layers,
+from dashboard_core import (ErrorStats, block_site, classify_layers, control_caption, encode_layers,
                             goal_error, position_at, position_error, stddev_from_covariance,
                             validate_control, world_geometry)
 from localization_common.geodesy import yaw_from_quaternion
@@ -58,8 +58,10 @@ class Dashboard(Node):
         world_file = self.get_parameter("world_file").value
         self.world = world_geometry(world_file) if world_file else dict(
             obstacles=[], goal=None, start=None)
+        start = self.world["start"]
+        self.world["return_goal"] = [start[0] - 6.0, start[1] - 3.0] if start else None
 
-        self.lock = threading.Lock()
+        self.lock = threading.RLock()
         self.commands = queue.Queue()
         self.controls = dict(NOMINAL)
         self.controls.update(
@@ -71,6 +73,7 @@ class Dashboard(Node):
         self.trail = dict(truth=[], fused=[], baseline=[])
         self.positions = {name: deque(maxlen=600) for name in self.trail}
         self.series = []  # (t, fused error, baseline error)
+        self.events = []  # chronological display/scoring evidence; never a navigation input
         self.stats = dict(fused=ErrorStats(), baseline=ErrorStats())
         self.last_sample = None
         self.start_time = None
@@ -148,6 +151,9 @@ class Dashboard(Node):
                 elif url.path == "/state":
                     query = {k: int(v[0]) for k, v in parse_qs(url.query).items() if v[0].isdigit()}
                     self.reply(200, json.dumps(node.snapshot(query)).encode())
+                elif url.path == "/events":
+                    with node.lock:
+                        self.reply(200, json.dumps(list(node.events)).encode())
                 else:
                     self.reply(404, b"{}")
 
@@ -183,6 +189,11 @@ class Dashboard(Node):
             f"Dashboard at http://localhost:{self.server.server_address[1]}")
 
     # Measurements -------------------------------------------------------------------
+    def record_event(self, kind, label, **details):
+        with self.lock:
+            self.events.append(dict(id=len(self.events), t=round(self.now_s(), 3),
+                                    kind=kind, label=label, **details))
+
     def now_s(self):
         now = self.get_clock().now().nanoseconds * 1e-9
         if self.start_time is None:
@@ -253,10 +264,13 @@ class Dashboard(Node):
 
     def on_faults(self, message):
         with self.lock:
-            self.state["flags"] = dict(
+            flags = dict(
                 valid=bool(message.window_valid), gps=bool(message.gps_outage),
                 wheels=bool(message.odometry_scale), gyro=bool(message.imu_drift),
                 uav=bool(message.uav_loss))
+            if flags != self.state["flags"]:
+                self.record_event("flags", "Sensor check changed", flags=flags)
+            self.state["flags"] = flags
 
     def on_control(self, message):
         try:
@@ -265,8 +279,11 @@ class Dashboard(Node):
             return
         mode = tick.get("supervisor_state")
         with self.lock:
+            reason = tick.get("hold_reason", "")
+            if mode != self.state["mode"] or reason != self.state["reason"]:
+                self.record_event("navigation", mode or "Waiting", mode=mode, reason=reason)
             self.state["mode"] = mode
-            self.state["reason"] = tick.get("hold_reason", "")
+            self.state["reason"] = reason
             self.state["detector_hold"] = bool(tick.get("detector_enabled", False))
             if not self.recording and mode and "NAV" in mode.upper():
                 self.recording = True
@@ -328,6 +345,7 @@ class Dashboard(Node):
             self.gazebo_world().apply(
                 Operation(id=f"add_{box.id}", at_ns=0, action="spawn", obstacle=box.id), box)
             self.blocks.append(box)
+            self.record_event("block", "Live block added", obstacle=box.shape())
 
     def remove_blocks(self):
         from simulation_support.obstacle_scenarios import Operation
@@ -342,10 +360,14 @@ class Dashboard(Node):
                     self.get_logger().warning(f"{box.id}: {error}")
                     raise
                 self.blocks.pop()
+                self.record_event("block_removed", "Live block removed", obstacle=box.shape())
 
     def on_goal(self, message):
         with self.lock:
-            self.state["goal"] = [message.pose.position.x, message.pose.position.y]
+            goal = [message.pose.position.x, message.pose.position.y]
+            if goal != self.state["goal"]:
+                self.record_event("goal", "Goal set", goal=goal)
+            self.state["goal"] = goal
 
     def on_scenario(self, message):
         try:
@@ -353,6 +375,10 @@ class Dashboard(Node):
         except ValueError:
             return
         with self.lock:
+            previous = {h["id"] for h in self.state["hazards"]}
+            for hazard in hazards:
+                if hazard["id"] not in previous:
+                    self.record_event("scenario", "Timed block spawned", obstacle=hazard)
             self.state["hazards"] = hazards
 
     # Controls -----------------------------------------------------------------------
@@ -414,6 +440,8 @@ class Dashboard(Node):
                             failures.append(error)
                         remaining[0] -= 1
                         if not remaining[0]:
+                            if not failures:
+                                self.record_event("restore", "Sensors restored")
                             done("; ".join(failures) or None)
 
                 def remove(done=restored):
@@ -486,6 +514,9 @@ class Dashboard(Node):
             ok = response.success if hasattr(response, "success") else response.results[0].successful
             if ok:
                 with self.lock:
+                    if self.controls[name] != value:
+                        self.record_event("control", control_caption(name, value),
+                                          control=name, value=value)
                     self.controls[name] = value
             finish(None if ok else f"{name} was rejected")
 
@@ -516,6 +547,7 @@ class Dashboard(Node):
                 trail_count={k: len(v) for k, v in self.trail.items()},
                 series=self.series[counts.get("series", 0):],
                 series_count=len(self.series), layers_seq=self.layers_seq,
+                events=list(self.events),
                 layers=self.layers if counts.get("layers", -1) != self.layers_seq else None)
 
 

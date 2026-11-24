@@ -7,7 +7,7 @@ from pathlib import Path
 
 import numpy as np
 import pytest
-from dashboard_core import (ErrorStats, block_site, classify_layers, encode_layers,
+from dashboard_core import (ErrorStats, block_site, classify_layers, control_caption, encode_layers,
                             goal_error, point_along, position_at, position_error, reduce_layers,
                             stddev_from_covariance, validate_control, world_geometry)
 
@@ -85,6 +85,13 @@ def test_valid_controls_are_coerced():
     assert validate_control("gps_enabled", False) is False
     assert validate_control("noise_scale", 2) == 2.0
     assert validate_control("imu_yaw_bias_rate", -0.01) == -0.01
+
+
+def test_control_captions_distinguish_the_receiver_and_measured_fault_units():
+    assert control_caption("gps_enabled", False) == "UGV GPS off"
+    assert control_caption("uav_assistance", False) == "UAV corrections off"
+    assert control_caption("wheel_speed_scale", 1.2) == "Wheel speed error +20%"
+    assert control_caption("imu_yaw_bias_rate", math.radians(2)) == "Gyro drift +2.00 deg/s"
 
 
 def test_goal_validation_rejects_obstacles_and_bad_values():

@@ -117,6 +117,23 @@ CONTROLS = {
 }
 
 
+def control_caption(name, value):
+    """Short, factual captions for acknowledged sensor controls."""
+    if name == "gps_enabled":
+        return "UGV GPS " + ("on" if value else "off")
+    if name == "uav_assistance":
+        return "UAV corrections " + ("on" if value else "off")
+    if name == "noise_scale":
+        return f"Sensor noise {value:.1f}x"
+    if name == "gps_horizontal_stddev":
+        return f"GPS noise {value:.1f} m"
+    if name == "wheel_speed_scale":
+        return f"Wheel speed error {(value - 1) * 100:+.0f}%"
+    if name == "imu_yaw_bias_rate":
+        return f"Gyro drift {math.degrees(value):+.2f} deg/s"
+    raise ValueError(f"unknown control {name!r}")
+
+
 def validate_control(name, value):
     """Return the value coerced to its type, or raise ValueError."""
     if name not in CONTROLS:

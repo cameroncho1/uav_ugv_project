@@ -14,5 +14,5 @@ exec ros2 launch mission_manager simple_goal_demo.launch.py \
   goal_x:=9.0 goal_y:=3.0 \
   evaluation_trace:=true \
   obstacle_scenario:="$ROOT/ros2_ws/src/simulation_support/config/scenarios/complex_course_box.yaml" \
-  fault_detection:=true dashboard:=true \
+  fault_detection:=true dashboard:=true start_rviz:=false \
   "$@"
