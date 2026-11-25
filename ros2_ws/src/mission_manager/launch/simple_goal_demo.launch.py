@@ -1,4 +1,7 @@
+import time
 from pathlib import Path
+
+import yaml
 
 from ament_index_python.packages import get_package_prefix, get_package_share_directory
 from launch import LaunchDescription
@@ -20,6 +23,9 @@ def generate_launch_description():
     localization_share = Path(get_package_share_directory("cooperative_localization"))
     start_simulation = LaunchConfiguration("start_simulation")
     start_rviz = LaunchConfiguration("start_rviz")
+    dashboard = LaunchConfiguration("dashboard")
+    baseline_ekf = yaml.safe_load(
+        (localization_share / "config/ugv_ekf.yaml").read_text())["ugv_ekf"]["ros__parameters"]
     # Map position of PX4's local origin; shared by the anchor adapter and UAV follower.
     map_origin = [0.0, 0.0, 0.3]
 
@@ -101,6 +107,25 @@ def generate_launch_description():
             description="Camera occupancy-grid cell size in meters.",
         ),
         DeclareLaunchArgument(
+            "dashboard", default_value="false",
+            description="Serve the live dashboard and run the GPS/wheel/IMU-only comparison "
+                        "estimator. Needs evaluation_trace:=true for the navigation state."),
+        DeclareLaunchArgument("dashboard_port", default_value="8765"),
+        DeclareLaunchArgument("dashboard_view", default_value="navigation",
+                              choices=["navigation", "ml"]),
+        DeclareLaunchArgument(
+            "obstacle_scenario", default_value="",
+            description="Scenario YAML that spawns obstacles during the run (for example "
+                        "simulation_support/config/scenarios/complex_course_box.yaml). "
+                        "Needs evaluation_trace:=true, which supplies the first-drive trigger.",
+        ),
+        DeclareLaunchArgument(
+            "scenario_output", default_value=str(
+                project_root / "localization_results/demo_scenario" /
+                time.strftime("%Y%m%d-%H%M%S")),
+            description="Fresh directory for the scenario operation log.",
+        ),
+        DeclareLaunchArgument(
             "obstacle_luminance_threshold", default_value="32.0",
             description="Dark-pixel threshold used by the initial camera occupancy heuristic.",
         ),
@@ -147,7 +172,9 @@ def generate_launch_description():
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(
                 str(sensing_share / "launch/uav_camera_sensor.launch.py")),
-            launch_arguments={"detect_ugv": LaunchConfiguration("uav_assistance"),
+            launch_arguments={"detect_ugv": PythonExpression([
+                "'true' if '", dashboard, "'.lower() == 'true' else '",
+                LaunchConfiguration("uav_assistance"), "'"]),
                               "measurement_topic": PythonExpression([
                                   "'/ugv/sensors/uav_relative_pose_raw' if '",
                                   LaunchConfiguration("uav_dropout_control"),
@@ -161,14 +188,17 @@ def generate_launch_description():
                  "evaluation_trace": ParameterValue(
                      LaunchConfiguration("evaluation_trace"), value_type=bool)}],
              condition=IfCondition(PythonExpression([
-                 "'", LaunchConfiguration("uav_assistance"), "'.lower() == 'true' and '",
-                 LaunchConfiguration("uav_dropout_control"), "'.lower() == 'true'"])),
+                 "'", LaunchConfiguration("uav_dropout_control"), "'.lower() == 'true' and ('",
+                 LaunchConfiguration("uav_assistance"), "'.lower() == 'true' or '",
+                 dashboard, "'.lower() == 'true')"])),
              output="screen"),
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(
                 str(fault_share / "launch/sensor_fault_detector.launch.py")),
             launch_arguments={"command_topic": "/ugv/cmd_vel",
-                              "monitor_uav": LaunchConfiguration("uav_assistance")}.items(),
+                              "monitor_uav": PythonExpression([
+                                  "'true' if '", dashboard, "'.lower() == 'true' else '",
+                                  LaunchConfiguration("uav_assistance"), "'"])}.items(),
             condition=IfCondition(LaunchConfiguration("fault_detection"))),
         Node(package="fault_management", executable="sim_anchor_fault.py",
              parameters=[{"random_seed": ParameterValue(
@@ -236,6 +266,45 @@ def generate_launch_description():
             name="ugv_command_bridge",
             parameters=[{"config_file": str(package_share / "config/ugv_command_bridge.yaml")}],
             output="screen",
+        ),
+        # Dashboard inputs: simulator truth for display and a second estimator that never
+        # receives UAV measurements. Both are scoring aids, not inputs to navigation.
+        Node(package="simulation_support", executable="ugv_truth",
+             parameters=[{"world": "simple_goal_demo"}], condition=IfCondition(dashboard)),
+        Node(package="robot_localization", executable="ekf_node", name="ugv_ekf_baseline",
+             parameters=[baseline_ekf],
+             remappings=[("odometry/filtered", "/evaluation/baseline_odometry")],
+             condition=IfCondition(dashboard)),
+        Node(package="cooperative_localization", executable="ugv_fused_pose.py",
+             name="baseline_pose",
+             parameters=[{"systematic_position_stddev": ParameterValue(
+                 LaunchConfiguration("systematic_position_stddev"), value_type=float)}],
+             remappings=[("/ugv/localization/odometry", "/evaluation/baseline_odometry"),
+                         ("/ugv/localization/pose", "/evaluation/baseline_pose")],
+             condition=IfCondition(dashboard)),
+        Node(package="fault_management", executable="demo_dashboard.py",
+             parameters=[{"world_file": LaunchConfiguration("world_file"),
+                          "view": LaunchConfiguration("dashboard_view"),
+                          "initial_gps_enabled": ParameterValue(
+                              LaunchConfiguration("initial_gps_enabled"), value_type=bool),
+                          "initial_uav_assistance": ParameterValue(
+                              LaunchConfiguration("uav_assistance"), value_type=bool),
+                          "initial_uav_measurements": ParameterValue(
+                              LaunchConfiguration("initial_uav_enabled"), value_type=bool),
+                          "port": ParameterValue(LaunchConfiguration("dashboard_port"),
+                                                 value_type=int)}],
+             output="screen", condition=IfCondition(dashboard)),
+        Node(
+            package="simulation_support",
+            executable="obstacle_scenario",
+            name="obstacle_scenario",
+            parameters=[{
+                "scenario_file": LaunchConfiguration("obstacle_scenario"),
+                "output_directory": LaunchConfiguration("scenario_output"),
+            }],
+            output="screen",
+            condition=IfCondition(PythonExpression(
+                ["'", LaunchConfiguration("obstacle_scenario"), "' != ''"])),
         ),
         Node(
             package="rviz2",

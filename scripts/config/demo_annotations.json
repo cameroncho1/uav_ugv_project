@@ -1,0 +1,77 @@
+{
+  "schema_version": 2,
+  "description": "Five orientation callouts for the unannotated virtual-20261124-take4 edit. Coordinates are source pixels; times are playback seconds.",
+  "source_sha256": "a31f8aca96d12792ebb39f74bfdb8ea29e7a32232e2a14b717b7dfbb479ab85c",
+  "preserve_existing_videos": [
+    {"filename": "uav-ugv-demo-annotated.mp4", "sha256": "fc2ed5a3e2f3ca1f727f37605c7a4e18fce8f877845436fd846b2e971c00222e"},
+    {"filename": "uav-ugv-demo-annotated-final.mp4", "sha256": "6f25f4472bc07ab3883f808d30e4d56222d489cb795784a1e1ec5b76090113f1"}
+  ],
+  "expected_video": {"width": 1920, "height": 1080, "duration_s": 240, "frame_rate": "24/1", "frames": 5760},
+  "style": {"font": "Arial", "heading_size": 28, "font_size": 26, "line_height": 32, "padding_x": 18, "padding_y": 13, "panel": "#101b27", "border": "#c0d3e1", "text": "#f6f9fc", "pointer_width": 2},
+  "outside_review_s": [2, 14, 26, 39, 49, 165, 186, 236],
+  "callouts": [
+    {
+      "id": "one-robot-two-estimates", "start_s": 3, "end_s": 13, "review_s": 8,
+      "text": [
+        "Two position estimates.",
+        "White: actual path (simulator truth).",
+        {"runs": [{"text": "Blue: GPS + wheels + IMU + UAV corrections.", "color": "#55a7fa"}]},
+        {"runs": [{"text": "Orange: GPS + wheels + IMU only.", "color": "#ffac50"}]},
+        "Blue controls the robot; orange is comparison."
+      ],
+      "box": {"x": 744, "y": 214, "width": 805, "height": 182},
+      "pointer": [[846, 396], [846, 548]],
+      "target": {"x": 846, "y": 548, "description": "Early recorded tracks of the same UGV near the start. Actual, cooperative and baseline tracks remain visible below the panel."},
+      "purpose": "Identify one physical robot, simulator truth, both estimators and which estimate controls navigation before the first detour."
+    },
+    {
+      "id": "camera-map-and-route", "start_s": 15, "end_s": 25, "review_s": 22,
+      "text": [
+        "The drone's downward camera builds this map.",
+        "Gray: detected obstacles. Purple: robot clearance.",
+        {"runs": [{"text": "Dashed cyan: planned route ahead.", "color": "#69e0d0"}]},
+        "White, blue and orange trace past positions."
+      ],
+      "box": {"x": 744, "y": 214, "width": 805, "height": 150},
+      "pointer": [[898, 364], [898, 378]],
+      "target": {"x": 898, "y": 378, "description": "Persistent gray occupied camera-map cells at the upper cylinder. The cyan intended route and recorded position tracks remain visible below."},
+      "purpose": "Explain camera-map provenance, obstacle clearance and the difference between planned motion and recorded position histories."
+    },
+    {
+      "id": "gps-position-readings", "start_s": 40, "end_s": 48, "review_s": 44,
+      "text": [
+        {"runs": [{"text": "Yellow dots: GPS readings from the ground robot.", "color": "#ecd574"}]},
+        "Their spread shows simulated measurement noise."
+      ],
+      "box": {"x": 744, "y": 815, "width": 805, "height": 92},
+      "target": {"description": "The persistent yellow color key identifies the GPS scatter. No pointer follows an individual fix because plotted dots fade after six browser wall seconds."},
+      "purpose": "Identify noisy UGV GPS position reports well before the noise and outage controls."
+    },
+    {
+      "id": "paired-speed-windows", "start_s": 166, "end_s": 176, "review_s": 170,
+      "text": [
+        "Paired speeds are the model's input.",
+        {"runs": [{"text": "Orange: measured wheel speed.", "color": "#ffac50"}]},
+        {"runs": [{"text": "Cyan: speed requested by the drive controller.", "color": "#69e0d0"}]},
+        "A window pairs the latest 100 wheel samples",
+        "with commands at matching sample times."
+      ],
+      "box": {"x": 24, "y": 389, "width": 660, "height": 182},
+      "target": {"description": "Orange measured wheel speed and cyan command reference in the upper ML plot. The panel sits on empty Gazebo ground below the physical robot; dashboard plots and telemetry remain visible."},
+      "purpose": "Define the controller command as the wheel-speed reference and explain the 100 acquisition-matched paired samples at ML chapter entry."
+    },
+    {
+      "id": "what-three-checks-count", "start_s": 176, "end_s": 186, "review_s": 181,
+      "text": [
+        "Each check uses the latest 100",
+        "wheel speed readings.",
+        {"runs": [{"text": "3/3", "color": "#55a7fa"}, {"text": " means three checks in a row"}]},
+        "detect a fault.",
+        "A clean check resets the count."
+      ],
+      "box": {"x": 24, "y": 389, "width": 660, "height": 182},
+      "target": {"description": "The live wheel-score and consecutive-window counter at the top of the dashboard. This panel begins before the first recorded 3/3 published fault."},
+      "purpose": "Explain that each model check uses 100 recent wheel speed readings, the counter counts consecutive fault detections, and a clean check resets it."
+    }
+  ]
+}

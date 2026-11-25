@@ -247,6 +247,9 @@ class SensorFaultDetector(Node):
             fault = result["bilstm"] or (self.use_autoencoder and result.get("autoencoder", False))
             self.decisions[channel] = (bool(fault), info[channel][1])
             values = [("fault_probability", f"{result['probability']:.4f}"),
+                      ("threshold", "0.5"),
+                      ("measured", f"{windows[channel][-1, 0]:.6f}"),
+                      ("reference", f"{windows[channel][-1, 1]:.6f}"),
                       ("window_start", f"{info[channel][0]:.3f}"),
                       ("window_end", f"{info[channel][1]:.3f}")]
             if self.use_autoencoder:
@@ -289,6 +292,20 @@ class SensorFaultDetector(Node):
                               sequence=self.sequence, window_valid=valid, **flags)
         message.header.stamp = Time(nanoseconds=round(stamp * 1e9)).to_msg()
         self.status_publisher.publish(message)
+        # Display telemetry follows the same persistence update as FaultStatus.
+        policy = DiagnosticStatus(name="ugv_sensor_fault/decision_policy",
+                                  level=DiagnosticStatus.OK if valid else DiagnosticStatus.STALE,
+                                  message="valid" if valid else "warming up")
+        policy.values = [KeyValue(key=k, value=str(v)) for k, v in {
+            "required": self.persistence.required,
+            "wheel_count": self.persistence.counts["odometry_scale"],
+            "gyro_count": self.persistence.counts["imu_drift"],
+            "wheel_flag": flags["odometry_scale"], "gyro_flag": flags["imu_drift"],
+            "decision_stamp": stamp,
+        }.items()]
+        telemetry = DiagnosticArray(status=[policy])
+        telemetry.header.stamp = message.header.stamp
+        self.publisher.publish(telemetry)
 
     def report_transition(self, channel, fault, result, window):
         name = channel_name(channel)

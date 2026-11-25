@@ -5,17 +5,18 @@ install(PROGRAMS scripts/sim_ugv_sensors.py scripts/sim_uav_sensor.py
   scripts/sim_anchor_fault.py scripts/localization_trial.py
   scripts/ugv_dataset_recorder.py scripts/sensor_fault_detector.py
   scripts/uav_measurement_gate.py DESTINATION lib/${PROJECT_NAME})
-install(PROGRAMS scripts/hazard_observer.py DESTINATION lib/${PROJECT_NAME})
+install(PROGRAMS scripts/hazard_observer.py scripts/demo_dashboard.py DESTINATION lib/${PROJECT_NAME})
 install(FILES scripts/simulation_faults.py scripts/hazard_assessment.py
-  scripts/sensor_fault_model.py DESTINATION lib/${PROJECT_NAME})
-install(DIRECTORY config launch models DESTINATION share/${PROJECT_NAME})
+  scripts/sensor_fault_model.py scripts/dashboard_core.py DESTINATION lib/${PROJECT_NAME})
+install(DIRECTORY config launch models web DESTINATION share/${PROJECT_NAME})
 if(BUILD_TESTING)
   find_package(ament_cmake_pytest REQUIRED)
   ament_add_pytest_test(localization_trial_test test/test_localization_trial.py)
   ament_add_pytest_test(sim_sensor_test test/test_sim_sensors.py)
   ament_add_pytest_test(launch_modes_test test/test_launch_modes.py)
   ament_add_pytest_test(ugv_dataset_recorder_test test/test_ugv_dataset_recorder.py)
-  ament_add_pytest_test(hazard_assessment_test test/test_hazard_assessment.py)
+  ament_add_pytest_test(hazard_assessment_test test/test_hazard_assessment.py
+    APPEND_ENV PYTHONPATH=${CMAKE_CURRENT_SOURCE_DIR}/../../../verification/src)
   ament_add_pytest_test(verification_test ../../../verification/tests
     TIMEOUT 300
     APPEND_ENV PYTHONPATH=${CMAKE_CURRENT_SOURCE_DIR}/../../../verification/src)
@@ -25,5 +26,8 @@ if(BUILD_TESTING)
     TIMEOUT 60
     APPEND_ENV PYTHONPATH=${CMAKE_CURRENT_SOURCE_DIR}/../../../verification/src)
   ament_add_pytest_test(sensor_fault_model_test test/test_sensor_fault_model.py)
+  ament_add_pytest_test(dashboard_core_test test/test_dashboard_core.py)
+  ament_add_pytest_test(dashboard_ros_test test/test_dashboard_ros.py TIMEOUT 60
+    ENV ROS_DOMAIN_ID=75)
 endif()
 ament_package()

@@ -1,0 +1,2811 @@
+{
+    "recorded_utc":  "2026-11-24T19:58:13.822570+00:00",
+    "success":  true,
+    "configuration":  {
+                          "seed":  513,
+                          "model":  "paired time-domain BiLSTM",
+                          "threshold":  0.5,
+                          "persistence":  3,
+                          "wheel_speed_scale":  1.6,
+                          "fault_hold":  true
+                      },
+    "actions":  [
+                    {
+                        "t":  23.74,
+                        "name":  "wheel_speed_scale",
+                        "value":  1.6,
+                        "ack":  {
+                                    "ok":  true
+                                }
+                    },
+                    {
+                        "t":  29.3,
+                        "name":  "wheel_speed_scale",
+                        "value":  1.0,
+                        "ack":  {
+                                    "ok":  true
+                                }
+                    },
+                    {
+                        "t":  44.96,
+                        "name":  "uav_measurements",
+                        "value":  false,
+                        "ack":  {
+                                    "ok":  true
+                                }
+                    },
+                    {
+                        "t":  47.06,
+                        "name":  "uav_measurements",
+                        "value":  true,
+                        "ack":  {
+                                    "ok":  true
+                                }
+                    }
+                ],
+    "highlights":  {
+                       "clean":  {
+                                     "t":  23.74,
+                                     "mode":  "NAVIGATE",
+                                     "reason":  "Following path using the fused pose",
+                                     "guard_valid":  true,
+                                     "flags":  {
+                                                   "valid":  true,
+                                                   "gps":  false,
+                                                   "wheels":  false,
+                                                   "gyro":  false,
+                                                   "uav":  false
+                                               },
+                                     "ml":  {
+                                                "wheel":  {
+                                                              "measured":  0.462746,
+                                                              "reference":  0.479672,
+                                                              "fault_probability":  0.0,
+                                                              "threshold":  0.5,
+                                                              "window_start":  18.304,
+                                                              "window_end":  23.452
+                                                          },
+                                                "gyro":  {
+                                                             "measured":  0.033269,
+                                                             "reference":  -0.052662,
+                                                             "fault_probability":  0.0017,
+                                                             "threshold":  0.5,
+                                                             "window_start":  21.5,
+                                                             "window_end":  23.48
+                                                         },
+                                                "policy":  {
+                                                               "valid":  true,
+                                                               "required":  "3",
+                                                               "wheel_count":  "0",
+                                                               "gyro_count":  "0",
+                                                               "wheel_flag":  "False",
+                                                               "gyro_flag":  "False",
+                                                               "decision_stamp":  "23.452"
+                                                           }
+                                            },
+                                     "truth":  [
+                                                   -2.4211377887678296,
+                                                   -0.019960781253450226,
+                                                   -0.0166693993641521
+                                               ],
+                                     "fused":  [
+                                                   -2.35811602538105,
+                                                   -0.01169776158721513,
+                                                   0.11100763815032325
+                                               ],
+                                     "controls":  {
+                                                      "gps_enabled":  true,
+                                                      "uav_assistance":  true,
+                                                      "uav_measurements":  true,
+                                                      "noise_scale":  1.0,
+                                                      "gps_horizontal_stddev":  1.5,
+                                                      "wheel_speed_scale":  1.0,
+                                                      "imu_yaw_bias_rate":  0.0
+                                                  }
+                                 },
+                       "persistence_1":  {
+                                             "t":  24.57,
+                                             "mode":  "NAVIGATE",
+                                             "reason":  "Following path using the fused pose",
+                                             "guard_valid":  true,
+                                             "flags":  {
+                                                           "valid":  true,
+                                                           "gps":  false,
+                                                           "wheels":  false,
+                                                           "gyro":  false,
+                                                           "uav":  false
+                                                       },
+                                             "ml":  {
+                                                        "wheel":  {
+                                                                      "measured":  0.857488,
+                                                                      "reference":  0.480335,
+                                                                      "fault_probability":  0.5993,
+                                                                      "threshold":  0.5,
+                                                                      "window_start":  19.344,
+                                                                      "window_end":  24.492
+                                                                  },
+                                                        "gyro":  {
+                                                                     "measured":  0.000474,
+                                                                     "reference":  0.01704,
+                                                                     "fault_probability":  0.0,
+                                                                     "threshold":  0.5,
+                                                                     "window_start":  22.5,
+                                                                     "window_end":  24.48
+                                                                 },
+                                                        "policy":  {
+                                                                       "valid":  true,
+                                                                       "required":  "3",
+                                                                       "wheel_count":  "1",
+                                                                       "gyro_count":  "0",
+                                                                       "wheel_flag":  "False",
+                                                                       "gyro_flag":  "False",
+                                                                       "decision_stamp":  "24.48"
+                                                                   }
+                                                    },
+                                             "truth":  [
+                                                           -2.006198050420577,
+                                                           -0.025022046393936685,
+                                                           -0.013846543659405929
+                                                       ],
+                                             "fused":  [
+                                                           -1.9021944029124933,
+                                                           -0.043231439025802273,
+                                                           0.11616569613061352
+                                                       ],
+                                             "controls":  {
+                                                              "gps_enabled":  true,
+                                                              "uav_assistance":  true,
+                                                              "uav_measurements":  true,
+                                                              "noise_scale":  1.0,
+                                                              "gps_horizontal_stddev":  1.5,
+                                                              "wheel_speed_scale":  1.6,
+                                                              "imu_yaw_bias_rate":  0.0
+                                                          }
+                                         },
+                       "persistence_2":  {
+                                             "t":  26.61,
+                                             "mode":  "NAVIGATE",
+                                             "reason":  "Following path using the fused pose",
+                                             "guard_valid":  true,
+                                             "flags":  {
+                                                           "valid":  true,
+                                                           "gps":  false,
+                                                           "wheels":  false,
+                                                           "gyro":  false,
+                                                           "uav":  false
+                                                       },
+                                             "ml":  {
+                                                        "wheel":  {
+                                                                      "measured":  0.800434,
+                                                                      "reference":  0.484752,
+                                                                      "fault_probability":  0.9997,
+                                                                      "threshold":  0.5,
+                                                                      "window_start":  21.32,
+                                                                      "window_end":  26.468
+                                                                  },
+                                                        "gyro":  {
+                                                                     "measured":  0.01817,
+                                                                     "reference":  0.013176,
+                                                                     "fault_probability":  0.0,
+                                                                     "threshold":  0.5,
+                                                                     "window_start":  24.5,
+                                                                     "window_end":  26.48
+                                                                 },
+                                                        "policy":  {
+                                                                       "valid":  true,
+                                                                       "required":  "3",
+                                                                       "wheel_count":  "2",
+                                                                       "gyro_count":  "0",
+                                                                       "wheel_flag":  "False",
+                                                                       "gyro_flag":  "False",
+                                                                       "decision_stamp":  "26.468"
+                                                                   }
+                                                    },
+                                             "truth":  [
+                                                           -1.014610053343928,
+                                                           -0.03361246935067677,
+                                                           0.0003658042980965212
+                                                       ],
+                                             "fused":  [
+                                                           -0.9090580704025187,
+                                                           -0.04453053855867015,
+                                                           0.12335402337066613
+                                                       ],
+                                             "controls":  {
+                                                              "gps_enabled":  true,
+                                                              "uav_assistance":  true,
+                                                              "uav_measurements":  true,
+                                                              "noise_scale":  1.0,
+                                                              "gps_horizontal_stddev":  1.5,
+                                                              "wheel_speed_scale":  1.6,
+                                                              "imu_yaw_bias_rate":  0.0
+                                                          }
+                                         },
+                       "persistence_3":  {
+                                             "t":  27.24,
+                                             "mode":  "HOLD_FAULT",
+                                             "reason":  "Fault hold: waiting for fresh clear detector decisions",
+                                             "guard_valid":  true,
+                                             "flags":  {
+                                                           "valid":  true,
+                                                           "gps":  false,
+                                                           "wheels":  true,
+                                                           "gyro":  false,
+                                                           "uav":  false
+                                                       },
+                                             "ml":  {
+                                                        "wheel":  {
+                                                                      "measured":  0.842436,
+                                                                      "reference":  0.499189,
+                                                                      "fault_probability":  1.0,
+                                                                      "threshold":  0.5,
+                                                                      "window_start":  21.84,
+                                                                      "window_end":  26.988
+                                                                  },
+                                                        "gyro":  {
+                                                                     "measured":  -0.027237,
+                                                                     "reference":  -0.025764,
+                                                                     "fault_probability":  0.0,
+                                                                     "threshold":  0.5,
+                                                                     "window_start":  25.0,
+                                                                     "window_end":  26.98
+                                                                 },
+                                                        "policy":  {
+                                                                       "valid":  true,
+                                                                       "required":  "3",
+                                                                       "wheel_count":  "3",
+                                                                       "gyro_count":  "0",
+                                                                       "wheel_flag":  "True",
+                                                                       "gyro_flag":  "False",
+                                                                       "decision_stamp":  "26.98"
+                                                                   }
+                                                    },
+                                             "truth":  [
+                                                           -0.7537197733504478,
+                                                           -0.03434943073117714,
+                                                           -0.0035486265569430104
+                                                       ],
+                                             "fused":  [
+                                                           -0.6428832018530667,
+                                                           -0.049685544802558296,
+                                                           0.12334708750821552
+                                                       ],
+                                             "controls":  {
+                                                              "gps_enabled":  true,
+                                                              "uav_assistance":  true,
+                                                              "uav_measurements":  true,
+                                                              "noise_scale":  1.0,
+                                                              "gps_horizontal_stddev":  1.5,
+                                                              "wheel_speed_scale":  1.6,
+                                                              "imu_yaw_bias_rate":  0.0
+                                                          }
+                                         },
+                       "detector_hold":  {
+                                             "t":  27.24,
+                                             "mode":  "HOLD_FAULT",
+                                             "reason":  "Fault hold: waiting for fresh clear detector decisions",
+                                             "guard_valid":  true,
+                                             "flags":  {
+                                                           "valid":  true,
+                                                           "gps":  false,
+                                                           "wheels":  true,
+                                                           "gyro":  false,
+                                                           "uav":  false
+                                                       },
+                                             "ml":  {
+                                                        "wheel":  {
+                                                                      "measured":  0.842436,
+                                                                      "reference":  0.499189,
+                                                                      "fault_probability":  1.0,
+                                                                      "threshold":  0.5,
+                                                                      "window_start":  21.84,
+                                                                      "window_end":  26.988
+                                                                  },
+                                                        "gyro":  {
+                                                                     "measured":  -0.027237,
+                                                                     "reference":  -0.025764,
+                                                                     "fault_probability":  0.0,
+                                                                     "threshold":  0.5,
+                                                                     "window_start":  25.0,
+                                                                     "window_end":  26.98
+                                                                 },
+                                                        "policy":  {
+                                                                       "valid":  true,
+                                                                       "required":  "3",
+                                                                       "wheel_count":  "3",
+                                                                       "gyro_count":  "0",
+                                                                       "wheel_flag":  "True",
+                                                                       "gyro_flag":  "False",
+                                                                       "decision_stamp":  "26.98"
+                                                                   }
+                                                    },
+                                             "truth":  [
+                                                           -0.7537197733504478,
+                                                           -0.03434943073117714,
+                                                           -0.0035486265569430104
+                                                       ],
+                                             "fused":  [
+                                                           -0.6428832018530667,
+                                                           -0.049685544802558296,
+                                                           0.12334708750821552
+                                                       ],
+                                             "controls":  {
+                                                              "gps_enabled":  true,
+                                                              "uav_assistance":  true,
+                                                              "uav_measurements":  true,
+                                                              "noise_scale":  1.0,
+                                                              "gps_horizontal_stddev":  1.5,
+                                                              "wheel_speed_scale":  1.6,
+                                                              "imu_yaw_bias_rate":  0.0
+                                                          }
+                                         },
+                       "navigation_resumes":  {
+                                                  "t":  35.1,
+                                                  "mode":  "NAVIGATE",
+                                                  "reason":  "Following path using the fused pose",
+                                                  "guard_valid":  true,
+                                                  "flags":  {
+                                                                "valid":  true,
+                                                                "gps":  false,
+                                                                "wheels":  false,
+                                                                "gyro":  false,
+                                                                "uav":  false
+                                                            },
+                                                  "ml":  {
+                                                             "wheel":  {
+                                                                           "measured":  0.444385,
+                                                                           "reference":  0.451583,
+                                                                           "fault_probability":  0.0,
+                                                                           "threshold":  0.5,
+                                                                           "window_start":  29.848,
+                                                                           "window_end":  34.996
+                                                                       },
+                                                             "gyro":  {
+                                                                          "measured":  -0.010614,
+                                                                          "reference":  -0.00157,
+                                                                          "fault_probability":  0.0,
+                                                                          "threshold":  0.5,
+                                                                          "window_start":  33.0,
+                                                                          "window_end":  34.98
+                                                                      },
+                                                             "policy":  {
+                                                                            "valid":  true,
+                                                                            "required":  "3",
+                                                                            "wheel_count":  "0",
+                                                                            "gyro_count":  "0",
+                                                                            "wheel_flag":  "False",
+                                                                            "gyro_flag":  "False",
+                                                                            "decision_stamp":  "34.98"
+                                                                        }
+                                                         },
+                                                  "truth":  [
+                                                                -0.7029315453850783,
+                                                                -0.03455873924281483,
+                                                                -0.0030473630904735856
+                                                            ],
+                                                  "fused":  [
+                                                                -0.7391189909949878,
+                                                                -0.014215663679078476,
+                                                                0.10129313298425634
+                                                            ],
+                                                  "controls":  {
+                                                                   "gps_enabled":  true,
+                                                                   "uav_assistance":  true,
+                                                                   "uav_measurements":  true,
+                                                                   "noise_scale":  1.0,
+                                                                   "gps_horizontal_stddev":  1.5,
+                                                                   "wheel_speed_scale":  1.0,
+                                                                   "imu_yaw_bias_rate":  0.0
+                                                               }
+                                              },
+                       "goal":  {
+                                    "t":  44.96,
+                                    "mode":  "GOAL",
+                                    "reason":  "UGV reached global goal tolerance",
+                                    "guard_valid":  true,
+                                    "flags":  {
+                                                  "valid":  true,
+                                                  "gps":  false,
+                                                  "wheels":  false,
+                                                  "gyro":  false,
+                                                  "uav":  false
+                                              },
+                                    "ml":  {
+                                               "wheel":  {
+                                                             "measured":  0.252463,
+                                                             "reference":  0.196751,
+                                                             "fault_probability":  0.0,
+                                                             "threshold":  0.5,
+                                                             "window_start":  39.312,
+                                                             "window_end":  44.46
+                                                         },
+                                               "gyro":  {
+                                                            "measured":  0.004537,
+                                                            "reference":  0.037514,
+                                                            "fault_probability":  0.0,
+                                                            "threshold":  0.5,
+                                                            "window_start":  42.5,
+                                                            "window_end":  44.48
+                                                        },
+                                               "policy":  {
+                                                              "valid":  true,
+                                                              "required":  "3",
+                                                              "wheel_count":  "0",
+                                                              "gyro_count":  "0",
+                                                              "wheel_flag":  "False",
+                                                              "gyro_flag":  "False",
+                                                              "decision_stamp":  "44.46"
+                                                          }
+                                           },
+                                    "truth":  [
+                                                  3.655389352970819,
+                                                  -0.01030900915876632,
+                                                  0.0164260712701903
+                                              ],
+                                    "fused":  [
+                                                  3.6777139591097296,
+                                                  -0.0076591390597818935,
+                                                  0.11197745085333627
+                                              ],
+                                    "controls":  {
+                                                     "gps_enabled":  true,
+                                                     "uav_assistance":  true,
+                                                     "uav_measurements":  true,
+                                                     "noise_scale":  1.0,
+                                                     "gps_horizontal_stddev":  1.5,
+                                                     "wheel_speed_scale":  1.0,
+                                                     "imu_yaw_bias_rate":  0.0
+                                                 }
+                                },
+                       "uav_timeout":  {
+                                           "t":  47.06,
+                                           "mode":  "GOAL",
+                                           "reason":  "UGV reached global goal tolerance",
+                                           "guard_valid":  true,
+                                           "flags":  {
+                                                         "valid":  true,
+                                                         "gps":  false,
+                                                         "wheels":  false,
+                                                         "gyro":  false,
+                                                         "uav":  true
+                                                     },
+                                           "ml":  {
+                                                      "wheel":  {
+                                                                    "measured":  -0.077665,
+                                                                    "reference":  0.0,
+                                                                    "fault_probability":  0.0,
+                                                                    "threshold":  0.5,
+                                                                    "window_start":  41.808,
+                                                                    "window_end":  46.956
+                                                                },
+                                                      "gyro":  {
+                                                                   "measured":  -0.004833,
+                                                                   "reference":  -0.009074,
+                                                                   "fault_probability":  0.0,
+                                                                   "threshold":  0.5,
+                                                                   "window_start":  45.02,
+                                                                   "window_end":  47.0
+                                                               },
+                                                      "policy":  {
+                                                                     "valid":  true,
+                                                                     "required":  "3",
+                                                                     "wheel_count":  "0",
+                                                                     "gyro_count":  "0",
+                                                                     "wheel_flag":  "False",
+                                                                     "gyro_flag":  "False",
+                                                                     "decision_stamp":  "46.956"
+                                                                 }
+                                                  },
+                                           "truth":  [
+                                                         3.655389352970819,
+                                                         -0.01030900915876632,
+                                                         0.0164260712701903
+                                                     ],
+                                           "fused":  [
+                                                         3.504625218990819,
+                                                         -0.160106608189784,
+                                                         0.31062746376416056
+                                                     ],
+                                           "controls":  {
+                                                            "gps_enabled":  true,
+                                                            "uav_assistance":  true,
+                                                            "uav_measurements":  false,
+                                                            "noise_scale":  1.0,
+                                                            "gps_horizontal_stddev":  1.5,
+                                                            "wheel_speed_scale":  1.0,
+                                                            "imu_yaw_bias_rate":  0.0
+                                                        }
+                                       },
+                       "uav_measurements_return":  {
+                                                       "t":  47.72,
+                                                       "mode":  "GOAL",
+                                                       "reason":  "UGV reached global goal tolerance",
+                                                       "guard_valid":  true,
+                                                       "flags":  {
+                                                                     "valid":  true,
+                                                                     "gps":  false,
+                                                                     "wheels":  false,
+                                                                     "gyro":  false,
+                                                                     "uav":  false
+                                                                 },
+                                                       "ml":  {
+                                                                  "wheel":  {
+                                                                                "measured":  -0.032115,
+                                                                                "reference":  0.0,
+                                                                                "fault_probability":  0.0,
+                                                                                "threshold":  0.5,
+                                                                                "window_start":  42.328,
+                                                                                "window_end":  47.476
+                                                                            },
+                                                                  "gyro":  {
+                                                                               "measured":  -0.009737,
+                                                                               "reference":  0.00638,
+                                                                               "fault_probability":  0.0,
+                                                                               "threshold":  0.5,
+                                                                               "window_start":  45.5,
+                                                                               "window_end":  47.48
+                                                                           },
+                                                                  "policy":  {
+                                                                                 "valid":  true,
+                                                                                 "required":  "3",
+                                                                                 "wheel_count":  "0",
+                                                                                 "gyro_count":  "0",
+                                                                                 "wheel_flag":  "False",
+                                                                                 "gyro_flag":  "False",
+                                                                                 "decision_stamp":  "47.476"
+                                                                             }
+                                                              },
+                                                       "truth":  [
+                                                                     3.655389352970819,
+                                                                     -0.01030900915876632,
+                                                                     0.0164260712701903
+                                                                 ],
+                                                       "fused":  [
+                                                                     3.6364683609473993,
+                                                                     0.014220704441156518,
+                                                                     0.10266711319932595
+                                                                 ],
+                                                       "controls":  {
+                                                                        "gps_enabled":  true,
+                                                                        "uav_assistance":  true,
+                                                                        "uav_measurements":  true,
+                                                                        "noise_scale":  1.0,
+                                                                        "gps_horizontal_stddev":  1.5,
+                                                                        "wheel_speed_scale":  1.0,
+                                                                        "imu_yaw_bias_rate":  0.0
+                                                                    }
+                                                   }
+                   },
+    "checks":  {
+                   "clean_score_below_threshold":  true,
+                   "three_windows":  true,
+                   "learned_hold":  true,
+                   "pose_guard_valid":  true,
+                   "navigation_recovers":  true,
+                   "goal_reached":  true,
+                   "f4_timeout":  true,
+                   "f4_restored":  true
+               },
+    "model_series":  [
+                         {
+                             "t":  2.024,
+                             "channel":  "gyro",
+                             "measured":  0.003715,
+                             "reference":  0.007579,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  0.008,
+                             "window_end":  1.98
+                         },
+                         {
+                             "t":  2.524,
+                             "channel":  "gyro",
+                             "measured":  0.001592,
+                             "reference":  -0.000557,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  0.5,
+                             "window_end":  2.48
+                         },
+                         {
+                             "t":  3.02,
+                             "channel":  "gyro",
+                             "measured":  0.005137,
+                             "reference":  0.021155,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  1.0,
+                             "window_end":  2.98
+                         },
+                         {
+                             "t":  3.52,
+                             "channel":  "gyro",
+                             "measured":  -0.009658,
+                             "reference":  -0.010609,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  1.5,
+                             "window_end":  3.48
+                         },
+                         {
+                             "t":  4.028,
+                             "channel":  "gyro",
+                             "measured":  0.012938,
+                             "reference":  -0.036198,
+                             "fault_probability":  0.0069,
+                             "threshold":  0.5,
+                             "window_start":  2.0,
+                             "window_end":  3.98
+                         },
+                         {
+                             "t":  4.544,
+                             "channel":  "gyro",
+                             "measured":  -0.004124,
+                             "reference":  0.004722,
+                             "fault_probability":  0.0003,
+                             "threshold":  0.5,
+                             "window_start":  2.5,
+                             "window_end":  4.48
+                         },
+                         {
+                             "t":  5.036,
+                             "channel":  "gyro",
+                             "measured":  -0.021121,
+                             "reference":  0.006105,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  3.0,
+                             "window_end":  4.98
+                         },
+                         {
+                             "t":  5.528,
+                             "channel":  "gyro",
+                             "measured":  0.000116,
+                             "reference":  0.005826,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  3.5,
+                             "window_end":  5.48
+                         },
+                         {
+                             "t":  5.528,
+                             "channel":  "wheel",
+                             "measured":  -0.043749,
+                             "reference":  0.0,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  0.312,
+                             "window_end":  5.46
+                         },
+                         {
+                             "t":  6.028,
+                             "channel":  "gyro",
+                             "measured":  0.007903,
+                             "reference":  0.013698,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  4.0,
+                             "window_end":  5.98
+                         },
+                         {
+                             "t":  6.028,
+                             "channel":  "wheel",
+                             "measured":  -0.024382,
+                             "reference":  0.0,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  0.832,
+                             "window_end":  5.98
+                         },
+                         {
+                             "t":  6.528,
+                             "channel":  "gyro",
+                             "measured":  -0.010879,
+                             "reference":  -0.001324,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  4.5,
+                             "window_end":  6.48
+                         },
+                         {
+                             "t":  6.528,
+                             "channel":  "wheel",
+                             "measured":  0.012635,
+                             "reference":  0.0,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  1.3,
+                             "window_end":  6.448
+                         },
+                         {
+                             "t":  7.028,
+                             "channel":  "gyro",
+                             "measured":  0.014098,
+                             "reference":  -0.001533,
+                             "fault_probability":  0.0001,
+                             "threshold":  0.5,
+                             "window_start":  5.0,
+                             "window_end":  6.98
+                         },
+                         {
+                             "t":  7.028,
+                             "channel":  "wheel",
+                             "measured":  -0.039711,
+                             "reference":  0.0,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  1.82,
+                             "window_end":  6.968
+                         },
+                         {
+                             "t":  7.528,
+                             "channel":  "gyro",
+                             "measured":  0.017842,
+                             "reference":  0.004713,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  5.5,
+                             "window_end":  7.48
+                         },
+                         {
+                             "t":  7.528,
+                             "channel":  "wheel",
+                             "measured":  0.019992,
+                             "reference":  0.0,
+                             "fault_probability":  0.0003,
+                             "threshold":  0.5,
+                             "window_start":  2.34,
+                             "window_end":  7.488
+                         },
+                         {
+                             "t":  8.04,
+                             "channel":  "gyro",
+                             "measured":  -0.003422,
+                             "reference":  0.018808,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  6.0,
+                             "window_end":  7.98
+                         },
+                         {
+                             "t":  8.04,
+                             "channel":  "wheel",
+                             "measured":  -0.002009,
+                             "reference":  0.0,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  2.808,
+                             "window_end":  7.956
+                         },
+                         {
+                             "t":  8.532,
+                             "channel":  "gyro",
+                             "measured":  0.002858,
+                             "reference":  -0.012155,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  6.5,
+                             "window_end":  8.48
+                         },
+                         {
+                             "t":  8.532,
+                             "channel":  "wheel",
+                             "measured":  -0.088162,
+                             "reference":  0.0,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  3.328,
+                             "window_end":  8.476
+                         },
+                         {
+                             "t":  9.028,
+                             "channel":  "gyro",
+                             "measured":  -0.006216,
+                             "reference":  0.001388,
+                             "fault_probability":  0.0005,
+                             "threshold":  0.5,
+                             "window_start":  7.0,
+                             "window_end":  8.98
+                         },
+                         {
+                             "t":  9.028,
+                             "channel":  "wheel",
+                             "measured":  -0.061785,
+                             "reference":  0.0,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  3.848,
+                             "window_end":  8.996
+                         },
+                         {
+                             "t":  9.524,
+                             "channel":  "gyro",
+                             "measured":  0.006175,
+                             "reference":  0.019498,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  7.5,
+                             "window_end":  9.48
+                         },
+                         {
+                             "t":  9.524,
+                             "channel":  "wheel",
+                             "measured":  0.082337,
+                             "reference":  0.0,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  4.316,
+                             "window_end":  9.464
+                         },
+                         {
+                             "t":  10.044,
+                             "channel":  "gyro",
+                             "measured":  0.003705,
+                             "reference":  0.013166,
+                             "fault_probability":  0.0001,
+                             "threshold":  0.5,
+                             "window_start":  8.0,
+                             "window_end":  9.98
+                         },
+                         {
+                             "t":  10.044,
+                             "channel":  "wheel",
+                             "measured":  -0.003133,
+                             "reference":  0.0,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  4.836,
+                             "window_end":  9.984
+                         },
+                         {
+                             "t":  10.532,
+                             "channel":  "gyro",
+                             "measured":  -0.002455,
+                             "reference":  0.007377,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  8.5,
+                             "window_end":  10.48
+                         },
+                         {
+                             "t":  10.532,
+                             "channel":  "wheel",
+                             "measured":  0.069681,
+                             "reference":  0.0,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  5.304,
+                             "window_end":  10.452
+                         },
+                         {
+                             "t":  11.036,
+                             "channel":  "gyro",
+                             "measured":  0.000877,
+                             "reference":  0.00087,
+                             "fault_probability":  0.1175,
+                             "threshold":  0.5,
+                             "window_start":  9.0,
+                             "window_end":  10.98
+                         },
+                         {
+                             "t":  11.036,
+                             "channel":  "wheel",
+                             "measured":  -0.049434,
+                             "reference":  0.0,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  5.824,
+                             "window_end":  10.972
+                         },
+                         {
+                             "t":  11.536,
+                             "channel":  "gyro",
+                             "measured":  -0.010049,
+                             "reference":  0.002047,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  9.5,
+                             "window_end":  11.48
+                         },
+                         {
+                             "t":  11.536,
+                             "channel":  "wheel",
+                             "measured":  0.081309,
+                             "reference":  0.0,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  6.344,
+                             "window_end":  11.492
+                         },
+                         {
+                             "t":  12.028,
+                             "channel":  "gyro",
+                             "measured":  -0.004702,
+                             "reference":  -0.00666,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  10.0,
+                             "window_end":  11.98
+                         },
+                         {
+                             "t":  12.028,
+                             "channel":  "wheel",
+                             "measured":  0.020444,
+                             "reference":  0.0,
+                             "fault_probability":  0.0001,
+                             "threshold":  0.5,
+                             "window_start":  6.812,
+                             "window_end":  11.96
+                         },
+                         {
+                             "t":  12.54,
+                             "channel":  "gyro",
+                             "measured":  -0.003339,
+                             "reference":  3.2E-05,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  10.5,
+                             "window_end":  12.48
+                         },
+                         {
+                             "t":  12.54,
+                             "channel":  "wheel",
+                             "measured":  -0.095286,
+                             "reference":  0.0,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  7.332,
+                             "window_end":  12.48
+                         },
+                         {
+                             "t":  13.04,
+                             "channel":  "gyro",
+                             "measured":  -0.00384,
+                             "reference":  -0.000566,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  11.0,
+                             "window_end":  12.98
+                         },
+                         {
+                             "t":  13.04,
+                             "channel":  "wheel",
+                             "measured":  -0.025822,
+                             "reference":  0.0,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  7.8,
+                             "window_end":  12.948
+                         },
+                         {
+                             "t":  13.556,
+                             "channel":  "gyro",
+                             "measured":  0.017492,
+                             "reference":  -0.007476,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  11.5,
+                             "window_end":  13.48
+                         },
+                         {
+                             "t":  13.556,
+                             "channel":  "wheel",
+                             "measured":  -0.030495,
+                             "reference":  0.0,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  8.32,
+                             "window_end":  13.468
+                         },
+                         {
+                             "t":  14.032,
+                             "channel":  "gyro",
+                             "measured":  -0.006299,
+                             "reference":  -0.011102,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  12.0,
+                             "window_end":  13.98
+                         },
+                         {
+                             "t":  14.032,
+                             "channel":  "wheel",
+                             "measured":  0.047157,
+                             "reference":  0.0,
+                             "fault_probability":  0.0004,
+                             "threshold":  0.5,
+                             "window_start":  8.84,
+                             "window_end":  13.988
+                         },
+                         {
+                             "t":  14.584,
+                             "channel":  "gyro",
+                             "measured":  0.02014,
+                             "reference":  0.001437,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  12.52,
+                             "window_end":  14.5
+                         },
+                         {
+                             "t":  14.584,
+                             "channel":  "wheel",
+                             "measured":  -0.041839,
+                             "reference":  0.0,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  9.308,
+                             "window_end":  14.456
+                         },
+                         {
+                             "t":  15.06,
+                             "channel":  "gyro",
+                             "measured":  -0.003414,
+                             "reference":  -0.054972,
+                             "fault_probability":  0.001,
+                             "threshold":  0.5,
+                             "window_start":  13.0,
+                             "window_end":  14.98
+                         },
+                         {
+                             "t":  15.06,
+                             "channel":  "wheel",
+                             "measured":  -0.06415,
+                             "reference":  0.0,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  9.828,
+                             "window_end":  14.976
+                         },
+                         {
+                             "t":  15.536,
+                             "channel":  "gyro",
+                             "measured":  0.009267,
+                             "reference":  -0.002498,
+                             "fault_probability":  0.0001,
+                             "threshold":  0.5,
+                             "window_start":  13.5,
+                             "window_end":  15.48
+                         },
+                         {
+                             "t":  15.536,
+                             "channel":  "wheel",
+                             "measured":  0.035961,
+                             "reference":  0.0,
+                             "fault_probability":  0.0172,
+                             "threshold":  0.5,
+                             "window_start":  10.348,
+                             "window_end":  15.496
+                         },
+                         {
+                             "t":  16.028,
+                             "channel":  "gyro",
+                             "measured":  -0.016515,
+                             "reference":  0.007739,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  14.0,
+                             "window_end":  15.98
+                         },
+                         {
+                             "t":  16.028,
+                             "channel":  "wheel",
+                             "measured":  0.027835,
+                             "reference":  0.0,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  10.816,
+                             "window_end":  15.964
+                         },
+                         {
+                             "t":  16.528,
+                             "channel":  "gyro",
+                             "measured":  -0.007174,
+                             "reference":  0.011754,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  14.5,
+                             "window_end":  16.48
+                         },
+                         {
+                             "t":  16.528,
+                             "channel":  "wheel",
+                             "measured":  -0.068844,
+                             "reference":  0.0,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  11.336,
+                             "window_end":  16.484
+                         },
+                         {
+                             "t":  17.052,
+                             "channel":  "gyro",
+                             "measured":  -0.007124,
+                             "reference":  -0.003629,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  15.0,
+                             "window_end":  16.98
+                         },
+                         {
+                             "t":  17.052,
+                             "channel":  "wheel",
+                             "measured":  0.090184,
+                             "reference":  0.0,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  11.804,
+                             "window_end":  16.952
+                         },
+                         {
+                             "t":  17.536,
+                             "channel":  "gyro",
+                             "measured":  0.012163,
+                             "reference":  -0.003832,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  15.5,
+                             "window_end":  17.48
+                         },
+                         {
+                             "t":  17.536,
+                             "channel":  "wheel",
+                             "measured":  0.018508,
+                             "reference":  0.0,
+                             "fault_probability":  0.0043,
+                             "threshold":  0.5,
+                             "window_start":  12.324,
+                             "window_end":  17.472
+                         },
+                         {
+                             "t":  18.036,
+                             "channel":  "gyro",
+                             "measured":  0.037948,
+                             "reference":  -0.014121,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  16.0,
+                             "window_end":  17.98
+                         },
+                         {
+                             "t":  18.036,
+                             "channel":  "wheel",
+                             "measured":  0.04612,
+                             "reference":  0.0,
+                             "fault_probability":  0.004,
+                             "threshold":  0.5,
+                             "window_start":  12.844,
+                             "window_end":  17.992
+                         },
+                         {
+                             "t":  18.552,
+                             "channel":  "gyro",
+                             "measured":  -0.006329,
+                             "reference":  0.022849,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  16.5,
+                             "window_end":  18.48
+                         },
+                         {
+                             "t":  18.552,
+                             "channel":  "wheel",
+                             "measured":  0.00675,
+                             "reference":  0.0,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  13.312,
+                             "window_end":  18.46
+                         },
+                         {
+                             "t":  19.036,
+                             "channel":  "gyro",
+                             "measured":  -0.014282,
+                             "reference":  0.000581,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  17.0,
+                             "window_end":  18.98
+                         },
+                         {
+                             "t":  19.036,
+                             "channel":  "wheel",
+                             "measured":  0.025653,
+                             "reference":  0.0,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  13.832,
+                             "window_end":  18.98
+                         },
+                         {
+                             "t":  19.536,
+                             "channel":  "gyro",
+                             "measured":  -0.029975,
+                             "reference":  0.011779,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  17.5,
+                             "window_end":  19.48
+                         },
+                         {
+                             "t":  19.536,
+                             "channel":  "wheel",
+                             "measured":  -0.051243,
+                             "reference":  0.0,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  14.3,
+                             "window_end":  19.448
+                         },
+                         {
+                             "t":  20.04,
+                             "channel":  "gyro",
+                             "measured":  0.001325,
+                             "reference":  -0.034909,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  18.0,
+                             "window_end":  19.98
+                         },
+                         {
+                             "t":  20.04,
+                             "channel":  "wheel",
+                             "measured":  0.001992,
+                             "reference":  0.0,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  14.82,
+                             "window_end":  19.968
+                         },
+                         {
+                             "t":  20.568,
+                             "channel":  "gyro",
+                             "measured":  -0.010523,
+                             "reference":  -0.023285,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  18.5,
+                             "window_end":  20.48
+                         },
+                         {
+                             "t":  20.568,
+                             "channel":  "wheel",
+                             "measured":  0.265603,
+                             "reference":  0.334233,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  15.34,
+                             "window_end":  20.488
+                         },
+                         {
+                             "t":  21.068,
+                             "channel":  "gyro",
+                             "measured":  -0.002492,
+                             "reference":  -0.017392,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  19.0,
+                             "window_end":  20.98
+                         },
+                         {
+                             "t":  21.068,
+                             "channel":  "wheel",
+                             "measured":  0.37788,
+                             "reference":  0.49805,
+                             "fault_probability":  0.0001,
+                             "threshold":  0.5,
+                             "window_start":  15.808,
+                             "window_end":  20.956
+                         },
+                         {
+                             "t":  21.588,
+                             "channel":  "gyro",
+                             "measured":  -0.000674,
+                             "reference":  0.030696,
+                             "fault_probability":  0.0006,
+                             "threshold":  0.5,
+                             "window_start":  19.5,
+                             "window_end":  21.48
+                         },
+                         {
+                             "t":  21.588,
+                             "channel":  "wheel",
+                             "measured":  0.518116,
+                             "reference":  0.499437,
+                             "fault_probability":  0.0004,
+                             "threshold":  0.5,
+                             "window_start":  16.328,
+                             "window_end":  21.476
+                         },
+                         {
+                             "t":  22.052,
+                             "channel":  "gyro",
+                             "measured":  -0.016518,
+                             "reference":  -0.005895,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  20.0,
+                             "window_end":  21.98
+                         },
+                         {
+                             "t":  22.052,
+                             "channel":  "wheel",
+                             "measured":  0.590079,
+                             "reference":  0.493899,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  16.848,
+                             "window_end":  21.996
+                         },
+                         {
+                             "t":  22.564,
+                             "channel":  "gyro",
+                             "measured":  0.012709,
+                             "reference":  0.036449,
+                             "fault_probability":  0.0001,
+                             "threshold":  0.5,
+                             "window_start":  20.5,
+                             "window_end":  22.48
+                         },
+                         {
+                             "t":  22.564,
+                             "channel":  "wheel",
+                             "measured":  0.562356,
+                             "reference":  0.494318,
+                             "fault_probability":  0.0006,
+                             "threshold":  0.5,
+                             "window_start":  17.316,
+                             "window_end":  22.464
+                         },
+                         {
+                             "t":  23.068,
+                             "channel":  "gyro",
+                             "measured":  -0.026189,
+                             "reference":  -0.022824,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  21.0,
+                             "window_end":  22.98
+                         },
+                         {
+                             "t":  23.068,
+                             "channel":  "wheel",
+                             "measured":  0.456743,
+                             "reference":  0.481765,
+                             "fault_probability":  0.0009,
+                             "threshold":  0.5,
+                             "window_start":  17.836,
+                             "window_end":  22.984
+                         },
+                         {
+                             "t":  23.536,
+                             "channel":  "gyro",
+                             "measured":  0.033269,
+                             "reference":  -0.052662,
+                             "fault_probability":  0.0017,
+                             "threshold":  0.5,
+                             "window_start":  21.5,
+                             "window_end":  23.48
+                         },
+                         {
+                             "t":  23.536,
+                             "channel":  "wheel",
+                             "measured":  0.462746,
+                             "reference":  0.479672,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  18.304,
+                             "window_end":  23.452
+                         },
+                         {
+                             "t":  24.048,
+                             "channel":  "gyro",
+                             "measured":  0.006304,
+                             "reference":  -0.001417,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  22.0,
+                             "window_end":  23.98
+                         },
+                         {
+                             "t":  24.048,
+                             "channel":  "wheel",
+                             "measured":  0.787799,
+                             "reference":  0.491973,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  18.824,
+                             "window_end":  23.972
+                         },
+                         {
+                             "t":  24.56,
+                             "channel":  "gyro",
+                             "measured":  0.000474,
+                             "reference":  0.01704,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  22.5,
+                             "window_end":  24.48
+                         },
+                         {
+                             "t":  24.56,
+                             "channel":  "wheel",
+                             "measured":  0.857488,
+                             "reference":  0.480335,
+                             "fault_probability":  0.5993,
+                             "threshold":  0.5,
+                             "window_start":  19.344,
+                             "window_end":  24.492
+                         },
+                         {
+                             "t":  25.044,
+                             "channel":  "gyro",
+                             "measured":  0.000932,
+                             "reference":  -0.002251,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  23.0,
+                             "window_end":  24.98
+                         },
+                         {
+                             "t":  25.044,
+                             "channel":  "wheel",
+                             "measured":  0.726645,
+                             "reference":  0.495877,
+                             "fault_probability":  0.0072,
+                             "threshold":  0.5,
+                             "window_start":  19.812,
+                             "window_end":  24.96
+                         },
+                         {
+                             "t":  25.544,
+                             "channel":  "gyro",
+                             "measured":  0.00801,
+                             "reference":  0.025039,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  23.5,
+                             "window_end":  25.48
+                         },
+                         {
+                             "t":  25.544,
+                             "channel":  "wheel",
+                             "measured":  0.756876,
+                             "reference":  0.498157,
+                             "fault_probability":  0.0065,
+                             "threshold":  0.5,
+                             "window_start":  20.332,
+                             "window_end":  25.48
+                         },
+                         {
+                             "t":  26.06,
+                             "channel":  "gyro",
+                             "measured":  0.004631,
+                             "reference":  -0.013257,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  24.0,
+                             "window_end":  25.98
+                         },
+                         {
+                             "t":  26.06,
+                             "channel":  "wheel",
+                             "measured":  0.852573,
+                             "reference":  0.497834,
+                             "fault_probability":  0.9961,
+                             "threshold":  0.5,
+                             "window_start":  20.8,
+                             "window_end":  25.948
+                         },
+                         {
+                             "t":  26.536,
+                             "channel":  "gyro",
+                             "measured":  0.01817,
+                             "reference":  0.013176,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  24.5,
+                             "window_end":  26.48
+                         },
+                         {
+                             "t":  26.536,
+                             "channel":  "wheel",
+                             "measured":  0.800434,
+                             "reference":  0.484752,
+                             "fault_probability":  0.9997,
+                             "threshold":  0.5,
+                             "window_start":  21.32,
+                             "window_end":  26.468
+                         },
+                         {
+                             "t":  27.064,
+                             "channel":  "gyro",
+                             "measured":  -0.027237,
+                             "reference":  -0.025764,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  25.0,
+                             "window_end":  26.98
+                         },
+                         {
+                             "t":  27.064,
+                             "channel":  "wheel",
+                             "measured":  0.842436,
+                             "reference":  0.499189,
+                             "fault_probability":  1.0,
+                             "threshold":  0.5,
+                             "window_start":  21.84,
+                             "window_end":  26.988
+                         },
+                         {
+                             "t":  27.564,
+                             "channel":  "gyro",
+                             "measured":  -0.010825,
+                             "reference":  -0.02189,
+                             "fault_probability":  0.0003,
+                             "threshold":  0.5,
+                             "window_start":  25.5,
+                             "window_end":  27.48
+                         },
+                         {
+                             "t":  27.564,
+                             "channel":  "wheel",
+                             "measured":  0.014432,
+                             "reference":  0.0,
+                             "fault_probability":  1.0,
+                             "threshold":  0.5,
+                             "window_start":  22.308,
+                             "window_end":  27.456
+                         },
+                         {
+                             "t":  28.04,
+                             "channel":  "gyro",
+                             "measured":  0.019972,
+                             "reference":  0.003575,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  26.0,
+                             "window_end":  27.98
+                         },
+                         {
+                             "t":  28.04,
+                             "channel":  "wheel",
+                             "measured":  0.015485,
+                             "reference":  0.0,
+                             "fault_probability":  1.0,
+                             "threshold":  0.5,
+                             "window_start":  22.828,
+                             "window_end":  27.976
+                         },
+                         {
+                             "t":  28.56,
+                             "channel":  "gyro",
+                             "measured":  -0.010327,
+                             "reference":  -0.023909,
+                             "fault_probability":  0.0001,
+                             "threshold":  0.5,
+                             "window_start":  26.52,
+                             "window_end":  28.5
+                         },
+                         {
+                             "t":  28.56,
+                             "channel":  "wheel",
+                             "measured":  0.046192,
+                             "reference":  0.0,
+                             "fault_probability":  1.0,
+                             "threshold":  0.5,
+                             "window_start":  23.348,
+                             "window_end":  28.496
+                         },
+                         {
+                             "t":  29.088,
+                             "channel":  "gyro",
+                             "measured":  -0.012285,
+                             "reference":  0.020707,
+                             "fault_probability":  0.0001,
+                             "threshold":  0.5,
+                             "window_start":  27.0,
+                             "window_end":  28.98
+                         },
+                         {
+                             "t":  29.088,
+                             "channel":  "wheel",
+                             "measured":  -0.027629,
+                             "reference":  0.0,
+                             "fault_probability":  0.9974,
+                             "threshold":  0.5,
+                             "window_start":  23.816,
+                             "window_end":  28.964
+                         },
+                         {
+                             "t":  29.556,
+                             "channel":  "gyro",
+                             "measured":  9.4E-05,
+                             "reference":  0.024643,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  27.5,
+                             "window_end":  29.48
+                         },
+                         {
+                             "t":  29.556,
+                             "channel":  "wheel",
+                             "measured":  0.054881,
+                             "reference":  0.0,
+                             "fault_probability":  0.9979,
+                             "threshold":  0.5,
+                             "window_start":  24.336,
+                             "window_end":  29.484
+                         },
+                         {
+                             "t":  30.048,
+                             "channel":  "gyro",
+                             "measured":  0.012859,
+                             "reference":  -0.046593,
+                             "fault_probability":  0.9022,
+                             "threshold":  0.5,
+                             "window_start":  28.0,
+                             "window_end":  29.98
+                         },
+                         {
+                             "t":  30.048,
+                             "channel":  "wheel",
+                             "measured":  0.051459,
+                             "reference":  0.0,
+                             "fault_probability":  0.4284,
+                             "threshold":  0.5,
+                             "window_start":  24.804,
+                             "window_end":  29.952
+                         },
+                         {
+                             "t":  30.532,
+                             "channel":  "gyro",
+                             "measured":  -0.001415,
+                             "reference":  -0.011082,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  28.5,
+                             "window_end":  30.48
+                         },
+                         {
+                             "t":  30.532,
+                             "channel":  "wheel",
+                             "measured":  0.055278,
+                             "reference":  0.0,
+                             "fault_probability":  0.0344,
+                             "threshold":  0.5,
+                             "window_start":  25.324,
+                             "window_end":  30.472
+                         },
+                         {
+                             "t":  31.032,
+                             "channel":  "gyro",
+                             "measured":  0.014131,
+                             "reference":  -0.010472,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  29.0,
+                             "window_end":  30.98
+                         },
+                         {
+                             "t":  31.032,
+                             "channel":  "wheel",
+                             "measured":  0.075724,
+                             "reference":  0.0,
+                             "fault_probability":  0.005,
+                             "threshold":  0.5,
+                             "window_start":  25.844,
+                             "window_end":  30.992
+                         },
+                         {
+                             "t":  31.556,
+                             "channel":  "gyro",
+                             "measured":  0.002631,
+                             "reference":  -0.004122,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  29.5,
+                             "window_end":  31.48
+                         },
+                         {
+                             "t":  31.556,
+                             "channel":  "wheel",
+                             "measured":  0.006807,
+                             "reference":  0.0,
+                             "fault_probability":  0.2679,
+                             "threshold":  0.5,
+                             "window_start":  26.312,
+                             "window_end":  31.46
+                         },
+                         {
+                             "t":  32.044,
+                             "channel":  "gyro",
+                             "measured":  0.009799,
+                             "reference":  0.026334,
+                             "fault_probability":  0.0001,
+                             "threshold":  0.5,
+                             "window_start":  30.0,
+                             "window_end":  31.98
+                         },
+                         {
+                             "t":  32.044,
+                             "channel":  "wheel",
+                             "measured":  -0.066842,
+                             "reference":  0.0,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  26.832,
+                             "window_end":  31.98
+                         },
+                         {
+                             "t":  32.536,
+                             "channel":  "gyro",
+                             "measured":  -0.016989,
+                             "reference":  -0.010265,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  30.5,
+                             "window_end":  32.48
+                         },
+                         {
+                             "t":  32.536,
+                             "channel":  "wheel",
+                             "measured":  0.028372,
+                             "reference":  0.0,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  27.3,
+                             "window_end":  32.448
+                         },
+                         {
+                             "t":  33.032,
+                             "channel":  "gyro",
+                             "measured":  -0.01075,
+                             "reference":  -0.023386,
+                             "fault_probability":  0.0099,
+                             "threshold":  0.5,
+                             "window_start":  31.0,
+                             "window_end":  32.98
+                         },
+                         {
+                             "t":  33.032,
+                             "channel":  "wheel",
+                             "measured":  -0.08958,
+                             "reference":  0.0,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  27.82,
+                             "window_end":  32.968
+                         },
+                         {
+                             "t":  33.556,
+                             "channel":  "gyro",
+                             "measured":  0.000794,
+                             "reference":  -0.01551,
+                             "fault_probability":  0.0116,
+                             "threshold":  0.5,
+                             "window_start":  31.5,
+                             "window_end":  33.48
+                         },
+                         {
+                             "t":  33.556,
+                             "channel":  "wheel",
+                             "measured":  -0.003516,
+                             "reference":  0.0,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  28.34,
+                             "window_end":  33.488
+                         },
+                         {
+                             "t":  34.036,
+                             "channel":  "gyro",
+                             "measured":  0.013864,
+                             "reference":  0.01434,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  32.0,
+                             "window_end":  33.98
+                         },
+                         {
+                             "t":  34.036,
+                             "channel":  "wheel",
+                             "measured":  -0.02229,
+                             "reference":  0.0,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  28.808,
+                             "window_end":  33.956
+                         },
+                         {
+                             "t":  34.556,
+                             "channel":  "gyro",
+                             "measured":  0.01426,
+                             "reference":  -0.000875,
+                             "fault_probability":  0.0183,
+                             "threshold":  0.5,
+                             "window_start":  32.5,
+                             "window_end":  34.48
+                         },
+                         {
+                             "t":  34.556,
+                             "channel":  "wheel",
+                             "measured":  -0.03758,
+                             "reference":  0.0,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  29.328,
+                             "window_end":  34.476
+                         },
+                         {
+                             "t":  35.044,
+                             "channel":  "gyro",
+                             "measured":  -0.010614,
+                             "reference":  -0.00157,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  33.0,
+                             "window_end":  34.98
+                         },
+                         {
+                             "t":  35.044,
+                             "channel":  "wheel",
+                             "measured":  0.444385,
+                             "reference":  0.451583,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  29.848,
+                             "window_end":  34.996
+                         },
+                         {
+                             "t":  35.564,
+                             "channel":  "gyro",
+                             "measured":  -0.010506,
+                             "reference":  -0.012152,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  33.5,
+                             "window_end":  35.48
+                         },
+                         {
+                             "t":  35.564,
+                             "channel":  "wheel",
+                             "measured":  0.559385,
+                             "reference":  0.498307,
+                             "fault_probability":  0.0002,
+                             "threshold":  0.5,
+                             "window_start":  30.316,
+                             "window_end":  35.464
+                         },
+                         {
+                             "t":  36.032,
+                             "channel":  "gyro",
+                             "measured":  -0.044872,
+                             "reference":  -0.039724,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  34.0,
+                             "window_end":  35.98
+                         },
+                         {
+                             "t":  36.032,
+                             "channel":  "wheel",
+                             "measured":  0.462049,
+                             "reference":  0.473121,
+                             "fault_probability":  0.0021,
+                             "threshold":  0.5,
+                             "window_start":  30.836,
+                             "window_end":  35.984
+                         },
+                         {
+                             "t":  36.568,
+                             "channel":  "gyro",
+                             "measured":  -0.000204,
+                             "reference":  -0.008764,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  34.5,
+                             "window_end":  36.48
+                         },
+                         {
+                             "t":  36.568,
+                             "channel":  "wheel",
+                             "measured":  0.517292,
+                             "reference":  0.493286,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  31.304,
+                             "window_end":  36.452
+                         },
+                         {
+                             "t":  37.072,
+                             "channel":  "gyro",
+                             "measured":  -0.007405,
+                             "reference":  -0.019137,
+                             "fault_probability":  0.0024,
+                             "threshold":  0.5,
+                             "window_start":  35.0,
+                             "window_end":  36.98
+                         },
+                         {
+                             "t":  37.072,
+                             "channel":  "wheel",
+                             "measured":  0.52614,
+                             "reference":  0.492599,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  31.824,
+                             "window_end":  36.972
+                         },
+                         {
+                             "t":  37.556,
+                             "channel":  "gyro",
+                             "measured":  0.006462,
+                             "reference":  0.020746,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  35.52,
+                             "window_end":  37.5
+                         },
+                         {
+                             "t":  37.556,
+                             "channel":  "wheel",
+                             "measured":  0.59246,
+                             "reference":  0.49854,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  32.344,
+                             "window_end":  37.492
+                         },
+                         {
+                             "t":  38.052,
+                             "channel":  "gyro",
+                             "measured":  0.074408,
+                             "reference":  -0.010478,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  36.0,
+                             "window_end":  37.98
+                         },
+                         {
+                             "t":  38.052,
+                             "channel":  "wheel",
+                             "measured":  0.464182,
+                             "reference":  0.491712,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  32.812,
+                             "window_end":  37.96
+                         },
+                         {
+                             "t":  38.58,
+                             "channel":  "gyro",
+                             "measured":  -0.038988,
+                             "reference":  -0.051094,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  36.5,
+                             "window_end":  38.48
+                         },
+                         {
+                             "t":  38.58,
+                             "channel":  "wheel",
+                             "measured":  0.432593,
+                             "reference":  0.478672,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  33.332,
+                             "window_end":  38.48
+                         },
+                         {
+                             "t":  39.056,
+                             "channel":  "gyro",
+                             "measured":  0.010843,
+                             "reference":  0.029944,
+                             "fault_probability":  0.0002,
+                             "threshold":  0.5,
+                             "window_start":  37.0,
+                             "window_end":  38.98
+                         },
+                         {
+                             "t":  39.056,
+                             "channel":  "wheel",
+                             "measured":  0.445951,
+                             "reference":  0.491651,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  33.8,
+                             "window_end":  38.948
+                         },
+                         {
+                             "t":  39.544,
+                             "channel":  "gyro",
+                             "measured":  0.000299,
+                             "reference":  0.019843,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  37.5,
+                             "window_end":  39.48
+                         },
+                         {
+                             "t":  39.544,
+                             "channel":  "wheel",
+                             "measured":  0.460364,
+                             "reference":  0.497564,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  34.32,
+                             "window_end":  39.468
+                         },
+                         {
+                             "t":  40.06,
+                             "channel":  "gyro",
+                             "measured":  0.015173,
+                             "reference":  0.026418,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  38.0,
+                             "window_end":  39.98
+                         },
+                         {
+                             "t":  40.06,
+                             "channel":  "wheel",
+                             "measured":  0.606524,
+                             "reference":  0.491982,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  34.84,
+                             "window_end":  39.988
+                         },
+                         {
+                             "t":  40.544,
+                             "channel":  "gyro",
+                             "measured":  -0.001003,
+                             "reference":  0.017433,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  38.5,
+                             "window_end":  40.48
+                         },
+                         {
+                             "t":  40.544,
+                             "channel":  "wheel",
+                             "measured":  0.487773,
+                             "reference":  0.491989,
+                             "fault_probability":  0.0001,
+                             "threshold":  0.5,
+                             "window_start":  35.308,
+                             "window_end":  40.456
+                         },
+                         {
+                             "t":  41.044,
+                             "channel":  "gyro",
+                             "measured":  -0.054633,
+                             "reference":  -0.08057,
+                             "fault_probability":  0.9942,
+                             "threshold":  0.5,
+                             "window_start":  39.0,
+                             "window_end":  40.98
+                         },
+                         {
+                             "t":  41.044,
+                             "channel":  "wheel",
+                             "measured":  0.483168,
+                             "reference":  0.478837,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  35.828,
+                             "window_end":  40.976
+                         },
+                         {
+                             "t":  41.564,
+                             "channel":  "gyro",
+                             "measured":  0.019556,
+                             "reference":  -0.062733,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  39.5,
+                             "window_end":  41.48
+                         },
+                         {
+                             "t":  41.564,
+                             "channel":  "wheel",
+                             "measured":  0.46975,
+                             "reference":  0.4895,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  36.296,
+                             "window_end":  41.444
+                         },
+                         {
+                             "t":  42.056,
+                             "channel":  "gyro",
+                             "measured":  0.011215,
+                             "reference":  0.007353,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  40.0,
+                             "window_end":  41.98
+                         },
+                         {
+                             "t":  42.056,
+                             "channel":  "wheel",
+                             "measured":  0.499514,
+                             "reference":  0.487417,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  36.816,
+                             "window_end":  41.964
+                         },
+                         {
+                             "t":  42.548,
+                             "channel":  "gyro",
+                             "measured":  -0.047076,
+                             "reference":  -0.037657,
+                             "fault_probability":  0.0004,
+                             "threshold":  0.5,
+                             "window_start":  40.5,
+                             "window_end":  42.48
+                         },
+                         {
+                             "t":  42.548,
+                             "channel":  "wheel",
+                             "measured":  0.499296,
+                             "reference":  0.471234,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  37.336,
+                             "window_end":  42.484
+                         },
+                         {
+                             "t":  43.052,
+                             "channel":  "gyro",
+                             "measured":  -0.02541,
+                             "reference":  -0.029978,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  41.0,
+                             "window_end":  42.98
+                         },
+                         {
+                             "t":  43.052,
+                             "channel":  "wheel",
+                             "measured":  0.43368,
+                             "reference":  0.436761,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  37.804,
+                             "window_end":  42.952
+                         },
+                         {
+                             "t":  43.576,
+                             "channel":  "gyro",
+                             "measured":  -0.006198,
+                             "reference":  -0.024425,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  41.5,
+                             "window_end":  43.48
+                         },
+                         {
+                             "t":  43.576,
+                             "channel":  "wheel",
+                             "measured":  0.294429,
+                             "reference":  0.333764,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  38.324,
+                             "window_end":  43.472
+                         },
+                         {
+                             "t":  44.048,
+                             "channel":  "gyro",
+                             "measured":  0.024677,
+                             "reference":  0.037573,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  42.0,
+                             "window_end":  43.98
+                         },
+                         {
+                             "t":  44.048,
+                             "channel":  "wheel",
+                             "measured":  0.236218,
+                             "reference":  0.241058,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  38.844,
+                             "window_end":  43.992
+                         },
+                         {
+                             "t":  44.548,
+                             "channel":  "gyro",
+                             "measured":  0.004537,
+                             "reference":  0.037514,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  42.5,
+                             "window_end":  44.48
+                         },
+                         {
+                             "t":  44.548,
+                             "channel":  "wheel",
+                             "measured":  0.252463,
+                             "reference":  0.196751,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  39.312,
+                             "window_end":  44.46
+                         },
+                         {
+                             "t":  45.048,
+                             "channel":  "gyro",
+                             "measured":  -0.000858,
+                             "reference":  0.012199,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  43.0,
+                             "window_end":  44.98
+                         },
+                         {
+                             "t":  45.048,
+                             "channel":  "wheel",
+                             "measured":  -0.058335,
+                             "reference":  0.0,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  39.832,
+                             "window_end":  44.98
+                         },
+                         {
+                             "t":  45.532,
+                             "channel":  "gyro",
+                             "measured":  -0.009398,
+                             "reference":  0.009441,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  43.5,
+                             "window_end":  45.48
+                         },
+                         {
+                             "t":  45.532,
+                             "channel":  "wheel",
+                             "measured":  -0.11142,
+                             "reference":  0.0,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  40.3,
+                             "window_end":  45.448
+                         },
+                         {
+                             "t":  46.04,
+                             "channel":  "gyro",
+                             "measured":  -0.004957,
+                             "reference":  -0.040263,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  44.0,
+                             "window_end":  45.98
+                         },
+                         {
+                             "t":  46.04,
+                             "channel":  "wheel",
+                             "measured":  0.126824,
+                             "reference":  0.0,
+                             "fault_probability":  0.0003,
+                             "threshold":  0.5,
+                             "window_start":  40.82,
+                             "window_end":  45.968
+                         },
+                         {
+                             "t":  46.548,
+                             "channel":  "gyro",
+                             "measured":  0.013604,
+                             "reference":  -0.025761,
+                             "fault_probability":  0.0055,
+                             "threshold":  0.5,
+                             "window_start":  44.5,
+                             "window_end":  46.48
+                         },
+                         {
+                             "t":  46.548,
+                             "channel":  "wheel",
+                             "measured":  0.075057,
+                             "reference":  0.0,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  41.34,
+                             "window_end":  46.488
+                         },
+                         {
+                             "t":  47.052,
+                             "channel":  "gyro",
+                             "measured":  -0.004833,
+                             "reference":  -0.009074,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  45.02,
+                             "window_end":  47.0
+                         },
+                         {
+                             "t":  47.052,
+                             "channel":  "wheel",
+                             "measured":  -0.077665,
+                             "reference":  0.0,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  41.808,
+                             "window_end":  46.956
+                         },
+                         {
+                             "t":  47.576,
+                             "channel":  "gyro",
+                             "measured":  -0.009737,
+                             "reference":  0.00638,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  45.5,
+                             "window_end":  47.48
+                         },
+                         {
+                             "t":  47.576,
+                             "channel":  "wheel",
+                             "measured":  -0.032115,
+                             "reference":  0.0,
+                             "fault_probability":  0.0,
+                             "threshold":  0.5,
+                             "window_start":  42.328,
+                             "window_end":  47.476
+                         }
+                     ],
+    "timeline":  [
+                     {
+                         "id":  0,
+                         "t":  0.0,
+                         "kind":  "goal",
+                         "label":  "Goal set",
+                         "goal":  [
+                                      4.0,
+                                      0.0
+                                  ]
+                     },
+                     {
+                         "id":  1,
+                         "t":  0.012,
+                         "kind":  "navigation",
+                         "label":  "HOLD_FAULT",
+                         "mode":  "HOLD_FAULT",
+                         "reason":  "Fault hold: waiting for fresh clear detector decisions"
+                     },
+                     {
+                         "id":  2,
+                         "t":  0.5,
+                         "kind":  "flags",
+                         "label":  "Sensor check changed",
+                         "flags":  {
+                                       "valid":  false,
+                                       "gps":  false,
+                                       "wheels":  false,
+                                       "gyro":  false,
+                                       "uav":  false
+                                   }
+                     },
+                     {
+                         "id":  3,
+                         "t":  0.5,
+                         "kind":  "ml_policy",
+                         "label":  "Detector persistence",
+                         "policy":  {
+                                        "valid":  false,
+                                        "required":  "3",
+                                        "wheel_count":  "0",
+                                        "gyro_count":  "0",
+                                        "wheel_flag":  "False",
+                                        "gyro_flag":  "False",
+                                        "decision_stamp":  "0.5"
+                                    }
+                     },
+                     {
+                         "id":  4,
+                         "t":  5.528,
+                         "kind":  "flags",
+                         "label":  "Sensor check changed",
+                         "flags":  {
+                                       "valid":  true,
+                                       "gps":  false,
+                                       "wheels":  false,
+                                       "gyro":  false,
+                                       "uav":  true
+                                   }
+                     },
+                     {
+                         "id":  5,
+                         "t":  5.528,
+                         "kind":  "ml_policy",
+                         "label":  "Detector persistence",
+                         "policy":  {
+                                        "valid":  true,
+                                        "required":  "3",
+                                        "wheel_count":  "0",
+                                        "gyro_count":  "0",
+                                        "wheel_flag":  "False",
+                                        "gyro_flag":  "False",
+                                        "decision_stamp":  "5.46"
+                                    }
+                     },
+                     {
+                         "id":  6,
+                         "t":  10.5,
+                         "kind":  "navigation",
+                         "label":  "HOLD_GUARD",
+                         "mode":  "HOLD_GUARD",
+                         "reason":  "Waiting for a fresh map path"
+                     },
+                     {
+                         "id":  7,
+                         "t":  16.028,
+                         "kind":  "flags",
+                         "label":  "Sensor check changed",
+                         "flags":  {
+                                       "valid":  true,
+                                       "gps":  false,
+                                       "wheels":  false,
+                                       "gyro":  false,
+                                       "uav":  false
+                                   }
+                     },
+                     {
+                         "id":  8,
+                         "t":  20.456,
+                         "kind":  "navigation",
+                         "label":  "NAVIGATE",
+                         "mode":  "NAVIGATE",
+                         "reason":  "Following path using the fused pose"
+                     },
+                     {
+                         "id":  9,
+                         "t":  23.752,
+                         "kind":  "control",
+                         "label":  "Wheel speed error +60%",
+                         "control":  "wheel_speed_scale",
+                         "value":  1.6
+                     },
+                     {
+                         "id":  10,
+                         "t":  24.564,
+                         "kind":  "ml_policy",
+                         "label":  "Detector persistence",
+                         "policy":  {
+                                        "valid":  true,
+                                        "required":  "3",
+                                        "wheel_count":  "1",
+                                        "gyro_count":  "0",
+                                        "wheel_flag":  "False",
+                                        "gyro_flag":  "False",
+                                        "decision_stamp":  "24.48"
+                                    }
+                     },
+                     {
+                         "id":  11,
+                         "t":  25.044,
+                         "kind":  "ml_policy",
+                         "label":  "Detector persistence",
+                         "policy":  {
+                                        "valid":  true,
+                                        "required":  "3",
+                                        "wheel_count":  "0",
+                                        "gyro_count":  "0",
+                                        "wheel_flag":  "False",
+                                        "gyro_flag":  "False",
+                                        "decision_stamp":  "24.96"
+                                    }
+                     },
+                     {
+                         "id":  12,
+                         "t":  26.064,
+                         "kind":  "ml_policy",
+                         "label":  "Detector persistence",
+                         "policy":  {
+                                        "valid":  true,
+                                        "required":  "3",
+                                        "wheel_count":  "1",
+                                        "gyro_count":  "0",
+                                        "wheel_flag":  "False",
+                                        "gyro_flag":  "False",
+                                        "decision_stamp":  "25.948"
+                                    }
+                     },
+                     {
+                         "id":  13,
+                         "t":  26.54,
+                         "kind":  "ml_policy",
+                         "label":  "Detector persistence",
+                         "policy":  {
+                                        "valid":  true,
+                                        "required":  "3",
+                                        "wheel_count":  "2",
+                                        "gyro_count":  "0",
+                                        "wheel_flag":  "False",
+                                        "gyro_flag":  "False",
+                                        "decision_stamp":  "26.468"
+                                    }
+                     },
+                     {
+                         "id":  14,
+                         "t":  27.064,
+                         "kind":  "flags",
+                         "label":  "Sensor check changed",
+                         "flags":  {
+                                       "valid":  true,
+                                       "gps":  false,
+                                       "wheels":  true,
+                                       "gyro":  false,
+                                       "uav":  false
+                                   }
+                     },
+                     {
+                         "id":  15,
+                         "t":  27.064,
+                         "kind":  "ml_policy",
+                         "label":  "Detector persistence",
+                         "policy":  {
+                                        "valid":  true,
+                                        "required":  "3",
+                                        "wheel_count":  "3",
+                                        "gyro_count":  "0",
+                                        "wheel_flag":  "True",
+                                        "gyro_flag":  "False",
+                                        "decision_stamp":  "26.98"
+                                    }
+                     },
+                     {
+                         "id":  16,
+                         "t":  27.076,
+                         "kind":  "navigation",
+                         "label":  "HOLD_FAULT",
+                         "mode":  "HOLD_FAULT",
+                         "reason":  "Fault hold: waiting for fresh clear detector decisions"
+                     },
+                     {
+                         "id":  17,
+                         "t":  27.564,
+                         "kind":  "ml_policy",
+                         "label":  "Detector persistence",
+                         "policy":  {
+                                        "valid":  true,
+                                        "required":  "3",
+                                        "wheel_count":  "4",
+                                        "gyro_count":  "0",
+                                        "wheel_flag":  "True",
+                                        "gyro_flag":  "False",
+                                        "decision_stamp":  "27.456"
+                                    }
+                     },
+                     {
+                         "id":  18,
+                         "t":  28.044,
+                         "kind":  "ml_policy",
+                         "label":  "Detector persistence",
+                         "policy":  {
+                                        "valid":  true,
+                                        "required":  "3",
+                                        "wheel_count":  "5",
+                                        "gyro_count":  "0",
+                                        "wheel_flag":  "True",
+                                        "gyro_flag":  "False",
+                                        "decision_stamp":  "27.976"
+                                    }
+                     },
+                     {
+                         "id":  19,
+                         "t":  28.56,
+                         "kind":  "ml_policy",
+                         "label":  "Detector persistence",
+                         "policy":  {
+                                        "valid":  true,
+                                        "required":  "3",
+                                        "wheel_count":  "6",
+                                        "gyro_count":  "0",
+                                        "wheel_flag":  "True",
+                                        "gyro_flag":  "False",
+                                        "decision_stamp":  "28.496"
+                                    }
+                     },
+                     {
+                         "id":  20,
+                         "t":  29.088,
+                         "kind":  "ml_policy",
+                         "label":  "Detector persistence",
+                         "policy":  {
+                                        "valid":  true,
+                                        "required":  "3",
+                                        "wheel_count":  "7",
+                                        "gyro_count":  "0",
+                                        "wheel_flag":  "True",
+                                        "gyro_flag":  "False",
+                                        "decision_stamp":  "28.964"
+                                    }
+                     },
+                     {
+                         "id":  21,
+                         "t":  29.352,
+                         "kind":  "control",
+                         "label":  "Wheel speed error +0%",
+                         "control":  "wheel_speed_scale",
+                         "value":  1.0
+                     },
+                     {
+                         "id":  22,
+                         "t":  29.556,
+                         "kind":  "ml_policy",
+                         "label":  "Detector persistence",
+                         "policy":  {
+                                        "valid":  true,
+                                        "required":  "3",
+                                        "wheel_count":  "8",
+                                        "gyro_count":  "0",
+                                        "wheel_flag":  "True",
+                                        "gyro_flag":  "False",
+                                        "decision_stamp":  "29.48"
+                                    }
+                     },
+                     {
+                         "id":  23,
+                         "t":  30.048,
+                         "kind":  "flags",
+                         "label":  "Sensor check changed",
+                         "flags":  {
+                                       "valid":  true,
+                                       "gps":  false,
+                                       "wheels":  false,
+                                       "gyro":  false,
+                                       "uav":  false
+                                   }
+                     },
+                     {
+                         "id":  24,
+                         "t":  30.048,
+                         "kind":  "ml_policy",
+                         "label":  "Detector persistence",
+                         "policy":  {
+                                        "valid":  true,
+                                        "required":  "3",
+                                        "wheel_count":  "0",
+                                        "gyro_count":  "1",
+                                        "wheel_flag":  "False",
+                                        "gyro_flag":  "False",
+                                        "decision_stamp":  "29.952"
+                                    }
+                     },
+                     {
+                         "id":  25,
+                         "t":  30.536,
+                         "kind":  "ml_policy",
+                         "label":  "Detector persistence",
+                         "policy":  {
+                                        "valid":  true,
+                                        "required":  "3",
+                                        "wheel_count":  "0",
+                                        "gyro_count":  "0",
+                                        "wheel_flag":  "False",
+                                        "gyro_flag":  "False",
+                                        "decision_stamp":  "30.472"
+                                    }
+                     },
+                     {
+                         "id":  26,
+                         "t":  34.952,
+                         "kind":  "navigation",
+                         "label":  "NAVIGATE",
+                         "mode":  "NAVIGATE",
+                         "reason":  "Following path using the fused pose"
+                     },
+                     {
+                         "id":  27,
+                         "t":  41.048,
+                         "kind":  "ml_policy",
+                         "label":  "Detector persistence",
+                         "policy":  {
+                                        "valid":  true,
+                                        "required":  "3",
+                                        "wheel_count":  "0",
+                                        "gyro_count":  "1",
+                                        "wheel_flag":  "False",
+                                        "gyro_flag":  "False",
+                                        "decision_stamp":  "40.976"
+                                    }
+                     },
+                     {
+                         "id":  28,
+                         "t":  41.564,
+                         "kind":  "ml_policy",
+                         "label":  "Detector persistence",
+                         "policy":  {
+                                        "valid":  true,
+                                        "required":  "3",
+                                        "wheel_count":  "0",
+                                        "gyro_count":  "0",
+                                        "wheel_flag":  "False",
+                                        "gyro_flag":  "False",
+                                        "decision_stamp":  "41.444"
+                                    }
+                     },
+                     {
+                         "id":  29,
+                         "t":  44.804,
+                         "kind":  "navigation",
+                         "label":  "GOAL",
+                         "mode":  "GOAL",
+                         "reason":  "UGV reached global goal tolerance"
+                     },
+                     {
+                         "id":  30,
+                         "t":  45.004,
+                         "kind":  "control",
+                         "label":  "UAV measurements off",
+                         "control":  "uav_measurements",
+                         "value":  false
+                     },
+                     {
+                         "id":  31,
+                         "t":  47.052,
+                         "kind":  "flags",
+                         "label":  "Sensor check changed",
+                         "flags":  {
+                                       "valid":  true,
+                                       "gps":  false,
+                                       "wheels":  false,
+                                       "gyro":  false,
+                                       "uav":  true
+                                   }
+                     },
+                     {
+                         "id":  32,
+                         "t":  47.104,
+                         "kind":  "control",
+                         "label":  "UAV measurements on",
+                         "control":  "uav_measurements",
+                         "value":  true
+                     },
+                     {
+                         "id":  33,
+                         "t":  47.58,
+                         "kind":  "flags",
+                         "label":  "Sensor check changed",
+                         "flags":  {
+                                       "valid":  true,
+                                       "gps":  false,
+                                       "wheels":  false,
+                                       "gyro":  false,
+                                       "uav":  false
+                                   }
+                     }
+                 ],
+    "duration":  {
+                     "wall_s":  34.268,
+                     "simulation_s":  47.72
+                 },
+    "validation":  {
+                       "runtime":  "Ubuntu-22.04 WSL / ROS 2 Humble / Gazebo Harmonic / PX4 SITL / MicroXRCEAgent",
+                       "packages":  [
+                                        "fault_management",
+                                        "mission_manager",
+                                        "uav_sensing"
+                                    ],
+                       "registered_checks":  269,
+                       "errors":  0,
+                       "failures":  0,
+                       "cppcheck_skips":  3,
+                       "desktop_viewport":  [
+                                                1440,
+                                                960
+                                            ],
+                       "mobile_viewport":  [
+                                               390,
+                                               844
+                                           ],
+                       "browser_javascript_errors":  0,
+                       "horizontal_overflow":  false,
+                       "owned_simulation_processes_remaining":  0
+                   }
+}

@@ -34,8 +34,44 @@ Y_LIMIT = 3.0
 MIN_START_GOAL_CLEARANCE = 1.5  # edge-to-centre, metres
 MIN_PASSABLE_GAP = 1.6  # robot radius 0.5 + 0.05 clearance, inflated, plus cell size
 
+# The camera UAV spawns at the origin, 0.3 m up. An obstacle edge just under it tilts the
+# UAV and fails PX4's attitude check, so a layout may set "uav_spawn_clearance".
+UAV_SPAWN = (0.0, 0.0)
+# Layouts may set "goal" (moves the goal marker) and "limits" (xmin, xmax, ymin, ymax).
+# The default limits above hold for a UAV hovering at the origin. With the UAV following
+# the UGV and the mapper keeping one fixed map, longer courses are possible, so a layout
+# that sets its own goal also sets its own limits.
 # ("box", x, y, size_x, size_y) or ("cyl", x, y, radius)
 LAYOUTS = {
+    "complex": {
+        "desc": "13 m course to (9, 3): a U-shaped pocket straight ahead of the UGV (dead "
+                "end), a wall with a 2.0 m gap, a cylinder slalom and scattered blocks near "
+                "the goal. Exercises routing around dead ends.",
+        "stress": False,
+        "goal": (9.0, 3.0),
+        "limits": (-3.2, 9.4, -9.2, 9.2),
+        "uav_spawn_clearance": 0.8,
+        "shapes": [
+            # U-shaped pocket straight ahead of the UGV, opening toward the start (touching
+            # pieces merge). Its back wall stays 1.1 m from the UAV spawn at the origin.
+            ("box", -1.8, 1.5, 1.4, 0.4),
+            ("box", -1.8, -1.5, 1.4, 0.4),
+            ("box", -1.3, 0.0, 0.4, 3.4),
+            # Markers either side of the detour.
+            ("cyl", -2.6, 3.8, 0.35),
+            ("cyl", -2.8, -3.8, 0.35),
+            # Wall across the course with a 2.0 m opening at y in [-2, 0]; it runs to the
+            # edge of the mapped area so the opening is the only way through.
+            ("box", 3.0, -5.5, 0.4, 7.0),
+            ("box", 3.0, 4.5, 0.4, 9.0),
+            # Slalom and scattered blocks before the goal.
+            ("cyl", 5.3, -2.4, 0.35),
+            ("cyl", 5.2, 1.0, 0.35),
+            ("cyl", 7.1, -0.7, 0.35),
+            ("cyl", 7.0, 2.6, 0.35),
+            ("box", 8.8, -3.0, 1.0, 0.8),
+        ],
+    },
     "sparse": {
         "desc": "Three separated obstacles; one sits on the straight start-goal line.",
         "stress": False,
@@ -112,19 +148,31 @@ def gap_between(a, b):
 
 def check_layout(name, shapes):
     """Return (problems, min_gap, min_start_goal_clearance)."""
+    spec = LAYOUTS[name]
+    goal = spec.get("goal", GOAL)
+    x_min, x_max, y_min, y_max = spec.get("limits", (-X_LIMIT, X_LIMIT, -Y_LIMIT, Y_LIMIT))
     problems = []
     for i, s in enumerate(shapes, 1):
         x0, x1, y0, y1 = extents(s)
-        if x0 < -X_LIMIT or x1 > X_LIMIT or y0 < -Y_LIMIT or y1 > Y_LIMIT:
+        if x0 < x_min or x1 > x_max or y0 < y_min or y1 > y_max:
             problems.append(f"obstacle_{i} leaves the safe camera area")
     clearance = min(
-        dist_point_to_shape(px, py, s) for s in shapes for (px, py) in (START, GOAL)
+        dist_point_to_shape(px, py, s) for s in shapes for (px, py) in (START, goal)
     )
     if clearance < MIN_START_GOAL_CLEARANCE:
         problems.append(f"obstacle only {clearance:.2f} m from start or goal")
-    gaps = [gap_between(a, b) for i, a in enumerate(shapes) for b in shapes[i + 1:]]
+    keep_out = spec.get("uav_spawn_clearance")
+    if keep_out is not None:
+        for i, s in enumerate(shapes, 1):
+            distance = dist_point_to_shape(*UAV_SPAWN, s)
+            if distance < keep_out:
+                problems.append(f"obstacle_{i} edge is {distance:.2f} m from the UAV spawn")
+    # Touching or overlapping shapes form one structure (a wall, a pocket); only the
+    # gaps between separate structures must stay passable.
+    gaps = [g for i, a in enumerate(shapes) for b in shapes[i + 1:]
+            if (g := gap_between(a, b)) > 1e-9]
     min_gap = min(gaps) if gaps else float("inf")
-    if not LAYOUTS[name]["stress"] and min_gap < MIN_PASSABLE_GAP:
+    if not spec["stress"] and min_gap < MIN_PASSABLE_GAP:
         problems.append(f"smallest gap {min_gap:.2f} m is below {MIN_PASSABLE_GAP} m")
     return problems, min_gap, clearance
 
@@ -150,9 +198,17 @@ def model_xml(index, shape):
     )
 
 
-def build_world(base_text, name, shapes):
+def build_world(base_text, name, shapes, goal=None):
     if "generate_obstacle_worlds" in base_text:
         sys.exit("Base world already contains generated obstacles; pass the original file.")
+    if goal is not None and goal != GOAL:
+        old_pose = f"<pose>{GOAL[0]:g} {GOAL[1]:g} 0 0 0 0</pose>"
+        start = base_text.find('<model name="global_goal_marker">')
+        at = base_text.find(old_pose, start)
+        if start == -1 or at == -1:
+            sys.exit("Could not find the goal marker pose in the base world.")
+        base_text = (base_text[:at] + f"<pose>{goal[0]:g} {goal[1]:g} 0 0 0 0</pose>"
+                     + base_text[at + len(old_pose):])
     block = (
         f"    <!-- generate_obstacle_worlds.py: layout '{name}'. Obstacles are dark so the\n"
         f"         camera luminance mapper marks them occupied. -->\n"
@@ -179,12 +235,16 @@ def save_preview(path):
     alt, hfov = 4.5, 1.74
     half_long = alt * math.tan(hfov / 2)
     half_short = half_long * 0.75
-    fig, axes = plt.subplots(2, 2, figsize=(11, 8.5))
+    fig, axes = plt.subplots(3, 2, figsize=(11, 12.5))
+    for ax in axes.flat[len(LAYOUTS):]:
+        ax.axis("off")
     for ax, (name, spec) in zip(axes.flat, LAYOUTS.items()):
+        goal = spec.get("goal", GOAL)
+        x_min, x_max, y_min, y_max = spec.get("limits", (-X_LIMIT, X_LIMIT, -Y_LIMIT, Y_LIMIT))
         for hx, hy in ((half_long, half_short), (half_short, half_long)):
             ax.add_patch(Rectangle((-hx, -hy), 2 * hx, 2 * hy, fill=False, ls="--",
                                    ec="#888", lw=1))
-        ax.add_patch(Rectangle((-X_LIMIT, -Y_LIMIT), 2 * X_LIMIT, 2 * Y_LIMIT,
+        ax.add_patch(Rectangle((x_min, y_min), x_max - x_min, y_max - y_min,
                                fill=False, ec="#2a7", lw=1.2))
         for s in spec["shapes"]:
             if s[0] == "box":
@@ -193,10 +253,10 @@ def save_preview(path):
             else:
                 ax.add_patch(Circle((s[1], s[2]), s[3], fc="#222", ec="k"))
         ax.add_patch(Circle(START, 0.5, fc="#4a90d9", ec="k", alpha=0.8))
-        ax.add_patch(Circle(GOAL, 0.8, fc="#f28c28", ec="k", alpha=0.6))
-        ax.plot([START[0], GOAL[0]], [0, 0], ":", c="#555")
+        ax.add_patch(Circle(goal, 0.8, fc="#f28c28", ec="k", alpha=0.6))
+        ax.plot([START[0], goal[0]], [START[1], goal[1]], ":", c="#555")
         ax.set_aspect("equal")
-        ax.set_xlim(-6, 6)
+        ax.set_xlim(-6, 11)
         ax.set_ylim(-6, 6)
         probs, gap, clr = check_layout(name, spec["shapes"])
         ax.set_title(f"{name}  (min gap {gap:.1f} m)" if gap != float("inf") else name)
@@ -227,7 +287,7 @@ def main():
         shapes = LAYOUTS[name]["shapes"]
         problems, gap, clearance = check_layout(name, shapes)
         out = args.out_dir / f"simple_goal_demo_{name}.sdf"
-        out.write_text(build_world(base, name, shapes))
+        out.write_text(build_world(base, name, shapes, LAYOUTS[name].get("goal")))
         status = "ok" if not problems else "PROBLEM: " + "; ".join(problems)
         print(f"{name:9s} {len(shapes)} obstacles  min gap {gap:5.2f} m  "
               f"start/goal clearance {clearance:4.2f} m  -> {out.name}  [{status}]")

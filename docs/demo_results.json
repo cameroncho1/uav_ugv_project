@@ -1,0 +1,944 @@
+{
+    "recorded_utc":  "2026-11-24T19:59:17.373160+00:00",
+    "configuration":  {
+                          "seed":  513,
+                          "measurement_profile":  "nominal",
+                          "fault_hold":  false,
+                          "world":  "simple_goal_demo_complex",
+                          "return_goal":  [
+                                              -10.0,
+                                              -3.0
+                                          ]
+                      },
+    "success":  true,
+    "checks":  {
+                   "first_goal":  {
+                                      "t":  79.4,
+                                      "truth_distance_m":  0.3792769410955946,
+                                      "truth":  [
+                                                    8.940490826390356,
+                                                    2.6254206942406877,
+                                                    1.3667325593484283
+                                                ],
+                                      "hazards":  [
+                                                      {
+                                                          "id":  "scenario_slalom_box",
+                                                          "kind":  "box",
+                                                          "x":  7.1,
+                                                          "y":  1.0,
+                                                          "half_x":  0.3,
+                                                          "half_y":  0.3,
+                                                          "yaw":  0.0
+                                                      },
+                                                      {
+                                                          "id":  "scenario_live_block_1",
+                                                          "kind":  "box",
+                                                          "x":  0.64,
+                                                          "y":  2.66,
+                                                          "half_x":  0.3,
+                                                          "half_y":  0.3,
+                                                          "yaw":  0.0
+                                                      }
+                                                  ],
+                                      "navigation_elapsed_sim_s":  59.084
+                                  },
+                   "live_block_added":  true,
+                   "timed_hazard_present":  true,
+                   "controls_restored":  true,
+                   "live_blocks_removed":  true,
+                   "return_goal_observed":  true,
+                   "uncertainty_grows_without_corrections":  true,
+                   "uncertainty_recovers_with_corrections":  true
+               },
+    "actions":  [
+                    {
+                        "t":  30.51,
+                        "phase":  "course",
+                        "path":  "/block",
+                        "body":  {
+
+                                 },
+                        "response":  {
+                                         "ok":  true
+                                     }
+                    },
+                    {
+                        "t":  79.4,
+                        "phase":  "course",
+                        "path":  "/goal",
+                        "body":  {
+                                     "x":  -10.0,
+                                     "y":  -3.0
+                                 },
+                        "response":  {
+                                         "ok":  true
+                                     }
+                    },
+                    {
+                        "t":  79.4,
+                        "phase":  "noise",
+                        "path":  "/control",
+                        "body":  {
+                                     "name":  "noise_scale",
+                                     "value":  3.0
+                                 },
+                        "response":  {
+                                         "ok":  true
+                                     }
+                    },
+                    {
+                        "t":  91.55,
+                        "phase":  "nominal",
+                        "path":  "/control",
+                        "body":  {
+                                     "name":  "noise_scale",
+                                     "value":  1.0
+                                 },
+                        "response":  {
+                                         "ok":  true
+                                     }
+                    },
+                    {
+                        "t":  94.64,
+                        "phase":  "gps_off",
+                        "path":  "/control",
+                        "body":  {
+                                     "name":  "gps_enabled",
+                                     "value":  false
+                                 },
+                        "response":  {
+                                         "ok":  true
+                                     }
+                    },
+                    {
+                        "t":  102.88,
+                        "phase":  "corrections_off",
+                        "path":  "/control",
+                        "body":  {
+                                     "name":  "uav_assistance",
+                                     "value":  false
+                                 },
+                        "response":  {
+                                         "ok":  true
+                                     }
+                    },
+                    {
+                        "t":  111.06,
+                        "phase":  "corrections_on",
+                        "path":  "/control",
+                        "body":  {
+                                     "name":  "uav_assistance",
+                                     "value":  true
+                                 },
+                        "response":  {
+                                         "ok":  true
+                                     }
+                    },
+                    {
+                        "t":  119.24,
+                        "phase":  "sensors_restored",
+                        "path":  "/reset",
+                        "body":  {
+
+                                 },
+                        "response":  {
+                                         "ok":  true
+                                     }
+                    }
+                ],
+    "phases":  [
+                   {
+                       "name":  "course",
+                       "t":  20.26
+                   },
+                   {
+                       "name":  "noise",
+                       "t":  79.4
+                   },
+                   {
+                       "name":  "nominal",
+                       "t":  91.55
+                   },
+                   {
+                       "name":  "gps_off",
+                       "t":  94.64
+                   },
+                   {
+                       "name":  "corrections_off",
+                       "t":  102.88
+                   },
+                   {
+                       "name":  "corrections_on",
+                       "t":  111.06
+                   },
+                   {
+                       "name":  "sensors_restored",
+                       "t":  119.24
+                   }
+               ],
+    "timeline":  [
+                     {
+                         "id":  0,
+                         "t":  0.0,
+                         "kind":  "navigation",
+                         "label":  "INIT",
+                         "mode":  "INIT",
+                         "reason":  "Waiting for a map goal"
+                     },
+                     {
+                         "id":  1,
+                         "t":  0.008,
+                         "kind":  "goal",
+                         "label":  "Goal set",
+                         "goal":  [
+                                      9.0,
+                                      3.0
+                                  ]
+                     },
+                     {
+                         "id":  2,
+                         "t":  0.008,
+                         "kind":  "navigation",
+                         "label":  "HOLD_GUARD",
+                         "mode":  "HOLD_GUARD",
+                         "reason":  "Waiting for a fused pose"
+                     },
+                     {
+                         "id":  3,
+                         "t":  0.06,
+                         "kind":  "navigation",
+                         "label":  "HOLD_GUARD",
+                         "mode":  "HOLD_GUARD",
+                         "reason":  "Position uncertainty exceeds the navigation limit"
+                     },
+                     {
+                         "id":  4,
+                         "t":  0.5,
+                         "kind":  "flags",
+                         "label":  "Sensor check changed",
+                         "flags":  {
+                                       "valid":  false,
+                                       "gps":  false,
+                                       "wheels":  false,
+                                       "gyro":  false,
+                                       "uav":  false
+                                   }
+                     },
+                     {
+                         "id":  5,
+                         "t":  0.5,
+                         "kind":  "ml_policy",
+                         "label":  "Detector persistence",
+                         "policy":  {
+                                        "valid":  false,
+                                        "required":  "3",
+                                        "wheel_count":  "0",
+                                        "gyro_count":  "0",
+                                        "wheel_flag":  "False",
+                                        "gyro_flag":  "False",
+                                        "decision_stamp":  "0.5"
+                                    }
+                     },
+                     {
+                         "id":  6,
+                         "t":  2.068,
+                         "kind":  "navigation",
+                         "label":  "HOLD_GUARD",
+                         "mode":  "HOLD_GUARD",
+                         "reason":  "Waiting for a fresh map path"
+                     },
+                     {
+                         "id":  7,
+                         "t":  5.54,
+                         "kind":  "flags",
+                         "label":  "Sensor check changed",
+                         "flags":  {
+                                       "valid":  true,
+                                       "gps":  false,
+                                       "wheels":  false,
+                                       "gyro":  false,
+                                       "uav":  true
+                                   }
+                     },
+                     {
+                         "id":  8,
+                         "t":  5.54,
+                         "kind":  "ml_policy",
+                         "label":  "Detector persistence",
+                         "policy":  {
+                                        "valid":  true,
+                                        "required":  "3",
+                                        "wheel_count":  "0",
+                                        "gyro_count":  "0",
+                                        "wheel_flag":  "False",
+                                        "gyro_flag":  "False",
+                                        "decision_stamp":  "5.46"
+                                    }
+                     },
+                     {
+                         "id":  9,
+                         "t":  15.532,
+                         "kind":  "flags",
+                         "label":  "Sensor check changed",
+                         "flags":  {
+                                       "valid":  true,
+                                       "gps":  false,
+                                       "wheels":  false,
+                                       "gyro":  false,
+                                       "uav":  false
+                                   }
+                     },
+                     {
+                         "id":  10,
+                         "t":  19.86,
+                         "kind":  "navigation",
+                         "label":  "NAVIGATE",
+                         "mode":  "NAVIGATE",
+                         "reason":  "Following path using the fused pose"
+                     },
+                     {
+                         "id":  11,
+                         "t":  31.904,
+                         "kind":  "block",
+                         "label":  "Live block added",
+                         "obstacle":  {
+                                          "id":  "scenario_live_block_1",
+                                          "kind":  "box",
+                                          "x":  0.64,
+                                          "y":  2.66,
+                                          "half_x":  0.3,
+                                          "half_y":  0.3,
+                                          "yaw":  0.0
+                                      }
+                     },
+                     {
+                         "id":  12,
+                         "t":  42.54,
+                         "kind":  "scenario",
+                         "label":  "Timed block spawned",
+                         "obstacle":  {
+                                          "id":  "scenario_slalom_box",
+                                          "kind":  "box",
+                                          "x":  7.1,
+                                          "y":  1.0,
+                                          "half_x":  0.3,
+                                          "half_y":  0.3,
+                                          "yaw":  0.0
+                                      }
+                     },
+                     {
+                         "id":  13,
+                         "t":  52.048,
+                         "kind":  "ml_policy",
+                         "label":  "Detector persistence",
+                         "policy":  {
+                                        "valid":  true,
+                                        "required":  "3",
+                                        "wheel_count":  "0",
+                                        "gyro_count":  "1",
+                                        "wheel_flag":  "False",
+                                        "gyro_flag":  "False",
+                                        "decision_stamp":  "51.948"
+                                    }
+                     },
+                     {
+                         "id":  14,
+                         "t":  52.6,
+                         "kind":  "ml_policy",
+                         "label":  "Detector persistence",
+                         "policy":  {
+                                        "valid":  true,
+                                        "required":  "3",
+                                        "wheel_count":  "0",
+                                        "gyro_count":  "0",
+                                        "wheel_flag":  "False",
+                                        "gyro_flag":  "False",
+                                        "decision_stamp":  "52.468"
+                                    }
+                     },
+                     {
+                         "id":  15,
+                         "t":  53.584,
+                         "kind":  "ml_policy",
+                         "label":  "Detector persistence",
+                         "policy":  {
+                                        "valid":  true,
+                                        "required":  "3",
+                                        "wheel_count":  "0",
+                                        "gyro_count":  "1",
+                                        "wheel_flag":  "False",
+                                        "gyro_flag":  "False",
+                                        "decision_stamp":  "53.456"
+                                    }
+                     },
+                     {
+                         "id":  16,
+                         "t":  54.092,
+                         "kind":  "ml_policy",
+                         "label":  "Detector persistence",
+                         "policy":  {
+                                        "valid":  true,
+                                        "required":  "3",
+                                        "wheel_count":  "0",
+                                        "gyro_count":  "0",
+                                        "wheel_flag":  "False",
+                                        "gyro_flag":  "False",
+                                        "decision_stamp":  "53.976"
+                                    }
+                     },
+                     {
+                         "id":  17,
+                         "t":  55.56,
+                         "kind":  "ml_policy",
+                         "label":  "Detector persistence",
+                         "policy":  {
+                                        "valid":  true,
+                                        "required":  "3",
+                                        "wheel_count":  "1",
+                                        "gyro_count":  "0",
+                                        "wheel_flag":  "False",
+                                        "gyro_flag":  "False",
+                                        "decision_stamp":  "55.48"
+                                    }
+                     },
+                     {
+                         "id":  18,
+                         "t":  56.072,
+                         "kind":  "ml_policy",
+                         "label":  "Detector persistence",
+                         "policy":  {
+                                        "valid":  true,
+                                        "required":  "3",
+                                        "wheel_count":  "0",
+                                        "gyro_count":  "0",
+                                        "wheel_flag":  "False",
+                                        "gyro_flag":  "False",
+                                        "decision_stamp":  "55.952"
+                                    }
+                     },
+                     {
+                         "id":  19,
+                         "t":  78.944,
+                         "kind":  "navigation",
+                         "label":  "GOAL",
+                         "mode":  "GOAL",
+                         "reason":  "UGV reached global goal tolerance"
+                     },
+                     {
+                         "id":  20,
+                         "t":  79.456,
+                         "kind":  "goal",
+                         "label":  "Goal set",
+                         "goal":  [
+                                      -10.0,
+                                      -3.0
+                                  ]
+                     },
+                     {
+                         "id":  21,
+                         "t":  79.5,
+                         "kind":  "control",
+                         "label":  "Sensor noise 3.0x",
+                         "control":  "noise_scale",
+                         "value":  3.0
+                     },
+                     {
+                         "id":  22,
+                         "t":  79.5,
+                         "kind":  "navigation",
+                         "label":  "HOLD_GUARD",
+                         "mode":  "HOLD_GUARD",
+                         "reason":  "Waiting for a fresh map path"
+                     },
+                     {
+                         "id":  23,
+                         "t":  79.692,
+                         "kind":  "navigation",
+                         "label":  "NAVIGATE",
+                         "mode":  "NAVIGATE",
+                         "reason":  "Following path using the fused pose"
+                     },
+                     {
+                         "id":  24,
+                         "t":  81.556,
+                         "kind":  "flags",
+                         "label":  "Sensor check changed",
+                         "flags":  {
+                                       "valid":  true,
+                                       "gps":  true,
+                                       "wheels":  false,
+                                       "gyro":  false,
+                                       "uav":  false
+                                   }
+                     },
+                     {
+                         "id":  25,
+                         "t":  86.552,
+                         "kind":  "flags",
+                         "label":  "Sensor check changed",
+                         "flags":  {
+                                       "valid":  true,
+                                       "gps":  false,
+                                       "wheels":  false,
+                                       "gyro":  false,
+                                       "uav":  false
+                                   }
+                     },
+                     {
+                         "id":  26,
+                         "t":  90.072,
+                         "kind":  "flags",
+                         "label":  "Sensor check changed",
+                         "flags":  {
+                                       "valid":  true,
+                                       "gps":  true,
+                                       "wheels":  false,
+                                       "gyro":  false,
+                                       "uav":  false
+                                   }
+                     },
+                     {
+                         "id":  27,
+                         "t":  90.564,
+                         "kind":  "flags",
+                         "label":  "Sensor check changed",
+                         "flags":  {
+                                       "valid":  true,
+                                       "gps":  false,
+                                       "wheels":  false,
+                                       "gyro":  false,
+                                       "uav":  false
+                                   }
+                     },
+                     {
+                         "id":  28,
+                         "t":  91.6,
+                         "kind":  "control",
+                         "label":  "Sensor noise 1.0x",
+                         "control":  "noise_scale",
+                         "value":  1.0
+                     },
+                     {
+                         "id":  29,
+                         "t":  94.7,
+                         "kind":  "control",
+                         "label":  "UGV GPS off",
+                         "control":  "gps_enabled",
+                         "value":  false
+                     },
+                     {
+                         "id":  30,
+                         "t":  96.032,
+                         "kind":  "flags",
+                         "label":  "Sensor check changed",
+                         "flags":  {
+                                       "valid":  true,
+                                       "gps":  true,
+                                       "wheels":  false,
+                                       "gyro":  false,
+                                       "uav":  false
+                                   }
+                     },
+                     {
+                         "id":  31,
+                         "t":  97.028,
+                         "kind":  "ml_policy",
+                         "label":  "Detector persistence",
+                         "policy":  {
+                                        "valid":  true,
+                                        "required":  "3",
+                                        "wheel_count":  "0",
+                                        "gyro_count":  "1",
+                                        "wheel_flag":  "False",
+                                        "gyro_flag":  "False",
+                                        "decision_stamp":  "96.98"
+                                    }
+                     },
+                     {
+                         "id":  32,
+                         "t":  97.548,
+                         "kind":  "ml_policy",
+                         "label":  "Detector persistence",
+                         "policy":  {
+                                        "valid":  true,
+                                        "required":  "3",
+                                        "wheel_count":  "0",
+                                        "gyro_count":  "0",
+                                        "wheel_flag":  "False",
+                                        "gyro_flag":  "False",
+                                        "decision_stamp":  "97.448"
+                                    }
+                     },
+                     {
+                         "id":  33,
+                         "t":  99.564,
+                         "kind":  "ml_policy",
+                         "label":  "Detector persistence",
+                         "policy":  {
+                                        "valid":  true,
+                                        "required":  "3",
+                                        "wheel_count":  "1",
+                                        "gyro_count":  "0",
+                                        "wheel_flag":  "False",
+                                        "gyro_flag":  "False",
+                                        "decision_stamp":  "99.476"
+                                    }
+                     },
+                     {
+                         "id":  34,
+                         "t":  100.04,
+                         "kind":  "ml_policy",
+                         "label":  "Detector persistence",
+                         "policy":  {
+                                        "valid":  true,
+                                        "required":  "3",
+                                        "wheel_count":  "0",
+                                        "gyro_count":  "0",
+                                        "wheel_flag":  "False",
+                                        "gyro_flag":  "False",
+                                        "decision_stamp":  "99.98"
+                                    }
+                     },
+                     {
+                         "id":  35,
+                         "t":  102.9,
+                         "kind":  "control",
+                         "label":  "UAV corrections off",
+                         "control":  "uav_assistance",
+                         "value":  false
+                     },
+                     {
+                         "id":  36,
+                         "t":  107.756,
+                         "kind":  "navigation",
+                         "label":  "HOLD_GUARD",
+                         "mode":  "HOLD_GUARD",
+                         "reason":  "Position uncertainty exceeds the navigation limit"
+                     },
+                     {
+                         "id":  37,
+                         "t":  111.1,
+                         "kind":  "control",
+                         "label":  "UAV corrections on",
+                         "control":  "uav_assistance",
+                         "value":  true
+                     },
+                     {
+                         "id":  38,
+                         "t":  111.3,
+                         "kind":  "navigation",
+                         "label":  "HOLD_GUARD",
+                         "mode":  "HOLD_GUARD",
+                         "reason":  "Waiting for a fresh map path"
+                     },
+                     {
+                         "id":  39,
+                         "t":  113.492,
+                         "kind":  "navigation",
+                         "label":  "NAVIGATE",
+                         "mode":  "NAVIGATE",
+                         "reason":  "Following path using the fused pose"
+                     },
+                     {
+                         "id":  40,
+                         "t":  119.3,
+                         "kind":  "block_removed",
+                         "label":  "Live block removed",
+                         "obstacle":  {
+                                          "id":  "scenario_live_block_1",
+                                          "kind":  "box",
+                                          "x":  0.64,
+                                          "y":  2.66,
+                                          "half_x":  0.3,
+                                          "half_y":  0.3,
+                                          "yaw":  0.0
+                                      }
+                     },
+                     {
+                         "id":  41,
+                         "t":  119.308,
+                         "kind":  "control",
+                         "label":  "UGV GPS on",
+                         "control":  "gps_enabled",
+                         "value":  true
+                     },
+                     {
+                         "id":  42,
+                         "t":  119.308,
+                         "kind":  "restore",
+                         "label":  "Sensors restored"
+                     },
+                     {
+                         "id":  43,
+                         "t":  119.576,
+                         "kind":  "flags",
+                         "label":  "Sensor check changed",
+                         "flags":  {
+                                       "valid":  true,
+                                       "gps":  false,
+                                       "wheels":  false,
+                                       "gyro":  false,
+                                       "uav":  false
+                                   }
+                     },
+                     {
+                         "id":  44,
+                         "t":  121.552,
+                         "kind":  "flags",
+                         "label":  "Sensor check changed",
+                         "flags":  {
+                                       "valid":  true,
+                                       "gps":  true,
+                                       "wheels":  false,
+                                       "gyro":  false,
+                                       "uav":  false
+                                   }
+                     },
+                     {
+                         "id":  45,
+                         "t":  121.556,
+                         "kind":  "ml_policy",
+                         "label":  "Detector persistence",
+                         "policy":  {
+                                        "valid":  true,
+                                        "required":  "3",
+                                        "wheel_count":  "0",
+                                        "gyro_count":  "1",
+                                        "wheel_flag":  "False",
+                                        "gyro_flag":  "False",
+                                        "decision_stamp":  "121.472"
+                                    }
+                     },
+                     {
+                         "id":  46,
+                         "t":  122.052,
+                         "kind":  "ml_policy",
+                         "label":  "Detector persistence",
+                         "policy":  {
+                                        "valid":  true,
+                                        "required":  "3",
+                                        "wheel_count":  "0",
+                                        "gyro_count":  "0",
+                                        "wheel_flag":  "False",
+                                        "gyro_flag":  "False",
+                                        "decision_stamp":  "121.98"
+                                    }
+                     },
+                     {
+                         "id":  47,
+                         "t":  124.556,
+                         "kind":  "flags",
+                         "label":  "Sensor check changed",
+                         "flags":  {
+                                       "valid":  true,
+                                       "gps":  false,
+                                       "wheels":  false,
+                                       "gyro":  false,
+                                       "uav":  false
+                                   }
+                     },
+                     {
+                         "id":  48,
+                         "t":  126.052,
+                         "kind":  "flags",
+                         "label":  "Sensor check changed",
+                         "flags":  {
+                                       "valid":  true,
+                                       "gps":  true,
+                                       "wheels":  false,
+                                       "gyro":  false,
+                                       "uav":  false
+                                   }
+                     }
+                 ],
+    "errors":  {
+                   "course":  {
+                                  "cooperative":  {
+                                                      "count":  227,
+                                                      "mean_m":  0.04310192250306733,
+                                                      "max_m":  0.0991811619533189,
+                                                      "stddev_m":  0.019428139657155317,
+                                                      "first_m":  0.033661605272429965,
+                                                      "last_m":  0.08289483478372023
+                                                  },
+                                  "baseline":  {
+                                                   "count":  227,
+                                                   "mean_m":  0.3280940820078485,
+                                                   "max_m":  0.8730241973649873,
+                                                   "stddev_m":  0.1647027503933812,
+                                                   "first_m":  0.495958223746837,
+                                                   "last_m":  0.21688699133870246
+                                               },
+                                  "cooperative_sigma":  {
+                                                            "first_m":  0.09358037313050481,
+                                                            "max_m":  0.1404806057967835,
+                                                            "last_m":  0.11957146610871412
+                                                        }
+                              },
+                   "noise":  {
+                                 "cooperative":  {
+                                                     "count":  47,
+                                                     "mean_m":  0.05004577623492513,
+                                                     "max_m":  0.0839893423925504,
+                                                     "stddev_m":  0.015753393851357902,
+                                                     "first_m":  0.05934801206591353,
+                                                     "last_m":  0.05584846587556939
+                                                 },
+                                 "baseline":  {
+                                                  "count":  47,
+                                                  "mean_m":  0.4812619691327667,
+                                                  "max_m":  0.9700771763259971,
+                                                  "stddev_m":  0.30871079770237747,
+                                                  "first_m":  0.3689955969489924,
+                                                  "last_m":  0.21333126566225608
+                                              },
+                                 "cooperative_sigma":  {
+                                                           "first_m":  0.10180441300592105,
+                                                           "max_m":  0.13408432568538045,
+                                                           "last_m":  0.11185549921669037
+                                                       }
+                             },
+                   "nominal":  {
+                                   "cooperative":  {
+                                                       "count":  12,
+                                                       "mean_m":  0.04504074620475663,
+                                                       "max_m":  0.06319281372278819,
+                                                       "stddev_m":  0.013469188385562617,
+                                                       "first_m":  0.06319281372278819,
+                                                       "last_m":  0.029453255755474108
+                                                   },
+                                   "baseline":  {
+                                                    "count":  12,
+                                                    "mean_m":  0.2843310807261295,
+                                                    "max_m":  0.46627869695897195,
+                                                    "stddev_m":  0.12286471214015181,
+                                                    "first_m":  0.2271474286933691,
+                                                    "last_m":  0.46627869695897195
+                                                },
+                                   "cooperative_sigma":  {
+                                                             "first_m":  0.1046585576591756,
+                                                             "max_m":  0.13127612950538617,
+                                                             "last_m":  0.13127612950538617
+                                                         }
+                               },
+                   "gps_off":  {
+                                   "cooperative":  {
+                                                       "count":  32,
+                                                       "mean_m":  0.03098177706420866,
+                                                       "max_m":  0.060220976785722795,
+                                                       "stddev_m":  0.015661661673290785,
+                                                       "first_m":  0.019006241114768053,
+                                                       "last_m":  0.029999627919832846
+                                                   },
+                                   "baseline":  {
+                                                    "count":  32,
+                                                    "mean_m":  0.32131421348779077,
+                                                    "max_m":  0.34549067061894817,
+                                                    "stddev_m":  0.01205726417396125,
+                                                    "first_m":  0.3016407524414778,
+                                                    "last_m":  0.3038993985998573
+                                                },
+                                   "cooperative_sigma":  {
+                                                             "first_m":  0.11983404192294968,
+                                                             "max_m":  0.1319880133738461,
+                                                             "last_m":  0.09653257778903895
+                                                         }
+                               },
+                   "corrections_off":  {
+                                           "cooperative":  {
+                                                               "count":  31,
+                                                               "mean_m":  0.024754658721300806,
+                                                               "max_m":  0.04187975695720673,
+                                                               "stddev_m":  0.0072202974031004155,
+                                                               "first_m":  0.026287659549397054,
+                                                               "last_m":  0.019779871977425863
+                                                           },
+                                           "baseline":  {
+                                                            "count":  31,
+                                                            "mean_m":  0.30661182005548776,
+                                                            "max_m":  0.3286340418176473,
+                                                            "stddev_m":  0.011193081419133076,
+                                                            "first_m":  0.30108719339030965,
+                                                            "last_m":  0.3259191357120462
+                                                        },
+                                           "cooperative_sigma":  {
+                                                                     "first_m":  0.1881165931464258,
+                                                                     "max_m":  0.6468645486878615,
+                                                                     "last_m":  0.6468645486878615
+                                                                 }
+                                       },
+                   "corrections_on":  {
+                                          "cooperative":  {
+                                                              "count":  32,
+                                                              "mean_m":  0.038749098226051375,
+                                                              "max_m":  0.05391616944226333,
+                                                              "stddev_m":  0.009928293678089957,
+                                                              "first_m":  0.018005826012245246,
+                                                              "last_m":  0.05352482713074362
+                                                          },
+                                          "baseline":  {
+                                                           "count":  32,
+                                                           "mean_m":  0.325123725472791,
+                                                           "max_m":  0.3633430297845682,
+                                                           "stddev_m":  0.016173923010526687,
+                                                           "first_m":  0.3157897663230274,
+                                                           "last_m":  0.3633430297845682
+                                                       },
+                                          "cooperative_sigma":  {
+                                                                    "first_m":  0.12878333471777242,
+                                                                    "max_m":  0.131656933819846,
+                                                                    "last_m":  0.13017610118527298
+                                                                }
+                                      },
+                   "sensors_restored":  {
+                                            "cooperative":  {
+                                                                "count":  31,
+                                                                "mean_m":  0.03833349072284307,
+                                                                "max_m":  0.06307065438207442,
+                                                                "stddev_m":  0.015280521596815779,
+                                                                "first_m":  0.053281292883343975,
+                                                                "last_m":  0.06307065438207442
+                                                            },
+                                            "baseline":  {
+                                                             "count":  31,
+                                                             "mean_m":  0.5855060489462687,
+                                                             "max_m":  1.3029850664350577,
+                                                             "stddev_m":  0.23151222773698316,
+                                                             "first_m":  0.37306067213452493,
+                                                             "last_m":  0.5077492581554879
+                                                         },
+                                            "cooperative_sigma":  {
+                                                                      "first_m":  0.12355884558160653,
+                                                                      "max_m":  0.12995098918062342,
+                                                                      "last_m":  0.0943382153312844
+                                                                  }
+                                        }
+               },
+    "duration":  {
+                     "wall_s":  130.04,
+                     "simulation_s":  127.48
+                 },
+    "validation":  {
+                       "runtime":  "Ubuntu-22.04 WSL / ROS 2 Humble / Gazebo Harmonic / PX4 SITL / MicroXRCEAgent",
+                       "packages":  [
+                                        "fault_management",
+                                        "mission_manager",
+                                        "uav_sensing"
+                                    ],
+                       "registered_checks":  269,
+                       "errors":  0,
+                       "failures":  0,
+                       "cppcheck_skips":  3,
+                       "desktop_viewport":  [
+                                                1440,
+                                                960
+                                            ],
+                       "mobile_viewport":  [
+                                               390,
+                                               844
+                                           ],
+                       "browser_javascript_errors":  0,
+                       "horizontal_overflow":  false,
+                       "owned_simulation_processes_remaining":  0
+                   }
+}

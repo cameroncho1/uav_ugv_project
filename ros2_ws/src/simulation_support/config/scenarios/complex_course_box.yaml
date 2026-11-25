@@ -1,0 +1,16 @@
+schema_version: 1
+id: complex_course_box_v1
+world: simple_goal_demo
+frame: map
+trigger: first_drive_command
+obstacles:
+  # Dark box dropped in the slalom exit while the UGV is still approaching the wall gap.
+  - id: slalom_box
+    shape: box
+    size: [0.6, 0.6, 0.4]
+    pose: [7.1, 1.0, 0.2, 0.0]
+operations:
+  - id: add_slalom_box
+    at_s: 22.0
+    action: spawn
+    obstacle: slalom_box
