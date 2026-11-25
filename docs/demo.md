@@ -8,6 +8,8 @@
 
 ## Run and record
 
+- For a scripted silent video while continuing to use the Windows desktop, use the [private-display recording workflow](demo_recording.md). It runs Gazebo on an isolated virtual Linux display, captures the dashboard headlessly, and assembles both chronological chapters with explicit pacing and evidence.
+
 - Build in Linux using the [goal demo instructions](../README_simple_goal_demo.md#build) or [WSL reproduction](demo_validation.md#wsl-reproduction). Runtime dependencies are Ubuntu-22.04, ROS 2 Humble, Gazebo Harmonic, PX4 SITL and MicroXRCEAgent. Windows provides editing and Git. The dashboard needs no Node runtime.
 - Start chapter 1 from the built repository root:
 
