@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "description": "Five explanatory callouts for the existing virtual-20261124-take4 edit. Coordinates are pixels in the 1920x1080 source; times are playback seconds.",
+  "expected_video": {"width": 1920, "height": 1080, "duration_s": 240, "frame_rate": "24/1", "frames": 5760},
+  "style": {"font": "Arial", "font_size": 28, "detail_size": 23, "panel": "#101b27", "border": "#c0d3e1", "text": "#f6f9fc", "pointer_width": 2},
+  "callouts": [
+    {
+      "id": "camera-obstacle", "start_s": 26, "end_s": 31, "review_s": 28.5,
+      "text": ["Camera detects the obstacle."],
+      "box": {"x": 754, "y": 254, "width": 430, "height": 72},
+      "pointer": [[1048, 326], [1048, 427]],
+      "target": {"x": 1048, "y": 427, "description": "Gray occupied camera-map cell above the live block's red placement outline and left of its label; not purple clearance."}
+    },
+    {
+      "id": "two-estimates", "start_s": 101, "end_s": 107, "review_s": 104,
+      "text": ["Same robot, two estimates.", "Blue: with UAV · Orange: without UAV"],
+      "box": {"x": 766, "y": 232, "width": 472, "height": 100},
+      "pointer": [[1100, 332], [1100, 480]],
+      "target": {"x": 1100, "y": 488, "description": "Adjacent blue cooperative and orange baseline tracks on the first route bend. Pointer stops above both tracks."}
+    },
+    {
+      "id": "three-decisions", "start_s": 179.25, "end_s": 183.25, "review_s": 181,
+      "text": ["Three flagged decisions", "trigger the hold."],
+      "box": {"x": 1110, "y": 205, "width": 430, "height": 78},
+      "pointer": [[1110, 258], [1075, 299]],
+      "target": {"x": 1038, "y": 306, "description": "Live 3 / 3 consecutive flagged-decision counter while FAULT and Holding are visible. Pointer stops beside the number."}
+    },
+    {
+      "id": "stopped-robot", "start_s": 183.5, "end_s": 187.5, "review_s": 185.5,
+      "text": ["Wheel fault stops the robot."],
+      "box": {"x": 70, "y": 444, "width": 460, "height": 72},
+      "pointer": [[353, 444], [353, 374]],
+      "target": {"x": 353, "y": 350, "description": "Stopped physical UGV in Gazebo. Dashboard still shows FAULT and Holding; the supervisor owns the hold command."}
+    },
+    {
+      "id": "goal-reached", "start_s": 232, "end_s": 238, "review_s": 235,
+      "text": ["Fault cleared. Goal reached."],
+      "box": {"x": 1110, "y": 205, "width": 430, "height": 72},
+      "pointer": [[1320, 277], [1320, 286]],
+      "target": {"x": 1320, "y": 306, "description": "Published detector flag reads Clear, navigation reads Goal reached, and the physical UGV is inside the goal ring."}
+    }
+  ]
+}
