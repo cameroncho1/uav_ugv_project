@@ -82,17 +82,28 @@ wsl -d Ubuntu-22.04 -e python3 "/mnt/c/Users/Rylan Wade/Desktop/CS513-CPS/uav_ug
 
 ## Annotate the existing edit
 
-- `scripts/annotate_demo_video.cjs` adds five timed vector callout bubbles to the existing MP4. It uses Windows Node, Playwright Chromium, ffmpeg and ffprobe from the dependencies above; it starts no simulation or recording. The [annotation timeline](../scripts/config/demo_annotations.json) is specific to the 240-second `virtual-20261124-take4` edit and its 1920x1080 layout.
-- Run from the repository in PowerShell, with a new output filename outside Git:
+- `scripts/annotate_demo_video.cjs` adds timed vector explanations to the existing MP4. It uses Windows Node, Playwright Chromium, ffmpeg and ffprobe from the dependencies above; it starts no simulation or recording. The [annotation timeline](../scripts/config/demo_annotations.json) identifies the unannotated 240-second `virtual-20261124-take4` source by SHA-256 and uses its 1920x1080 layout.
+- Run from the repository in PowerShell, with a new output filename outside Git. Preview mode composites each explanation over its matching original frame without encoding an MP4:
 
   ```powershell
   node --check scripts/annotate_demo_video.cjs
   node scripts/annotate_demo_video.cjs `
     --input '..\demo_recordings\virtual-20261124-take4\uav-ugv-demo.mp4' `
-    --output '..\demo_recordings\virtual-20261124-take4\uav-ugv-demo-annotated-final.mp4'
+    --output '..\demo_recordings\virtual-20261124-take4\uav-ugv-demo-explained.mp4' `
+    --mode preview
   ```
 
-- The renderer rejects identical input/output paths and existing output/manifest files. It hashes the original before and after, writes a separate MP4, and preserves chronological playback, all source frames, existing captions and wall-time disclosures. It adds no audio and changes no measurements, model outputs or navigation states. Encoding uses H.264 CRF 18; pixels outside the overlays can differ through video compression.
-- Exactly five nonoverlapping bubbles explain the gray camera obstacle cells (26–31 s), blue/orange pose estimates (101–107 s), three-decision persistence rule (179.25–183.25 s), stopped physical UGV (183.5–187.5 s), and cleared fault with goal arrival (232–238 s). The pointer for the stopped robot appears while both **FAULT** and **Holding** are visible. The supervisor owns the hold command; the detector supplies the flag.
-- The adjacent `uav-ugv-demo-annotated-final.annotations.json` records all five texts, target descriptions, pixel coordinates and time spans; source/result SHA-256 hashes and ffprobe metadata; `original_unchanged`; exact duration, geometry, frame count and silence checks; and full-decode status. A uniquely named adjacent artifacts directory contains the vector/transparent PNG overlays, exact FFmpeg arguments, render/decode logs, and five `review-*.png` frames extracted from the final MP4. Inspect those frames for target placement and uncovered readouts. Existing review artifacts remain intact on subsequent runs.
-- Annotation changes touch no ROS package. Validation consists of script syntax, the actual full encode, ffprobe checks for 240 seconds / 1920x1080 / 24 fps / 5760 frames / no audio, full FFmpeg decode, five-callout validation, original-hash equality, and visual review.
+- Inspect the five `preview-*.png` images listed in the adjacent `.preview.json`. Encode the reviewed timeline with the same unused output name:
+
+  ```powershell
+  node scripts/annotate_demo_video.cjs `
+    --input '..\demo_recordings\virtual-20261124-take4\uav-ugv-demo.mp4' `
+    --output '..\demo_recordings\virtual-20261124-take4\uav-ugv-demo-explained.mp4'
+  ```
+
+- The renderer rejects identical input/output paths and existing output/sidecar files. The default timeline accepts only the unannotated original with SHA-256 `a31f8aca96d12792ebb39f74bfdb8ea29e7a32232e2a14b717b7dfbb479ab85c`. It verifies the original and both existing annotated MP4 hashes before and after preview/render. The new MP4 preserves chronological playback, source frame count, existing captions and wall-time disclosures. It adds no audio and changes no measurements, model outputs or navigation states. Encoding uses H.264 CRF 18; pixels outside the overlays can differ through video compression.
+- Five nonoverlapping explanations establish one robot with two estimates and the controlling estimate (3–13 s), the downward-camera map and planned route versus position histories (15–25 s), noisy UGV GPS dots (40–48 s), measured wheel speed paired with controller commands (166–176 s), and the 100-sample checks counted by 3/3 (176–186 s). The early track key appears before the first detour. The yellow key identifies fading GPS fixes without pointing at a disappearing dot. ML explanations occupy empty Gazebo ground below the robot and keep all plots, scores, detector flags and supervisor states visible.
+- Each wheel-model window pairs the latest 100 measured forward-speed samples with drive commands interpolated to their acquisition times. Inference runs every 0.5 simulation seconds over overlapping windows. Persistence counts three distinct consecutive flagged decisions with increasing decision stamps; repeated windows do not count again. The score is a classifier output, not calibrated confidence. These are the existing [detector](../ros2_ws/src/fault_management/scripts/sensor_fault_detector.py) and [reference/persistence](../ros2_ws/src/fault_management/scripts/sensor_fault_model.py) semantics; the overlays change presentation only.
+- The adjacent `uav-ugv-demo-explained.annotations.json` records all text, target descriptions, purposes, pixel coordinates and time spans; configuration/source/result SHA-256 hashes; protected-video hash equality; ffprobe metadata; exact duration, geometry, frame count and silence checks; and full-decode status. `uav-ugv-demo-explained.annotations.md` supplies the human-readable explanation timeline for later voiceover. The original `voiceover-cues.md` retains the underlying event cues.
+- A uniquely named adjacent artifacts directory contains SVG/transparent PNG overlays, exact FFmpeg arguments, render/decode logs, five `review-*.png` images from the encoded MP4, and eight `outside-*.png` images without callouts. Browser bounds checks reject text that exceeds its panel. The renderer supports one to eight nonoverlapping callouts, six to ten seconds each, with up to six text lines and configurable color runs. The default edit uses five.
+- Annotation changes touch no ROS package. Validation consists of script syntax, previews, the actual full encode, ffprobe checks for 240 seconds / 1920x1080 / 24 fps / 5760 frames / no audio, full FFmpeg decode, timeline/text-boundary checks, all three original-video hash comparisons, overwrite/source rejection checks, and visual review.

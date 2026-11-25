@@ -1,43 +1,76 @@
 {
-  "schema_version": 1,
-  "description": "Five explanatory callouts for the existing virtual-20261124-take4 edit. Coordinates are pixels in the 1920x1080 source; times are playback seconds.",
+  "schema_version": 2,
+  "description": "Five orientation callouts for the unannotated virtual-20261124-take4 edit. Coordinates are source pixels; times are playback seconds.",
+  "source_sha256": "a31f8aca96d12792ebb39f74bfdb8ea29e7a32232e2a14b717b7dfbb479ab85c",
+  "preserve_existing_videos": [
+    {"filename": "uav-ugv-demo-annotated.mp4", "sha256": "fc2ed5a3e2f3ca1f727f37605c7a4e18fce8f877845436fd846b2e971c00222e"},
+    {"filename": "uav-ugv-demo-annotated-final.mp4", "sha256": "6f25f4472bc07ab3883f808d30e4d56222d489cb795784a1e1ec5b76090113f1"}
+  ],
   "expected_video": {"width": 1920, "height": 1080, "duration_s": 240, "frame_rate": "24/1", "frames": 5760},
-  "style": {"font": "Arial", "font_size": 28, "detail_size": 23, "panel": "#101b27", "border": "#c0d3e1", "text": "#f6f9fc", "pointer_width": 2},
+  "style": {"font": "Arial", "heading_size": 28, "font_size": 26, "line_height": 32, "padding_x": 18, "padding_y": 13, "panel": "#101b27", "border": "#c0d3e1", "text": "#f6f9fc", "pointer_width": 2},
+  "outside_review_s": [2, 14, 26, 39, 49, 165, 186, 236],
   "callouts": [
     {
-      "id": "camera-obstacle", "start_s": 26, "end_s": 31, "review_s": 28.5,
-      "text": ["Camera detects the obstacle."],
-      "box": {"x": 754, "y": 254, "width": 430, "height": 72},
-      "pointer": [[1048, 326], [1048, 427]],
-      "target": {"x": 1048, "y": 427, "description": "Gray occupied camera-map cell above the live block's red placement outline and left of its label; not purple clearance."}
+      "id": "one-robot-two-estimates", "start_s": 3, "end_s": 13, "review_s": 8,
+      "text": [
+        "One ground robot. Two position estimates.",
+        "White: actual path (simulator truth).",
+        {"runs": [{"text": "Blue: GPS + wheels + IMU + UAV corrections.", "color": "#55a7fa"}]},
+        {"runs": [{"text": "Orange: GPS + wheels + IMU only.", "color": "#ffac50"}]},
+        "Blue controls the robot; orange is comparison."
+      ],
+      "box": {"x": 744, "y": 214, "width": 805, "height": 182},
+      "pointer": [[846, 396], [846, 548]],
+      "target": {"x": 846, "y": 548, "description": "Early recorded tracks of the same UGV near the start. Actual, cooperative and baseline tracks remain visible below the panel."},
+      "purpose": "Identify one physical robot, simulator truth, both estimators and which estimate controls navigation before the first detour."
     },
     {
-      "id": "two-estimates", "start_s": 101, "end_s": 107, "review_s": 104,
-      "text": ["Same robot, two estimates.", "Blue: with UAV · Orange: without UAV"],
-      "box": {"x": 766, "y": 232, "width": 472, "height": 100},
-      "pointer": [[1100, 332], [1100, 480]],
-      "target": {"x": 1100, "y": 488, "description": "Adjacent blue cooperative and orange baseline tracks on the first route bend. Pointer stops above both tracks."}
+      "id": "camera-map-and-route", "start_s": 15, "end_s": 25, "review_s": 22,
+      "text": [
+        "The drone's downward camera builds this map.",
+        "Gray: detected obstacles. Purple: robot clearance.",
+        {"runs": [{"text": "Dashed cyan: planned route ahead.", "color": "#69e0d0"}]},
+        "White, blue and orange trace past positions."
+      ],
+      "box": {"x": 744, "y": 214, "width": 805, "height": 150},
+      "pointer": [[898, 364], [898, 378]],
+      "target": {"x": 898, "y": 378, "description": "Persistent gray occupied camera-map cells at the upper cylinder. The cyan intended route and recorded position tracks remain visible below."},
+      "purpose": "Explain camera-map provenance, obstacle clearance and the difference between planned motion and recorded position histories."
     },
     {
-      "id": "three-decisions", "start_s": 179.25, "end_s": 183.25, "review_s": 181,
-      "text": ["Three flagged decisions", "trigger the hold."],
-      "box": {"x": 1110, "y": 205, "width": 430, "height": 78},
-      "pointer": [[1110, 258], [1075, 299]],
-      "target": {"x": 1038, "y": 306, "description": "Live 3 / 3 consecutive flagged-decision counter while FAULT and Holding are visible. Pointer stops beside the number."}
+      "id": "gps-position-readings", "start_s": 40, "end_s": 48, "review_s": 44,
+      "text": [
+        {"runs": [{"text": "Yellow dots: GPS readings from the ground robot.", "color": "#ecd574"}]},
+        "Their spread shows simulated measurement noise."
+      ],
+      "box": {"x": 744, "y": 815, "width": 805, "height": 92},
+      "target": {"description": "The persistent yellow color key identifies the GPS scatter. No pointer follows an individual fix because plotted dots fade after six browser wall seconds."},
+      "purpose": "Identify noisy UGV GPS position reports well before the noise and outage controls."
     },
     {
-      "id": "stopped-robot", "start_s": 183.5, "end_s": 187.5, "review_s": 185.5,
-      "text": ["Wheel fault stops the robot."],
-      "box": {"x": 70, "y": 444, "width": 460, "height": 72},
-      "pointer": [[353, 444], [353, 374]],
-      "target": {"x": 353, "y": 350, "description": "Stopped physical UGV in Gazebo. Dashboard still shows FAULT and Holding; the supervisor owns the hold command."}
+      "id": "paired-speed-windows", "start_s": 166, "end_s": 176, "review_s": 170,
+      "text": [
+        "Paired speeds are the model's input.",
+        {"runs": [{"text": "Orange: measured wheel speed.", "color": "#ffac50"}]},
+        {"runs": [{"text": "Cyan: speed requested by the drive controller.", "color": "#69e0d0"}]},
+        "A window pairs the latest 100 wheel samples",
+        "with commands at matching sample times."
+      ],
+      "box": {"x": 24, "y": 389, "width": 660, "height": 182},
+      "target": {"description": "Orange measured wheel speed and cyan command reference in the upper ML plot. The panel sits on empty Gazebo ground below the physical robot; dashboard plots and telemetry remain visible."},
+      "purpose": "Define the controller command as the wheel-speed reference and explain the 100 acquisition-matched paired samples at ML chapter entry."
     },
     {
-      "id": "goal-reached", "start_s": 232, "end_s": 238, "review_s": 235,
-      "text": ["Fault cleared. Goal reached."],
-      "box": {"x": 1110, "y": 205, "width": 430, "height": 72},
-      "pointer": [[1320, 277], [1320, 286]],
-      "target": {"x": 1320, "y": 306, "description": "Published detector flag reads Clear, navigation reads Goal reached, and the physical UGV is inside the goal ring."}
+      "id": "what-three-checks-count", "start_s": 176, "end_s": 186, "review_s": 181,
+      "text": [
+        "Each model check scores a window",
+        "of 100 wheel samples.",
+        {"runs": [{"text": "3/3", "color": "#55a7fa"}, {"text": " counts three consecutive wheel"}]},
+        "checks above 0.50. The windows overlap."
+      ],
+      "box": {"x": 24, "y": 405, "width": 660, "height": 150},
+      "target": {"description": "The live wheel-score and consecutive-window counter at the top of the dashboard. This panel begins before the first recorded 3/3 published fault."},
+      "purpose": "Explain that three counts distinct consecutive model decisions over overlapping wheel-speed windows, rather than sensors, fault types, training failures or trials."
     }
   ]
 }
