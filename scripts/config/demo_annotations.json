@@ -13,7 +13,7 @@
     {
       "id": "one-robot-two-estimates", "start_s": 3, "end_s": 13, "review_s": 8,
       "text": [
-        "One ground robot. Two position estimates.",
+        "Two position estimates.",
         "White: actual path (simulator truth).",
         {"runs": [{"text": "Blue: GPS + wheels + IMU + UAV corrections.", "color": "#55a7fa"}]},
         {"runs": [{"text": "Orange: GPS + wheels + IMU only.", "color": "#ffac50"}]},
@@ -63,14 +63,15 @@
     {
       "id": "what-three-checks-count", "start_s": 176, "end_s": 186, "review_s": 181,
       "text": [
-        "Each model check scores a window",
-        "of 100 wheel samples.",
-        {"runs": [{"text": "3/3", "color": "#55a7fa"}, {"text": " counts three consecutive wheel"}]},
-        "checks above 0.50. The windows overlap."
+        "Each check uses the latest 100",
+        "wheel speed readings.",
+        {"runs": [{"text": "3/3", "color": "#55a7fa"}, {"text": " means three checks in a row"}]},
+        "detect a fault.",
+        "A clean check resets the count."
       ],
-      "box": {"x": 24, "y": 405, "width": 660, "height": 150},
+      "box": {"x": 24, "y": 389, "width": 660, "height": 182},
       "target": {"description": "The live wheel-score and consecutive-window counter at the top of the dashboard. This panel begins before the first recorded 3/3 published fault."},
-      "purpose": "Explain that three counts distinct consecutive model decisions over overlapping wheel-speed windows, rather than sensors, fault types, training failures or trials."
+      "purpose": "Explain that each model check uses 100 recent wheel speed readings, the counter counts consecutive fault detections, and a clean check resets it."
     }
   ]
 }
